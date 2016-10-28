@@ -249,4 +249,4 @@ let TableMarkersLayer = React.createClass({
 
 });
 
-module.exports = TableMarkersLayer;
+export default TableMarkersLayer;

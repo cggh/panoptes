@@ -28,4 +28,4 @@ let SidebarHeader = React.createClass({
   }
 });
 
-module.exports = SidebarHeader;
+export default SidebarHeader;

@@ -235,4 +235,4 @@ let QueryPicker = React.createClass({
 
 });
 
-module.exports = QueryPicker;
+export default QueryPicker;

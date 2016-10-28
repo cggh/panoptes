@@ -42,4 +42,4 @@ let EmptyTab = React.createClass({
   }
 });
 
-module.exports = EmptyTab;
+export default EmptyTab;

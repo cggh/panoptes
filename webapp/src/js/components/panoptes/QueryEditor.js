@@ -600,4 +600,4 @@ let QueryEditor = React.createClass({
 
 });
 
-module.exports = QueryEditor;
+export default QueryEditor;

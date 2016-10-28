@@ -393,4 +393,4 @@ const PerRowIndicatorControls = React.createClass({
 
 });
 
-module.exports = PerRowIndicatorChannel;
+export default PerRowIndicatorChannel;

@@ -63,4 +63,4 @@ let FeatureGroup = React.createClass({
 
 });
 
-module.exports = FeatureGroup;
+export default FeatureGroup;

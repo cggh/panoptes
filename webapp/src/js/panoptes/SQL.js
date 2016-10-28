@@ -773,4 +773,4 @@ SQL.TableSort = function(icollist) {
 
 SQL.nullQuery = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
 
-module.exports = SQL;
+export default SQL;

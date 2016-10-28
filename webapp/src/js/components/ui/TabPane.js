@@ -61,4 +61,4 @@ let TabPane = React.createClass({
 
 });
 
-module.exports = TabPane;
+export default TabPane;

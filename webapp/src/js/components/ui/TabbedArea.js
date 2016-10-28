@@ -171,4 +171,4 @@ let TabbedArea = React.createClass({
   }
 });
 
-module.exports = TabbedArea;
+export default TabbedArea;

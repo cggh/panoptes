@@ -57,4 +57,4 @@ let Plot = React.createClass({
 
 });
 
-module.exports = Plot;
+export default Plot;

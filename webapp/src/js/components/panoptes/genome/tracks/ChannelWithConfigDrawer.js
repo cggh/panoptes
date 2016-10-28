@@ -99,7 +99,7 @@ let ChannelWithConfigDrawer = React.createClass({
   }
 });
 
-module.exports = ChannelWithConfigDrawer;
+export default ChannelWithConfigDrawer;
 
 //          {this.props.onClose ? <Icon className="close" name="times" onClick={this.handleClose}/> : null}
 

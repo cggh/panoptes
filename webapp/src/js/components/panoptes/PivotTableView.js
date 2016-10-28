@@ -404,4 +404,4 @@ let PivotTableView = React.createClass({
 
 });
 
-module.exports = PivotTableView;
+export default PivotTableView;

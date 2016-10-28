@@ -35,4 +35,4 @@ let PropertyInput = React.createClass({
 
 });
 
-module.exports = PropertyInput;
+export default PropertyInput;

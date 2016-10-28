@@ -57,4 +57,4 @@ let TableList = React.createClass({
   }
 });
 
-module.exports = TableList;
+export default TableList;

@@ -113,4 +113,4 @@ let PropertyGroup = React.createClass({
 
 });
 
-module.exports = PropertyGroup;
+export default PropertyGroup;

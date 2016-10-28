@@ -76,4 +76,4 @@ let BaseLayer = React.createClass({
 
 });
 
-module.exports = BaseLayer;
+export default BaseLayer;

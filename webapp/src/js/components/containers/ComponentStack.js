@@ -22,4 +22,4 @@ let ComponentStack = React.createClass({
 
 });
 
-module.exports = ComponentStack;
+export default ComponentStack;

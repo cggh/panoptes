@@ -88,4 +88,4 @@ let TreeContainer = React.createClass({
 
 });
 
-module.exports = TreeContainer;
+export default TreeContainer;

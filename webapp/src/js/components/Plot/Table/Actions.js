@@ -156,4 +156,4 @@ let TablePlotActions = React.createClass({
   }
 });
 
-module.exports = TablePlotActions;
+export default TablePlotActions;

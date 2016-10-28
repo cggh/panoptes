@@ -54,6 +54,6 @@ let YScale = React.createClass({
   }
 });
 
-module.exports = YScale;
+export default YScale;
 
 

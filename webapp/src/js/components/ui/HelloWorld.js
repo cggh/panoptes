@@ -19,4 +19,4 @@ let HelloWorld = React.createClass({
 
 });
 
-module.exports = HelloWorld;
+export default HelloWorld;

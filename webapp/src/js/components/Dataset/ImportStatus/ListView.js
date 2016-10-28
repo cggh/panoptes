@@ -127,4 +127,4 @@ let DatasetImportStatusListView = React.createClass({
 
 });
 
-module.exports = DatasetImportStatusListView;
+export default DatasetImportStatusListView;

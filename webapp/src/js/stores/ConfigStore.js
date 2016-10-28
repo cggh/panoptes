@@ -291,4 +291,4 @@ const ConfigStore = Fluxxor.createStore({
 
 });
 
-module.exports = ConfigStore;
+export default ConfigStore;

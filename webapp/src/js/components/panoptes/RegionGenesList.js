@@ -156,4 +156,4 @@ let RegionGenesList = React.createClass({
 
 });
 
-module.exports = RegionGenesList;
+export default RegionGenesList;

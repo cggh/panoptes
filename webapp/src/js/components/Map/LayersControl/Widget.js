@@ -66,4 +66,4 @@ let LayersControl = React.createClass({
 
 });
 
-module.exports = LayersControl;
+export default LayersControl;

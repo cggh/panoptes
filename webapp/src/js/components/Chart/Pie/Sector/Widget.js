@@ -40,4 +40,4 @@ let PieChartSector = React.createClass({
   }
 });
 
-module.exports = PieChartSector;
+export default PieChartSector;

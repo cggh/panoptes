@@ -337,4 +337,4 @@ DataDecoders.Encoder.Create = function(info) {
 };
 
 
-module.exports = DataDecoders;
+export default DataDecoders;

@@ -23,4 +23,4 @@ let Rectangle = React.createClass({
   }
 });
 
-module.exports = Rectangle;
+export default Rectangle;

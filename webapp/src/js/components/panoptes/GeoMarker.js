@@ -47,4 +47,4 @@ let GeoMarker = React.createClass({
 
 });
 
-module.exports = GeoMarker;
+export default GeoMarker;

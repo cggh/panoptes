@@ -265,4 +265,4 @@ let Legend = () =>
 Legend.shouldComponentUpdate = () => false;
 
 
-module.exports = ReferenceSequence;
+export default ReferenceSequence;

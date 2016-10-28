@@ -75,4 +75,4 @@ let FindGeneByNameDesc = React.createClass({
   }
 });
 
-module.exports = FindGeneByNameDesc;
+export default FindGeneByNameDesc;

@@ -29,4 +29,4 @@ let ErrorTab = React.createClass({
   }
 });
 
-module.exports = ErrorTab;
+export default ErrorTab;

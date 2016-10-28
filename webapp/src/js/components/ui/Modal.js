@@ -106,4 +106,4 @@ let Modal = React.createClass({
   }
 });
 
-module.exports = Modal;
+export default Modal;

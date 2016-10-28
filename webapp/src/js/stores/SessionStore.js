@@ -252,4 +252,4 @@ let SessionStore = Fluxxor.createStore({
 
 });
 
-module.exports = SessionStore;
+export default SessionStore;

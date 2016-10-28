@@ -63,5 +63,5 @@ let NumericInput = React.createClass({
   }
 });
 
-module.exports = NumericInput;
+export default NumericInput;
 

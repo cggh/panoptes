@@ -81,4 +81,4 @@ let ViewList = React.createClass({
   }
 });
 
-module.exports = ViewList;
+export default ViewList;

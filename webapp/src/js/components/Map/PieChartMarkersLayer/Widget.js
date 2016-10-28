@@ -312,4 +312,4 @@ let PieChartMarkersLayer = React.createClass({
 
 });
 
-module.exports = PieChartMarkersLayer;
+export default PieChartMarkersLayer;

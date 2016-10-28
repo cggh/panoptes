@@ -68,4 +68,4 @@ let ImageOverlay = React.createClass({
 
 });
 
-module.exports = ImageOverlay;
+export default ImageOverlay;

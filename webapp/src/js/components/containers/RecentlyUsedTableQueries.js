@@ -98,4 +98,4 @@ let RecentlyUsedTableQueries = React.createClass({
   }
 });
 
-module.exports = RecentlyUsedTableQueries;
+export default RecentlyUsedTableQueries;

@@ -3,7 +3,7 @@ let JD2DateTime = function(JD) {
   return new Date((JD - 2440587.5) * 24 * 60 * 60 * 1000);
 };
 
-module.exports = function(property, value) {
+export default function(property, value) {
   if (property.isText) {
     return value === null ? '' : value;
   }

@@ -82,4 +82,4 @@ let RecentlyFoundGenes = React.createClass({
   }
 });
 
-module.exports = RecentlyFoundGenes;
+export default RecentlyFoundGenes;

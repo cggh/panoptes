@@ -27,4 +27,4 @@ let ConfigMixin = {
   }
 };
 
-module.exports = ConfigMixin;
+export default ConfigMixin;

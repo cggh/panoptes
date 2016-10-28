@@ -27,4 +27,4 @@ let Circle = React.createClass({
   }
 });
 
-module.exports = Circle;
+export default Circle;

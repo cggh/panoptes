@@ -54,4 +54,4 @@ let Loading = React.createClass({
 
 });
 
-module.exports = Loading;
+export default Loading;

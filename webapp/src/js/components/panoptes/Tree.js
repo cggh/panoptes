@@ -40,4 +40,4 @@ let Tree = React.createClass({
 
 });
 
-module.exports = Tree;
+export default Tree;

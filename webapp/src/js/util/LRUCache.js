@@ -76,5 +76,5 @@ let LRUCache = {
   }
 };
 
-module.exports = LRUCache;
+export default LRUCache;
 

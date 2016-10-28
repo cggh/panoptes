@@ -58,4 +58,4 @@ let PropertyHeader = React.createClass({
 
 });
 
-module.exports = PropertyHeader;
+export default PropertyHeader;

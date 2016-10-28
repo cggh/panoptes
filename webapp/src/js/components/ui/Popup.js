@@ -141,4 +141,4 @@ let Popup = React.createClass({
 
 });
 
-module.exports = Popup;
+export default Popup;

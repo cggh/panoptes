@@ -368,4 +368,4 @@ let Map = React.createClass({
 
 });
 
-module.exports = Map;
+export default Map;

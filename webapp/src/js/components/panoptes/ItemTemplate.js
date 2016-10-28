@@ -145,4 +145,4 @@ let ItemTemplate = React.createClass({
   }
 });
 
-module.exports = ItemTemplate;
+export default ItemTemplate;

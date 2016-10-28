@@ -149,4 +149,4 @@ let Finder = React.createClass({
   }
 });
 
-module.exports = Finder;
+export default Finder;

@@ -80,4 +80,4 @@ let WMSTileLayer = React.createClass({
 
 });
 
-module.exports = WMSTileLayer;
+export default WMSTileLayer;

@@ -83,6 +83,6 @@ let GenomeScale = React.createClass({
   }
 });
 
-module.exports = GenomeScale;
+export default GenomeScale;
 
 

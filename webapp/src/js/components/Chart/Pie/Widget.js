@@ -91,4 +91,4 @@ let PieChart = React.createClass({
 
 });
 
-module.exports = PieChart;
+export default PieChart;

@@ -140,5 +140,5 @@ let Controls = React.createClass({
   }
 });
 
-module.exports = Controls;
+export default Controls;
 

@@ -3,7 +3,6 @@ import arrayBufferDecode from 'panoptes/arrayBufferDecode';
 import _keys from 'lodash/keys';
 import _forEach from 'lodash/forEach';
 import _isNumber from 'lodash/isNumber';
-import _map from 'lodash/map';
 import {assertRequired} from 'util/Assert';
 import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';

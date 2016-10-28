@@ -33,4 +33,4 @@ DataFetcherMixin.componentWillMount = function() {
     'mixins: [DataFetcherMixin("Prop1", "Prop2")]');
 };
 
-module.exports = DataFetcherMixin;
+export default DataFetcherMixin;

@@ -41,4 +41,4 @@ let ComponentWrapper = React.createClass({
 
 });
 
-module.exports = ComponentWrapper;
+export default ComponentWrapper;

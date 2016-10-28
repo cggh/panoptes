@@ -85,4 +85,4 @@ let ComponentMarker = React.createClass({
 
 });
 
-module.exports = ComponentMarker;
+export default ComponentMarker;

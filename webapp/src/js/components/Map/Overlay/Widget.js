@@ -73,4 +73,4 @@ let Overlay = React.createClass({
 
 });
 
-module.exports = Overlay;
+export default Overlay;
