@@ -58,9 +58,13 @@ function downloadTableData(payload) {
 
 function downloadGenotypeData(payload) {
 
-  let {dataset, onLimitBreach} = payload;
+  let {dataset, chromosome, start, end, onLimitBreach} = payload;
 
   console.log('downloadGenotypeData dataset: %o', dataset);
+  console.log('downloadGenotypeData chromosome: %o', chromosome);
+  console.log('downloadGenotypeData start: %o', start);
+  console.log('downloadGenotypeData end: %o', end);
+
 
   // TODO: determine totalDataPoints
   let totalDataPoints = MAX_DOWNLOAD_DATA_POINTS;
@@ -70,8 +74,8 @@ function downloadGenotypeData(payload) {
   }
 
   // TODO: determine downloadURL
-  let downloadURL = 'http://abc.xyz';
-  window.location.href = downloadURL;
+  //let downloadURL = 'http://abc.xyz';
+  //window.location.href = downloadURL;
 
 }
 
