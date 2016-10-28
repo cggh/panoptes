@@ -58,7 +58,21 @@ function downloadTableData(payload) {
 
 function downloadGenotypeData(payload) {
 
-  console.log('downloadGenotypeData payload: %o', payload);
+  let {dataset, onLimitBreach} = payload;
+
+  console.log('downloadGenotypeData dataset: %o', dataset);
+
+  // TODO: determine totalDataPoints
+  let totalDataPoints = MAX_DOWNLOAD_DATA_POINTS;
+  if (totalDataPoints > MAX_DOWNLOAD_DATA_POINTS) {
+    onLimitBreach({totalDataPoints, maxDataPoints: MAX_DOWNLOAD_DATA_POINTS});
+    return null;
+  }
+
+  // TODO: determine downloadURL
+  let downloadURL = 'http://abc.xyz';
+  window.location.href = downloadURL;
+
 }
 
 module.exports = {

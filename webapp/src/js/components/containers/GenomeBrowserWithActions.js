@@ -29,6 +29,7 @@ import ListWithActions from 'containers/ListWithActions';
 import DataTableWithActions from 'containers/DataTableWithActions';
 import SQL from 'panoptes/SQL';
 import DataDownloader from 'util/DataDownloader';
+import Alert from 'ui/Alert';
 
 let GenomeBrowserWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -154,6 +155,12 @@ let GenomeBrowserWithActions = React.createClass({
         onLimitBreach: this.handleDownloadLimitBreach
       }
     );
+  },
+
+  handleDownloadLimitBreach(payload) {
+    let {totalDataPoints, maxDataPoints} = payload;
+    let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${maxDataPoints}. Please use a stricter filter or fewer columns, or contact us directly.`;
+    this.getFlux().actions.session.modalOpen(<Alert title="Warning" message={message}/>);
   },
 
   render() {
