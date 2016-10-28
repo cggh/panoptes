@@ -58,13 +58,13 @@ function downloadTableData(payload) {
 
 function downloadGenotypeData(payload) {
 
-  let {dataset, chromosome, start, end, onLimitBreach} = payload;
+  let {children, chromosome, dataset, onLimitBreach, end, start} = payload;
 
-  console.log('downloadGenotypeData dataset: %o', dataset);
+  console.log('downloadGenotypeData children: %o', children);
   console.log('downloadGenotypeData chromosome: %o', chromosome);
-  console.log('downloadGenotypeData start: %o', start);
+  console.log('downloadGenotypeData dataset: %o', dataset);
   console.log('downloadGenotypeData end: %o', end);
-
+  console.log('downloadGenotypeData start: %o', start);
 
   // TODO: determine totalDataPoints
   let totalDataPoints = MAX_DOWNLOAD_DATA_POINTS;

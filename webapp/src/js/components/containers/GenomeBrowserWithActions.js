@@ -237,7 +237,8 @@ let GenomeBrowserWithActions = React.createClass({
         dataset: this.config.dataset,
         onLimitBreach: this.handleDownloadLimitBreach,
         start: this.props.start || 0,
-        end: this.props.end || this.config.chromosomes[chromosome]
+        end: this.props.end || this.config.chromosomes[chromosome],
+        children: this.genomeBrowser.props.children
       }
     );
   },
@@ -341,7 +342,7 @@ let GenomeBrowserWithActions = React.createClass({
               title={sidebar ? 'Expand' : 'Sidebar'}
             />
           </div>
-          <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} />
+          <GenomeBrowser ref={(ref) => this.genomeBrowser = ref} setProps={setProps} sideWidth={150} {...subProps} />
         </div>
       </Sidebar>
     );
