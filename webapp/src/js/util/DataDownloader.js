@@ -58,24 +58,38 @@ function downloadTableData(payload) {
 
 function downloadGenotypeData(payload) {
 
-  let {children, chromosome, dataset, onLimitBreach, end, start} = payload;
-
-  console.log('downloadGenotypeData children: %o', children);
-  console.log('downloadGenotypeData chromosome: %o', chromosome);
-  console.log('downloadGenotypeData dataset: %o', dataset);
-  console.log('downloadGenotypeData end: %o', end);
-  console.log('downloadGenotypeData start: %o', start);
+  let data = '';
+  data += '#Dataset: ' + payload.dataset + '\r\n';
+  // NB: tableCapNamePlural (Cap) is not available
+  data += '#Table: ' + payload.tableNamePlural + (payload.cellColour == 'call' ? ' Calls' : ' Allele Depths') + '\r\n';
+  data += '#' + payload.colTableCapNamePlural + ' query: ' + payload.columnQueryAsString + '\r\n';
+  data += '#' + payload.rowTableCapNamePlural + ' query: ' + payload.rowQueryAsString + '\r\n';
+  data += '#Choromosome: ' + payload.chromosome + '\r\n';
+  data += '#Start: ' + Math.floor(payload.start) + '\r\n';
+  data += '#End: ' + Math.ceil(payload.end) + '\r\n';
+  data += '#URL: ' + window.location.href + '\r\n';
 
   // TODO: determine totalDataPoints
   let totalDataPoints = MAX_DOWNLOAD_DATA_POINTS;
   if (totalDataPoints > MAX_DOWNLOAD_DATA_POINTS) {
-    onLimitBreach({totalDataPoints, maxDataPoints: MAX_DOWNLOAD_DATA_POINTS});
+    payload.onLimitBreach({totalDataPoints, maxDataPoints: MAX_DOWNLOAD_DATA_POINTS});
     return null;
   }
 
-  // TODO: determine downloadURL
-  //let downloadURL = 'http://abc.xyz';
-  //window.location.href = downloadURL;
+  // Magic, credit http://jsfiddle.net/user/koldev/
+  let tmp = document.createElement('a');
+  document.body.appendChild(tmp);
+  tmp.style = 'display: none';
+  let blob = new Blob([data], {type: 'text/plain'});
+  let url = window.URL.createObjectURL(blob);
+  tmp.href = url;
+  tmp.download = payload.tableNamePlural + '_'
+    + (payload.cellColour == 'call' ? 'Calls_' : 'Allele_Depths_')
+    + payload.chromosome + '_'
+    + Math.floor(payload.start) + '-' + Math.ceil(payload.end) + '.txt'
+  ;
+  tmp.click();
+  window.URL.revokeObjectURL(url);
 
 }
 

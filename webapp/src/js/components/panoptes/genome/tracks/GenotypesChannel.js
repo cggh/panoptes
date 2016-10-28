@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -17,6 +18,7 @@ import _unique from 'lodash/uniq';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
+import FlatButton from 'material-ui/FlatButton';
 
 import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet, combineBlocks} from 'util/PropertyRegionCache';
@@ -30,6 +32,10 @@ import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
 import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericInput from 'ui/NumericInput';
+import DataDownloader from 'util/DataDownloader';
+import Alert from 'ui/Alert';
+import Icon from 'ui/Icon';
+import Formatter from 'panoptes/Formatter';
 
 const FAN_HEIGHT = 60;
 
@@ -190,8 +196,7 @@ let GenotypesChannel = React.createClass({
     let config = this.config.twoDTablesById[table];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
-    // console.log(this.config);
-    // console.log(config);
+
     const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, null);
@@ -398,7 +403,6 @@ let GenotypesChannel = React.createClass({
     });
   },
 
-
   render() {
     let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
@@ -493,6 +497,37 @@ const GenotypesControls = React.createClass({
     layoutGaps: React.PropTypes.bool,
   },
 
+
+  // FIXME: Ideally wanted to use <QueryString> to convert Query to String
+  // using ReactDOMServer.renderToStaticMarkup(<QueryString flux={this.flux} ... />)
+  convertQueryToString(tableConfig, query) {
+
+    // TODO
+
+console.info('convertQueryToString tableConfig: %o', tableConfig);
+
+    let qry = SQL.WhereClause.decode(query);
+
+    if ((!qry) || (qry.isTrivial))
+      return 'No filter';
+
+    return JSON.stringify(qry);
+  },
+
+  handleDownload() {
+
+    let params = {
+      dataset: this.config.dataset,
+      tableNamePlural: this.config.twoDTablesById[this.props.table].namePlural,
+      colTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].capNamePlural,
+      rowTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].capNamePlural,
+      columnQueryAsString: this.convertQueryToString(this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable], this.props.columnQuery),
+      rowQueryAsString: this.convertQueryToString(this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable], this.props.rowQuery)
+    };
+
+    DataDownloader.downloadGenotypeData({...params, ...this.props});
+  },
+
   render() {
     let {table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;
     const config = this.config.twoDTablesById[table];
@@ -507,6 +542,13 @@ const GenotypesControls = React.createClass({
           <FilterButton table={config.rowDataTable} query={rowQuery}
                         name={this.config.tablesById[config.rowDataTable].capNamePlural}
                         onPick={(rowQuery) => this.redirectedProps.setProps({rowQuery})}/>
+        </div>
+        <div className="control">
+          <FlatButton label="Download data"
+                      primary={true}
+                      onClick={() => this.handleDownload()}
+                      icon={<Icon fixedWidth={true} name="download" />}
+          />
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}
