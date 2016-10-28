@@ -31,6 +31,7 @@ import scrollbarSize from 'scrollbar-size';
 import ListWithActions from 'containers/ListWithActions';
 import DataTableWithActions from 'containers/DataTableWithActions';
 import SQL from 'panoptes/SQL';
+import DataDownloader from 'util/DataDownloader';
 
 let GenomeBrowserWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -225,6 +226,15 @@ let GenomeBrowserWithActions = React.createClass({
     );
   },
 
+  handleDownload() {
+    DataDownloader.downloadGenotypeData(
+      {
+        dataset: this.config.dataset,
+        onLimitBreach: this.handleDownloadLimitBreach
+      }
+    );
+  },
+
   render() {
     let actions = this.getFlux().actions;
     let {sidebar, setProps, ...subProps} = this.props;
@@ -295,6 +305,11 @@ let GenomeBrowserWithActions = React.createClass({
           )}
         />
         <Divider />
+        <FlatButton label="Download data"
+                    primary={true}
+                    onClick={() => this.handleDownload()}
+                    icon={<Icon fixedWidth={true} name="download" />}
+        />
         {genomePositionTableButtons}
       </div>
     );
