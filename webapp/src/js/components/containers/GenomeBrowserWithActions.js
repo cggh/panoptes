@@ -28,8 +28,6 @@ import scrollbarSize from 'scrollbar-size';
 import ListWithActions from 'containers/ListWithActions';
 import DataTableWithActions from 'containers/DataTableWithActions';
 import SQL from 'panoptes/SQL';
-import DataDownloader from 'util/DataDownloader';
-import Alert from 'ui/Alert';
 
 let GenomeBrowserWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -148,28 +146,6 @@ let GenomeBrowserWithActions = React.createClass({
     );
   },
 
-  handleDownload() {
-
-    let chromosome = this.props.chromosome || _head(_keys(this.config.chromosomes));
-
-    DataDownloader.downloadGenotypeData(
-      {
-        chromosome,
-        dataset: this.config.dataset,
-        onLimitBreach: this.handleDownloadLimitBreach,
-        start: this.props.start || 0,
-        end: this.props.end || this.config.chromosomes[chromosome],
-        children: this.genomeBrowser.props.children
-      }
-    );
-  },
-
-  handleDownloadLimitBreach(payload) {
-    let {totalDataPoints, maxDataPoints} = payload;
-    let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${maxDataPoints}. Please use a stricter filter or fewer columns, or contact us directly.`;
-    this.getFlux().actions.session.modalOpen(<Alert title="Warning" message={message}/>);
-  },
-
   render() {
     let actions = this.getFlux().actions;
     let {sidebar, setProps, ...subProps} = this.props;
@@ -231,11 +207,6 @@ let GenomeBrowserWithActions = React.createClass({
                       onPick={this.handleChannelAdd}
                     />)}/>
         <Divider />
-        <FlatButton label="Download data"
-                    primary={true}
-                    onClick={() => this.handleDownload()}
-                    icon={<Icon fixedWidth={true} name="download" />}
-        />
         {genomePositionTableButtons}
       </div>
     );
