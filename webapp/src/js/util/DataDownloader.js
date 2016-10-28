@@ -2,7 +2,6 @@ import Immutable from 'immutable';
 import LZString from 'lz-string';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
-import Base64 from 'panoptes/Base64';
 
 const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
@@ -56,6 +55,13 @@ function downloadTableData(payload) {
   window.location.href = downloadURL;
 }
 
+
+function downloadGenotypeData(payload) {
+
+  console.log('downloadGenotypeData payload: %o', payload);
+}
+
 module.exports = {
-  downloadTableData
+  downloadTableData,
+  downloadGenotypeData
 };
