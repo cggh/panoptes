@@ -72,4 +72,4 @@ let Background = React.createClass({
 
 });
 
-module.exports = Background;
+export default Background;

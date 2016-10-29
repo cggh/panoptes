@@ -17,6 +17,7 @@ import Modal from 'ui/Modal';
 import Finder from 'containers/Finder';
 import Copy from 'ui/Copy';
 import Confirm from 'ui/Confirm';
+import SessionComponent from 'panoptes/SessionComponent';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
@@ -59,8 +60,10 @@ let Panoptes = React.createClass({
   },
 
   getStateFromFlux() {
+    let {tabs, popups} = this.getFlux().store('SessionStore').getState().toObject();
     return {
-      session: this.getFlux().store('SessionStore').getState(),
+      tabs,
+      popups,
       modal: this.getFlux().store('SessionStore').getModal(),
       panoptes: this.getFlux().store('PanoptesStore').getState()
     };
@@ -72,8 +75,7 @@ let Panoptes = React.createClass({
 
   render() {
     let actions = this.getFlux().actions.session;
-    let {tabs, popups, components} = this.state.session.toObject();
-    let modal = this.state.modal;
+    let {tabs, popups, modal} = this.state;
     let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.config;
     // NB: initialConfig is defined in index.html
@@ -95,15 +97,11 @@ let Panoptes = React.createClass({
                             onDragAway={actions.tabPopOut}
                 >
                   {tabs.get('components').map((compId) => {
-                    let tab = components.get(compId);
                     return (
                       <TabPane
                         compId={compId}
                         key={compId}>
-                        {deserialiseComponent(tab, [compId], {
-                          setProps: actions.componentSetProps,
-                          replaceSelf: actions.componentReplace
-                        })}
+                        <SessionComponent compId={compId} />
                       </TabPane>
                     );
                   }).toArray()}
@@ -112,11 +110,9 @@ let Panoptes = React.createClass({
             </div>
             <Popups>
               {popups.get('components').map((compId) => {
-                let popup = components.get(compId);
                 let state = popups.getIn(['state', compId]);
                 let {x, y} = state.get('position', Map()).toJS();
                 let {width, height} = state.get('size', Map()).toJS();
-
                 return (
                   <Popup
                     x={x}
@@ -130,19 +126,16 @@ let Panoptes = React.createClass({
                     onClose={actions.popupClose.bind(this, compId)}
                     onMaximise={actions.popupToTab.bind(this, compId)}
                     onClick={actions.popupFocus.bind(this, compId)}>
-                    {deserialiseComponent(popup, [compId], {
-                      setProps: actions.componentSetProps,
-                      replaceSelf: actions.componentReplace
-                    })}
+                    <SessionComponent compId={compId} />
                   </Popup>
                 );
               }).toArray()}
             </Popups>
             <Modal visible={modal ? true : false}
                    onClose={actions.modalClose}>
-                    {modal ?
-                      React.cloneElement(modal, {setProps: actions.modalSetProps})
-                      : null}
+              {modal ?
+                React.cloneElement(modal, {setProps: actions.modalSetProps})
+                : null}
             </Modal>
             <NotificationSystem ref="notificationSystem"/>
           </div>

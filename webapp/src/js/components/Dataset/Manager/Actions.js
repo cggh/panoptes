@@ -102,4 +102,4 @@ let DatasetManagerActions = React.createClass({
   }
 });
 
-module.exports = DatasetManagerActions;
+export default DatasetManagerActions;

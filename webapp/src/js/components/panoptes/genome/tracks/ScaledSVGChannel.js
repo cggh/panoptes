@@ -132,6 +132,6 @@ let ScaledSVGChannel = React.createClass({
 });
 
 
-module.exports = ScaledSVGChannel;
+export default ScaledSVGChannel;
 
 

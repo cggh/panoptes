@@ -167,4 +167,4 @@ let GeneSearchResultsList = React.createClass({
 
 });
 
-module.exports = GeneSearchResultsList;
+export default GeneSearchResultsList;

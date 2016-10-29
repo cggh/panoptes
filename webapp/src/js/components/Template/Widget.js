@@ -39,4 +39,4 @@ let Template = React.createClass({
   }
 });
 
-module.exports = Template;
+export default Template;

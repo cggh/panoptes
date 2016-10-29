@@ -93,4 +93,4 @@ let APIActions = {
 
 };
 
-module.exports = APIActions;
+export default APIActions;

@@ -311,6 +311,6 @@ let GenomeBrowser = React.createClass({
   }
 });
 
-module.exports = GenomeBrowser;
+export default GenomeBrowser;
 
 

@@ -23,4 +23,4 @@ const PanoptesActions = (config) => ({
   }
 });
 
-module.exports = PanoptesActions;
+export default PanoptesActions;

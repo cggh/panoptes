@@ -290,4 +290,4 @@ let NumericalSummaryTrack = React.createClass({
 
 });
 
-module.exports = NumericalSummaryTrack;
+export default NumericalSummaryTrack;

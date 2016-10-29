@@ -35,4 +35,4 @@ let PanoptesStore = Fluxxor.createStore({
   }
 });
 
-module.exports = PanoptesStore;
+export default PanoptesStore;

@@ -67,4 +67,4 @@ let QueryString = React.createClass({
 
 });
 
-module.exports = QueryString;
+export default QueryString;

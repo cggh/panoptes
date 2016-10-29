@@ -87,4 +87,4 @@ let Copy = React.createClass({
 
 });
 
-module.exports = Copy;
+export default Copy;

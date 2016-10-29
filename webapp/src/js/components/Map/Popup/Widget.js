@@ -47,4 +47,4 @@ let MapPopup = React.createClass({
 
 });
 
-module.exports = MapPopup;
+export default MapPopup;

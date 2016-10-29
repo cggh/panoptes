@@ -190,4 +190,4 @@ let FindGeneByRegion = React.createClass({
   }
 });
 
-module.exports = FindGeneByRegion;
+export default FindGeneByRegion;

@@ -108,4 +108,4 @@ let TileLayer = React.createClass({
 
 });
 
-module.exports = TileLayer;
+export default TileLayer;

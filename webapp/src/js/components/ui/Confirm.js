@@ -79,4 +79,4 @@ let Confirm = React.createClass({
 
 });
 
-module.exports = Confirm;
+export default Confirm;

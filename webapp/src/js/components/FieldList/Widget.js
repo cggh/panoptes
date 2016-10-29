@@ -119,4 +119,4 @@ let FieldList = React.createClass({
 
 });
 
-module.exports = FieldList;
+export default FieldList;

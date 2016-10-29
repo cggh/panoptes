@@ -139,4 +139,4 @@ let FindGene = React.createClass({
 
 });
 
-module.exports = FindGene;
+export default FindGene;

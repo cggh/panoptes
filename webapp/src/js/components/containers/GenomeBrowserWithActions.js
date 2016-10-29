@@ -222,4 +222,4 @@ let GenomeBrowserWithActions = React.createClass({
   }
 });
 
-module.exports = GenomeBrowserWithActions;
+export default GenomeBrowserWithActions;

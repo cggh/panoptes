@@ -129,4 +129,4 @@ let TablePlot = React.createClass({
   }
 });
 
-module.exports = TablePlot;
+export default TablePlot;

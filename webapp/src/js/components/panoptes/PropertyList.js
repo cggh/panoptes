@@ -41,4 +41,4 @@ let PropertyList = React.createClass({
 
 });
 
-module.exports = PropertyList;
+export default PropertyList;

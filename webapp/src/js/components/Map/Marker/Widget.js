@@ -78,4 +78,4 @@ let Marker = React.createClass({
 
 });
 
-module.exports = Marker;
+export default Marker;

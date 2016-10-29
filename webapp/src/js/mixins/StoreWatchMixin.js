@@ -37,4 +37,4 @@ StoreWatchMixin.componentWillMount = function() {
     'mixins: [StoreWatchMixin("Store1", "Store2")]');
 };
 
-module.exports = StoreWatchMixin;
+export default StoreWatchMixin;

@@ -32,4 +32,4 @@ let DetectResize = React.createClass({
   }
 });
 
-module.exports = DetectResize;
+export default DetectResize;

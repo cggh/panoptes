@@ -62,4 +62,4 @@ let PropertyLegend = React.createClass({
   }
 });
 
-module.exports = PropertyLegend;
+export default PropertyLegend;

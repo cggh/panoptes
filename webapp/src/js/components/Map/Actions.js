@@ -542,4 +542,4 @@ let MapActions = React.createClass({
   }
 });
 
-module.exports = MapActions;
+export default MapActions;

@@ -136,4 +136,4 @@ let PivotTableWithActions = React.createClass({
   }
 });
 
-module.exports = PivotTableWithActions;
+export default PivotTableWithActions;

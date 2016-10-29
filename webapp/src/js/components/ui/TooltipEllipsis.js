@@ -26,4 +26,4 @@ let TooltipEllipsis = React.createClass({
 
 });
 
-module.exports = TooltipEllipsis;
+export default TooltipEllipsis;

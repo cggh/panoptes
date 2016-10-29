@@ -418,6 +418,6 @@ let CategoricalTrackControls = React.createClass({
 });
 
 
-module.exports = CategoricalChannel;
+export default CategoricalChannel;
 
 

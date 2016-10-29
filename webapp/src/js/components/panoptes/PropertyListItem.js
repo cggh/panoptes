@@ -48,4 +48,4 @@ let PropertyListItem = React.createClass({
 
 });
 
-module.exports = PropertyListItem;
+export default PropertyListItem;

@@ -205,4 +205,4 @@ let ListView = React.createClass({
 
 });
 
-module.exports = ListView;
+export default ListView;

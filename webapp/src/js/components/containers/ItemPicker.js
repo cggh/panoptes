@@ -185,4 +185,4 @@ let ItemPicker = React.createClass({
 
 });
 
-module.exports = ItemPicker;
+export default ItemPicker;

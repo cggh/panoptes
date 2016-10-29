@@ -20,4 +20,4 @@ class RequestContext {
 }
 
 
-module.exports = RequestContext;
+export default RequestContext;

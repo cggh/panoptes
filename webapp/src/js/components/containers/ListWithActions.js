@@ -166,4 +166,4 @@ let ListWithActions = React.createClass({
   }
 });
 
-module.exports = ListWithActions;
+export default ListWithActions;

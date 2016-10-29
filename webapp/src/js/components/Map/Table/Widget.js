@@ -105,4 +105,4 @@ let TableMap = React.createClass({
 
 });
 
-module.exports = TableMap;
+export default TableMap;

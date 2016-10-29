@@ -85,4 +85,4 @@ let PieChartMap = React.createClass({
 
 });
 
-module.exports = PieChartMap;
+export default PieChartMap;

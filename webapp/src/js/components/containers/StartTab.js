@@ -52,4 +52,4 @@ let StartTab = React.createClass({
   }
 });
 
-module.exports = StartTab;
+export default StartTab;

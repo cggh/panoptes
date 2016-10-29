@@ -7,4 +7,4 @@ FluxMixin.componentWillMount = function() {
   this.flux = this.getFlux();
 };
 
-module.exports = FluxMixin;
+export default FluxMixin;

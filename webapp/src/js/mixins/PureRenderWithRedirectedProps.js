@@ -34,4 +34,4 @@ let PureRenderWithRedirectedProps = function({check, redirect}) {
   };
 };
 
-module.exports = PureRenderWithRedirectedProps;
+export default PureRenderWithRedirectedProps;

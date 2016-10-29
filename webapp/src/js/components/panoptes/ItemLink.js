@@ -41,4 +41,4 @@ let ItemLink = React.createClass({
 
 });
 
-module.exports = ItemLink;
+export default ItemLink;

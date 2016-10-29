@@ -24,4 +24,4 @@ let fetchInitialConfig = function(dataset) {
     .then((resp) => ({dataset, user: {isManager}, ...resp.config}));
 };
 
-module.exports = fetchInitialConfig;
+export default fetchInitialConfig;

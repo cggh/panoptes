@@ -141,4 +141,4 @@ let GeoLayouter = React.createClass({
   }
 });
 
-module.exports = GeoLayouter;
+export default GeoLayouter;

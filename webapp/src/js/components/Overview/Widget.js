@@ -101,4 +101,4 @@ let Overview = React.createClass({
 
 });
 
-module.exports = Overview;
+export default Overview;

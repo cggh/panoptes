@@ -581,6 +581,6 @@ const GenotypesLegend = React.createClass({
 
 });
 
-module.exports = GenotypesChannel;
+export default GenotypesChannel;
 
 

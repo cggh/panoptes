@@ -23,4 +23,4 @@ let Popups = React.createClass({
 
 });
 
-module.exports = Popups;
+export default Popups;

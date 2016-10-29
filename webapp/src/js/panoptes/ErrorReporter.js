@@ -19,4 +19,4 @@ function errorNotify(flux, message, retryFunc) {
   flux.actions.session.notify(note);
 }
 
-module.exports = errorNotify;
+export default errorNotify;

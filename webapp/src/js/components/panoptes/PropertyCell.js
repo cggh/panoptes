@@ -81,4 +81,4 @@ let PropertyCell = React.createClass({
 
 });
 
-module.exports = PropertyCell;
+export default PropertyCell;

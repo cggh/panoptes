@@ -171,4 +171,4 @@ let TreeWithActions = React.createClass({
   }
 });
 
-module.exports = TreeWithActions;
+export default TreeWithActions;

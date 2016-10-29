@@ -327,4 +327,4 @@ let DataTableView = React.createClass({
 
 });
 
-module.exports = DataTableView;
+export default DataTableView;

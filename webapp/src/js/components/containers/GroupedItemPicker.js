@@ -186,4 +186,4 @@ let GroupedItemPicker = React.createClass({
 
 });
 
-module.exports = GroupedItemPicker;
+export default GroupedItemPicker;

@@ -124,4 +124,4 @@ let SummarisationCache = {
 };
 
 
-module.exports = SummarisationCache;
+export default SummarisationCache;

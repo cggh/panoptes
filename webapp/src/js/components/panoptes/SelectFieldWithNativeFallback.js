@@ -220,4 +220,4 @@ let SelectFieldWithNativeFallback = React.createClass({
 
 });
 
-module.exports = SelectFieldWithNativeFallback;
+export default SelectFieldWithNativeFallback;

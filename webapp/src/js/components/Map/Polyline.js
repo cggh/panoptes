@@ -23,4 +23,4 @@ let Polyline = React.createClass({
   }
 });
 
-module.exports = Polyline;
+export default Polyline;

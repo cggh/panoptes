@@ -98,4 +98,4 @@ let LoadingIndicator = React.createClass({
   }
 });
 
-module.exports = LoadingIndicator;
+export default LoadingIndicator;

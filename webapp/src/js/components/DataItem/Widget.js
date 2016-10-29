@@ -75,4 +75,4 @@ let DataItem = React.createClass({
 
 });
 
-module.exports = DataItem;
+export default DataItem;

@@ -465,4 +465,4 @@ let DataTableWithActions = React.createClass({
   }
 });
 
-module.exports = DataTableWithActions;
+export default DataTableWithActions;

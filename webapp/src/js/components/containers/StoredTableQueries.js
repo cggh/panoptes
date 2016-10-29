@@ -154,4 +154,4 @@ let StoredTableQueries = React.createClass({
   }
 });
 
-module.exports = StoredTableQueries;
+export default StoredTableQueries;

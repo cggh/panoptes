@@ -5,7 +5,7 @@ let DateTime2JD = function(date) {
 };
 
 
-module.exports = function(property, string) {
+export default function(property, string) {
   if (property.isBoolean) {
     return string === 'NULL' ? null : _indexOf(['Yes', 'yes', '1', 'true', 'True'], string) !== -1;
   }

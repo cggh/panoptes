@@ -137,6 +137,6 @@ let CanvasGroupChannel = React.createClass({
 });
 
 
-module.exports = CanvasGroupChannel;
+export default CanvasGroupChannel;
 
 
