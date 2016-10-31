@@ -87,6 +87,17 @@ let Criterion = React.createClass({
     table: React.PropTypes.string.isRequired
   },
 
+  componentWillMount() {
+
+    let {component} = this.props;
+    this.value = component.CompValue;
+    this.min = component.CompValueMin;
+    this.max = component.CompValueMax;
+    this.factor = component.Factor;
+    this.offset = component.Offset;
+    this.subset = component.subset;
+  },
+
   getStateFromFlux() {
     return {
       subsets: this.getFlux().store('PanoptesStore').getStoredSubsetsFor(this.props.table)
@@ -123,7 +134,10 @@ let Criterion = React.createClass({
     // Set the CompValue to the property's default.
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (currentOperator.fieldType === 'value') {
-      component.CompValue = property.defaultValue;
+      // The defaultValue might be badly formatted, so we format it.
+      // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
+      component.CompValue = Deformatter(property, Formatter(property, property.defaultValue));
+      this.setState({CompValue: component.CompValue});
     }
 
     onChange();
@@ -141,7 +155,11 @@ let Criterion = React.createClass({
 
   newComponent() {
     let config = this.tableConfig();
-    return SQL.WhereClause.CompareFixed(config.primKey, '=', config.propertiesById[config.primKey].defaultValue);
+
+    // The defaultValue might be badly formatted, so we format it.
+    // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
+    let CompValue = Deformatter(config.propertiesById[config.primKey], Formatter(config.propertiesById[config.primKey], config.propertiesById[config.primKey].defaultValue));
+    return SQL.WhereClause.CompareFixed(config.primKey, '=', CompValue);
   },
 
   handleAddOr() {
@@ -232,8 +250,8 @@ let Criterion = React.createClass({
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
 
+    // Reset this component's values
     component.CompValue = undefined;
-    component.CompValue2 = undefined;
     component.CompValueMin = undefined;
     component.CompValueMax = undefined;
     component.Factor = undefined;
@@ -242,7 +260,9 @@ let Criterion = React.createClass({
 
     // Set the CompValue to the property's default.
     if (currentOperator.fieldType === 'value') {
-      component.CompValue = property.defaultValue;
+      // The defaultValue might be badly formatted, so we format it.
+      // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
+      this.handleValueChange({input: 'value', value: property.defaultValue});
     }
 
     this.validateOperatorAndValues();
@@ -258,13 +278,15 @@ let Criterion = React.createClass({
 
   handleValueChange(payload) {
 
-    if (payload && payload.input) {
-      this[payload.input] = payload.value;
-    }
-
     let {component, onChange} = this.props;
     let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
+
+    if (payload && payload.input) {
+      // The payload.value might be badly formatted, so we format it.
+      // The this[input] value needs to be formatted, because it needs to be user-friendly.
+      this[payload.input] = Formatter(property, payload.value);
+    }
 
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator) {
@@ -272,30 +294,41 @@ let Criterion = React.createClass({
     }
 
     if (currentOperator.fieldType === 'value') {
+      // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
       component.CompValue = Deformatter(property, this.value);
-      this.setState({CompValue: this.value});
+      this.setState({CompValue: component.CompValue});
     } else if (currentOperator.fieldType === 'minMax') {
+      // The CompValues need to be deformatted, because they need to be SQL-friendly.
       component.CompValueMin = Deformatter(property, this.min);
       component.CompValueMax = Deformatter(property, this.max);
       this.setState({
-        CompValueMin: this.min,
-        CompValueMax: this.max
+        CompValueMin: component.CompValueMin,
+        CompValueMax: component.CompValueMax
       });
     } else if (currentOperator.fieldType === 'otherColumn') {
-      component.ColName2 = this.otherColumn;
+      // The CompValues need to be deformatted, because they need to be SQL-friendly.
+      component.ColName2 = Deformatter(property, this.otherColumn);
     } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
       component.ColName2 = this.otherColumn;
-      component.Factor = this.scale;
-      component.Offset = this.offset;
+      // The component.Factor and .Offset need to be deformatted, because they need to be SQL-friendly.
+      component.Factor = Deformatter(property, this.scale);
+      component.Offset = Deformatter(property, this.offset);
       this.setState({
-        Factor: this.min,
-        Offset: this.max
+        Factor: component.Factor,
+        Offset: component.Offset
       });
     } else if (currentOperator.fieldType === 'subset') {
       component.Subset = this.subset;
     }
 
     onChange();
+  },
+
+
+  handleValueEdit(payload) {
+
+    // The this[input] value needs to be raw (unformatted) while it's being edited.
+    this[payload.input] = payload.value;
   },
 
   render() {
@@ -351,11 +384,11 @@ let Criterion = React.createClass({
           {validOperators.map((operator) => {
             let {ID, name} = operator;
             return (
-                <option key={ID}
-                        value={ID}>
-                  {name}
-                </option>
-              );
+              <option key={ID}
+                      value={ID}>
+                {name}
+              </option>
+            );
           }
           )}
         </select>
@@ -367,29 +400,26 @@ let Criterion = React.createClass({
           {groups.map((group) => {
             if (group.id === 'other') return null;
             return (
-                <optgroup key={group.id} label={group.name}>
-                  {group.properties.map((property) => {
-                    let {id, disabled, name} = property;
-                    return (
-                      <option key={id}
-                              value={id}
-                              disabled={disabled}>
-                        {name}
-                      </option>
-                    );
-                  })
-                  }
-                </optgroup>
-              );
+              <optgroup key={group.id} label={group.name}>
+                {group.properties.map((property) => {
+                  let {id, disabled, name} = property;
+                  return (
+                    <option key={id}
+                            value={id}
+                            disabled={disabled}>
+                      {name}
+                    </option>
+                  );
+                })
+                }
+              </optgroup>
+            );
           }
           )}
         </select>;
 
     let fields = null;
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
-
-console.log('currentOperator.fieldType: ' + currentOperator.fieldType);
-console.log('property: %o', property);
 
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
@@ -403,7 +433,7 @@ console.log('property: %o', property);
               value={
                 component.CompValue !== undefined ?
                 Formatter(property, component.CompValue)
-                : this.state.CompValue
+                : Formatter(property, this.state.CompValue)
               }
               onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
             >
@@ -427,7 +457,7 @@ console.log('property: %o', property);
               value={
                 component.CompValue !== undefined ?
                 Formatter(property, component.CompValue)
-                : this.state.CompValue
+                : Formatter(property, this.state.CompValue)
               }
               onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
             >
@@ -452,18 +482,19 @@ console.log('property: %o', property);
             </select>
           </div>
         );
+
       } else {
-console.log('beep');
+
         fields = (
           <div className="fields">
             <PropertyInput
               value={
                 component.CompValue !== undefined ?
                 Formatter(property, component.CompValue)
-                : this.state.CompValue
+                : Formatter(property, this.state.CompValue)
               }
-              onChange={(value) => this.handleValueChange({input: 'value', value})}
-              onBlur={(value) => this.handleValueChange({input: 'value', value: Formatter(property, value)})}
+              onChange={(value) => this.handleValueEdit({input: 'value', value})}
+              onBlur={this.handleValueChange}
             />
           </div>
         );
@@ -475,20 +506,20 @@ console.log('beep');
                value={
                  component.CompValueMin !== undefined ?
                  Formatter(property, component.CompValueMin)
-                 : this.state.CompValueMin
+                 : Formatter(property, this.state.CompValueMin)
                }
-               onChange={(value) => this.handleValueChange({input: 'min', value})}
-               onBlur={(value) => this.handleValueChange({input: 'min', value: Formatter(property, value)})}
+               onChange={(value) => this.handleValueEdit({input: 'min', value})}
+               onBlur={this.handleValueChange}
              />
           <div>and</div>
             <PropertyInput
               value={
                 component.CompValueMax !== undefined ?
                 Formatter(property, component.CompValueMax)
-                : this.state.CompValueMax
+                : Formatter(property, this.state.CompValueMax)
               }
-              onChange={(value) => this.handleValueChange({input: 'max', value})}
-              onBlur={(value) => this.handleValueChange({input: 'max', value: Formatter(property, value)})}
+              onChange={(value) => this.handleValueEdit({input: 'max', value})}
+              onBlur={this.handleValueChange}
             />
         </div>
       );
@@ -504,12 +535,25 @@ console.log('beep');
         <div className="fields">
           {otherColumnSelect()}
           <div>x</div>
-          <input className="field" value={component.Factor || this.state.Factor}
-                 onChange={(value) => this.handleValueChange({input: 'scale', value})}/>
-
+          <input
+            className="field"
+            value={
+              component.Factor !== undefined ?
+              Formatter(property, component.Factor)
+              : Formatter(property, this.state.Factor)
+            }
+            onChange={(value) => this.handleValueChange({input: 'scale', value})}
+          />
           <div>+</div>
-          <input className="field" value={component.Offset || this.state.Offset}
-                 onChange={(value) => this.handleValueChange({input: 'offset', value})}/>
+          <input
+            className="field"
+            value={
+              component.Offset !== undefined ?
+              Formatter(property, component.Offset)
+              : Formatter(property, this.state.Offset)
+            }
+            onChange={(value) => this.handleValueChange({input: 'offset', value})}
+          />
         </div>
       );
     } else if (currentOperator.fieldType === 'subset') {
@@ -538,7 +582,6 @@ console.log('beep');
 
     let key = [
       component.CompValue,
-      component.CompValue2,
       component.CompValueMin,
       component.CompValueMax,
       component.Factor,
