@@ -223,7 +223,7 @@ let GenomeBrowserWithActions = React.createClass({
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
           </div>
-          <GenomeBrowser ref={(ref) => this.genomeBrowser = ref} setProps={setProps} sideWidth={150} {...subProps} />
+          <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} />
         </div>
       </Sidebar>
     );
