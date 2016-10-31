@@ -67,7 +67,7 @@ let RecentlyUsedTableQueries = React.createClass({
 
           let usedTableQueriesListItem = (
             <ListItem key={'usedTableQueriesListItem' + i}
-                      primaryText={<span className="list-string"><QueryString className="text" prepend="" table={table} query={usedTableQuery.get('query')}/></span>}
+                      primaryText={<span className="list-string"><QueryString className="text" table={table} query={usedTableQuery.get('query')}/></span>}
                       onClick={(e) => this.handleClick(e, usedTableQuery.get('query'))}
                       onDoubleClick={(e) => this.handleDoubleClick(e, usedTableQuery.get('query'))}
                       leftIcon={<Icon fixedWidth={true} name={'filter'}/>}

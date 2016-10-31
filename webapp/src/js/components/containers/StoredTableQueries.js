@@ -118,7 +118,7 @@ let StoredTableQueries = React.createClass({
       return <ListItem
                key={index}
                primaryText={name}
-               secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={query} /></p>}
+               secondaryText={<p className="list-string"><QueryString className="text" table={table} query={query} /></p>}
                secondaryTextLines={2}
                onClick={(e) => this.handleClick(e, query)}
                onDoubleClick={(e) => this.handleDoubleClick(e, query)}
@@ -141,7 +141,7 @@ let StoredTableQueries = React.createClass({
         />
         <ListItem
           primaryText="Default filter"
-          secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={defaultQuery} /></p>}
+          secondaryText={<p className="list-string"><QueryString className="text" table={table} query={defaultQuery} /></p>}
           secondaryTextLines={2}
           onClick={(e) => this.handleClick(e, defaultQuery)}
           onDoubleClick={(e) => this.handleDoubleClick(e, defaultQuery)}

@@ -5,8 +5,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-import SQL from 'panoptes/SQL';
-import Formatter from 'panoptes/Formatter';
+import QueryConverter from 'util/QueryConverter';
 
 
 let QueryString = React.createClass({
@@ -20,9 +19,8 @@ let QueryString = React.createClass({
   propTypes: {
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string.isRequired,
-    prepend: React.PropTypes.string.isRequired
+    prefix: React.PropTypes.string
   },
-
 
   getStateFromFlux() {
     return {
@@ -31,37 +29,16 @@ let QueryString = React.createClass({
   },
 
   render() {
-    let {query, prepend} = this.props;
-    let qry = SQL.WhereClause.decode(query);
-
-    if ((!qry) || (qry.isTrivial))
-      return <span>
-        {`${prepend} No filter`}
-      </span>;
-
-    let nameMap = {};
-    this.tableConfig().properties.forEach((property) => {
-      nameMap[property.id] = {
-        name: property.name,
-        toDisplayString: Formatter.bind(this, property)
-      };
-    });
-
-    let subsetMap = {};
-    this.state.subsets.map((subset) => {
-      subsetMap[subset.id] = {
-        name: subset.name
-      };
-    });
-
-    let queryData = {
-      fieldInfoMap: nameMap,
-      subsetMap: subsetMap
-    };
-    return (
-      <span>
-        { prepend + ' ' + qry.toQueryDisplayString(queryData, 0) }
-      </span>
+    let {query, prefix, table} = this.props;
+    let {subsets} = this.state;
+    return QueryConverter.tableQueryToReactComponent(
+      {
+        prefix,
+        properties: this.tableConfig().properties,
+        query,
+        subsets,
+        table
+      }
     );
   }
 

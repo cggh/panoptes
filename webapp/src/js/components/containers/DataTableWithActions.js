@@ -445,7 +445,7 @@ let DataTableWithActions = React.createClass({
                   onClick={() => setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <span className="block text"><QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/></span>
+            <span className="block text"><QueryString prefix="Filter:" table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
             <span className="block text">{columns.length} of {this.tableConfig().properties.length} columns shown</span>
