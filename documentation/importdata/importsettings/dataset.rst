@@ -45,4 +45,7 @@ twoD_DataTables
 googleAnalyticsId
   *Text.* .
 
+initialSessionState
+  *Block.* The default tabs, popups and recently used genes and queries for a new session. Most easily set by using the save button on the header (only shown to managers).
+
 
