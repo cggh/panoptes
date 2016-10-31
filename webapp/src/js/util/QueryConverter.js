@@ -55,6 +55,45 @@ function tableQueryToReactComponent(payload) {
   return tableQueryAsReactComponent;
 }
 
+function tableQueryToString(payload) {
+
+  let defaults = {
+    query: SQL.nullQuery
+  };
+
+  let {properties, query, table} = {...defaults, ...payload};
+
+  if (table === undefined) {
+    console.error('table === undefined');
+    return null;
+  }
+
+  let decodedQuery = SQL.WhereClause.decode(query);
+  let tableQueryAsString = undefined;
+
+  if ((!decodedQuery) || (decodedQuery.isTrivial)) {
+    tableQueryAsString = 'No filter';
+  } else {
+
+    let nameMap = {};
+    properties.forEach((property) => {
+      nameMap[property.id] = {
+        name: property.name,
+        toDisplayString: Formatter.bind(this, property)
+      };
+    });
+
+    let queryData = {
+      fieldInfoMap: nameMap
+    };
+
+    tableQueryAsString = decodedQuery.toQueryDisplayString(queryData, 0);
+  }
+
+  return tableQueryAsString;
+}
+
 module.exports = {
-  tableQueryToReactComponent
+  tableQueryToReactComponent,
+  tableQueryToString
 };
