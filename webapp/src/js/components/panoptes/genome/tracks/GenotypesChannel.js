@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -33,8 +32,8 @@ import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericInput from 'ui/NumericInput';
 import DataDownloader from 'util/DataDownloader';
-import Alert from 'ui/Alert';
 import Icon from 'ui/Icon';
+import QueryConverter from 'util/QueryConverter';
 
 const FAN_HEIGHT = 60;
 
@@ -184,9 +183,9 @@ let GenotypesChannel = React.createClass({
   },
 
   getDefinedQuery(query, table) {
-    return query
-      || ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null)
-      || SQL.nullQuery;
+    return query ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -496,23 +495,6 @@ const GenotypesControls = React.createClass({
     layoutGaps: React.PropTypes.bool,
   },
 
-
-  // FIXME: Ideally wanted to use <QueryString> to convert Query to String
-  // using ReactDOMServer.renderToStaticMarkup(<QueryString flux={this.flux} ... />)
-  convertQueryToString(tableConfig, query) {
-
-    // TODO
-
-console.info('convertQueryToString tableConfig: %o', tableConfig);
-
-    let qry = SQL.WhereClause.decode(query);
-
-    if ((!qry) || (qry.isTrivial))
-      return 'No filter';
-
-    return JSON.stringify(qry);
-  },
-
   handleDownload() {
 
     let params = {
@@ -520,8 +502,16 @@ console.info('convertQueryToString tableConfig: %o', tableConfig);
       tableNamePlural: this.config.twoDTablesById[this.props.table].namePlural,
       colTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].capNamePlural,
       rowTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].capNamePlural,
-      columnQueryAsString: this.convertQueryToString(this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable], this.props.columnQuery),
-      rowQueryAsString: this.convertQueryToString(this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable], this.props.rowQuery)
+      columnQueryAsString: QueryConverter.tableQueryToString({
+        table: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].id,
+        query: this.props.columnQuery,
+        properties: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].properties
+      }),
+      rowQueryAsString: QueryConverter.tableQueryToString({
+        table: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].id,
+        query: this.props.rowQuery,
+        properties: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].properties
+      })
     };
 
     DataDownloader.downloadGenotypeData({...params, ...this.props});
