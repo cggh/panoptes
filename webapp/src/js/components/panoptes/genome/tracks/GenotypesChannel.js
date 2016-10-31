@@ -107,8 +107,8 @@ let GenotypesChannel = React.createClass({
 
   getDefaultProps() {
     return {
-      rowQuery: SQL.nullQuery,
-      columnQuery: SQL.nullQuery,
+      rowQuery: undefined,  //Defaults set at render time
+      columnQuery: undefined,
       layoutGaps: true,
       rowHeight: 10,
       pageSize: 100,
@@ -178,10 +178,18 @@ let GenotypesChannel = React.createClass({
     return {colWidth, layoutBlocks};
   },
 
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
+  },
+
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort} = props;
     let config = this.config.twoDTablesById[table];
+    columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
+    rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
     // console.log(this.config);
     // console.log(config);
     const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
@@ -392,10 +400,12 @@ let GenotypesChannel = React.createClass({
 
 
   render() {
-    let {width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
+    let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
+    columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
+    rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
     const numRows = rowData ? rowData.id.shape[0] : 0;
     return (
       <ChannelWithConfigDrawer
@@ -411,7 +421,10 @@ let GenotypesChannel = React.createClass({
           rowLabel={rowLabel || rowConfig.primKey}
         />}
         //Override component update to get latest in case of skipped render
-        configComponent={<GenotypesControls {...this.props} setProps={this.redirectedProps.setProps}/>}
+        configComponent={<GenotypesControls {...this.props}
+                                            columnQuery={columnQuery}
+                                            rowQuery={rowQuery}
+                                            setProps={this.redirectedProps.setProps}/>}
         legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
       >
@@ -479,7 +492,6 @@ const GenotypesControls = React.createClass({
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
   },
-
 
   render() {
     let {table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;
