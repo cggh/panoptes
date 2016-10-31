@@ -1,5 +1,6 @@
 import React from 'react';
 import repeatString from 'repeat-string';
+import chunkedMap from 'util/chunkedMap';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -83,13 +84,12 @@ let GenotypesTable = React.createClass({
       heightScale
     });
     if (block.cacheKey !== cacheKey) {
-
       let offscreenCanvas = document.createElement('canvas');
       const rowLen = colShape[1];
       offscreenCanvas.width = rowLen;
       offscreenCanvas.height = colShape[0] * rowHeight;
       let ctx = offscreenCanvas.getContext('2d');
-      for (let x = 0, jEnd = rowLen; x < jEnd; x++) {
+      function draw(x) {
         for (let y = 0, iEnd = colShape[0]; y < iEnd; y++) {
           const index = y * rowLen + x;
           let alpha = alphaArray ?
@@ -99,20 +99,20 @@ let GenotypesTable = React.createClass({
           //Decide a colour for this genotype
           if (cellColour === 'call') {
             switch (colArray[index]) {
-            case 0:  //REF
-              ctx.fillStyle = 'rgba(0,128,192,' + alpha + ')';
-              break;
-            case 1:  //ALT
-              ctx.fillStyle = 'rgba(255,50,50,' + alpha + ')';
-              break;
-            case 2:  //HET
-              ctx.fillStyle = 'rgba(0,192,120,' + alpha + ')';
-              break;
-            default: //NO CALL
-              height = 0.2;
-              alpha = 0.2;
-              ctx.fillStyle = 'rgb(230,230,230)';
-              break;
+              case 0:  //REF
+                ctx.fillStyle = 'rgba(0,128,192,' + alpha + ')';
+                break;
+              case 1:  //ALT
+                ctx.fillStyle = 'rgba(255,50,50,' + alpha + ')';
+                break;
+              case 2:  //HET
+                ctx.fillStyle = 'rgba(0,192,120,' + alpha + ')';
+                break;
+              default: //NO CALL
+                height = 0.2;
+                alpha = 0.2;
+                ctx.fillStyle = 'rgb(230,230,230)';
+                break;
             }
           } else if (cellColour === 'fraction') {
             const fraction = colArray[index];
@@ -121,11 +121,14 @@ let GenotypesTable = React.createClass({
           ctx.fillRect(x, (y * rowHeight) + ((1 - height) * rowHeight * 0.5), 1, height * rowHeight);
         }
       }
+      function update() {
+          this.paint(this.refs.gridCanvas, this.refs.overlayCanvas);
+      }
+      chunkedMap([0, rowLen], draw, update, 100, 50, this);
       block.len = rowLen || 0;
       block.cache = offscreenCanvas;
       block.cacheKey = cacheKey;
     }
-
   },
 
   paint(gridCanvas, overlayCanvas) {
@@ -155,16 +158,16 @@ let GenotypesTable = React.createClass({
       let [blockStart, blockEnd, colStart] = layoutBlocks[i];
       while (true) { //eslint-disable-line no-constant-condition
         const currentDataBlock = dataBlocks[dataBlockIndex];
-        if (dataBlockOffset + currentDataBlock.len <= blockStart ) {
+        if (dataBlockOffset + currentDataBlock.len <= blockStart) {
           dataBlockIndex += 1;
           dataBlockOffset += currentDataBlock.len;
         } else if (dataBlockOffset > blockEnd) {
           throw Error('Datablocks not in order? Data is ahead of layout');
         } else {
-          const source = currentDataBlock.cache;
           const sourceStart = blockStart - dataBlockOffset;
           const sourceEnd = Math.min(blockEnd - dataBlockOffset, currentDataBlock.len);
           const sourceWidth = sourceEnd - sourceStart;
+          const source = currentDataBlock.cache;
           gCtx.drawImage(source, sourceStart, 0, sourceWidth, source.height, //Source params
             colStart * pixColWidth, 0, sourceWidth * pixColWidth, source.height); //Destination params
           this.drawOverlay(oCtx, currentDataBlock, sourceStart, sourceWidth, colStart);
@@ -254,12 +257,12 @@ let GenotypesTable = React.createClass({
     if (!layoutBlocks || !dataBlocks) {
       return <div>
         <canvas ref="gridCanvas"
-                     width={width}
-                     height={height}/>
+                width={width}
+                height={height}/>
         <canvas ref="overlayCanvas"
                 width={width}
                 height={height}/>
-        </div>;
+      </div>;
     }
 
     return <div className="genotypes-table">
