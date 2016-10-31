@@ -69,13 +69,6 @@ function downloadGenotypeData(payload) {
   data += '#End: ' + Math.ceil(payload.end) + '\r\n';
   data += '#URL: ' + window.location.href + '\r\n';
 
-  // TODO: determine totalDataPoints
-  let totalDataPoints = MAX_DOWNLOAD_DATA_POINTS;
-  if (totalDataPoints > MAX_DOWNLOAD_DATA_POINTS) {
-    payload.onLimitBreach({totalDataPoints, maxDataPoints: MAX_DOWNLOAD_DATA_POINTS});
-    return null;
-  }
-
   // Magic, credit http://jsfiddle.net/user/koldev/
   let tmp = document.createElement('a');
   document.body.appendChild(tmp);

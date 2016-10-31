@@ -35,7 +35,6 @@ import NumericInput from 'ui/NumericInput';
 import DataDownloader from 'util/DataDownloader';
 import Alert from 'ui/Alert';
 import Icon from 'ui/Icon';
-import Formatter from 'panoptes/Formatter';
 
 const FAN_HEIGHT = 60;
 
