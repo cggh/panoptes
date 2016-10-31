@@ -387,6 +387,10 @@ let Criterion = React.createClass({
 
     let fields = null;
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
+
+console.log('currentOperator.fieldType: ' + currentOperator.fieldType);
+console.log('property: %o', property);
+
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
     if (currentOperator.fieldType === 'value') {
@@ -449,6 +453,7 @@ let Criterion = React.createClass({
           </div>
         );
       } else {
+console.log('beep');
         fields = (
           <div className="fields">
             <PropertyInput
@@ -468,7 +473,7 @@ let Criterion = React.createClass({
         <div className="fields">
              <PropertyInput
                value={
-                 component.CompValueMin ?
+                 component.CompValueMin !== undefined ?
                  Formatter(property, component.CompValueMin)
                  : this.state.CompValueMin
                }
@@ -478,7 +483,7 @@ let Criterion = React.createClass({
           <div>and</div>
             <PropertyInput
               value={
-                component.CompValueMax ?
+                component.CompValueMax !== undefined ?
                 Formatter(property, component.CompValueMax)
                 : this.state.CompValueMax
               }
