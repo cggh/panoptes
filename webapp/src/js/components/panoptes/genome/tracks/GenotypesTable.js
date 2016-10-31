@@ -89,7 +89,7 @@ let GenotypesTable = React.createClass({
       offscreenCanvas.width = rowLen;
       offscreenCanvas.height = colShape[0] * rowHeight;
       let ctx = offscreenCanvas.getContext('2d');
-      for (let x = 0, jEnd = rowLen; x < jEnd; x++) {
+      function draw(x) {
         for (let y = 0, iEnd = colShape[0]; y < iEnd; y++) {
           const index = y * rowLen + x;
           let alpha = alphaArray ?
@@ -121,10 +121,13 @@ let GenotypesTable = React.createClass({
           ctx.fillRect(x, (y * rowHeight) + ((1 - height) * rowHeight * 0.5), 1, height * rowHeight);
         }
       }
+      function update() {
+          this.paint(this.refs.gridCanvas, this.refs.overlayCanvas);
+      }
+      chunkedMap([0, rowLen], draw, update, 100, 50, this);
       block.len = rowLen || 0;
       block.cache = offscreenCanvas;
       block.cacheKey = cacheKey;
-      this.paint(this.refs.gridCanvas, this.refs.overlayCanvas);
     }
   },
 
@@ -147,7 +150,7 @@ let GenotypesTable = React.createClass({
     if (!layoutBlocks || !dataBlocks) {
       return;
     }
-    chunkedMap(dataBlocks, this.drawOffscreenIfNeeded, 10, this);
+    dataBlocks.forEach(this.drawOffscreenIfNeeded);
     //Loop over the layout blocks to draw them
     let dataBlockOffset = 0;
     let dataBlockIndex = 0;
@@ -164,12 +167,10 @@ let GenotypesTable = React.createClass({
           const sourceStart = blockStart - dataBlockOffset;
           const sourceEnd = Math.min(blockEnd - dataBlockOffset, currentDataBlock.len);
           const sourceWidth = sourceEnd - sourceStart;
-          if (currentDataBlock.cache) {  //The drawing might not have happened yet
-            const source = currentDataBlock.cache;
-            gCtx.drawImage(source, sourceStart, 0, sourceWidth, source.height, //Source params
-              colStart * pixColWidth, 0, sourceWidth * pixColWidth, source.height); //Destination params
-            this.drawOverlay(oCtx, currentDataBlock, sourceStart, sourceWidth, colStart);
-          }
+          const source = currentDataBlock.cache;
+          gCtx.drawImage(source, sourceStart, 0, sourceWidth, source.height, //Source params
+            colStart * pixColWidth, 0, sourceWidth * pixColWidth, source.height); //Destination params
+          this.drawOverlay(oCtx, currentDataBlock, sourceStart, sourceWidth, colStart);
           if (blockEnd - dataBlockOffset > currentDataBlock.len) {  //Not all was drawn, need to go to next data
             blockStart += sourceWidth;
             colStart += sourceWidth;

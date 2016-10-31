@@ -1,23 +1,27 @@
-export default function chunkedMap(array, fn, maxTimePerChunk, context) {
-    context = context || window;
-    maxTimePerChunk = maxTimePerChunk || 200;
-    var index = 0;
+export default function chunkedMap(bounds, fn, updateFn, chunkSize, maxTimePerChunk, context) {
+  const [start, end] = bounds;
+  context = context || window;
+  maxTimePerChunk = maxTimePerChunk || 200;
+  chunkSize = chunkSize || 100;
+  var index = start;
 
-    function now() {
-        return new Date().getTime();
-    }
+  function now() {
+    return new Date().getTime();
+  }
 
-    function doChunk() {
-        var startTime = now();
-        while (index < array.length && (now() - startTime) <= maxTimePerChunk) {
-            // callback called with args (value, index, array)
-            fn.call(context, array[index], index, array);
-            ++index;
-        }
-        if (index < array.length) {
-            // set Timeout for async iteration
-            setTimeout(doChunk, 1);
-        }
+  function doChunk() {
+    var startTime = now();
+    let chunkStart = index;
+    while (index < end && ((index - chunkStart < chunkSize) || (now() - startTime) <= maxTimePerChunk && (chunkSize = index))) {
+      // callback called with args (value, index, array)
+      fn.call(context, index);
+      ++index;
     }
-    doChunk();
+    updateFn.call(context);
+    if (index < end) {
+      // set Timeout for async iteration
+      setTimeout(doChunk, 1);
+    }
+  }
+  setTimeout(doChunk, 1);
 }
