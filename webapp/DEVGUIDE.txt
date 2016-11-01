@@ -1,8 +1,8 @@
 #Getting started - a little rough at the mo until we come to fix up the build and deploy system
 
-sudo apt-get install -y git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
+sudo apt-get install -y git gcc gfortran python-dev virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
 
-sudo apt-add-repository "http://dev.monetdb.org/downloads/deb/ xenial monetdb"
+sudo apt-add-repository "deb http://dev.monetdb.org/downloads/deb/ xenial monetdb"
 wget --output-document=- https://www.monetdb.org/downloads/MonetDB-GPG-KEY | sudo apt-key add -
 sudo apt-get update
 sudo apt-get install -y --allow-unauthenticated monetdb5-sql monetdb-client
@@ -36,10 +36,10 @@ sudo npm install -g npm
 sudo npm cache clean -f
 sudo npm install -g n
 sudo n stable
-
+sudo npm install -g yarn
 #Now install dependancies
 cd webapp
-npm install
+yarn
 
 #Now run the dev html/js server
 npm run dev          #(options are dev, build, serveprod)
