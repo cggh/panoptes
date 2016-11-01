@@ -106,13 +106,13 @@ let GenomeBrowserWithActions = React.createClass({
           name: `Per ${table.capNameSingle}`,
           icon: table.icon,
           items: _map(table.tableBasedSummaryValuesById, (channel) => (
-          {
-            name: channel.name,
-            description: 'Description needs to be implemented',
-            icon: 'line-chart',
-            payload: serialiseComponent(<PerRowNumericalChannel name={channel.name} table={table.id}
-                                                                channel={channel.id}/>)
-          }
+            {
+              name: channel.name,
+              description: 'Description needs to be implemented',
+              icon: 'line-chart',
+              payload: serialiseComponent(<PerRowNumericalChannel name={channel.name} table={table.id}
+                                                                  channel={channel.id}/>)
+            }
           ))
         };
       }
