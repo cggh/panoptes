@@ -180,18 +180,6 @@ let DataTableView = React.createClass({
     }
   },
 
-  defaultWidth(columnData) {
-    if (columnData.dispDataType == 'Boolean')
-      return 75;
-    if (columnData.defaultWidth)
-      return columnData.defaultWidth;
-    if (columnData.isDate)
-      return 110;
-    if (columnData.decimDigits)
-      return Math.max(15 + columnData.decimDigits * 15, 110);
-    return 110;
-  },
-
   handleResize(size) {
     this.setState(size);
     this.setShowableRows(size);
@@ -214,8 +202,54 @@ let DataTableView = React.createClass({
     }
   },
 
+  calcColumnWidthPx(column) {
+
+    let {columnWidths} = this.props;
+
+    // If a pixel width for this column is in the props, use that.
+    if (columnWidths[column]) {
+      return columnWidths[column];
+    }
+
+    let columnData = this.tableConfig().propertiesById[column];
+
+    // If a pixel width for this column is in the config, use that.
+    if (columnData.defaultWidth) {
+      return columnData.defaultWidth;
+    }
+
+    // NB: Columns need to be initialized with at least a non-null.
+    let columnWidthPx = 0;
+
+    // NB: Needs to allow for
+    // sort icon (20px)
+    // + info icon (20px)
+    // + columnResizerContainer(6px, inc. columnResizerKnob (4px))
+    let paddingWidthPx = 46;
+
+    // NB: This method is not supported by IE < v9.0
+    // Also used in GenotypesTable.js
+
+    let propertyHeaderElementId = 'PropertyHeader_' + columnData.id;
+    let propertyHeaderElement = document.getElementById(propertyHeaderElementId);
+
+    if (propertyHeaderElement !== undefined && propertyHeaderElement !== null) {
+
+      let propertyHeaderTextElement = propertyHeaderElement.getElementsByClassName('label')[0];
+      let propertyHeaderTextElementStyles = window.getComputedStyle(propertyHeaderTextElement);
+      let canvas2dContext = this.canvas2dContext || (this.canvas2dContext = document.createElement('canvas').getContext('2d'));
+      // NB: syntax [font style][font weight][font size][font face]
+      canvas2dContext.font = propertyHeaderTextElementStyles['fontStyle'] + ' ' + propertyHeaderTextElementStyles['fontWeight'] + ' ' + propertyHeaderTextElementStyles['fontSize'] + ' "' + propertyHeaderTextElementStyles['fontFamily'] + '"';
+      columnWidthPx = Math.ceil(canvas2dContext.measureText(columnData.name).width) + paddingWidthPx;
+
+    }
+
+    return columnWidthPx;
+  },
+
+
   render() {
-    let {className, columns, columnWidths, order} = this.props;
+    let {className, columns, order} = this.props;
     let {loadStatus, rows, width, height} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -245,10 +279,8 @@ let DataTableView = React.createClass({
                 let {id, isPrimKey, description, name} = columnData;
                 let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
                 let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
-                let width = columnWidths[column] || this.defaultWidth(columnData);
                 return <Column
-                  //TODO Better default column widths
-                  width={width}
+                  width={this.calcColumnWidthPx(column)}
                   key={id}
                   columnKey={id}
                   fixed={isPrimKey}
@@ -257,13 +289,14 @@ let DataTableView = React.createClass({
                   minWidth={50}
                   header={
                     <PropertyHeader
+                      id={'PropertyHeader_' + id}
                       className={classNames({
                         'pointer': true,
                         'table-row-header': true,
                         'sort-column-ascending': asc,
                         'sort-column-descending': desc
                       })}
-                      style={{width: width}}
+                      style={{width: this.calcColumnWidthPx(column)}}
                       onClick={() => this.handleOrderChange(id)}
                       prefix={(asc || desc) ?
                         <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> :
@@ -271,7 +304,8 @@ let DataTableView = React.createClass({
                       name={name}
                       description={description}
                       tooltipPlacement={'bottom'}
-                      tooltipTrigger={['click']}/>
+                      tooltipTrigger={['click']}
+                    />
                   }
                   cell={({rowIndex}) => {
 
@@ -307,7 +341,7 @@ let DataTableView = React.createClass({
                                         }}>
                           <PropertyCell prop={columnData} value={cellData}/>
                         </div>
-                  );
+                    );
                   }}
                 />;
               })
