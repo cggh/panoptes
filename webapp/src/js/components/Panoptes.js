@@ -39,7 +39,11 @@ const muiTheme = getMuiTheme({
   palette: {
     primary1Color: blue500,
     primary2Color: blue700,
-    accent1Color: pinkA200
+    accent1Color: pinkA200,
+    genotypeRefColor: 'rgb(0, 128, 192)',
+    genotypeAltColor: 'rgb(255, 50, 50)',
+    genotypeHetColor: 'rgb(0, 192, 120)',
+    genotypeNoCallColor: 'rgb(230, 230, 230)'
   }
 });
 
@@ -96,15 +100,13 @@ let Panoptes = React.createClass({
                             onAddTab={actions.tabOpen}
                             onDragAway={actions.tabPopOut}
                 >
-                  {tabs.get('components').map((compId) => {
-                    return (
+                  {tabs.get('components').map((compId) =>
                       <TabPane
                         compId={compId}
                         key={compId}>
                         <SessionComponent compId={compId} />
                       </TabPane>
-                    );
-                  }).toArray()}
+                  ).toArray()}
                 </TabbedArea>
               </div>
             </div>

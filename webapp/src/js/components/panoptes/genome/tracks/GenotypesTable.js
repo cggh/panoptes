@@ -11,6 +11,11 @@ for (let i = 0; i < 255; i++) {
 }
 FRACTIONAL_COLOURMAP[0] = 'hsl(0,50%,0%)';
 
+function colourToRGBA(colour, alpha) {
+  // TODO: Currently only supports RGB to RGBA. Support conversion from HEX, RGBA, HSL, HSLA
+  return colour.replace(/\)/, ', ' + (alpha !== undefined ? alpha : 1) + ')').replace(/rgb/, 'rgba');
+}
+
 let GenotypesTable = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -18,6 +23,9 @@ let GenotypesTable = React.createClass({
     FluxMixin
   ],
 
+  contextTypes: {
+    muiTheme: React.PropTypes.object
+  },
   propTypes: {
     table: React.PropTypes.string,
     genomicPositions: React.PropTypes.any,
@@ -97,21 +105,22 @@ let GenotypesTable = React.createClass({
           let height = heightArray ?
             Math.max(0, Math.min(1, (heightArray[index] - heightOffset) / heightScale)) : 1;
           //Decide a colour for this genotype
+          let {genotypeRefColor, genotypeAltColor, genotypeHetColor, genotypeNoCallColor} = this.context.muiTheme.palette;
           if (cellColour === 'call') {
             switch (colArray[index]) {
               case 0:  //REF
-                ctx.fillStyle = 'rgba(0,128,192,' + alpha + ')';
+                ctx.fillStyle = colourToRGBA(genotypeRefColor, alpha);
                 break;
               case 1:  //ALT
-                ctx.fillStyle = 'rgba(255,50,50,' + alpha + ')';
+                ctx.fillStyle = colourToRGBA(genotypeAltColor, alpha);
                 break;
               case 2:  //HET
-                ctx.fillStyle = 'rgba(0,192,120,' + alpha + ')';
+                ctx.fillStyle = colourToRGBA(genotypeHetColor, alpha);
                 break;
               default: //NO CALL
                 height = 0.2;
                 alpha = 0.2;
-                ctx.fillStyle = 'rgb(230,230,230)';
+                ctx.fillStyle = genotypeNoCallColor;
                 break;
             }
           } else if (cellColour === 'fraction') {
