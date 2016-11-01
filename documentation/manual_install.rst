@@ -14,14 +14,14 @@ Download the code from the GitHub repository::
 
 Panoptes uses MonetDB (https://www.monetdb.org) which is best installed from their repository. See instructions at https://www.monetdb.org/downloads For ubuntu this is::
 
-    sudo apt-add-repository "http://dev.monetdb.org/downloads/deb/ xenial monetdb"
+    sudo apt-add-repository "deb http://dev.monetdb.org/downloads/deb/ xenial monetdb"
     wget --output-document=- https://www.monetdb.org/downloads/MonetDB-GPG-KEY | sudo apt-key add -
     sudo apt-get update
     sudo apt-get install -y --allow-unauthenticated monetdb5-sql monetdb-client
 
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based Linuxes::
 
-    sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
+    sudo apt-get install git gcc gfortran python-dev virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
 
 
 Build

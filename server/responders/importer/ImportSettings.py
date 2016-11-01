@@ -656,7 +656,7 @@ class ImportSettings:
             raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
 
         #We now write the change to the YAML - we reload as the load on constuction adds defaults etc and strips comments.
-        with portalocker.Lock(self.fileName, mode="r", timeout=5, truncate=None) as configfile:
+        with portalocker.Lock(self.fileName, mode="r", timeout=5) as configfile:
             config = ruamel.yaml.load(configfile.read(), ruamel.yaml.RoundTripLoader)
             config = updateConfig(config)
             with open(self.fileName+'_tmp', 'w') as tempfile:

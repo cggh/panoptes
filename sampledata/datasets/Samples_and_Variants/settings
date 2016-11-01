@@ -79,7 +79,6 @@ description: |
     </LayersControl>
   </Map>
   </div>
-
 # Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder names in [datatables]
 # This can be used to provide an explicit ordering of the data tables in the UI
@@ -94,3 +93,34 @@ dataTables:
 - sequence
 
 googleAnalyticsId: UA-56388755-1
+initialSessionState:
+  tabs:
+    selectedTab: d4rn1bi9y1
+    unclosableTab: FirstTab
+    components:
+    - FirstTab
+    - d4rn1bi9y1
+  foundGenes: []
+  usedTableQueries: []
+  components:
+    d4rn1bi9y1:
+      type: GenomeBrowserWithActions
+      props:
+        sidebar: true
+        children:
+        - type: ReferenceSequence
+          props:
+            fixed: true
+        - type: AnnotationChannel
+          props:
+            fixed: true
+    brh904k830:
+      type: DatasetManagerActions
+      props:
+        sidebar: true
+    FirstTab:
+      type: StartTab
+      props: {}
+  popups:
+    state: {}
+    components: []
