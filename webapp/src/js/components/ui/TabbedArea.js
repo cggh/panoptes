@@ -65,7 +65,7 @@ let TabbedArea = React.createClass({
       this.props.onClose(tabId);
     }
   },
-  handleAddTab() {
+  handleAddTab(event) {
     if (this.props.onAddTab) {
       event.preventDefault();
       event.stopPropagation();
