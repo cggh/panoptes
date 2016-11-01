@@ -37,4 +37,4 @@ export default function(property, value) {
     return parsedValue.toFixed(property.decimDigits).toLocaleString();
   }
   return value.toLocaleString();
-};
+}
