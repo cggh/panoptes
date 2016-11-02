@@ -31,6 +31,9 @@ import FilterButton from 'panoptes/FilterButton';
 
 import 'plot.scss';
 
+const NULL_TABLE = '— None —';
+const NULL_PLOT_TYPE = '— None —';
+
 // CSS
 //TODO: import 'Plot/Table/actions-styles.scss';
 
@@ -58,11 +61,10 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true
+      sidebar: true,
+      table: NULL_TABLE,
+      plotType: NULL_PLOT_TYPE
     };
-  },
-
-  componentWillMount() {
   },
 
   icon() {
@@ -78,14 +80,26 @@ let TablePlotActions = React.createClass({
   },
 
   handleChangeTable(table) {
-    this.props.setProps({table});
+    if (table === NULL_TABLE) {
+      this.props.setProps({table: undefined, plotType: undefined});
+    } else {
+      this.props.setProps({table});
+    }
   },
 
-  // NB: the behaviour depends on whether this.props.table is defined.
-  getDefinedQuery(query, table) {
-    return (query || this.props.query) ||
-      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
-      SQL.nullQuery;
+  handleChangePlotType(plotType) {
+    if (plotType === NULL_PLOT_TYPE) {
+      this.props.setProps({plotType: undefined});
+    } else {
+      this.props.setProps({plotType});
+    }
+  },
+
+  // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
+  getDefinedQuery() {
+    return this.props.query
+      || (this.props.table !== NULL_TABLE ? this.config.tablesById[this.props.table].defaultQuery : null)
+      || SQL.nullQuery;
   },
 
   render() {
@@ -96,6 +110,14 @@ let TablePlotActions = React.createClass({
       leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
       label: table.capNamePlural
     }));
+
+    let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
+
+    // Add a "no table" and "no plot type" options
+    // NB: The value cannot be undefined or null or '',
+    // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
+    tableOptions = [{value: NULL_TABLE, leftIcon: undefined, label: NULL_TABLE}].concat(tableOptions);
+    plotTypeOptions = [<MenuItem value={NULL_PLOT_TYPE} key={NULL_PLOT_TYPE} primaryText={NULL_PLOT_TYPE}/>].concat(plotTypeOptions);
 
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
@@ -108,16 +130,17 @@ let TablePlotActions = React.createClass({
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
-          {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
+          {table !== NULL_TABLE ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
-          <SelectField value={plotType}
-                       autoWidth={true}
-                       floatingLabelText="Plot Type:"
-                       onChange={(e, i, v) => setProps({plotType: v})}>
-            {_map(plotTypes, (plot, key) =>
-              <MenuItem value={key} key={key} primaryText={plot.displayName}/>)}
+          <SelectField
+            value={plotType}
+            autoWidth={true}
+            floatingLabelText="Plot Type:"
+            onChange={(e, i, v) => this.handleChangePlotType(v)}
+          >
+            {plotTypeOptions}
           </SelectField>
-          {table && plotType ?
+          {table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ?
             _map(plotTypes[plotType].dimensions, (dimension) =>
               <PropertySelector table={table}
                                 key={dimension}
@@ -140,15 +163,15 @@ let TablePlotActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
-            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
-            {plotType && table ?
+            <span className="text">{table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
+            {table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
               </span>
             : null}
           </div>
           <div className="grow">
-            {table ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
+            {table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
           </div>
         </div>
       </Sidebar>
