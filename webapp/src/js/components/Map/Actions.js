@@ -39,9 +39,9 @@ import 'map.scss';
 
 import 'leaflet-providers/leaflet-providers.js';
 
-const DEFAULT_BASE_TILE_LAYER = '— Default —';
-const DEFAULT_MARKER_LAYER = '— None —';
-const DEFAULT_OVERLAY_LAYER = '— None —';
+const NULL_BASE_TILE_LAYER = '— Default —';
+const NULL_MARKER_LAYER = '— None —';
+const NULL_OVERLAY_LAYER = '— None —';
 
 let MapActions = React.createClass({
   mixins: [
@@ -69,10 +69,10 @@ let MapActions = React.createClass({
   getDefaultProps() {
     return {
       query: undefined,
-      baseTileLayer: DEFAULT_BASE_TILE_LAYER,
-      overlayLayer: DEFAULT_OVERLAY_LAYER,
+      baseTileLayer: NULL_BASE_TILE_LAYER,
+      overlayLayer: NULL_OVERLAY_LAYER,
       sidebar: true,
-      table: DEFAULT_MARKER_LAYER
+      table: NULL_MARKER_LAYER
     };
   },
 
@@ -89,11 +89,11 @@ let MapActions = React.createClass({
     this.overlayLayersMenu = [];
 
     // Add the default baseTileLayer option, so it can be re-selected.
-    this.baseTileLayers[DEFAULT_BASE_TILE_LAYER] = {};
-    this.baseTileLayersMenu.push(<MenuItem key={DEFAULT_BASE_TILE_LAYER} primaryText={DEFAULT_BASE_TILE_LAYER} value={DEFAULT_BASE_TILE_LAYER} />);
+    this.baseTileLayers[NULL_BASE_TILE_LAYER] = {};
+    this.baseTileLayersMenu.push(<MenuItem key={NULL_BASE_TILE_LAYER} primaryText={NULL_BASE_TILE_LAYER} value={NULL_BASE_TILE_LAYER} />);
 
-    this.overlayLayers[DEFAULT_OVERLAY_LAYER] = {};
-    this.overlayLayersMenu.push(<MenuItem key={DEFAULT_OVERLAY_LAYER} primaryText={DEFAULT_OVERLAY_LAYER} value={DEFAULT_OVERLAY_LAYER} />);
+    this.overlayLayers[NULL_OVERLAY_LAYER] = {};
+    this.overlayLayersMenu.push(<MenuItem key={NULL_OVERLAY_LAYER} primaryText={NULL_OVERLAY_LAYER} value={NULL_OVERLAY_LAYER} />);
 
     for (let mapLayerKey in this.config.mapLayers) {
       this.overlayLayersMenu.push(<MenuItem key={mapLayerKey} primaryText={this.config.mapLayers[mapLayerKey].name} value={mapLayerKey} />);
@@ -206,7 +206,7 @@ let MapActions = React.createClass({
   },
   handleChangeTable(table) {
 
-    if (table === DEFAULT_MARKER_LAYER) {
+    if (table === NULL_MARKER_LAYER) {
       this.props.setProps({table: undefined});
     } else {
       this.props.setProps({table});
@@ -216,7 +216,7 @@ let MapActions = React.createClass({
   handleChangeBaseTileLayer(event, selectedIndex, selectedTileLayer) {
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
 
-    if (selectedTileLayer === DEFAULT_BASE_TILE_LAYER) {
+    if (selectedTileLayer === NULL_BASE_TILE_LAYER) {
       this.props.setProps({baseTileLayer: undefined, baseTileLayerProps: undefined, zoom: undefined});
     } else {
 
@@ -244,7 +244,7 @@ let MapActions = React.createClass({
   },
   handleChangeOverlayLayer(event, selectedIndex, selectedTileLayer) {
 
-    if (selectedTileLayer === DEFAULT_OVERLAY_LAYER) {
+    if (selectedTileLayer === NULL_OVERLAY_LAYER) {
       this.props.setProps({overlayLayer: undefined});
     } else {
       this.props.setProps({overlayLayer: selectedTileLayer});
@@ -282,7 +282,7 @@ let MapActions = React.createClass({
   // NB: the behaviour depends on whether this.props.table is defined.
   getDefinedQuery(query, table) {
     return (query || this.props.query) ||
-      (((table || this.props.table) && (table || this.props.table) !== DEFAULT_MARKER_LAYER) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      (((table || this.props.table) && (table || this.props.table) !== NULL_MARKER_LAYER) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
       SQL.nullQuery;
   },
 
@@ -300,7 +300,7 @@ let MapActions = React.createClass({
     // Add a "no table" option
     // NB: The value cannot be undefined or null or '',
     // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
-    tableOptions = [{value: DEFAULT_MARKER_LAYER, leftIcon: undefined, label: DEFAULT_MARKER_LAYER}].concat(tableOptions);
+    tableOptions = [{value: NULL_MARKER_LAYER, leftIcon: undefined, label: NULL_MARKER_LAYER}].concat(tableOptions);
 
 
     // If no table has been selected, just show a map with the other selected layers (if any).
@@ -312,7 +312,7 @@ let MapActions = React.createClass({
 
     let adaptedMarkersLayerProps = {};
 
-    if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
+    if (table !== undefined && table !== NULL_MARKER_LAYER) {
 
       if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
         adaptedMarkersLayerProps.query = this.getDefinedQuery();
@@ -329,7 +329,7 @@ let MapActions = React.createClass({
       );
     }
 
-    if (baseTileLayer !== undefined && baseTileLayer !== DEFAULT_BASE_TILE_LAYER) {
+    if (baseTileLayer !== undefined && baseTileLayer !== NULL_BASE_TILE_LAYER) {
 
       // Place the base tile layer below the overlay layer tile layer.
       baseTileLayerProps.zIndex = baseTileLayerProps.zIndex !== undefined ? baseTileLayerProps.zIndex : 1;
@@ -345,7 +345,7 @@ let MapActions = React.createClass({
       );
     }
 
-    if (overlayLayer !== undefined && overlayLayer !== DEFAULT_OVERLAY_LAYER) {
+    if (overlayLayer !== undefined && overlayLayer !== NULL_OVERLAY_LAYER) {
 
       let overlayLayerConfig = this.config.mapLayers[overlayLayer];
 
@@ -508,10 +508,10 @@ let MapActions = React.createClass({
 
     // This title appears above the map, in the blue bar.
     let mapTitle = 'Map';
-    if (baseTileLayer !== undefined && baseTileLayer != DEFAULT_BASE_TILE_LAYER) {
+    if (baseTileLayer !== undefined && baseTileLayer != NULL_BASE_TILE_LAYER) {
       mapTitle = baseTileLayer + ' map';
     }
-    if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
+    if (table !== undefined && table !== NULL_MARKER_LAYER) {
       mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
     }
 
