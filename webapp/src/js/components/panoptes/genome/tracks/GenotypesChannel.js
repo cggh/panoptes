@@ -179,9 +179,17 @@ let GenotypesChannel = React.createClass({
   },
 
   getDefinedQuery(query, table) {
-    return (query || this.props.query) ||
-      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
-      SQL.nullQuery;
+    return query
+      || ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null)
+      || SQL.nullQuery;
+  },
+
+  adjustRowSort(props) {
+    let {rowSort, rowLabel, table} = props;
+    let nextRowSort = rowSort || rowLabel || this.config.tablesById[this.config.twoDTablesById[table].rowDataTable].primKey;
+    if (nextRowSort !== rowSort) {
+      this.redirectedProps.setProps({rowSort: nextRowSort});
+    }
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -355,6 +363,11 @@ let GenotypesChannel = React.createClass({
     return block;
   },
 
+
+  componentWillMount() {
+    this.adjustRowSort(this.props);
+  },
+
   componentWillReceiveProps(nextProps) {
     const toCheck = ['start', 'end', 'layoutMode'];
     if (toCheck.some((name) => this.props[name] !== nextProps[name]) &&
@@ -362,6 +375,8 @@ let GenotypesChannel = React.createClass({
     ) {
       this.setState(this.layoutColumns(nextProps, this.state.genomicPositions));
     }
+
+    this.adjustRowSort(nextProps);
   },
 
   applyData(props, dataBlocks) {
@@ -594,5 +609,3 @@ const GenotypesLegend = React.createClass({
 });
 
 export default GenotypesChannel;
-
-
