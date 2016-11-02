@@ -155,7 +155,7 @@ let TablePlotActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            {table && plotType ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
+            {table && plotType ? <TablePlot showLegend={true} {...this.props} query={this.getDefinedQuery()} /> : null}
           </div>
         </div>
       </Sidebar>

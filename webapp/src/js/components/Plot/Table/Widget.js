@@ -114,13 +114,15 @@ let TablePlot = React.createClass({
   },
 
   render() {
-    const {plotType} = this.props;
+    const {plotType, showLegend, legend} = this.props;
     const {loadStatus} = this.state;
     return (
       <div className="plot-container">
         { plotType ?
           <Plot className="plot"
                 plotType={plotType}
+                showLegend={showLegend}
+                legend={legend}
                 {...this.state}
           />
           : null }

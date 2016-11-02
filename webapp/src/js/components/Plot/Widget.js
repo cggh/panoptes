@@ -14,7 +14,19 @@ let Plot = React.createClass({
 
   propTypes: {
     plotType: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {})
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {}),
+    showLegend: React.PropTypes.bool,
+    legend: React.PropTypes.object
+  },
+
+  getDefaultProps() {
+    return {
+      showLegend: false,
+      legend: {
+        x: 100,
+        y: 1
+      }
+    };
   },
 
   getInitialState() {
@@ -24,19 +36,17 @@ let Plot = React.createClass({
     };
   },
 
-  componentDidMount() {
-  },
-
-
   render() {
     let {width, height} = this.state;
-    let {plotType} = this.props;
+    let {plotType, showLegend, legend} = this.props;
 
     const layout = {
       barmode: 'overlay',
       autosize: false,
       width: width,
-      height: height
+      height: height,
+      showlegend: showLegend,
+      legend: legend
     };
     const config = {
       showLink: false,
