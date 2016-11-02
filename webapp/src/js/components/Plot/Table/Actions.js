@@ -142,11 +142,14 @@ let TablePlotActions = React.createClass({
           </SelectField>
           {table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ?
             _map(plotTypes[plotType].dimensions, (dimension) =>
-              <PropertySelector table={table}
-                                key={dimension}
-                                value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
-                                label={titleCase(dimension)}
-                                onSelect={(v) => setProps({[dimension]: v})}/>
+              <PropertySelector
+                table={table}
+                key={dimension}
+                value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
+                label={titleCase(dimension)}
+                onSelect={(v) => setProps({[dimension]: v})}
+                allowNull={true}
+              />
             )
             : null }
         </div>
