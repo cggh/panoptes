@@ -184,14 +184,6 @@ let GenotypesChannel = React.createClass({
       || SQL.nullQuery;
   },
 
-  adjustRowSort(props) {
-    let {rowSort, rowLabel, table} = props;
-    let nextRowSort = rowSort || rowLabel || this.config.tablesById[this.config.twoDTablesById[table].rowDataTable].primKey;
-    if (nextRowSort !== rowSort) {
-      this.redirectedProps.setProps({rowSort: nextRowSort});
-    }
-  },
-
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort} = props;
@@ -363,11 +355,6 @@ let GenotypesChannel = React.createClass({
     return block;
   },
 
-
-  componentWillMount() {
-    this.adjustRowSort(this.props);
-  },
-
   componentWillReceiveProps(nextProps) {
     const toCheck = ['start', 'end', 'layoutMode'];
     if (toCheck.some((name) => this.props[name] !== nextProps[name]) &&
@@ -375,8 +362,6 @@ let GenotypesChannel = React.createClass({
     ) {
       this.setState(this.layoutColumns(nextProps, this.state.genomicPositions));
     }
-
-    this.adjustRowSort(nextProps);
   },
 
   applyData(props, dataBlocks) {
@@ -527,7 +512,7 @@ const GenotypesControls = React.createClass({
           <PropertySelector table={config.rowDataTable}
                             value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
                             label="Row Label"
-                            onSelect={(rowLabel) => this.redirectedProps.setProps({rowLabel})}/>
+                            onSelect={(rowLabel) => this.redirectedProps.setProps({rowLabel, rowSort: rowSort || rowLabel})}/>
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}
