@@ -31,9 +31,6 @@ import FilterButton from 'panoptes/FilterButton';
 
 import 'plot.scss';
 
-const NULL_TABLE = '— None —';
-const NULL_PLOT_TYPE = '— None —';
-
 // CSS
 //TODO: import 'Plot/Table/actions-styles.scss';
 
@@ -62,8 +59,6 @@ let TablePlotActions = React.createClass({
       query: undefined,
       setProps: null,
       sidebar: true,
-      table: NULL_TABLE,
-      plotType: NULL_PLOT_TYPE
     };
   },
 
@@ -80,25 +75,17 @@ let TablePlotActions = React.createClass({
   },
 
   handleChangeTable(table) {
-    if (table === NULL_TABLE) {
-      this.props.setProps({table: undefined, plotType: undefined});
-    } else {
-      this.props.setProps({table});
-    }
+    this.props.setProps({table});
   },
 
   handleChangePlotType(plotType) {
-    if (plotType === NULL_PLOT_TYPE) {
-      this.props.setProps({plotType: undefined});
-    } else {
-      this.props.setProps({plotType});
-    }
+    this.props.setProps({plotType});
   },
 
   // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
   getDefinedQuery() {
     return this.props.query
-      || (this.props.table !== NULL_TABLE ? this.config.tablesById[this.props.table].defaultQuery : null)
+      || (this.props.table ? this.config.tablesById[this.props.table].defaultQuery : null)
       || SQL.nullQuery;
   },
 
@@ -113,12 +100,6 @@ let TablePlotActions = React.createClass({
 
     let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
 
-    // Add a "no table" and "no plot type" options
-    // NB: The value cannot be undefined or null or '',
-    // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
-    tableOptions = [{value: NULL_TABLE, leftIcon: undefined, label: NULL_TABLE}].concat(tableOptions);
-    plotTypeOptions = [<MenuItem value={NULL_PLOT_TYPE} key={NULL_PLOT_TYPE} primaryText={NULL_PLOT_TYPE}/>].concat(plotTypeOptions);
-
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
         <SidebarHeader icon={this.icon()} description="View table data graphically"/>
@@ -127,10 +108,10 @@ let TablePlotActions = React.createClass({
             value={table}
             autoWidth={true}
             floatingLabelText="Table"
-            onChange={this.handleChangeTable}
+            onChange={(v) => this.handleChangeTable(v)}
             options={tableOptions}
           />
-          {table !== NULL_TABLE ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
+          {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
           <SelectField
             value={plotType}
@@ -140,7 +121,7 @@ let TablePlotActions = React.createClass({
           >
             {plotTypeOptions}
           </SelectField>
-          {table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ?
+          {table && plotType ?
             _map(plotTypes[plotType].dimensions, (dimension) =>
               <PropertySelector
                 table={table}
@@ -166,15 +147,15 @@ let TablePlotActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
-            <span className="text">{table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
-            {table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ?
+            <span className="text">{table && plotType ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
+            {table && plotType ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
               </span>
             : null}
           </div>
           <div className="grow">
-            {table !== NULL_TABLE && plotType !== NULL_PLOT_TYPE ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
+            {table && plotType ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
           </div>
         </div>
       </Sidebar>
