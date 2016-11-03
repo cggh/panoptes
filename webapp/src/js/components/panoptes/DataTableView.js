@@ -37,6 +37,8 @@ const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 const SCROLLBAR_HEIGHT = 15;
 
+const MEASURED_COLUMN_WIDTHS = {};
+
 let DataTableView = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -203,9 +205,7 @@ let DataTableView = React.createClass({
   },
 
   calcColumnWidthPx(column) {
-
     let {columnWidths} = this.props;
-
     // If a pixel width for this column is in the props, use that.
     if (columnWidths[column]) {
       return columnWidths[column];
@@ -218,14 +218,17 @@ let DataTableView = React.createClass({
       return columnData.defaultWidth;
     }
 
+    if (MEASURED_COLUMN_WIDTHS[this.props.table] && MEASURED_COLUMN_WIDTHS[this.props.table][column]) {
+      return MEASURED_COLUMN_WIDTHS[this.props.table][column]
+    }
     // NB: Columns need to be initialized with at least a non-null.
     let columnWidthPx = 0;
 
     // NB: Needs to allow for
     // sort icon (20px)
-    // + info icon (20px)
+    // + info icon (20px) (if set on this column)
     // + columnResizerContainer(6px, inc. columnResizerKnob (4px))
-    let paddingWidthPx = 46;
+    let paddingWidthPx = 26 + (this.tableConfig().propertiesById[column].description ? 20 : 0);
 
     // NB: This method is not supported by IE < v9.0
     // Also used in GenotypesTable.js
@@ -241,7 +244,8 @@ let DataTableView = React.createClass({
       // NB: syntax [font style][font weight][font size][font face]
       canvas2dContext.font = propertyHeaderTextElementStyles['fontStyle'] + ' ' + propertyHeaderTextElementStyles['fontWeight'] + ' ' + propertyHeaderTextElementStyles['fontSize'] + ' "' + propertyHeaderTextElementStyles['fontFamily'] + '"';
       columnWidthPx = Math.ceil(canvas2dContext.measureText(columnData.name).width) + paddingWidthPx;
-
+      MEASURED_COLUMN_WIDTHS[this.props.table] = MEASURED_COLUMN_WIDTHS[this.props.table] || {}
+      MEASURED_COLUMN_WIDTHS[this.props.table][column] = columnWidthPx
     }
 
     return columnWidthPx;
@@ -335,7 +339,7 @@ let DataTableView = React.createClass({
                         <div className="table-row-cell"
                                         style={{
                                           textAlign: alignment,
-                                          width: width,
+                                          width: this.calcColumnWidthPx(column),
                                           height: ROW_HEIGHT + 'px',
                                           background: background
                                         }}>
