@@ -63,25 +63,28 @@ let GenomeBrowserWithActions = React.createClass({
           }
           ]
         };
-        _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser && (prop.isCategorical || prop.isBoolean)) {
-            groups[table.id].items.push({
-              name: prop.name,
-              description: prop.description,
-              icon: prop.icon,
-              payload: serialiseComponent(<CategoricalChannel name={prop.name} table={table.id} track={prop.id}/>)
-            });
-          } else if (prop.showInBrowser && prop.isNumerical) {
-            groups[table.id].items.push({
-              name: prop.name,
-              description: prop.description,
-              icon: prop.icon,
-              payload: serialiseComponent(<NumericalTrackGroupChannel>
-                <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id}/>
-              </NumericalTrackGroupChannel>)
-            });
+        _forEach(
+          _filter(table.properties, (prop) => prop.id !== table.chromosome && prop.id !== table.position),
+          (prop) => {
+            if (prop.showInBrowser && (prop.isCategorical || prop.isBoolean)) {
+              groups[table.id].items.push({
+                name: prop.name,
+                description: prop.description,
+                icon: prop.icon,
+                payload: serialiseComponent(<CategoricalChannel name={prop.name} table={table.id} track={prop.id}/>)
+              });
+            } else if (prop.showInBrowser && prop.isNumerical) {
+              groups[table.id].items.push({
+                name: prop.name,
+                description: prop.description,
+                icon: prop.icon,
+                payload: serialiseComponent(<NumericalTrackGroupChannel>
+                  <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id}/>
+                </NumericalTrackGroupChannel>)
+              });
+            }
           }
-        });
+        );
       }
     });
     if (this.config.twoDTables.length > 0) {
@@ -106,13 +109,18 @@ let GenomeBrowserWithActions = React.createClass({
           name: `Per ${table.capNameSingle}`,
           icon: table.icon,
           items: _map(table.tableBasedSummaryValuesById, (channel) => (
-          {
-            name: channel.name,
-            description: 'Description needs to be implemented',
-            icon: 'line-chart',
-            payload: serialiseComponent(<PerRowNumericalChannel name={channel.name} table={table.id}
-                                                                channel={channel.id}/>)
-          }
+            {
+              name: channel.name,
+              description: 'Description needs to be implemented',
+              icon: 'line-chart',
+              payload: serialiseComponent(
+                <PerRowNumericalChannel
+                  name={channel.name}
+                  table={table.id}
+                  channel={channel.id}
+                />
+              )
+            }
           ))
         };
       }
