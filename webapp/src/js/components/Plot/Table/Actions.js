@@ -58,11 +58,8 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true
+      sidebar: true,
     };
-  },
-
-  componentWillMount() {
   },
 
   icon() {
@@ -81,11 +78,15 @@ let TablePlotActions = React.createClass({
     this.props.setProps({table});
   },
 
-  // NB: the behaviour depends on whether this.props.table is defined.
-  getDefinedQuery(query, table) {
-    return (query || this.props.query) ||
-      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
-      SQL.nullQuery;
+  handleChangePlotType(plotType) {
+    this.props.setProps({plotType});
+  },
+
+  // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
+  getDefinedQuery() {
+    return this.props.query
+      || (this.props.table ? this.config.tablesById[this.props.table].defaultQuery : null)
+      || SQL.nullQuery;
   },
 
   render() {
@@ -97,6 +98,8 @@ let TablePlotActions = React.createClass({
       label: table.capNamePlural
     }));
 
+    let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
+
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
         <SidebarHeader icon={this.icon()} description="View table data graphically"/>
@@ -105,25 +108,29 @@ let TablePlotActions = React.createClass({
             value={table}
             autoWidth={true}
             floatingLabelText="Table"
-            onChange={this.handleChangeTable}
+            onChange={(v) => this.handleChangeTable(v)}
             options={tableOptions}
           />
           {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
-          <SelectField value={plotType}
-                       autoWidth={true}
-                       floatingLabelText="Plot Type:"
-                       onChange={(e, i, v) => setProps({plotType: v})}>
-            {_map(plotTypes, (plot, key) =>
-              <MenuItem value={key} key={key} primaryText={plot.displayName}/>)}
+          <SelectField
+            value={plotType}
+            autoWidth={true}
+            floatingLabelText="Plot Type:"
+            onChange={(e, i, v) => this.handleChangePlotType(v)}
+          >
+            {plotTypeOptions}
           </SelectField>
           {table && plotType ?
             _map(plotTypes[plotType].dimensions, (dimension) =>
-              <PropertySelector table={table}
-                                key={dimension}
-                                value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
-                                label={titleCase(dimension)}
-                                onSelect={(v) => setProps({[dimension]: v})}/>
+              <PropertySelector
+                table={table}
+                key={dimension}
+                value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
+                label={titleCase(dimension)}
+                onSelect={(v) => setProps({[dimension]: v})}
+                allowNull={true}
+              />
             )
             : null }
         </div>
@@ -140,15 +147,15 @@ let TablePlotActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
-            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
-            {plotType && table ?
+            <span className="text">{table && plotType ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
+            {table && plotType ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
               </span>
             : null}
           </div>
           <div className="grow">
-            {table ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
+            {table && plotType ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
           </div>
         </div>
       </Sidebar>
