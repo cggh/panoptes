@@ -179,9 +179,9 @@ let GenotypesChannel = React.createClass({
   },
 
   getDefinedQuery(query, table) {
-    return (query || this.props.query) ||
-      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
-      SQL.nullQuery;
+    return query
+      || ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null)
+      || SQL.nullQuery;
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -512,7 +512,7 @@ const GenotypesControls = React.createClass({
           <PropertySelector table={config.rowDataTable}
                             value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
                             label="Row Label"
-                            onSelect={(rowLabel) => this.redirectedProps.setProps({rowLabel})}/>
+                            onSelect={(rowLabel) => this.redirectedProps.setProps({rowLabel, rowSort: rowSort || rowLabel})}/>
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}
@@ -594,5 +594,3 @@ const GenotypesLegend = React.createClass({
 });
 
 export default GenotypesChannel;
-
-
