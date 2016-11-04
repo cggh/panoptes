@@ -31,9 +31,6 @@ import FilterButton from 'panoptes/FilterButton';
 
 import 'plot.scss';
 
-// CSS
-//TODO: import 'Plot/Table/actions-styles.scss';
-
 let TablePlotActions = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -48,7 +45,10 @@ let TablePlotActions = React.createClass({
     plotType: React.PropTypes.string,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
+    horizontal: React.PropTypes.string,
+    vertical: React.PropTypes.string,
+    colour: React.PropTypes.string
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -98,7 +98,10 @@ let TablePlotActions = React.createClass({
       label: table.capNamePlural
     }));
 
+
     let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
+
+    let dimensionProperties = {};
 
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
@@ -122,20 +125,41 @@ let TablePlotActions = React.createClass({
             {plotTypeOptions}
           </SelectField>
           {table && plotType ?
-            _map(plotTypes[plotType].dimensions, (dimension) =>
-              <PropertySelector
+            _map(plotTypes[plotType].dimensions, (dimension) => {
+              let value = this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null;
+              let name = this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.config.tablesById[table].propertiesById[this.props[dimension]].name : null;
+
+console.log('property object %o', this.config.tablesById[table].propertiesById[value]);
+
+              dimensionProperties[dimension] = {id: value, name};
+              return <PropertySelector
                 table={table}
                 key={dimension}
-                value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
+                value={value}
                 label={titleCase(dimension)}
                 onSelect={(v) => setProps({[dimension]: v})}
                 allowNull={true}
-              />
-            )
+              />;
+            })
             : null }
         </div>
       </div>
     );
+
+console.log('Actions props: %o', this.props);
+
+    //plotTypes[plotType].dimensions
+console.log('Actions dimensionProperties: %o', dimensionProperties);
+
+
+    // make a legend of the colours and use legendonly so it doesn't show
+
+
+    let hasColourDimension = false;
+    if (plotType && dimensionProperties.colour && this.props.colour) {
+      hasColourDimension = true;
+    }
+
     return (
       <Sidebar
         docked={sidebar}
@@ -155,7 +179,7 @@ let TablePlotActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            {table && plotType ? <TablePlot showLegend={true} {...this.props} query={this.getDefinedQuery()} /> : null}
+            {table && plotType ? <TablePlot showLegend={hasColourDimension} dimensionProperties={dimensionProperties} {...this.props} query={this.getDefinedQuery()} /> : null}
           </div>
         </div>
       </Sidebar>

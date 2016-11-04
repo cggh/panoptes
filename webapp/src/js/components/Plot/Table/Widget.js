@@ -34,7 +34,8 @@ let TablePlot = React.createClass({
     setProps: React.PropTypes.func,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
+    dimensionProperties: React.PropTypes.object
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -84,14 +85,27 @@ let TablePlot = React.createClass({
           )
         )
         .then((data) => {
+
+console.log('data: %o', data);
+
           this.setState(
             _reduce(allDimensions,
               (state, dim) => {
                 state[dim] = data[props[dim]] || null;
                 let prop = tableConfig.propertiesById[props[dim]];
+
                 if (dim == 'colour' && state[dim] && !prop.isNumerical && prop.isCategorical) {
                   state[dim] = _map(state[dim], propertyColour(prop));
+console.log('dim: %o', dim);
+console.log('state[dim]: %o', state[dim]);
+console.log('property: %o', prop);
+console.log('colour: ' + state[dim]);
+
                 }
+
+console.log('state: %o', state);
+
+
                 return state;
               },
               {loadStatus: 'loaded'})
@@ -114,8 +128,24 @@ let TablePlot = React.createClass({
   },
 
   render() {
-    const {plotType, showLegend, legend} = this.props;
+    const {plotType, showLegend, legend, dimensionProperties} = this.props;
     const {loadStatus} = this.state;
+
+if (dimensionProperties) {
+console.log('Table Plot dimensionProperties.colour: %o', dimensionProperties.colour);
+}
+
+/*
+    // To go here, not in Plot, which will need to handle multiple traces.
+
+
+    // TODO: support multiple traces
+    if (dimensionProperties) {
+      plotData[0].name = _map(dimensionProperties, (property) => (property.name || property.id)).join(' ');
+    }
+
+*/
+
     return (
       <div className="plot-container">
         { plotType ?
@@ -123,6 +153,7 @@ let TablePlot = React.createClass({
                 plotType={plotType}
                 showLegend={showLegend}
                 legend={legend}
+                dimensionProperties={dimensionProperties}
                 {...this.state}
           />
           : null }
