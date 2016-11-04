@@ -6,6 +6,7 @@ import Sidebar from 'react-sidebar';
 // Lodash
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
+import _clone from 'lodash/clone';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -45,10 +46,7 @@ let TablePlotActions = React.createClass({
     plotType: React.PropTypes.string,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
-    horizontal: React.PropTypes.string,
-    vertical: React.PropTypes.string,
-    colour: React.PropTypes.string
+    dimensionProperties: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}))
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -59,6 +57,7 @@ let TablePlotActions = React.createClass({
       query: undefined,
       setProps: null,
       sidebar: true,
+      dimensionProperties: {}
     };
   },
 
@@ -82,6 +81,14 @@ let TablePlotActions = React.createClass({
     this.props.setProps({plotType});
   },
 
+  handleChangeDimensionProperty(payload) {
+    let {dimension, property} = payload;
+    let nextDimensionProperties = _clone(this.props.dimensionProperties);
+    nextDimensionProperties[dimension] = property;
+    this.props.setProps({dimensionProperties: nextDimensionProperties});
+console.log('handleChangeDimensionValue nextDimensionProperties: %o', nextDimensionProperties);
+  },
+
   // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
   getDefinedQuery() {
     return this.props.query
@@ -90,7 +97,7 @@ let TablePlotActions = React.createClass({
   },
 
   render() {
-    let {sidebar, table, plotType, setProps} = this.props;
+    let {sidebar, table, plotType, setProps, dimensionProperties} = this.props;
 
     let tableOptions = _map(this.config.visibleTables, (table) => ({
       value: table.id,
@@ -98,10 +105,7 @@ let TablePlotActions = React.createClass({
       label: table.capNamePlural
     }));
 
-
     let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
-
-    let dimensionProperties = {};
 
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
@@ -126,18 +130,22 @@ let TablePlotActions = React.createClass({
           </SelectField>
           {table && plotType ?
             _map(plotTypes[plotType].dimensions, (dimension) => {
-              let value = this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null;
-              let name = this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.config.tablesById[table].propertiesById[this.props[dimension]].name : null;
 
-console.log('property object %o', this.config.tablesById[table].propertiesById[value]);
+              // If the selected property for this dimension
+              // e.g. "Chromosome" selected for the horizontal dimension
+              // is actually a property of the selected table
+              // e.g. "Chromosome" is a property in the "Variants" table
+              // then allow the selection of this property for this dimension
+              // e.g. allow "Chromosome" to be value of the horizontal dimension
+              // TODO: Why is this check necessary or prudent?
+              let selectedProperty = this.config.tablesById[table].propertiesById[dimensionProperties[dimension]] ? dimensionProperties[dimension] : null;
 
-              dimensionProperties[dimension] = {id: value, name};
               return <PropertySelector
                 table={table}
                 key={dimension}
-                value={value}
+                value={selectedProperty}
                 label={titleCase(dimension)}
-                onSelect={(v) => setProps({[dimension]: v})}
+                onSelect={(v) => this.handleChangeDimensionProperty({dimension, property: v})}
                 allowNull={true}
               />;
             })
@@ -146,19 +154,7 @@ console.log('property object %o', this.config.tablesById[table].propertiesById[v
       </div>
     );
 
-console.log('Actions props: %o', this.props);
-
-    //plotTypes[plotType].dimensions
-console.log('Actions dimensionProperties: %o', dimensionProperties);
-
-
-    // make a legend of the colours and use legendonly so it doesn't show
-
-
-    let hasColourDimension = false;
-    if (plotType && dimensionProperties.colour && this.props.colour) {
-      hasColourDimension = true;
-    }
+    // FIXME: test with {...dimensionProperties}
 
     return (
       <Sidebar
@@ -168,7 +164,7 @@ console.log('Actions dimensionProperties: %o', dimensionProperties);
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
+                  name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">{table && plotType ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
@@ -179,7 +175,7 @@ console.log('Actions dimensionProperties: %o', dimensionProperties);
             : null}
           </div>
           <div className="grow">
-            {table && plotType ? <TablePlot showLegend={hasColourDimension} dimensionProperties={dimensionProperties} {...this.props} query={this.getDefinedQuery()} /> : null}
+            {table && plotType && dimensionProperties ? <TablePlot dimensionProperties={dimensionProperties} table={table} query={this.getDefinedQuery()} /> : null}
           </div>
         </div>
       </Sidebar>

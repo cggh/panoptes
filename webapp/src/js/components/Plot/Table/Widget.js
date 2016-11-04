@@ -3,9 +3,9 @@ import React from 'react';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
+import _pickBy from 'lodash/pickBy';
 
 import Plot from 'Plot/Widget';
-
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -16,8 +16,6 @@ import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import ErrorReport from 'panoptes/ErrorReporter';
 import {allDimensions} from 'panoptes/plotTypes';
-import {propertyColour} from 'util/Colours';
-
 
 import 'plot.scss';
 
@@ -27,15 +25,20 @@ let TablePlot = React.createClass({
     PureRenderMixin,
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin.apply(this, ['table', 'query'].concat(allDimensions))
+    DataFetcherMixin.apply(this, ['table', 'query', 'dimensionProperties'].concat(allDimensions))
   ],
 
+  // ['table', 'query'].concat(_map(allDimensions, (dim) => 'dimensionProperties.' + dim))
+
+  // NB: For template API, TablePlot also supports individual dimension props.
+  // E.g. either dimensionProperties={horizontal: 'chromosome'} or horizontal="chromosome"
   propTypes: {
+    plotType: React.PropTypes.string,
     setProps: React.PropTypes.func,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
-    dimensionProperties: React.PropTypes.object
+    dimensionProperties: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})),
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -49,8 +52,18 @@ let TablePlot = React.createClass({
 
   getInitialState() {
     return {
-      loadStatus: 'loaded'
+      loadStatus: 'loaded',
+      dimensionData: {},
+      dimensionMetadata: {}
     };
+  },
+
+  collectDimensionProperties(props) {
+    // Get a list of all the props that have the same name as a recognised dimension, e.g. 'horizontal'
+    let individualDimensionProps = _pickBy(props, (value, name) => allDimensions.indexOf(name) !== -1);
+    // Combine that list of props with any others that are in the prop named 'dimensionProperties'
+    // NB: individualDimensionProps override props.dimensionProperties
+    return {...individualDimensionProps, ...props.dimensionProperties};
   },
 
   getDefinedQuery(query, table) {
@@ -60,13 +73,29 @@ let TablePlot = React.createClass({
   },
 
   fetchData(props, requestContext) {
+
+console.log('fetchData props: %o', props);
+
     const {table, query} = props;
+    const dimensionProperties = this.collectDimensionProperties(props);
     const tableConfig = this.config.tablesById[table];
-    const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesById[props[dim]]);
-    const columns = _map(dimensions, (dim) => props[dim]);
+
+console.log('fetchData dimensionProperties: %o', dimensionProperties);
+
+    // Get a list of all the recognised dimension names, e.g. horizontal, that:
+    // - have been provided as props; and
+    // - have a value, e.g. "Chromosome", is a recognised property of the table.
+    const validDimensionNames = _filter(allDimensions, (dim) => dimensionProperties[dim] && tableConfig.propertiesById[dimensionProperties[dim]]);
+
+    // Get a list of all the values, e.g. "Chromosome", for all the valid dimension names.
+    const columns = _map(validDimensionNames, (validDimensionName) => dimensionProperties[validDimensionName]);
+
+console.log('fetchData columns: %o', columns);
 
     if (columns.length > 0) {
+
       this.setState({loadStatus: 'loading'});
+
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.id,
@@ -86,78 +115,71 @@ let TablePlot = React.createClass({
         )
         .then((data) => {
 
-console.log('data: %o', data);
+console.log('fetchData data: %o', data);
 
-          this.setState(
-            _reduce(allDimensions,
-              (state, dim) => {
-                state[dim] = data[props[dim]] || null;
-                let prop = tableConfig.propertiesById[props[dim]];
+// console.log('TablePlot data: %o', data);
+//
+//           let dimensionData = _reduce(allDimensions, (state, dim) => {
+//
+// console.log('_reduce state: %o', state);
+// console.log('_reduce dim: %o', dim);
+//
+//             state[dim] = data[dimensions[dim]] || null;
+//             return state;
+//           });
+//
+// console.log('nextDimensionData %o: ', nextDimensionData);
 
-                if (dim == 'colour' && state[dim] && !prop.isNumerical && prop.isCategorical) {
-                  state[dim] = _map(state[dim], propertyColour(prop));
-console.log('dim: %o', dim);
-console.log('state[dim]: %o', state[dim]);
-console.log('property: %o', prop);
-console.log('colour: ' + state[dim]);
+          // Need to convert {'Value1': [NaN, 0, ...], 'Value2': [0.5, NaN]}
+          // to {'horizontal':  [NaN, 0, ...], 'vertical':[0.5, NaN] }
+          // and metadata 'horizontal': 'Value1', 'vertical': 'Value2'
 
-                }
+          this.setState({
+            dimensionData: {'horizontal': data['chromosome'], 'vertical': data['position']},
+            dimensionMetadata: {'horizontal': 'chromosome', 'vertical': 'position'},
+            loadStatus: 'loaded'
+          });
 
-console.log('state: %o', state);
-
-
-                return state;
-              },
-              {loadStatus: 'loaded'})
-          );
         })
         .catch((error) => {
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
           this.setState({loadStatus: 'error'});
         });
+
     } else {
-      this.setState(
-        _reduce(allDimensions,
-          (state, dim) => {
-            state[dim] = null;
-            return state;
-          },
-          {loadStatus: 'loaded'})
-      );
+
+      // let nextDimensionData = _reduce(allDimensions, (state, dim) => {
+      //   state[dim] = null;
+      //   return state;
+      // });
+
+console.log('fetchData no columns');
+
+      this.setState({
+        dimensionData: {'horizontal': null, 'vertical': null},
+        dimensionMetadata: {'horizontal': 'chromosome', 'vertical': 'position'},
+        loadStatus: 'loaded'
+      });
+
     }
   },
 
   render() {
-    const {plotType, showLegend, legend, dimensionProperties} = this.props;
-    const {loadStatus} = this.state;
-
-if (dimensionProperties) {
-console.log('Table Plot dimensionProperties.colour: %o', dimensionProperties.colour);
-}
-
-/*
-    // To go here, not in Plot, which will need to handle multiple traces.
-
-
-    // TODO: support multiple traces
-    if (dimensionProperties) {
-      plotData[0].name = _map(dimensionProperties, (property) => (property.name || property.id)).join(' ');
-    }
-
-*/
+    const {plotType} = this.props;
 
     return (
       <div className="plot-container">
-        { plotType ?
-          <Plot className="plot"
-                plotType={plotType}
-                showLegend={showLegend}
-                legend={legend}
-                dimensionProperties={dimensionProperties}
-                {...this.state}
+        {
+          plotType ?
+          <Plot
+            className="plot"
+            plotType={plotType}
+            dimensionData={this.state.dimensionData}
+            dimensionMetadata={this.state.dimensionMetadata}
           />
-          : null }
-        <Loading status={loadStatus} />
+          : null
+        }
+        <Loading status={this.state.loadStatus} />
       </div>);
   }
 });

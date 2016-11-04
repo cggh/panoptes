@@ -14,20 +14,8 @@ let Plot = React.createClass({
 
   propTypes: {
     plotType: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {}),
-    showLegend: React.PropTypes.bool,
-    legend: React.PropTypes.object,
-    dimensionProperties: React.PropTypes.object
-  },
-
-  // https://plot.ly/javascript/reference/#layout-legend
-  getDefaultProps() {
-    return {
-      showLegend: false,
-      legend: {
-        orientation: 'h'
-      }
-    };
+    dimensionData: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {})),
+    dimensionMetadata: React.PropTypes.object
   },
 
   getInitialState() {
@@ -39,21 +27,28 @@ let Plot = React.createClass({
 
   render() {
     let {width, height} = this.state;
-    let {plotType, showLegend, legend} = this.props;
+    let {plotType, dimensionData, dimensionMetadata} = this.props;
 
-    const layout = {
+
+console.log('Plot dimensionData %o', dimensionData);
+console.log('Plot dimensionMetadata %o', dimensionMetadata);
+
+    const defaultLayout = {
       barmode: 'overlay',
       autosize: false,
       width: width,
       height: height,
-      showlegend: showLegend,
-      legend: legend
+      showlegend: false
     };
 
     const config = {
       showLink: false,
       displayModeBar: true
     };
+
+    let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);
+
+console.log('plotData: %o', plotData);
 
     return (
       <DetectResize
@@ -63,8 +58,8 @@ let Plot = React.createClass({
       >
         <Plotly
           className="plot"
-          data={plotTypes[plotType].plotlyTraces(this.props)}
-          layout={layout}
+          data={plotData}
+          layout={{...defaultLayout, ...plotTypes[plotType].layout}}
           config={config}
         />
       </DetectResize>
