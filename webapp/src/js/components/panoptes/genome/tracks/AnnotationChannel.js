@@ -195,8 +195,8 @@ let AnnotationChannel = React.createClass({
       if (types[i] === 'CDS') {
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
-        if (x2 > -4 && x1 < width + 4 && x2 - x1 > 0.25) {
-          ctx.fillRect(x1, (rows[i] * ROW_HEIGHT) + 16, x2 - x1, 10);   //Exon square
+        if (x2 > -4 && x1 < width + 4) {
+          ctx.fillRect(x1, (rows[i] * ROW_HEIGHT) + 16, Math.max(0.125, x2 - x1), 10);   //Exon square
           //ctx.strokeRect(x1, psy-5, x2 - x1, 10);
         }
       }
