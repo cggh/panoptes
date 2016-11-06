@@ -159,7 +159,7 @@ let QueryPicker = React.createClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={hasSidebar ? 'arrows-h' : 'bars'}
+                  name={hasSidebar ? 'arrow-left' : 'bars'}
                   onClick={this.handleToggleSidebar}
                   title={hasSidebar ? 'Expand' : 'Sidebar'}
             />

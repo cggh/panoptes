@@ -147,7 +147,7 @@ let ListWithActions = React.createClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrows-h' : 'bars'}
+                  name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => this.redirectedProps.setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
