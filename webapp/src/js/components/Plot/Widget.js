@@ -50,7 +50,6 @@ let Plot = React.createClass({
       && dimensionMetadata
       && dimensionMetadata.colour
       && dimensionMetadata.colour.isCategorical
-      && !dimensionMetadata.colour.isNumerical
     ) {
       showLegend = true;
     }
