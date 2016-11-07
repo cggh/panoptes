@@ -83,31 +83,22 @@ export const plotTypes = {
         }];
       }
 
-      // We now know we have data.colour.
-
       // If we don't have a horizontal or vertical dimension, bail out.
       // FIXME: Can a scatter can be plotted with just one dimension + colour?
       if (!data.horizontal && !data.vertical) {
         return [];
       }
 
-      // We know whe have data.colour and a horizontal/vertical dimension.
+      // We know we have colour dimension data and a horizontal/vertical dimension.
 
       // Compose a separate trace object for each unique colour dimension value,
       // keyed on the colour dimension value, e.g. {'A': {}, 'B': {}, ...}
       // NB: The colour dimension value is not given to plotly, only used here as a key.
-      // NB: The corresponding colour for the value will be determined by metadata.colourFunction
-      // and provided in the trace object, e.g. {A: {color: metadata.colourFunction('A'), ...}, ...}
 
       let colourTraces = {};
 
       // For each data point...
       for (let i = 0, end = (data.horizontal || data.vertical).length; i < end; ++i) {
-
-        // OLD logic, to determine whether we can convert the value to a colour?
-        // If the dimension is colour, and there are a set of values for the dimension,
-        // and the dimension is not numerical and is categorical
-        // if (dim == 'colour' && state[dim] && !prop.isNumerical && prop.isCategorical) {
 
         let colour = data.colour[i];
         let formattedColourName = metadata.colour.formatterFunction(colour);

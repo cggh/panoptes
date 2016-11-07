@@ -42,9 +42,26 @@ let Plot = React.createClass({
       displayModeBar: true
     };
 
+    let showLegend = false;
+    if (
+      plotTypes[plotType].dimensions.indexOf('colour') !== -1
+      && dimensionData.colour !== undefined
+      && dimensionData.colour !== null
+      && dimensionMetadata
+      && dimensionMetadata.colour
+      && dimensionMetadata.colour.isCategorical
+      && !dimensionMetadata.colour.isNumerical
+    ) {
+      showLegend = true;
+    }
+
+    let showScale = false;
+    // TODO: showScale instead if the colour data is not categorical and is numerical (dimensionMetadata)
+
     // data-dependent, plotType-independent config
     const dataDependentLayout = {
-      showlegend: dimensionData.colour ? true : false
+      showlegend: showLegend,
+      showscale: showScale
     };
 
     let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);
