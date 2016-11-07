@@ -1,4 +1,5 @@
 import React from 'react';
+import Color from 'color';
 
 import _min from 'lodash/min';
 import _max from 'lodash/max';
@@ -24,7 +25,8 @@ let NumericalSummaryTrack = React.createClass({
     PureRenderWithRedirectedProps({
       check: [
         'width',
-        'height'
+        'height',
+        'colour'
       ]
     }),
     FluxMixin,
@@ -38,6 +40,7 @@ let NumericalSummaryTrack = React.createClass({
     end: React.PropTypes.number, //Provided by ScaledSVGChannel
     height: React.PropTypes.number,
     width: React.PropTypes.number,
+    colour: React.PropTypes.string,
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
@@ -163,7 +166,7 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   draw(props) {
-    const {yMin, yMax, height, start, end, width} = props;
+    const {yMin, yMax, height, start, end, width, colour} = props;
     if (!this.refs.canvas) {
       return;
     }
@@ -200,7 +203,7 @@ let NumericalSummaryTrack = React.createClass({
         lastWindow = window[i];
       }
     });
-    ctx.fillStyle = 'rgba(61, 139, 213, 0.3)';
+    ctx.fillStyle = Color(colour).clearer(0.7).rgbString();
     ctx.fill();
     let lastPointNull = true;
     let lastWindow = null;
@@ -224,7 +227,7 @@ let NumericalSummaryTrack = React.createClass({
         lastWindow = window[i];
       }
     });
-    ctx.strokeStyle = '#3d8bd5';
+    ctx.strokeStyle = colour;
     ctx.stroke();
     // Circles for single data points
     ctx.beginPath();

@@ -19,12 +19,13 @@ import ItemPicker from 'containers/ItemPicker';
 import {findBlock} from 'util/PropertyRegionCache';
 import SQL from 'panoptes/SQL';
 import DataTableWithActions from 'containers/DataTableWithActions';
-
+import {categoryColours} from 'util/Colours'
+import LegendElement from 'panoptes/LegendElement';
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
 ];
-
+const colourFunc = categoryColours('__default__');
 
 let NumericalTrackGroupChannel = React.createClass({
   mixins: [
@@ -87,8 +88,6 @@ let NumericalTrackGroupChannel = React.createClass({
         query={query}
       />);
     });
-
-
   },
 
   render() {
@@ -96,21 +95,47 @@ let NumericalTrackGroupChannel = React.createClass({
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     return (
       <CanvasGroupChannel onTap={this.handleTap} {...this.props}
-        side={
-          <span>
-            {ValidComponentChildren.map(children, (track) => track.props.name).join(', ')}
-          </span>
-        }
+        side={ValidComponentChildren.map(children, (child) =>
+              <div style={{whiteSpace: 'nowrap'}}>
+                <i className="fa fa-square" style={{color:child.props.colour || colourFunc(child.props.track)}}/>
+                {child.props.track}<br/>
+              </div>
+        )}
         onClose={this.redirectedProps.onClose}
         controls={<NumericalTrackGroupControls {...this.props} setProps={this.redirectedProps.setProps} />}
+        //legend={<Legend>{children}</Legend>}
         >
         {React.Children.map(children,
-          (child) => React.cloneElement(child, {...this.props, width: width - sideWidth}))}
+          (child) => React.cloneElement(child, {
+            ...this.props,
+            width: width - sideWidth,
+            colour: child.props.colour || colourFunc(child.props.track)}))}
       </CanvasGroupChannel>
     );
   }
 });
 
+let Legend = React.createClass({
+  mixins: [
+    PureRenderWithRedirectedProps({
+      check: [
+        'children'
+      ],
+    })
+  ],
+
+  render() {
+    return <div className="legend">
+      <div className="legend-element">Tracks:</div>
+      {React.Children.map(this.props.children,
+          (child) => <LegendElement
+            key={child.props.track}
+            name={child.props.track}
+            colour={child.props.colour || colourFunc(child.props.track)} />)}
+    </div>
+  }
+
+});
 
 let NumericalTrackGroupControls = React.createClass({
   mixins: [
