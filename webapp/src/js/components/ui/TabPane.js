@@ -42,7 +42,8 @@ let TabPane = React.createClass({
 
     let classes = {
       'tab-pane': true,
-      'active': this.props.active
+      'active': this.props.active,
+      'inactive': !this.props.active
     };
 
     let child = React.Children.only(this.props.children);
