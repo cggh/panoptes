@@ -122,26 +122,16 @@ let TablePlotActions = React.createClass({
             {plotTypeOptions}
           </SelectField>
           {table && plotType ?
-            _map(plotTypes[plotType].dimensions, (dimension) => {
-
-              // If the selected property for this dimension
-              // e.g. "Chromosome" selected for the horizontal dimension
-              // is actually a property of the selected table
-              // e.g. "Chromosome" is a property in the "Variants" table
-              // then allow the selection of this property for this dimension
-              // e.g. allow "Chromosome" to be value of the horizontal dimension
-              // TODO: Why is this check necessary or prudent?
-              let selectedProperty = this.config.tablesById[table].propertiesById[dimensionProperties[dimension]] ? dimensionProperties[dimension] : null;
-
-              return <PropertySelector
+            _map(plotTypes[plotType].dimensions, (dimension) =>
+              <PropertySelector
                 table={table}
                 key={dimension}
-                value={selectedProperty}
+                value={this.config.tablesById[table].propertiesById[dimensionProperties[dimension]] ? dimensionProperties[dimension] : null}
                 label={titleCase(dimension)}
                 onSelect={(v) => setProps({[dimension]: v})}
                 allowNull={true}
-              />;
-            })
+              />
+            )
             : null }
         </div>
       </div>
