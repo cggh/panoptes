@@ -31,8 +31,8 @@ let YScale = React.createClass({
     const {min, max, width, height} = this.props;
     const canvas = this.refs.canvas;
     const scale = d3.scale.linear().domain([min, max]).range([height, 0]);
-    const n = 5;
-    const format = scale.tickFormat(n, 's');
+    const n = 4;
+    const format = scale.tickFormat(n);
 
     const ctx = canvas.getContext('2d');
     ctx.lineWidth = 0.25;
