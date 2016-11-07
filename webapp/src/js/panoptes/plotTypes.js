@@ -81,9 +81,8 @@ export const plotTypes = {
         }];
       }
 
-      // If we don't have a horizontal or vertical dimension, bail out.
-      // FIXME: Can a scatter can be plotted with just one dimension + colour?
-      if (!data.horizontal && !data.vertical) {
+      //A valid graph must have one of vertical or horizontal
+      if (!(data.horizontal || !data.vertical)) {
         return [];
       }
 
@@ -138,9 +137,13 @@ export const plotTypes = {
         // then add this datum to the relevant dimension for this colour trace.
         if (data.horizontal) {
           colourTraces[colour].x.push(data.horizontal[i]);
+        } else {
+          colourTraces[colour].x.push(i);
         }
         if (data.vertical) {
           colourTraces[colour].y.push(data.vertical[i]);
+        } else {
+          colourTraces[colour].y.push(i);
         }
 
       }
