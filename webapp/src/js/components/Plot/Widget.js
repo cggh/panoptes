@@ -55,13 +55,9 @@ let Plot = React.createClass({
       showLegend = true;
     }
 
-    let showScale = false;
-    // TODO: showScale instead if the colour data is not categorical and is numerical (dimensionMetadata)
-
     // data-dependent, plotType-independent config
     const dataDependentLayout = {
-      showlegend: showLegend,
-      showscale: showScale
+      showlegend: showLegend
     };
 
     let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);

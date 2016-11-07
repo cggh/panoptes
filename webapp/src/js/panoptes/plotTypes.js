@@ -2,8 +2,6 @@ import _reduce from 'lodash/reduce';
 import _uniq from 'lodash/uniq';
 import _values from 'lodash/values';
 
-
-
 export const plotTypes = {
   bar: {
     displayName: 'Bar',
@@ -89,7 +87,26 @@ export const plotTypes = {
         return [];
       }
 
-      // We know we have colour dimension data and a horizontal/vertical dimension.
+      // We have colour dimension data and a horizontal/vertical dimension.
+
+      // If the colour dimension data is numerical and non-categorical,
+      // then provide those data for marker colours and show the scale.
+      // NB: data.colour can contain NaN and null values
+      if (metadata.colour.isNumerical && !metadata.colour.isCategorical) {
+        return [{
+          x: data.horizontal,
+          y: data.vertical,
+          marker: {
+            color: data.colour,
+            autocolorscale: true,
+            showscale: true
+          },
+          type: 'scatter',
+          mode: 'markers'
+        }];
+      }
+
+      // The colour dimension data is either categorical or non-numerical
 
       // Compose a separate trace object for each unique colour dimension value,
       // keyed on the colour dimension value, e.g. {'A': {}, 'B': {}, ...}
