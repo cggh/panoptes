@@ -29,10 +29,7 @@ let Plot = React.createClass({
     let {width, height} = this.state;
     let {plotType, dimensionData, dimensionMetadata} = this.props;
 
-
-console.log('Plot dimensionData %o', dimensionData);
-console.log('Plot dimensionMetadata %o', dimensionMetadata);
-
+    // data and plotType-independent config
     const defaultLayout = {
       barmode: 'overlay',
       autosize: false,
@@ -40,15 +37,18 @@ console.log('Plot dimensionMetadata %o', dimensionMetadata);
       height: height,
       showlegend: false
     };
-
     const config = {
       showLink: false,
       displayModeBar: true
     };
 
-    let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);
+    // data-dependent, plotType-independent config
+    const dataDependentLayout = {
+      showlegend: dimensionData.colour ? true : false
+    };
 
-console.log('plotData: %o', plotData);
+    let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);
+    let layout = {...defaultLayout, ...plotTypes[plotType].layout, ...dataDependentLayout};
 
     return (
       <DetectResize
@@ -59,7 +59,7 @@ console.log('plotData: %o', plotData);
         <Plotly
           className="plot"
           data={plotData}
-          layout={{...defaultLayout, ...plotTypes[plotType].layout}}
+          layout={layout}
           config={config}
         />
       </DetectResize>

@@ -2,7 +2,7 @@ import _reduce from 'lodash/reduce';
 import _uniq from 'lodash/uniq';
 import _values from 'lodash/values';
 
-import {propertyColour} from 'util/Colours';
+
 
 export const plotTypes = {
   bar: {
@@ -50,84 +50,96 @@ export const plotTypes = {
     layout: {showlegend: true, legend: {orientation: 'h'}},
     plotlyTraces: (data, metadata) => {
 
-console.log('plotlyTraces data: %o', data);
-console.log('plotlyTraces metadata: %o', metadata);
-
-
       // The data object contains an array of values for each dimension.
       // The arrays are parallel, i.e. elements are in one-to-one correspondence.
       // e.g. data.horizontal might contain ["Pf3D7_01_v3", "Pf3D7_01_v3", ...]
       // data.vertical might contain [1, 10, ...]
       // data.colour might contain ["A", "B", ...]
       // representing tuples [("Pf3D7_01_v3", 1, "A"), ("Pf3D7_01_v3", 10, "B"), ...]
+      // NB: The data.colour values need to be converted to corresponding colours.
 
+      // The metadata object contains an object for each dimension.
+      // e.g. metadata.colour might contain {id: "Extra_1", ...}
 
-      // If the dimension is color, and there is a value for the dim,
-      // and the dim is not numerical and is categorical
-      // if (dim == 'colour' && state[dim] && !prop.isNumerical && prop.isCategorical) {
+      // NB: A different default marker could be specified here.
+      let defaultMarker = {};
 
-      // To get the corresponding colour, need the property and
-      // _map(state[dim], propertyColour(prop));
+      // let defaultMarker = {
+      //   color: 'rgb(0,0,0)',
+      //   line: {color: 'rgba(217, 217, 217, 1.0)', width: 1},
+      //   symbol: 'circle',
+      //   size: 16
+      // };
 
-
-      // OLD
-      // data.colour might contain ["#388E3C", "#388E3C", ...]
-      // representing tuples [("Pf3D7_01_v3", 1, "#388E3C"), ("Pf3D7_01_v3", 10, "#388E3C"), ...]
-
-
-
-
-      // TODO: Need the values that each colour represents, e.g. #388E3C = High Quality true
-
-      // Should pass colours through as the values and translate on this side.
-
-      // Also what the name of the colour dimension (and other dimensions?) so that the plot makes sense out of context.
-      // e.g. High Quality: [green] true    [red] false
-      // Extra 1:
-
-      let traces = {};
-
-      if (data.horizontal || data.vertical) {
-
-        for (let i = 0, end = (data.horizontal || data.vertical).length; i < end; ++i) {
-
-
-          /* When no colour dimension has been selected, the markers shoud use the default (but this is currently set to black) */
-
-          let colour = data.colour ? data.colour[i] : 'rgb(0,0,0)';
-
-          let symbol = data.symbol ? data.symbol[i] : 'circle';
-          let line = data.line ? data.line[i] : {color: 'rgba(217, 217, 217, 1.0)', width: 1};
-          let marker = data.marker ? data.marker[i] : {
-            color: colour,
-            line: line,
-            symbol: symbol,
-            size: 16
-          };
-          if (!traces[colour]) {
-            traces[colour] = {
-              x: [],
-              y: [],
-              marker: {
-                color: colour,
-                line: line,
-                symbol: symbol,
-                size: 16
-              },
-              type: 'scatter',
-              mode: 'markers',
-              name: 'test ' + colour
-            };
-          }
-          if (data.horizontal)
-            traces[colour].x.push(data.horizontal[i]);
-          if (data.vertical)
-            traces[colour].y.push(data.vertical[i]);
-        }
+      // If there are no data for a colour dimension,
+      // then just return one trace using the horizontal and vertical.
+      if (!data.colour) {
+        return [{
+          x: data.horizontal,
+          y: data.vertical,
+          marker: defaultMarker,
+          type: 'scatter',
+          mode: 'markers'
+        }];
       }
 
-      // Return the data arrays for each trace.
-      return _values(traces);
+      // We now know we have data.colour.
+
+      // If we don't have a horizontal or vertical dimension, bail out.
+      // FIXME: Can a scatter can be plotted with just one dimension + colour?
+      if (!data.horizontal && !data.vertical) {
+        return [];
+      }
+
+      // We know whe have data.colour and a horizontal/vertical dimension.
+
+      // Compose a separate trace object for each unique colour dimension value,
+      // keyed on the colour dimension value, e.g. {'A': {}, 'B': {}, ...}
+      // NB: The colour dimension value is not given to plotly, only used here as a key.
+      // NB: The corresponding colour for the value will be determined by metadata.colourFunction
+      // and provided in the trace object, e.g. {A: {color: metadata.colourFunction('A'), ...}, ...}
+
+      let colourTraces = {};
+
+      // For each data point...
+      for (let i = 0, end = (data.horizontal || data.vertical).length; i < end; ++i) {
+
+        // OLD logic, to determine whether we can convert the value to a colour?
+        // If the dimension is colour, and there are a set of values for the dimension,
+        // and the dimension is not numerical and is categorical
+        // if (dim == 'colour' && state[dim] && !prop.isNumerical && prop.isCategorical) {
+
+        let colour = data.colour[i];
+        let formattedColourName = metadata.colour.formatterFunction(colour);
+        let legendColourName = formattedColourName !== '' ? formattedColourName : 'NULL';
+
+        // If the trace for this colour has not yet been defined...
+        if (!colourTraces[colour]) {
+          colourTraces[colour] = {
+            x: [],
+            y: [],
+            marker: defaultMarker,
+            type: 'scatter',
+            mode: 'markers',
+            name: legendColourName,
+            color: metadata.colour.colourFunction(colour)
+          };
+        }
+
+        // If data for the horizontal dimension has been provided,
+        // then add this datum to the relevant dimension for this colour trace.
+        if (data.horizontal) {
+          colourTraces[colour].x.push(data.horizontal[i]);
+        }
+
+        if (data.vertical) {
+          colourTraces[colour].y.push(data.vertical[i]);
+        }
+
+      }
+
+      // Return the data arrays for each colour trace.
+      return _values(colourTraces);
     }
   }
 };

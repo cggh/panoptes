@@ -6,7 +6,7 @@ import Sidebar from 'react-sidebar';
 // Lodash
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
-import _clone from 'lodash/clone';
+import _pickBy from 'lodash/pickBy';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -46,7 +46,7 @@ let TablePlotActions = React.createClass({
     plotType: React.PropTypes.string,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    dimensionProperties: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}))
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -56,8 +56,7 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true,
-      dimensionProperties: {}
+      sidebar: true
     };
   },
 
@@ -83,10 +82,7 @@ let TablePlotActions = React.createClass({
 
   handleChangeDimensionProperty(payload) {
     let {dimension, property} = payload;
-    let nextDimensionProperties = _clone(this.props.dimensionProperties);
-    nextDimensionProperties[dimension] = property;
-    this.props.setProps({dimensionProperties: nextDimensionProperties});
-console.log('handleChangeDimensionValue nextDimensionProperties: %o', nextDimensionProperties);
+    this.props.setProps({[dimension]: property});
   },
 
   // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
@@ -97,7 +93,9 @@ console.log('handleChangeDimensionValue nextDimensionProperties: %o', nextDimens
   },
 
   render() {
-    let {sidebar, table, plotType, setProps, dimensionProperties} = this.props;
+    let {sidebar, table, plotType, setProps} = this.props;
+
+    let dimensionProperties = _pickBy(this.props, (value, name) => allDimensions.indexOf(name) !== -1);
 
     let tableOptions = _map(this.config.visibleTables, (table) => ({
       value: table.id,
@@ -154,8 +152,6 @@ console.log('handleChangeDimensionValue nextDimensionProperties: %o', nextDimens
       </div>
     );
 
-    // FIXME: test with {...dimensionProperties}
-
     return (
       <Sidebar
         docked={sidebar}
@@ -175,7 +171,7 @@ console.log('handleChangeDimensionValue nextDimensionProperties: %o', nextDimens
             : null}
           </div>
           <div className="grow">
-            {table && plotType && dimensionProperties ? <TablePlot dimensionProperties={dimensionProperties} table={table} query={this.getDefinedQuery()} /> : null}
+            {table && plotType && dimensionProperties ? <TablePlot table={table} plotType={plotType} query={this.getDefinedQuery()} {...dimensionProperties} /> : null}
           </div>
         </div>
       </Sidebar>

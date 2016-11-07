@@ -16,6 +16,8 @@ import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import ErrorReport from 'panoptes/ErrorReporter';
 import {allDimensions} from 'panoptes/plotTypes';
+import {propertyColour} from 'util/Colours';
+import Formatter from 'panoptes/Formatter';
 
 import 'plot.scss';
 
@@ -25,7 +27,7 @@ let TablePlot = React.createClass({
     PureRenderMixin,
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin.apply(this, ['table', 'query', 'dimensionProperties'].concat(allDimensions))
+    DataFetcherMixin.apply(this, ['table', 'query'].concat(allDimensions))
   ],
 
   // ['table', 'query'].concat(_map(allDimensions, (dim) => 'dimensionProperties.' + dim))
@@ -37,7 +39,6 @@ let TablePlot = React.createClass({
     setProps: React.PropTypes.func,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    dimensionProperties: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})),
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
@@ -58,14 +59,6 @@ let TablePlot = React.createClass({
     };
   },
 
-  collectDimensionProperties(props) {
-    // Get a list of all the props that have the same name as a recognised dimension, e.g. 'horizontal'
-    let individualDimensionProps = _pickBy(props, (value, name) => allDimensions.indexOf(name) !== -1);
-    // Combine that list of props with any others that are in the prop named 'dimensionProperties'
-    // NB: individualDimensionProps override props.dimensionProperties
-    return {...individualDimensionProps, ...props.dimensionProperties};
-  },
-
   getDefinedQuery(query, table) {
     return (query || this.props.query) ||
       ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
@@ -74,13 +67,9 @@ let TablePlot = React.createClass({
 
   fetchData(props, requestContext) {
 
-console.log('fetchData props: %o', props);
-
     const {table, query} = props;
-    const dimensionProperties = this.collectDimensionProperties(props);
+    const dimensionProperties = _pickBy(props, (value, name) => allDimensions.indexOf(name) !== -1);
     const tableConfig = this.config.tablesById[table];
-
-console.log('fetchData dimensionProperties: %o', dimensionProperties);
 
     // Get a list of all the recognised dimension names, e.g. horizontal, that:
     // - have been provided as props; and
@@ -90,7 +79,6 @@ console.log('fetchData dimensionProperties: %o', dimensionProperties);
     // Get a list of all the values, e.g. "Chromosome", for all the valid dimension names.
     const columns = _map(validDimensionNames, (validDimensionName) => dimensionProperties[validDimensionName]);
 
-console.log('fetchData columns: %o', columns);
 
     if (columns.length > 0) {
 
@@ -115,28 +103,25 @@ console.log('fetchData columns: %o', columns);
         )
         .then((data) => {
 
-console.log('fetchData data: %o', data);
-
-// console.log('TablePlot data: %o', data);
-//
-//           let dimensionData = _reduce(allDimensions, (state, dim) => {
-//
-// console.log('_reduce state: %o', state);
-// console.log('_reduce dim: %o', dim);
-//
-//             state[dim] = data[dimensions[dim]] || null;
-//             return state;
-//           });
-//
-// console.log('nextDimensionData %o: ', nextDimensionData);
-
-          // Need to convert {'Value1': [NaN, 0, ...], 'Value2': [0.5, NaN]}
-          // to {'horizontal':  [NaN, 0, ...], 'vertical':[0.5, NaN] }
-          // and metadata 'horizontal': 'Value1', 'vertical': 'Value2'
+          let dimensionData = {};
+          let dimensionMetadata = {};
+          for (let dimensionProperty in dimensionProperties) {
+            // NB: When a dimensionProperty has been deselected,
+            // its value will be null here.
+            if (dimensionProperties[dimensionProperty] !== null) {
+              // Decide which properties of the dimensionProperty to pass forward as metadata.
+              // TODO: just pass all properties, i.e. the object?
+              let {id, channelColor, description, name, isCategorical, isNumerical} = this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]];
+              let colourFunction = propertyColour(dimensionProperties[dimensionProperty]);
+              let formatterFunction = (value) => Formatter(this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]], value);
+              dimensionData[dimensionProperty] = data[dimensionProperties[dimensionProperty]];
+              dimensionMetadata[dimensionProperty] = {id, channelColor, description, name, isCategorical, isNumerical, colourFunction, formatterFunction};
+            }
+          }
 
           this.setState({
-            dimensionData: {'horizontal': data['chromosome'], 'vertical': data['position']},
-            dimensionMetadata: {'horizontal': 'chromosome', 'vertical': 'position'},
+            dimensionData,
+            dimensionMetadata,
             loadStatus: 'loaded'
           });
 
@@ -148,16 +133,9 @@ console.log('fetchData data: %o', data);
 
     } else {
 
-      // let nextDimensionData = _reduce(allDimensions, (state, dim) => {
-      //   state[dim] = null;
-      //   return state;
-      // });
-
-console.log('fetchData no columns');
-
       this.setState({
-        dimensionData: {'horizontal': null, 'vertical': null},
-        dimensionMetadata: {'horizontal': 'chromosome', 'vertical': 'position'},
+        dimensionData: {},
+        dimensionMetadata: {},
         loadStatus: 'loaded'
       });
 
