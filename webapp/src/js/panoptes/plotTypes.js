@@ -139,14 +139,13 @@ export const plotTypes = {
         if (data.horizontal) {
           colourTraces[colour].x.push(data.horizontal[i]);
         }
-
         if (data.vertical) {
           colourTraces[colour].y.push(data.vertical[i]);
         }
 
       }
 
-      // Return the data arrays for each colour trace.
+      // Return the colourTrace objects as array elements.
       return _values(colourTraces);
     }
   }
