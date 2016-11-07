@@ -80,8 +80,8 @@ let PieChartMarkersLayer = React.createClass({
       e.originalEvent.stopPropagation();
     }
     this.getFlux().actions.panoptes.dataItemPopup({
-      table: marker.chartDataTable,
-      primKey: marker.primKey,
+      table: marker.locationTable,
+      primKey: marker.locationPrimKey,
       switchTo: !middleClick
     });
   },
@@ -245,11 +245,10 @@ let PieChartMarkersLayer = React.createClass({
     let pieAreaSum = _sum(_map(
       _filter(markers, (marker) => {
         let {lat, lng} = marker;
-        return bounds.contains([lat, lng])
+        return bounds.contains([lat, lng]);
       }),
-      (marker) => {
-        return marker.originalRadius * marker.originalRadius * 2 * Math.PI
-      }));
+      (marker) => marker.originalRadius * marker.originalRadius * 2 * Math.PI)
+    );
     let lengthRatio = this.lastLengthRatio || 1;
     if (pieAreaSum > 0) {
       lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
@@ -263,14 +262,13 @@ let PieChartMarkersLayer = React.createClass({
     return (
       <GeoLayouter nodes={markers}>
         {
-          (renderNodes) => {
-            return <FeatureGroup
+          (renderNodes) =>
+            <FeatureGroup
               layerContainer={layerContainer}
               map={map}
             >
               {renderNodes.map(
-                  (marker, i) => {
-                    return (
+                  (marker, i) =>
                       <ComponentMarker
                         key={i}
                         position={{lat: marker.lat, lng: marker.lng}}
@@ -288,22 +286,16 @@ let PieChartMarkersLayer = React.createClass({
                           radius={marker.radius}
                         />
                       </ComponentMarker>
-                    );
-                  }
                 ).concat(
                   renderNodes.map(
-                    (marker, i) => {
-                      return (
-                        <Polyline
-                          positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
-                        />
-                      );
-                    }
+                    (marker, i) =>
+                      <Polyline
+                        positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
+                      />
                   )
                 )
               }
             </FeatureGroup>
-          }
         }
       </GeoLayouter>
     );
