@@ -80,11 +80,6 @@ let TablePlotActions = React.createClass({
     this.props.setProps({plotType});
   },
 
-  handleChangeDimensionProperty(payload) {
-    let {dimension, property} = payload;
-    this.props.setProps({[dimension]: property});
-  },
-
   // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
   getDefinedQuery() {
     return this.props.query
@@ -143,7 +138,7 @@ let TablePlotActions = React.createClass({
                 key={dimension}
                 value={selectedProperty}
                 label={titleCase(dimension)}
-                onSelect={(v) => this.handleChangeDimensionProperty({dimension, property: v})}
+                onSelect={(v) => setProps({[dimension]: v})}
                 allowNull={true}
               />;
             })
