@@ -105,8 +105,7 @@ class ImportSettings:
                             ('defaultWidth', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'Sets the deafult column width in pixels.',
-                                   'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
+                                   'description': 'Sets the default column width in pixels.',
                                    }),
                             ('showBar', {
                                    'type': 'Boolean',
