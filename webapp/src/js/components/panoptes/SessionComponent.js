@@ -12,7 +12,8 @@ let SessionComponent = React.createClass({
     StoreWatchMixin('SessionStore')],
 
   propTypes: {
-    compId: React.PropTypes.string
+    compId: React.PropTypes.string,
+    updateTitleIcon: React.PropTypes.func
   },
 
   getStateFromFlux(props) {
@@ -40,7 +41,8 @@ let SessionComponent = React.createClass({
     let actions = this.getFlux().actions.session;
     return React.cloneElement(deserialiseComponent(component, [compId], {
       setProps: actions.componentSetProps,
-      replaceSelf: actions.componentReplace
+      replaceSelf: actions.componentReplace,
+      updateTitleIcon: this.props.updateTitleIcon
     }), {ref: 'child'});
   }
 });

@@ -27,15 +27,21 @@ let ViewList = React.createClass({
 
   propTypes: {
     style: React.PropTypes.object,
-    onClick: React.PropTypes.func.isRequired
+    onClick: React.PropTypes.func
   },
-
-
+  
   handleOpen(e, component) {
     const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
-    this.props.onClick({component, middleClick});
+    (this.props.onClick || this.handleClick)({component, middleClick});
   },
 
+  handleClick({component, middleClick}) {
+    if (middleClick)
+      this.flux.actions.session.tabOpen(component, false);
+    else {
+      this.flux.actions.session.tabOpen(component, true);
+    }
+  },
 
   render() {
     const hasShowableTables = _some(this.config.visibleTables);

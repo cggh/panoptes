@@ -29,14 +29,6 @@ let StartTab = React.createClass({
     return 'Start';
   },
 
-  handleClick({component, middleClick}) {
-    if (middleClick)
-      this.flux.actions.session.tabOpen(component, false);
-    else {
-      this.flux.actions.session.tabOpen(component, true);
-    }
-  },
-
   render() {
     return (
       <div className="horizontal stack start-align">
@@ -44,8 +36,8 @@ let StartTab = React.createClass({
           {this.config.settings.description}
         </HTMLWithComponents>
         <div className="">
-          <ViewList style={{width: '410px'}} onClick={this.handleClick} />
-          <TableList style={{width: '410px'}} onClick={this.handleClick} />
+          <ViewList style={{width: '410px'}} />
+          <TableList style={{width: '410px'}} />
         </div>
       </div>
     );
