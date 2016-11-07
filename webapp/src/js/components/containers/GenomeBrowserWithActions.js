@@ -162,7 +162,7 @@ let GenomeBrowserWithActions = React.createClass({
                         //Set default bounds
                         start = _isNumber(start) ? start : 0;
                         end = (_isNumber(end) ? end : this.config.chromosomes[chromosome]) || 10000;
-                        chromosome = chromosome || _head(_keys(this.config.chromosomes))
+                        chromosome = chromosome || _head(_keys(this.config.chromosomes));
                         let genomePositionTableQuery = null;
                         if (table.hasGenomePositions) {
                           genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([

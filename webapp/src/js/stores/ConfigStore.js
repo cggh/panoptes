@@ -8,6 +8,8 @@ import SQL from 'panoptes/SQL';
 import _values from 'lodash/values';
 import _each from 'lodash/each';
 import _filter from 'lodash/filter';
+import _sortBy from 'lodash/sortBy';
+import _keys from 'lodash/keys';
 import _cloneDeep from 'lodash/cloneDeep';
 
 const ConfigStore = Fluxxor.createStore({
@@ -41,6 +43,9 @@ const ConfigStore = Fluxxor.createStore({
     this.addTableConfig(newConfig);
     this.addRelationConfig(newConfig);
     this.add2DConfig(newConfig);
+    let chromosomes = {};
+    _each(_sortBy(_keys(newConfig.chromosomes)), (name) => chromosomes[name] = newConfig.chromosomes[name]);
+    newConfig.chromosomes = chromosomes;
     return newConfig;
   },
 
