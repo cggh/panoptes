@@ -27,7 +27,7 @@ def ignored_callback(environ, start_response):
 
 general_with_static = SharedDataMiddleware(wsgi_general.application, {
     '/': os.path.join(os.path.dirname(config.__file__), 'webapp/dist')
-})
+}, cache_timeout=1)
 application = DispatcherMiddleware(general_with_static, {
     '/panoptes/api':        wsgi_api.application,
 })
