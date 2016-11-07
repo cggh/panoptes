@@ -73,7 +73,7 @@ let TablePlot = React.createClass({
 
     // Get a list of all the recognised dimension names, e.g. horizontal, that:
     // - have been provided as props; and
-    // - have a value, e.g. "Chromosome", is a recognised property of the table.
+    // - have a value, e.g. "Chromosome", that is a recognised property of the table.
     const validDimensionNames = _filter(allDimensions, (dim) => dimensionProperties[dim] && tableConfig.propertiesById[dimensionProperties[dim]]);
 
     // Get a list of all the values, e.g. "Chromosome", for all the valid dimension names.
