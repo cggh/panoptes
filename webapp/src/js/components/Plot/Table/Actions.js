@@ -6,6 +6,7 @@ import Sidebar from 'react-sidebar';
 // Lodash
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
+import _pickBy from 'lodash/pickBy';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -31,9 +32,6 @@ import FilterButton from 'panoptes/FilterButton';
 
 import 'plot.scss';
 
-// CSS
-//TODO: import 'Plot/Table/actions-styles.scss';
-
 let TablePlotActions = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -58,7 +56,7 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true,
+      sidebar: true
     };
   },
 
@@ -91,6 +89,8 @@ let TablePlotActions = React.createClass({
 
   render() {
     let {sidebar, table, plotType, setProps} = this.props;
+
+    let dimensionProperties = _pickBy(this.props, (value, name) => allDimensions.indexOf(name) !== -1);
 
     let tableOptions = _map(this.config.visibleTables, (table) => ({
       value: table.id,
@@ -126,7 +126,7 @@ let TablePlotActions = React.createClass({
               <PropertySelector
                 table={table}
                 key={dimension}
-                value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
+                value={this.config.tablesById[table].propertiesById[dimensionProperties[dimension]] ? dimensionProperties[dimension] : null}
                 label={titleCase(dimension)}
                 onSelect={(v) => setProps({[dimension]: v})}
                 allowNull={true}
@@ -136,6 +136,7 @@ let TablePlotActions = React.createClass({
         </div>
       </div>
     );
+
     return (
       <Sidebar
         docked={sidebar}
@@ -155,7 +156,7 @@ let TablePlotActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            {table && plotType ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
+            {table && plotType && dimensionProperties ? <TablePlot table={table} plotType={plotType} query={this.getDefinedQuery()} {...dimensionProperties} /> : null}
           </div>
         </div>
       </Sidebar>

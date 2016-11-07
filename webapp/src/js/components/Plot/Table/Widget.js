@@ -3,9 +3,9 @@ import React from 'react';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
+import _pickBy from 'lodash/pickBy';
 
 import Plot from 'Plot/Widget';
-
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -17,7 +17,7 @@ import SQL from 'panoptes/SQL';
 import ErrorReport from 'panoptes/ErrorReporter';
 import {allDimensions} from 'panoptes/plotTypes';
 import {propertyColour} from 'util/Colours';
-
+import Formatter from 'panoptes/Formatter';
 
 import 'plot.scss';
 
@@ -30,7 +30,12 @@ let TablePlot = React.createClass({
     DataFetcherMixin.apply(this, ['table', 'query'].concat(allDimensions))
   ],
 
+  // ['table', 'query'].concat(_map(allDimensions, (dim) => 'dimensionProperties.' + dim))
+
+  // NB: For template API, TablePlot also supports individual dimension props.
+  // E.g. either dimensionProperties={horizontal: 'chromosome'} or horizontal="chromosome"
   propTypes: {
+    plotType: React.PropTypes.string,
     setProps: React.PropTypes.func,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
@@ -48,7 +53,9 @@ let TablePlot = React.createClass({
 
   getInitialState() {
     return {
-      loadStatus: 'loaded'
+      loadStatus: 'loaded',
+      dimensionData: {},
+      dimensionMetadata: {}
     };
   },
 
@@ -59,13 +66,24 @@ let TablePlot = React.createClass({
   },
 
   fetchData(props, requestContext) {
+
     const {table, query} = props;
+    const dimensionProperties = _pickBy(props, (value, name) => allDimensions.indexOf(name) !== -1);
     const tableConfig = this.config.tablesById[table];
-    const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesById[props[dim]]);
-    const columns = _map(dimensions, (dim) => props[dim]);
+
+    // Get a list of all the recognised dimension names, e.g. horizontal, that:
+    // - have been provided as props; and
+    // - have a value, e.g. "Chromosome", that is a recognised property of the table.
+    const validDimensionNames = _filter(allDimensions, (dim) => dimensionProperties[dim] && tableConfig.propertiesById[dimensionProperties[dim]]);
+
+    // Get a list of all the values, e.g. "Chromosome", for all the valid dimension names.
+    const columns = _map(validDimensionNames, (validDimensionName) => dimensionProperties[validDimensionName]);
+
 
     if (columns.length > 0) {
+
       this.setState({loadStatus: 'loading'});
+
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.id,
@@ -84,47 +102,62 @@ let TablePlot = React.createClass({
           )
         )
         .then((data) => {
-          this.setState(
-            _reduce(allDimensions,
-              (state, dim) => {
-                state[dim] = data[props[dim]] || null;
-                let prop = tableConfig.propertiesById[props[dim]];
-                if (dim == 'colour' && state[dim] && !prop.isNumerical && prop.isCategorical) {
-                  state[dim] = _map(state[dim], propertyColour(prop));
-                }
-                return state;
-              },
-              {loadStatus: 'loaded'})
-          );
+
+          let dimensionData = {};
+          let dimensionMetadata = {};
+          for (let dimensionProperty in dimensionProperties) {
+            // NB: When a dimensionProperty has been deselected,
+            // its value will be null here.
+            if (dimensionProperties[dimensionProperty] !== null) {
+              // Decide which properties of the dimensionProperty to pass forward as metadata.
+              // TODO: just pass all properties, i.e. the object?
+              let {id, channelColor, description, name, isCategorical, isNumerical} = this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]];
+              let colourFunction = propertyColour(dimensionProperties[dimensionProperty]);
+              let formatterFunction = (value) => Formatter(this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]], value);
+              dimensionData[dimensionProperty] = data[dimensionProperties[dimensionProperty]];
+              dimensionMetadata[dimensionProperty] = {id, channelColor, description, name, isCategorical, isNumerical, colourFunction, formatterFunction};
+            }
+          }
+
+          this.setState({
+            dimensionData,
+            dimensionMetadata,
+            loadStatus: 'loaded'
+          });
+
         })
         .catch((error) => {
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
           this.setState({loadStatus: 'error'});
         });
+
     } else {
-      this.setState(
-        _reduce(allDimensions,
-          (state, dim) => {
-            state[dim] = null;
-            return state;
-          },
-          {loadStatus: 'loaded'})
-      );
+
+      this.setState({
+        dimensionData: {},
+        dimensionMetadata: {},
+        loadStatus: 'loaded'
+      });
+
     }
   },
 
   render() {
     const {plotType} = this.props;
-    const {loadStatus} = this.state;
+
     return (
       <div className="plot-container">
-        { plotType ?
-          <Plot className="plot"
-                plotType={plotType}
-                {...this.state}
+        {
+          plotType ?
+          <Plot
+            className="plot"
+            plotType={plotType}
+            dimensionData={this.state.dimensionData}
+            dimensionMetadata={this.state.dimensionMetadata}
           />
-          : null }
-        <Loading status={loadStatus} />
+          : null
+        }
+        <Loading status={this.state.loadStatus} />
       </div>);
   }
 });

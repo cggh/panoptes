@@ -1,10 +1,10 @@
 import React from 'react';
 import Plotly from 'react-plotlyjs';
+
 import _reduce from 'lodash/reduce';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';
-
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 
 let Plot = React.createClass({
@@ -14,7 +14,8 @@ let Plot = React.createClass({
 
   propTypes: {
     plotType: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {})
+    dimensionData: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {})),
+    dimensionMetadata: React.PropTypes.object
   },
 
   getInitialState() {
@@ -24,33 +25,55 @@ let Plot = React.createClass({
     };
   },
 
-  componentDidMount() {
-  },
-
-
   render() {
     let {width, height} = this.state;
-    let {plotType} = this.props;
+    let {plotType, dimensionData, dimensionMetadata} = this.props;
 
-    const layout = {
+    // data and plotType-independent config
+    const defaultLayout = {
       barmode: 'overlay',
       autosize: false,
       width: width,
-      height: height
+      height: height,
+      showlegend: false
     };
     const config = {
       showLink: false,
       displayModeBar: true
     };
+
+    let showLegend = false;
+    if (
+      plotTypes[plotType].dimensions.indexOf('colour') !== -1
+      && dimensionData.colour !== undefined
+      && dimensionData.colour !== null
+      && dimensionMetadata
+      && dimensionMetadata.colour
+      && dimensionMetadata.colour.isCategorical
+    ) {
+      showLegend = true;
+    }
+
+    // data-dependent, plotType-independent config
+    const dataDependentLayout = {
+      showlegend: showLegend
+    };
+
+    let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);
+    let layout = {...defaultLayout, ...plotTypes[plotType].layout, ...dataDependentLayout};
+
     return (
-      <DetectResize onResize={(size) => {
-        this.setState(size);
-      }}>
+      <DetectResize
+        onResize={(size) => {
+          this.setState(size);
+        }}
+      >
         <Plotly
           className="plot"
-          data={plotTypes[plotType].plotlyTraces(this.props)}
+          data={plotData}
           layout={layout}
-          config={config}/>
+          config={config}
+        />
       </DetectResize>
     );
   }
