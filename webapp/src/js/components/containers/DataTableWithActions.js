@@ -342,7 +342,7 @@ let DataTableWithActions = React.createClass({
         />
         <FlatButton label="Plot Table"
                     primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen(<PlotTableWithActions table={table} />, true)}
+                    onClick={() => this.flux.actions.session.tabOpen(<PlotTableWithActions table={table} query={dataTableQuery}/>, true)}
                     icon={<Icon fixedWidth={true} name="bar-chart" />}
         />
       </div>
