@@ -53,7 +53,7 @@ const PropertySelector = React.createClass({
           propertyMenu.push(<Divider key={i++}/>);
         }
         let {id, name} = group;
-        propertyMenu.push(<MenuItem disabled value={id} key={id} primaryText={name}/>);
+        propertyMenu.push(<MenuItem disabled value={id} key={`group_${id}`} primaryText={name}/>);
         _each(filteredProps, (property) => {
           let {id, name} = property;
           propertyMenu.push(<MenuItem value={id} key={id} primaryText={name}/>);
