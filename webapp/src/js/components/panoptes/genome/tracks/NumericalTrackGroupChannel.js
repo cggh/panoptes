@@ -41,6 +41,7 @@ let NumericalTrackGroupChannel = React.createClass({
 
   propTypes: {
     width: React.PropTypes.number,
+    name: React.PropTypes.string,
     sideWidth: React.PropTypes.number,
     children: React.PropTypes.node,
     setProps: React.PropTypes.func

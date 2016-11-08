@@ -26,7 +26,8 @@ let NumericalSummaryTrack = React.createClass({
       check: [
         'width',
         'height',
-        'colour'
+        'colour',
+        'minMax'
       ]
     }),
     FluxMixin,
@@ -41,6 +42,7 @@ let NumericalSummaryTrack = React.createClass({
     height: React.PropTypes.number,
     width: React.PropTypes.number,
     colour: React.PropTypes.string,
+    minMax: React.PropTypes.bool,
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
@@ -48,6 +50,12 @@ let NumericalSummaryTrack = React.createClass({
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
     onChangeLoadStatus: React.PropTypes.func,
+  },
+
+  getDefaultProps() {
+    return {
+      minMax: true
+    };
   },
 
   getInitialState() {
@@ -166,7 +174,7 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   draw(props) {
-    const {yMin, yMax, height, start, end, width, colour} = props;
+    const {yMin, yMax, height, start, end, width, colour, minMax} = props;
     if (!this.refs.canvas) {
       return;
     }
@@ -184,27 +192,29 @@ let NumericalSummaryTrack = React.createClass({
     const yScaleFactor = height / (yMax - yMin);
     const pixelWindowSize = windowSize * xScaleFactor;
     //Max and min
-    ctx.beginPath();
-    this.blocks.forEach((block) => {
-      const window = block.window.array;
-      const min = block.min.array;
-      const max = block.max.array;
-      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
-        if (min[i] !== nullVal && min[i] == +min[i]) {  //If min is null then max, avg should be
-          const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
-          const yMinPixel = height - (yScaleFactor * (min[i] - yMin));
-          const yMaxPixel = height - (yScaleFactor * (max[i] - yMin));
-          ctx.moveTo(xPixel, yMinPixel);
-          ctx.lineTo(xPixel + pixelWindowSize, yMinPixel);
-          ctx.lineTo(xPixel + pixelWindowSize, yMaxPixel);
-          ctx.lineTo(xPixel, yMaxPixel);
+    if (minMax) {
+      ctx.beginPath();
+      this.blocks.forEach((block) => {
+        const window = block.window.array;
+        const min = block.min.array;
+        const max = block.max.array;
+        for (let i = 0, iEnd = window.length; i < iEnd; i++) {
+          if (min[i] !== nullVal && min[i] == +min[i]) {  //If min is null then max, avg should be
+            const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
+            const yMinPixel = height - (yScaleFactor * (min[i] - yMin));
+            const yMaxPixel = height - (yScaleFactor * (max[i] - yMin));
+            ctx.moveTo(xPixel, yMinPixel);
+            ctx.lineTo(xPixel + pixelWindowSize, yMinPixel);
+            ctx.lineTo(xPixel + pixelWindowSize, yMaxPixel);
+            ctx.lineTo(xPixel, yMaxPixel);
+          }
+          lastPointNull = (min[i] === nullVal || min[i] != +min[i]);
+          lastWindow = window[i];
         }
-        lastPointNull = (min[i] === nullVal || min[i] != +min[i]);
-        lastWindow = window[i];
-      }
-    });
-    ctx.fillStyle = Color(colour).clearer(0.7).rgbString();
-    ctx.fill();
+      });
+      ctx.fillStyle = Color(colour).clearer(0.7).rgbString();
+      ctx.fill();
+    }
     let lastPointNull = true;
     let lastWindow = null;
     //Avg line
