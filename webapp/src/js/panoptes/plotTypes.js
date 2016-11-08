@@ -82,7 +82,7 @@ export const plotTypes = {
       }
 
       //A valid graph must have one of vertical or horizontal
-      if (!(data.horizontal || !data.vertical)) {
+      if (!data.horizontal && !data.vertical) {
         return [];
       }
 
