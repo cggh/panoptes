@@ -91,11 +91,11 @@ let NumericalTrackGroupChannel = React.createClass({
   },
 
   render() {
-    let {width, sideWidth, children} = this.props;
+    let {width, sideWidth, children, name} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     return (
       <CanvasGroupChannel onTap={this.handleTap} {...this.props}
-        side={ValidComponentChildren.map(children, (child) =>
+        side={name ? name : ValidComponentChildren.map(children, (child) =>
               <div style={{whiteSpace: 'nowrap'}}>
                 <i className="fa fa-square" style={{color:child.props.colour || colourFunc(child.props.track)}}/>
                 {child.props.track}<br/>
@@ -103,7 +103,7 @@ let NumericalTrackGroupChannel = React.createClass({
         )}
         onClose={this.redirectedProps.onClose}
         controls={<NumericalTrackGroupControls {...this.props} setProps={this.redirectedProps.setProps} />}
-        //legend={<Legend>{children}</Legend>}
+        legend={<Legend>{children}</Legend>}
         >
         {React.Children.map(children,
           (child) => React.cloneElement(child, {
