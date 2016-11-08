@@ -11,15 +11,12 @@ import CalcMapBounds from 'util/CalcMapBounds';
 import ComponentMarker from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroup from 'Map/FeatureGroup/Widget';
-import Circle from 'Map/Circle/Widget';
 import Polyline from 'Map/Polyline';
 import GeoLayouter from 'utils/GeoLayouter';
-import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 import LRUCache from 'util/LRUCache';
 import PieChart from 'Chart/Pie/Widget';
 
 // Lodash
-import _cloneDeep from 'lodash/cloneDeep';
 import _sumBy from 'lodash/sumBy';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
