@@ -109,7 +109,7 @@ let DocPage = React.createClass({
     const {content, loadStatus} = this.state;
     const {replaceSelf} = this.props;
     return <div className="load-container">
-      <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>;
+      <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       <Loading status={loadStatus}/>
     </div>;
   }
