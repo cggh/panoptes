@@ -286,15 +286,9 @@ let PieChartMarkersLayer = React.createClass({
                 ).concat(
                   renderNodes.map(
                     (marker, i) =>
-<<<<<<< f66e010bdea2f066451efb6eb7c9c52ea8aafb0b
                       <Polyline
                         positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
                       />
-=======
-                        <Polyline
-                          positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
-                        />
->>>>>>> lint: add semicolon, remove explicit returns and block bodies from arrow functions
                   )
                 )
               }
