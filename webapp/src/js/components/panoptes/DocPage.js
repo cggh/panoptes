@@ -43,6 +43,10 @@ let DocPage = React.createClass({
       this.titleFromHTML = 'Loading...';
       this.setState(this.getInitialState());
     }
+    if (this.config.docs[path]) {
+      this.setState({loadStatus: 'loaded', content: this.config.docs[path]}, () => this.componentWillUpdate(props, this.state));
+      return;
+    }
     const {dataset} = this.config;
     requestContext.request((componentCancellation) =>
       LRUCache.get(
@@ -58,39 +62,38 @@ let DocPage = React.createClass({
       .catch((error) => {
         this.setState({loadStatus: 'error', content: ''});
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(this.props, requestContext));
+        console.error(error);
         throw error;
       })
       .done();
   },
 
   componentWillUpdate(nextProps, nextState) {
-    if (this.state.content !== nextState.content && nextState.content != '') {
-      let inTitle = false;
-      let title = 'Untitled';
-      const parser = new htmlparser.Parser({
-        onopentag: function(tagname, attribs) {
-          if (tagname === 'title') {
-            inTitle = true;
-          }
-        },
-        ontext: function(text) {
-          if (inTitle) {
-            title = text;
-          }
-        },
-        onclosetag: function(tagname) {
-          if (tagname === 'title') {
-            inTitle = false;
-          }
+    let inTitle = false;
+    let title = 'Untitled';
+    const parser = new htmlparser.Parser({
+      onopentag: function(tagname, attribs) {
+        if (tagname === 'title') {
+          inTitle = true;
         }
-      }, {decodeEntities: true});
-      parser.write(nextState.content);
-      parser.end();
-      if (title !== this.titleFromHTML) {
-        this.titleFromHTML = title;
-        if (nextProps.updateTitleIcon) {
-          nextProps.updateTitleIcon();
+      },
+      ontext: function(text) {
+        if (inTitle) {
+          title = text;
         }
+      },
+      onclosetag: function(tagname) {
+        if (tagname === 'title') {
+          inTitle = false;
+        }
+      }
+    }, {decodeEntities: true});
+    parser.write(nextState.content);
+    parser.end();
+    if (title !== this.titleFromHTML) {
+      this.titleFromHTML = title;
+      if (nextProps.updateTitleIcon) {
+        nextProps.updateTitleIcon();
       }
     }
   },

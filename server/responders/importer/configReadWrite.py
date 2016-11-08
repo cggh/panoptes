@@ -62,13 +62,21 @@ def readJSONConfig(datasetId):
     twoDTables = readSetOfSettings(join(dataset_folder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
     genome = loads(SettingsRefGenome(join(dataset_folder, 'refgenome', 'settings'), validate=True).serialize())
     mapLayers = readSetOfSettings(join(dataset_folder, 'maps'), SettingsMapLayer)
+    #As an optimisation we send index.html if it exists to avoid the inevitable request.
+    try:
+        with open(join(baseDir, 'Docs', datasetId, 'index.html'), 'r') as f:
+            introPage = f.read()
+    except IOError:
+        introPage = None
+
     return {
         'settings': settings,
         'chromosomes': chromosomes,
         'tablesById': tables,
         'twoDTablesById': twoDTables,
         'genome': genome,
-        'mapLayers': mapLayers
+        'mapLayers': mapLayers,
+        'docs': {'index.html': introPage}
     }
 
 class ReadOnlyErrorWriter:

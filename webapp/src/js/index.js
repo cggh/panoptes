@@ -88,9 +88,13 @@ if (dataset) {
       const defaultState = {
         session: {
           components: {
-            FirstTab: {
-              type: 'StartTab',
-              props: {}
+            FirstTab: config.docs['index.html'] ? {
+              type: 'DocPage',
+              props: {
+                path: 'index.html'
+              }
+            } : {
+              type: 'EmptyTab'
             }
           },
           tabs: {

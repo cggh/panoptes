@@ -47,9 +47,8 @@ let TabPane = React.createClass({
     };
 
     let child = React.Children.only(this.props.children);
-    let extraProps = (child && child.propTypes && child.propTypes.updateTitleIcon) ?
+    let extraProps = (child && child.type.propTypes && child.type.propTypes.updateTitleIcon) ?
     {updateTitleIcon: this.props.updateTitleIcon} : {};
-
     return (
       <div {...divProps} className={classNames(this.props.className, classes)}>
         {React.cloneElement(child, {

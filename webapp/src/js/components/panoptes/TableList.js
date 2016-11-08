@@ -24,10 +24,17 @@ let TableList = React.createClass({
     onClick: React.PropTypes.func.isRequired
   },
 
-
   handleOpen(e, component) {
-    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    this.props.onClick({component, middleClick});
+    const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
+    (this.props.onClick || this.handleClick)({component, middleClick});
+  },
+
+  handleClick({component, middleClick}) {
+    if (middleClick)
+      this.flux.actions.session.tabOpen(component, false);
+    else {
+      this.flux.actions.session.tabOpen(component, true);
+    }
   },
 
   handleTableClick(e, table) {

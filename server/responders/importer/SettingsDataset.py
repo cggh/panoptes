@@ -15,17 +15,6 @@ class SettingsDataset(ImportSettings):
                                           'type': 'Text',
                                           'required': False,
                                           'description': 'Visible name of the dataset, as it appears on the top banner of the app.\n  Note: this text may contain html markup'}),
-                                    ('description', {
-                                          'type': 'Text',
-                                          'required': False,
-                                          'description': '''A description of the dataset that appears on the start page.
-  Note: this text may contain html markup, and documentation links (see :ref:`def-source-docs`).
-  A longer description can be split over several lines by writing a ``>`` sign on the key line,
-  and indent subsequent lines::
-
-     Description: >
-        This web application provides an interactive view
-        on the data ..'''}),
                                     ('dataTables', {
                                           'type': 'List',
                                           'required': False,
