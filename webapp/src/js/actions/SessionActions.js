@@ -72,9 +72,10 @@ let SessionActions = {
   tabSwitch(compId) {
     this.dispatch(SESSION.TAB_SWITCH, {compId});
   },
-  geneFound(geneId) {
+  geneFound(geneId, geneDesc) {
     this.dispatch(SESSION.GENE_FOUND, {
-      geneId: geneId
+      geneId,
+      geneDesc
     });
   },
   tableQueryUsed(table, query) {

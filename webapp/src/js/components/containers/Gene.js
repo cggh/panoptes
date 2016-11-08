@@ -123,13 +123,14 @@
               SQL.WhereClause.CompareFixed(table.regionStop, '>=', parseInt(geneData['fstart']))
             ]));
           }
-          const component = table.listView ? ListWithActions : DataTableWithActions;
           let genomePositionTableButton = (
             <PopupButton key={table.id}
                        label={'Show ' + table.namePlural + ' in ' + geneData['fname']}
                        icon={table.icon} >
-            <component table={table.id}
-                       query={genomePositionTableQuery} />
+              {table.listView ? <ListWithActions table={table.id}
+                       query={genomePositionTableQuery} /> :
+              <DataTableWithActions table={table.id}
+                       query={genomePositionTableQuery} />}
             </PopupButton>
         );
           genomePositionTableButtons.push(genomePositionTableButton);

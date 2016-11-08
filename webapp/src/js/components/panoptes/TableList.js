@@ -21,7 +21,7 @@ let TableList = React.createClass({
 
   propTypes: {
     style: React.PropTypes.object,
-    onClick: React.PropTypes.func.isRequired
+    onClick: React.PropTypes.func
   },
 
   handleOpen(e, component) {

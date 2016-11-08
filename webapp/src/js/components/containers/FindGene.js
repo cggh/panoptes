@@ -49,9 +49,9 @@ let FindGene = React.createClass({
     return 'Find gene';
   },
 
-  handleSelectGene(e, geneId) {
+  handleSelectGene(e, geneId, geneDesc) {
     // Add selected geneId to list of recently found genes.
-    this.getFlux().actions.session.geneFound(geneId);
+    this.getFlux().actions.session.geneFound(geneId, geneDesc);
     const component = <Gene geneId={geneId} />;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (middleClick)

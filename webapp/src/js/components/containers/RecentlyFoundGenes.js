@@ -1,4 +1,5 @@
 import React from 'react';
+import _map from 'lodash/map';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -42,22 +43,14 @@ let RecentlyFoundGenes = React.createClass({
     let foundGenesList = null;
 
     if (foundGenes.size > 0) {
-
-      let foundGenesListItems = [];
-
-      foundGenes.map( (foundGene) => {
-
-        let foundGenesListItem = (
-          <ListItem key={foundGene}
-                    primaryText={foundGene}
+      let foundGenesListItems = _map(foundGenes.toJS(), ({geneId, geneDesc}) =>
+          <ListItem key={geneId}
+                    primaryText={geneId}
+                    secondaryText={geneDesc}
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
-                    onClick={(e) => onSelect(e, foundGene)}
+                    onClick={(e) => onSelect(e, geneId, geneDesc)}
           />
-        );
-
-        foundGenesListItems.push(foundGenesListItem);
-
-      });
+      );
 
       let subheader = undefined;
       if (subheaderText !== undefined) {
