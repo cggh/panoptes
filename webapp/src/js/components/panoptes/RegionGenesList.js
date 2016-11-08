@@ -130,11 +130,11 @@ let RegionGenesList = React.createClass({
                   }
                   secondaryText={
                     <div>
-                          {regionGenesData[i].descr.split(';').join('; ')}
+                          {regionGenesData[i].descr.split(';').join('; ').split(',').join(', ')}
                     </div>
                   }
                   secondaryTextLines={2}
-                  onClick={(e) => this.handleSelectGene(e, regionGenesData[i].fid)}
+                  onClick={(e) => this.handleSelectGene(e, regionGenesData[i].fid, regionGenesData[i].descr.split(';').join('; ').split(',').join(', '))}
                   leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
         />
       );
