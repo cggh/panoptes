@@ -199,8 +199,8 @@ let SessionStore = Fluxxor.createStore({
     return this.lastNotification;
   },
 
-  geneFound({geneId}) {
-    this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((foundGeneId) => foundGeneId !== geneId).push(geneId));
+  geneFound({geneId, geneDesc}) {
+    this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((gene) => gene.get('geneId') !== geneId).unshift(Immutable.Map({geneId, geneDesc})));
   },
 
   tableQueryUsed({table, query}) {

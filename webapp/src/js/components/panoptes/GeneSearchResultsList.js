@@ -51,8 +51,8 @@ let GeneSearchResultsList = React.createClass({
     };
   },
 
-  handleSelectGene(e, geneId) {
-    this.props.onSelectGene(e, geneId);
+  handleSelectGene(e, geneId, geneDesc) {
+    this.props.onSelectGene(e, geneId, geneDesc);
   },
 
   //Called by DataFetcherMixin
@@ -145,7 +145,7 @@ let GeneSearchResultsList = React.createClass({
                     </div>
                   }
                   secondaryTextLines={2}
-                  onClick={(e) => this.handleSelectGene(e, matchData.ids[i])}
+                  onClick={(e) => this.handleSelectGene(e, matchData.ids[i], matchData.descriptions[i].split(',').join(', ').split(';').join('; '))}
                   leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
         />
       );
