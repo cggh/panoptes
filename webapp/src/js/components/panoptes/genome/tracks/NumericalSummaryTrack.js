@@ -27,7 +27,7 @@ let NumericalSummaryTrack = React.createClass({
         'width',
         'height',
         'colour',
-        'minMax'
+        'hideMinMax'
       ]
     }),
     FluxMixin,
@@ -42,7 +42,7 @@ let NumericalSummaryTrack = React.createClass({
     height: React.PropTypes.number,
     width: React.PropTypes.number,
     colour: React.PropTypes.string,
-    minMax: React.PropTypes.bool,
+    hideMinMax: React.PropTypes.bool,
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
@@ -50,12 +50,6 @@ let NumericalSummaryTrack = React.createClass({
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
     onChangeLoadStatus: React.PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      minMax: true
-    };
   },
 
   getInitialState() {
@@ -174,7 +168,7 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   draw(props) {
-    const {yMin, yMax, height, start, end, width, colour, minMax} = props;
+    const {yMin, yMax, height, start, end, width, colour, hideMinMax} = props;
     if (!this.refs.canvas) {
       return;
     }
@@ -192,7 +186,7 @@ let NumericalSummaryTrack = React.createClass({
     const yScaleFactor = height / (yMax - yMin);
     const pixelWindowSize = windowSize * xScaleFactor;
     //Max and min
-    if (minMax) {
+    if (!hideMinMax) {
       ctx.beginPath();
       this.blocks.forEach((block) => {
         const window = block.window.array;
