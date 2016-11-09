@@ -2,11 +2,12 @@ import Immutable from 'immutable';
 import LZString from 'lz-string';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
+import FileSaver from 'file-saver';
 
 const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
 // TODO: migrate to API.js ???
-function downloadTableData(payload) {
+export function downloadTableData(payload) {
 
   let defaults = {
     query: SQL.nullQuery
@@ -51,42 +52,49 @@ function downloadTableData(payload) {
   if (order instanceof Array && order.length > 0) {
     downloadURL += '&orderBy=' + JSON.stringify(order);
   }
-
   window.location.href = downloadURL;
 }
 
-
-function downloadGenotypeData(payload) {
-
+export function downloadGenotypeData({
+  dataset, tableNamePlural, cellColour,
+  colTableCapNamePlural, rowTableCapNamePlural,
+  columnQueryAsString, rowQueryAsString,
+  chromosome, start, end,
+  rowPrimaryKey, callData, alleleDepthData, positions
+  }) {
   let data = '';
-  data += '#Dataset: ' + payload.dataset + '\r\n';
+  data += '#Dataset: ' + dataset + '\r\n';
   // NB: tableCapNamePlural (Cap) is not available
-  data += '#Table: ' + payload.tableNamePlural + (payload.cellColour == 'call' ? ' Calls' : ' Allele Depths') + '\r\n';
-  data += '#' + payload.colTableCapNamePlural + ' query: ' + payload.columnQueryAsString + '\r\n';
-  data += '#' + payload.rowTableCapNamePlural + ' query: ' + payload.rowQueryAsString + '\r\n';
-  data += '#Choromosome: ' + payload.chromosome + '\r\n';
-  data += '#Start: ' + Math.floor(payload.start) + '\r\n';
-  data += '#End: ' + Math.ceil(payload.end) + '\r\n';
+  data += '#Table: ' + tableNamePlural + (cellColour == 'call' ? ' Calls' : ' Allele Depths') + '\r\n';
+  data += '#' + colTableCapNamePlural + ' filter: ' + columnQueryAsString + '\r\n';
+  data += '#' + rowTableCapNamePlural + ' filter: ' + rowQueryAsString + '\r\n';
+  data += '#Choromosome: ' + chromosome + '\r\n';
+  data += '#Start: ' + Math.floor(start) + '\r\n';
+  data += '#End: ' + Math.ceil(end) + '\r\n';
   data += '#URL: ' + window.location.href + '\r\n';
-
-  // Magic, credit http://jsfiddle.net/user/koldev/
-  let tmp = document.createElement('a');
-  document.body.appendChild(tmp);
-  tmp.style = 'display: none';
+  data += 'Position\t';
+  for (var i = 0; i < rowPrimaryKey.length; i++)
+    data += rowPrimaryKey[i] + '\t'
+  data += "\r\n";
+  var propArray = cellColour == 'call' ? callData : alleleDepthData;
+  var arity = propArray.shape[2] || 1;
+  for (i = 0; i < positions.length; i++) {
+    data += positions[i] + '\t';
+    for (var j = 0; j < rowPrimaryKey.length; j++) {
+      for (var k = 0; k < arity; k++) {
+        data += propArray[j][i * arity + k];
+        if (k < arity - 1)
+          data += ','
+      }
+      data += '\t';
+    }
+    data += '\r\n';
+  }
   let blob = new Blob([data], {type: 'text/plain'});
-  let url = window.URL.createObjectURL(blob);
-  tmp.href = url;
-  tmp.download = payload.tableNamePlural + '_'
-    + (payload.cellColour == 'call' ? 'Calls_' : 'Allele_Depths_')
-    + payload.chromosome + '_'
-    + Math.floor(payload.start) + '-' + Math.ceil(payload.end) + '.txt'
-  ;
-  tmp.click();
-  window.URL.revokeObjectURL(url);
-
+  FileSaver.saveAs(blob,
+    payload.dataset + '-' +
+    (payload.cellColour == 'call' ? 'Calls' : ' Allele Depths') + '-' +
+    payload.tableNamePlural + '-' +
+    payload.chromosome + '_' +
+    Math.floor(payload.start) + '-' + Math.ceil(payload.end) + '.txt');
 }
-
-module.exports = {
-  downloadTableData,
-  downloadGenotypeData
-};

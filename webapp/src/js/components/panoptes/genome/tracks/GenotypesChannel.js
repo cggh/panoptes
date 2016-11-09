@@ -33,7 +33,7 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import NumericInput from 'ui/NumericInput';
 import DataDownloader from 'util/DataDownloader';
 import Icon from 'ui/Icon';
-import QueryConverter from 'util/QueryConverter';
+import queryToString from 'util/queryToString';
 
 const FAN_HEIGHT = 60;
 
@@ -401,6 +401,17 @@ let GenotypesChannel = React.createClass({
     });
   },
 
+  getDataForDownload() {
+    let rowPrimaryKey = this.state.rowData ? this.state.rowData.id.array : [];
+
+    return {
+      rowPrimaryKey,
+      callData,
+      alleleDepthData,
+      positions
+    };
+  },
+
   render() {
     let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
@@ -426,6 +437,7 @@ let GenotypesChannel = React.createClass({
         configComponent={<GenotypesControls {...this.props}
                                             columnQuery={columnQuery}
                                             rowQuery={rowQuery}
+                                            getDataForDownload={this.getDataForDownload}
                                             setProps={this.redirectedProps.setProps}/>}
         legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
@@ -493,25 +505,36 @@ const GenotypesControls = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
+    getDataForDownload: React.PropTypes.func
   },
 
   handleDownload() {
-
+    let tableConfig = this.config.twoDTablesById[this.props.table];
+    let columnTableConfig = this.config.tablesById[tableConfig.columnDataTable];
+    let rowTableConfig = this.config.tablesById[tableConfig.rowDataTable];
+    let {
+      rowPrimaryKey,
+      callData,
+      alleleDepthData,
+      positions
+    } = this.props.getDataForDownload();
     let params = {
       dataset: this.config.dataset,
-      tableNamePlural: this.config.twoDTablesById[this.props.table].namePlural,
-      colTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].capNamePlural,
-      rowTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].capNamePlural,
-      columnQueryAsString: QueryConverter.tableQueryToString({
-        table: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].id,
+      tableNamePlural: tableConfig.namePlural,
+      colTableCapNamePlural: columnTableConfig.capNamePlural,
+      rowTableCapNamePlural: rowTableConfig.capNamePlural,
+      columnQueryAsString: queryToString({
         query: this.props.columnQuery,
-        properties: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].properties
+        properties: columnTableConfig.properties
       }),
-      rowQueryAsString: QueryConverter.tableQueryToString({
-        table: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].id,
+      rowQueryAsString: queryToString({
         query: this.props.rowQuery,
-        properties: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].properties
-      })
+        properties: rowTableConfig.properties
+      }),
+      rowPrimaryKey,
+      callData,
+      alleleDepthData,
+      positions
     };
 
     DataDownloader.downloadGenotypeData({...params, ...this.props});
