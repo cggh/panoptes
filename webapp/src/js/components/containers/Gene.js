@@ -169,6 +169,7 @@
             <div className="grow">
               <table className="table-col">
                 <tbody>
+                  <tr><th className="table-col-header">ID: </th><td className="table-col-cell">{geneData['fid']}</td></tr>
                   <tr><th className="table-col-header">Name: </th><td className="table-col-cell">{geneData['fname']}</td></tr>
                   <tr><th className="table-col-header">Alternatives: </th><td className="table-col-cell">{geneData['fnames'].split(',').join(', ')}</td></tr>
                   <tr><th className="table-col-header">Description: </th><td className="table-col-cell">{geneData['descr']}</td></tr>
