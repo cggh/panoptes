@@ -12,6 +12,7 @@
   width: 100%;
   background-color: rgba(255, 255, 255, 0.6);
   visibility: hidden;
+  pointer-events: none;
   opacity: 0;
   transition: visibility 0s linear 0.5s, opacity 0.5s linear;
   .load-icon {
