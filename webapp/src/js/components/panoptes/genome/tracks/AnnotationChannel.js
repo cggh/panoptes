@@ -162,7 +162,7 @@ let AnnotationChannel = React.createClass({
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!(this.data && this.data.starts)) return;
-    const {names, sizes, starts, types, rows} = this.data;
+    const {ids, names, sizes, starts, types, rows} = this.data;
     ctx.strokeStyle = '#000';
     ctx.fillStyle = '#000';
     ctx.font = '10px monospace';
@@ -175,7 +175,8 @@ let AnnotationChannel = React.createClass({
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
         if (x2 > -60 && x1 < width + 4) {
           ctx.fillRect(x1, (rows[i] * ROW_HEIGHT) + 20, Math.max(1, x2 - x1), 2);   //Gene bar
-          if (names[i] && (lastTextAt[rows[i]] + 30 < x1  || typeof lastTextAt[rows[i]] === 'undefined')) {
+          let text = names[i] || ids[i];
+          if (text && (lastTextAt[rows[i]] + 30 < x1  || typeof lastTextAt[rows[i]] === 'undefined')) {
             lastTextAt[rows[i]] = x1;
             let grd = ctx.createLinearGradient(x1 - 12, 0, x1, 0);
             grd.addColorStop(0.000, 'rgba(255, 255, 255, 0)');
@@ -183,7 +184,7 @@ let AnnotationChannel = React.createClass({
             ctx.fillStyle = grd;
             ctx.fillRect(x1 - 12, (rows[i] * ROW_HEIGHT) + 4, 12 + names[i].length * 6, 10);
             ctx.fillStyle = '#000';
-            ctx.fillText(names[i], x1, (rows[i] * ROW_HEIGHT) + 14);
+            ctx.fillText(text, x1, (rows[i] * ROW_HEIGHT) + 14);
           }
           if (rows[i] > maxRow)
             maxRow = rows[i];
