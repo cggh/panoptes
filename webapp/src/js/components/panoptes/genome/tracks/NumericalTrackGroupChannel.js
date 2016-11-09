@@ -19,7 +19,7 @@ import ItemPicker from 'containers/ItemPicker';
 import {findBlock} from 'util/PropertyRegionCache';
 import SQL from 'panoptes/SQL';
 import DataTableWithActions from 'containers/DataTableWithActions';
-import {categoryColours} from 'util/Colours'
+import {categoryColours} from 'util/Colours';
 import LegendElement from 'panoptes/LegendElement';
 
 const ALLOWED_CHILDREN = [
@@ -161,7 +161,8 @@ let NumericalTrackGroupControls = React.createClass({
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
-    setProps: React.PropTypes.func
+    setProps: React.PropTypes.func,
+    children: React.PropTypes.node
   },
 
   trackGroups() {
@@ -173,7 +174,7 @@ let NumericalTrackGroupControls = React.createClass({
         groups[table.id] = {
           name: table.capNamePlural,
           icon: table.icon,
-          items: {}
+          items: []
         };
         _forEach(table.properties, (prop) => {
           if (prop.showInBrowser && prop.isNumerical) {
@@ -210,8 +211,8 @@ let NumericalTrackGroupControls = React.createClass({
                       primary={true}
                       onClick={() => actions.session.modalOpen(<ItemPicker
                         title="Pick tracks to be displayed"
-                        itemName="Numerical track"
-                        itemVerb="display"
+                        itemName="numerical track"
+                        pickVerb="display"
                         groups={this.trackGroups()}
                         initialSelection={React.Children.map(children, (child) => ({
                           groupId: child.props.table,

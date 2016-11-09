@@ -14,7 +14,7 @@ import _without from 'lodash/without';
 import _forEach from 'lodash/forEach';
 import _sumBy from 'lodash/sumBy';
 import _filter from 'lodash/filter';
-import _difference from 'lodash/difference'
+import _difference from 'lodash/difference';
 import Icon from 'ui/Icon';
 
 
@@ -62,8 +62,7 @@ let GroupedItemPicker = React.createClass({
   handleAdd(propId) {
     if (_includes(this.state.picked, propId)) {
       this.setState({picked: _without(this.state.picked, propId)});
-    }
-    else {
+    } else {
       this.setState({picked: this.state.picked.concat([propId])});
     }
   },
