@@ -1,4 +1,5 @@
 import React from 'react';
+import FileSaver from 'file-saver';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -11,6 +12,7 @@ import _sortedIndex from 'lodash/sortedIndex';
 import _sortedLastIndex from 'lodash/sortedLastIndex';
 import _sortBy from 'lodash/sortBy';
 import _last from 'lodash/last';
+import _some from 'lodash/some';
 import _takeRight from 'lodash/takeRight';
 import _unique from 'lodash/uniq';
 
@@ -31,9 +33,8 @@ import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
 import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericInput from 'ui/NumericInput';
-import DataDownloader from 'util/DataDownloader';
 import Icon from 'ui/Icon';
-import QueryConverter from 'util/QueryConverter';
+import queryToString from 'util/queryToString';
 
 const FAN_HEIGHT = 60;
 
@@ -195,7 +196,7 @@ let GenotypesChannel = React.createClass({
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
 
-    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
+    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight', 'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, null);
     }
@@ -401,6 +402,10 @@ let GenotypesChannel = React.createClass({
     });
   },
 
+  getDataBlocks() {
+    return this.state.dataBlocks;
+  },
+
   render() {
     let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
@@ -426,6 +431,7 @@ let GenotypesChannel = React.createClass({
         configComponent={<GenotypesControls {...this.props}
                                             columnQuery={columnQuery}
                                             rowQuery={rowQuery}
+                                            getDataBlocks={this.getDataBlocks}
                                             setProps={this.redirectedProps.setProps}/>}
         legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
@@ -493,28 +499,81 @@ const GenotypesControls = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
+    getDataBlocks: React.PropTypes.func
   },
 
   handleDownload() {
+    const {table, chromosome, columnQuery, rowQuery, start, end, cellColour, getDataBlocks} = this.props;
+    const tableConfig = this.config.twoDTablesById[table];
+    const columnTableConfig = this.config.tablesById[tableConfig.columnDataTable];
+    const rowTableConfig = this.config.tablesById[tableConfig.rowDataTable];
+    const columnQueryAsString = queryToString({
+      query: columnQuery,
+      properties: columnTableConfig.properties
+    });
+    const rowQueryAsString = queryToString({
+      query: rowQuery,
+      properties: rowTableConfig.properties
+    });
 
-    let params = {
-      dataset: this.config.dataset,
-      tableNamePlural: this.config.twoDTablesById[this.props.table].namePlural,
-      colTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].capNamePlural,
-      rowTableCapNamePlural: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].capNamePlural,
-      columnQueryAsString: QueryConverter.tableQueryToString({
-        table: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].id,
-        query: this.props.columnQuery,
-        properties: this.config.tablesById[this.config.twoDTablesById[this.props.table].columnDataTable].properties
-      }),
-      rowQueryAsString: QueryConverter.tableQueryToString({
-        table: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].id,
-        query: this.props.rowQuery,
-        properties: this.config.tablesById[this.config.twoDTablesById[this.props.table].rowDataTable].properties
-      })
-    };
+    let data = '';
+    data += '#Dataset: ' + this.config.dataset + '\r\n';
+    // NB: tableCapNamePlural (Cap) is not available
+    data += `#Table: ${tableConfig.namePlural}${(cellColour == 'call' ? ' Calls' : ' Allele Depths')}\r\n`;
+    data += `#${columnTableConfig.capNamePlural} filter: ${columnQueryAsString}\r\n`;
+    data += `#${rowTableConfig.capNamePlural} filter: ${rowQueryAsString}\r\n`;
+    data += `#Choromosome: ${chromosome}\r\n`;
+    data += `#Start: ${Math.floor(start)}\r\n`;
+    data += `#End: ${Math.ceil(end)}\r\n`;
+    data += `#URL: ${window.location.href}\r\n`;
+    data += 'Position\t';
 
-    DataDownloader.downloadGenotypeData({...params, ...this.props});
+    const dataBlocks = getDataBlocks();
+    if (dataBlocks.length == 0) {
+      ErrorReport(this.getFlux(), `No genotype data to download`);
+      return;
+    }
+    if (_some(dataBlocks, (block) => block._tooBig)) {
+      ErrorReport(this.getFlux(), `Too much genotype data to download - zoom in`);
+      return;
+    }
+
+    const rowPrimaryKey = dataBlocks[0][`row_${rowTableConfig.primKey}`].array;
+    for (var i = 0; i < rowPrimaryKey.length; i++)
+      data += rowPrimaryKey[i] + '\t'
+    data += "\r\n";
+
+    for (let b = 0; b < dataBlocks.length; ++b) {
+      let block = dataBlocks[b];
+      let propArray = block[`2D_${tableConfig.showInGenomeBrowser[cellColour == 'call' ? 'call' : 'alleleDepth']}`];
+      let shape = propArray.shape;
+      propArray = propArray.array;
+      let lcols = shape[1];
+      let ploidy = shape[2] || 1;
+      let positions = block[`col_${columnTableConfig.position}`].array;
+      for (i = 0; i < positions.length; i++) {
+        if (positions[i] >= start && positions[i] <= end) {
+          data += positions[i] + '\t';
+          for (var j = 0; j < rowPrimaryKey.length; j++) {
+            for (var k = 0; k < ploidy; k++) {
+              data += propArray[j * lcols * ploidy + i * ploidy + k];
+              if (k < ploidy - 1)
+                data += ','
+            }
+            data += '\t';
+          }
+          data += '\r\n';
+        }
+      }
+    }
+
+    let blob = new Blob([data], {type: 'text/plain'});
+    FileSaver.saveAs(blob,
+      this.config.dataset + '-' +
+      (cellColour == 'call' ? 'Calls' : ' Allele Depths') + '-' +
+      tableConfig.tableNamePlural + '-' +
+      chromosome + '_' +
+      Math.floor(start) + '-' + Math.ceil(end) + '.txt');
   },
 
   render() {
@@ -536,14 +595,17 @@ const GenotypesControls = React.createClass({
           <FlatButton label="Download data"
                       primary={true}
                       onClick={() => this.handleDownload()}
-                      icon={<Icon fixedWidth={true} name="download" />}
+                      icon={<Icon fixedWidth={true} name="download"/>}
           />
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}
                             value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
                             label="Row Label"
-                            onSelect={(rowLabel) => this.redirectedProps.setProps({rowLabel, rowSort: rowSort || rowLabel})}/>
+                            onSelect={(rowLabel) => this.redirectedProps.setProps({
+                              rowLabel,
+                              rowSort: rowSort || rowLabel
+                            })}/>
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}
@@ -578,7 +640,8 @@ const GenotypesControls = React.createClass({
                        floatingLabelText="Cell Opacity"
                        onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
             <MenuItem value="none" primaryText="None"/>
-            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
+            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
+                                                                                primaryText={config.propertiesById[prop].name}/>)}
           </SelectField>
         </div>
         <div className="control">
@@ -588,7 +651,8 @@ const GenotypesControls = React.createClass({
                        floatingLabelText="Cell Height"
                        onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
             <MenuItem value="none" primaryText="None"/>
-            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
+            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
+                                                                                primaryText={config.propertiesById[prop].name}/>)}
           </SelectField>
         </div>
         <div className="control">

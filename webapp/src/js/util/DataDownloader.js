@@ -6,7 +6,7 @@ import SQL from 'panoptes/SQL';
 const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
 // TODO: migrate to API.js ???
-function downloadTableData(payload) {
+export function downloadTableData(payload) {
 
   let defaults = {
     query: SQL.nullQuery
@@ -51,42 +51,5 @@ function downloadTableData(payload) {
   if (order instanceof Array && order.length > 0) {
     downloadURL += '&orderBy=' + JSON.stringify(order);
   }
-
   window.location.href = downloadURL;
 }
-
-
-function downloadGenotypeData(payload) {
-
-  let data = '';
-  data += '#Dataset: ' + payload.dataset + '\r\n';
-  // NB: tableCapNamePlural (Cap) is not available
-  data += '#Table: ' + payload.tableNamePlural + (payload.cellColour == 'call' ? ' Calls' : ' Allele Depths') + '\r\n';
-  data += '#' + payload.colTableCapNamePlural + ' query: ' + payload.columnQueryAsString + '\r\n';
-  data += '#' + payload.rowTableCapNamePlural + ' query: ' + payload.rowQueryAsString + '\r\n';
-  data += '#Choromosome: ' + payload.chromosome + '\r\n';
-  data += '#Start: ' + Math.floor(payload.start) + '\r\n';
-  data += '#End: ' + Math.ceil(payload.end) + '\r\n';
-  data += '#URL: ' + window.location.href + '\r\n';
-
-  // Magic, credit http://jsfiddle.net/user/koldev/
-  let tmp = document.createElement('a');
-  document.body.appendChild(tmp);
-  tmp.style = 'display: none';
-  let blob = new Blob([data], {type: 'text/plain'});
-  let url = window.URL.createObjectURL(blob);
-  tmp.href = url;
-  tmp.download = payload.tableNamePlural + '_'
-    + (payload.cellColour == 'call' ? 'Calls_' : 'Allele_Depths_')
-    + payload.chromosome + '_'
-    + Math.floor(payload.start) + '-' + Math.ceil(payload.end) + '.txt'
-  ;
-  tmp.click();
-  window.URL.revokeObjectURL(url);
-
-}
-
-module.exports = {
-  downloadTableData,
-  downloadGenotypeData
-};

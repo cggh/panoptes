@@ -1,19 +1,16 @@
 import React from 'react';
+import SQL from 'panoptes/SQL';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
-import StoreWatchMixin from 'mixins/StoreWatchMixin';
-
-import QueryConverter from 'util/QueryConverter';
-
+import queryToString from 'util/queryToString';
 
 let QueryString = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
-    ConfigMixin,
-    StoreWatchMixin('PanoptesStore')
+    ConfigMixin
   ],
 
   propTypes: {
@@ -22,26 +19,20 @@ let QueryString = React.createClass({
     prefix: React.PropTypes.string
   },
 
-  getStateFromFlux() {
+  getDefaultProps() {
     return {
-      subsets: this.getFlux().store('PanoptesStore').getStoredSubsetsFor(this.props.table)
-    };
+      prefix: '',
+      query: SQL.nullQuery
+    }
   },
 
   render() {
-    let {query, prefix, table} = this.props;
-    let {subsets} = this.state;
-    return QueryConverter.tableQueryToReactComponent(
-      {
-        prefix,
-        properties: this.tableConfig().properties,
-        query,
-        subsets,
-        table
-      }
-    );
+    let {query, prefix} = this.props;
+    let properties = this.tableConfig().properties;
+    return <span>
+        { prefix + queryToString({properties, query})}
+      </span>;
   }
-
 });
 
 export default QueryString;

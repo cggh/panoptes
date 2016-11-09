@@ -58,6 +58,7 @@
     "d3": "^3.5.17",
     "datastream": "^1.0.0",
     "esprima": "^3.1.0",
+    "file-saver": "^1.3.3",
     "fixed-data-table": "^0.6.3",
     "fluxxor": "^1.7.3",
     "handlebars": "^4.0.5",
