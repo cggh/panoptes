@@ -43,7 +43,6 @@ let GenomeBrowser = React.createClass({
     start: React.PropTypes.number,
     end: React.PropTypes.number,
     sideWidth: React.PropTypes.number.isRequired,
-    chromPositions: React.PropTypes.object,  //Stores the position on each chrom so you can flick back without losing place
     children: React.PropTypes.node
   },
 
@@ -53,7 +52,7 @@ let GenomeBrowser = React.createClass({
       start: undefined, //Defaults for start and end are set at render time as they are config dependant
       end: undefined,
       sideWidth: 150,
-      width: 500,
+      width: 500
     };
   },
 
@@ -73,6 +72,9 @@ let GenomeBrowser = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.chromosome !== this.props.chromosome && nextProps.setProps) {
+      nextProps.setProps({start: 0, end: this.config.chromosomes[nextProps.chromosome] || 10000});
+    }
     if (this.nextSpringConfig) {
       this.setState({springConfig: this.nextSpringConfig});
       this.nextSpringConfig = null;
