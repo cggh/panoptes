@@ -136,7 +136,7 @@ let GenomeBrowserWithActions = React.createClass({
           {
             name: table.capNamePlural,
             description: `Positions of ${table.namePlural}`,
-            icon: 'arrow-down',
+            icon: 'caret-up',
             payload: serialiseComponent(<PerRowIndicatorChannel table={table.id} />)
           }
         );
