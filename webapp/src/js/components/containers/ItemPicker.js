@@ -151,44 +151,48 @@ let ItemPicker = React.createClass({
           />
         );
       }
-      if (!itemGroups) return [];
-      let totalItemGroupItemsCount = 0;
-      let nestedItemGroups = [];
-      if (itemGroups['_UNGROUPED_']) {
-        nestedItemGroups = nestedItemGroups.concat(_map(itemGroups['_UNGROUPED_'].items, (item, itemId) => this.convertItemTolistItem(item, itemId, search, groupId, '_UNGROUPED_')));
-        totalItemGroupItemsCount += nestedItemGroups.length;
-      }
-      // Convert all of the itemGroups and their items into ListItem components.
-      nestedItemGroups = nestedItemGroups.concat(_map(itemGroups, (itemGroup, itemGroupId) => {
-        if (itemGroupId === '_UNGROUPED_') return null;
-        // Convert all of the items in this itemGroup into ListItem components.
-        let itemGroupNestedItems = _map(itemGroup.items, (item, itemId) => this.convertItemTolistItem(item, itemId, search, groupId, itemGroupId));
-        totalItemGroupItemsCount += itemGroupNestedItems.length;
-        return _some(itemGroupNestedItems) ? (
-          <ListItem
-            primaryText={<div> {itemGroup.name} ({itemGroupNestedItems.length} <Pluralise text={itemName} ord={itemGroupNestedItems.length}/>)</div>}
-            key={groupId + itemGroupId + !!search}
-            initiallyOpen={!!search}
-            leftIcon={itemGroup.icon ? <Icon fixedWidth={true} name={itemGroup.icon}/> : null}
-            primaryTogglesNestedList={true}
-            nestedItems={itemGroupNestedItems}
-          />
-        ) : null;
-      }));
-      tolalItemsCount += totalItemGroupItemsCount;
-      // If there are any nestedItemGroups for this group (after search exclusions),
-      // then convert this group to a ListItem component containing the nestedItemGroups (along with their nestedItems).
-      if (nestedItemGroups.length !== 0) {
-        listItems.push(
-          <ListItem
-            primaryText={<div> {name} ({totalItemGroupItemsCount} <Pluralise text={itemName} ord={totalItemGroupItemsCount}/>)</div>}
-            key={groupId + !!search}
-            initiallyOpen={!!search}
-            leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
-            primaryTogglesNestedList={true}
-            nestedItems={nestedItemGroups}
-          />
-        );
+      if (itemGroups) {
+        let totalItemGroupItemsCount = 0;
+        let nestedItemGroups = [];
+        if (itemGroups['_UNGROUPED_']) {
+          nestedItemGroups = nestedItemGroups.concat(_map(itemGroups['_UNGROUPED_'].items, (item, itemId) => this.convertItemTolistItem(item, itemId, search, groupId, '_UNGROUPED_')));
+          totalItemGroupItemsCount += nestedItemGroups.length;
+        }
+        // Convert all of the itemGroups and their items into ListItem components.
+        nestedItemGroups = nestedItemGroups.concat(_map(itemGroups, (itemGroup, itemGroupId) => {
+          if (itemGroupId === '_UNGROUPED_') return null;
+          // Convert all of the items in this itemGroup into ListItem components.
+          let itemGroupNestedItems = _map(itemGroup.items, (item, itemId) => this.convertItemTolistItem(item, itemId, search, groupId, itemGroupId));
+          totalItemGroupItemsCount += itemGroupNestedItems.length;
+          return _some(itemGroupNestedItems) ? (
+            <ListItem
+              primaryText={<div> {itemGroup.name} ({itemGroupNestedItems.length} <Pluralise text={itemName}
+                                                                                            ord={itemGroupNestedItems.length}/>)
+              </div>}
+              key={groupId + itemGroupId + !!search}
+              initiallyOpen={!!search}
+              leftIcon={itemGroup.icon ? <Icon fixedWidth={true} name={itemGroup.icon}/> : null}
+              primaryTogglesNestedList={true}
+              nestedItems={itemGroupNestedItems}
+            />
+          ) : null;
+        }));
+        tolalItemsCount += totalItemGroupItemsCount;
+        // If there are any nestedItemGroups for this group (after search exclusions),
+        // then convert this group to a ListItem component containing the nestedItemGroups (along with their nestedItems).
+        if (nestedItemGroups.length !== 0) {
+          listItems.push(
+            <ListItem
+              primaryText={<div> {name} ({totalItemGroupItemsCount} <Pluralise text={itemName}
+                                                                               ord={totalItemGroupItemsCount}/>)</div>}
+              key={groupId + !!search}
+              initiallyOpen={!!search}
+              leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
+              primaryTogglesNestedList={true}
+              nestedItems={nestedItemGroups}
+            />
+          );
+        }
       }
       return listItems;
     });
