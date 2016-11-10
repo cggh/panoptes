@@ -129,6 +129,9 @@ let GenomeBrowserWithActions = React.createClass({
         channelGroups[table.id].itemGroups = propertiesByPropertyGroupId;
 
         // Add table positions as a PerRowIndicatorChannel component.
+        channelGroups[table.id].itemGroups[undefinedPropertyGroupId] = channelGroups[table.id].itemGroups[undefinedPropertyGroupId] || {
+            items: []
+        };
         channelGroups[table.id].itemGroups[undefinedPropertyGroupId].items.unshift(
           {
             name: table.capNamePlural,
