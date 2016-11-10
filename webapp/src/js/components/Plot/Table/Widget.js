@@ -18,6 +18,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import {allDimensions} from 'panoptes/plotTypes';
 import {propertyColour} from 'util/Colours';
 import Formatter from 'panoptes/Formatter';
+import queryToString from 'util/queryToString';
 
 import 'plot.scss';
 
@@ -143,7 +144,12 @@ let TablePlot = React.createClass({
   },
 
   render() {
-    const {plotType} = this.props;
+    const {plotType, table} = this.props;
+    const query = queryToString({
+      query: this.getDefinedQuery(),
+      properties: this.config.tablesById[table].properties
+    });
+    const title = this.tableConfig().capNamePlural + (this.getDefinedQuery() !== SQL.nullQuery ? ' where ' + query : '');
 
     return (
       <div className="plot-container">
@@ -154,6 +160,7 @@ let TablePlot = React.createClass({
             plotType={plotType}
             dimensionData={this.state.dimensionData}
             dimensionMetadata={this.state.dimensionMetadata}
+            title={title}
           />
           : null
         }
