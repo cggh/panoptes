@@ -74,8 +74,7 @@ let GenomeBrowserWithActions = React.createClass({
 
         let propertiesByPropertyGroupId = {};
 
-        // NB: The id "_UNGROUPED_" is used in order to be compatible with stores/ConfigStore.js
-        // TODO: _UNGROUPED_ app-wide constant?
+        //_UNGROUPED_ items will be placed above groups in the picker
         let undefinedPropertyGroupId = '_UNGROUPED_';
 
         // For each table property...
@@ -203,7 +202,6 @@ let GenomeBrowserWithActions = React.createClass({
         channelGroups[groupId].items = _values(items);
       }
     });
-
     return channelGroups;
   },
 
