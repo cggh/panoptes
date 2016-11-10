@@ -1,10 +1,11 @@
 import React from 'react';
+import Hammer from 'react-hammerjs';
+import Color from 'color';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-import Color from 'color';
 
 import _map from 'lodash/map';
 import _isEqual from 'lodash/isEqual';
@@ -19,12 +20,11 @@ import PropertyLegend from 'panoptes/PropertyLegend';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import {hatchRect} from 'util/CanvasDrawing';
-
+import QueryString from 'panoptes/QueryString';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FilterButton from 'panoptes/FilterButton';
-
 import {propertyColour} from 'util/Colours';
-import Hammer from 'react-hammerjs';
+
 
 const HEIGHT = 50;
 
@@ -299,12 +299,10 @@ let PerRowIndicatorChannel = React.createClass({
   handleTap(e) {
     let rect = this.refs.canvas.getBoundingClientRect();
     let x = e.center.x - rect.left;
-    let y = e.center.y - rect.top;
     const {width, sideWidth, start, end} = this.props;
     const positions = this.positions;
     const scaleFactor = ((width - sideWidth) / (end - start));
     //Triangles/Lines
-    let psy = (HEIGHT / 2) - 6;
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
     for (let i = 0, l = numPositions; i < l; ++i) {
@@ -324,8 +322,7 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   render() {
-    let {width, sideWidth, table, colourProperty, query} = this.props;
-    query = this.getDefinedQuery(query);
+    const {width, sideWidth, table, colourProperty} = this.props;
     const {knownValues} = this.state;
     return (
       <ChannelWithConfigDrawer
@@ -374,18 +371,29 @@ const PerRowIndicatorControls = React.createClass({
     this.redirectedProps.setProps({query});
   },
 
+  getDefinedQuery() {
+    return (this.props.query) ||
+      ((this.props.table) ? this.config.tablesById[this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
+  },
+
   render() {
     let {table, colourProperty, query} = this.props;
     return (
       <div className="channel-controls">
         <div className="control">
+          <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
+        </div>
+        <div className="control">
           <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
         </div>
         <div className="control">
           <div className="label">Colour By:</div>
-          <PropertySelector table={table}
-                            value={colourProperty}
-                            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})}/>
+          <PropertySelector
+            table={table}
+            value={colourProperty}
+            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})}
+          />
         </div>
       </div>
     );
