@@ -37,7 +37,12 @@ let Plot = React.createClass({
       width: width,
       height: height,
       showlegend: false,
-      title
+      title,
+      scene: {
+        xaxis: {title: dimensionMetadata.horizontal !== undefined ? dimensionMetadata.horizontal.name : ''},
+        yaxis: {title: dimensionMetadata.vertical !== undefined ? dimensionMetadata.vertical.name : ''},
+        zaxis: {title: dimensionMetadata.colour !== undefined ? dimensionMetadata.colour.name : ''}
+      }
     };
     const config = {
       showLink: false,
