@@ -1,27 +1,30 @@
 import React from 'react';
 import Immutable from 'immutable';
+
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import _map from 'lodash/map';
-import _forEach from 'lodash/forEach';
-import _filter from 'lodash/filter';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import serialiseComponent from 'util/serialiseComponent';
+
+import _map from 'lodash/map';
+import _forEach from 'lodash/forEach';
+import _filter from 'lodash/filter';
 import _isNumber from 'lodash/isNumber';
 import _head from 'lodash/head';
 import _keys from 'lodash/keys';
+import _values from 'lodash/values';
 
 import Sidebar from 'react-sidebar';
 import Divider from 'material-ui/Divider';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import GenomeBrowser from 'panoptes/genome/GenomeBrowser';
-import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChannel';
 import CategoricalChannel from 'panoptes/genome/tracks/CategoricalChannel';
 import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
 import NumericalTrackGroupChannel from 'panoptes/genome/tracks/NumericalTrackGroupChannel';
 import GenotypesChannel from 'panoptes/genome/tracks/GenotypesChannel';
 import PerRowNumericalChannel from 'panoptes/genome/tracks/PerRowNumericalChannel';
+import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChannel';
 import ItemPicker from 'containers/ItemPicker';
 import FlatButton from 'material-ui/FlatButton';
 import scrollbarSize from 'scrollbar-size';
@@ -47,34 +50,67 @@ let GenomeBrowserWithActions = React.createClass({
     };
   },
 
+
   channelGroups() {
-    let groups = {};
+
+    // NB: table properties (columns) will be grouped by their propertyGroup
+    // and assigned to channelGroups[table.id].itemGroups
+    // In contrast, twoDTables will be assigned to channelGroups['_2D_tables_'].items
+    // tableBasedSummaryValues for each table will be assigned to channelGroups[`_per_${table.id}`].items
+    let channelGroups = {};
+
     //Normal summaries
+
+    // For each table...
     _forEach(this.config.tables, (table) => {
+
+      // Only include properties for tables that have genome positions and are not hidden.
       if (table.hasGenomePositions && !table.isHidden) {
-        groups[table.id] = {
+
+        channelGroups[table.id] = {
           name: table.capNamePlural,
-          icon: table.icon,
-          items: [{
-            name: table.capNamePlural,
-            description: `Positions of ${table.capNamePlural}`,
-            icon: 'arrow-down',
-            payload: serialiseComponent(<PerRowIndicatorChannel table={table.id}/>)
-          }
-          ]
+          icon: table.icon
         };
+
+        let propertiesByPropertyGroupId = {};
+
+        //_UNGROUPED_ items will be placed above groups in the picker
+        let undefinedPropertyGroupId = '_UNGROUPED_';
+
+        // For each table property...
         _forEach(
+          // NB: The table's chromosome and position properties are excluded.
           _filter(table.properties, (prop) => prop.id !== table.chromosome && prop.id !== table.position),
           (prop) => {
+
+            let definedPropertyGroupId = prop.groupId !== undefined ? prop.groupId : undefinedPropertyGroupId;
+
+            // If this propertyGroup hasn't been created yet, create it.
+            if (!propertiesByPropertyGroupId.hasOwnProperty(definedPropertyGroupId)) {
+              propertiesByPropertyGroupId[definedPropertyGroupId] = {
+                name: table.propertyGroupsById[definedPropertyGroupId].name,
+                items: []
+              };
+            }
+
             if (prop.showInBrowser && (prop.isCategorical || prop.isBoolean)) {
-              groups[table.id].items.push({
+
+              // If this property is showInBrowser and either categorical or boolean,
+              // then add it with a CategoricalChannel component payload.
+
+              propertiesByPropertyGroupId[definedPropertyGroupId].items.push({
                 name: prop.name,
                 description: prop.description,
                 icon: prop.icon,
                 payload: serialiseComponent(<CategoricalChannel name={prop.name} table={table.id} track={prop.id}/>)
               });
+
             } else if (prop.showInBrowser && prop.isNumerical) {
-              groups[table.id].items.push({
+
+              // Otherwise, if this property is showInBrowser and numerical,
+              // then add it with a NumericalTrackGroupChannel component payload.
+
+              propertiesByPropertyGroupId[definedPropertyGroupId].items.push({
                 name: prop.name,
                 description: prop.description,
                 icon: prop.icon,
@@ -82,33 +118,74 @@ let GenomeBrowserWithActions = React.createClass({
                   <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id}/>
                 </NumericalTrackGroupChannel>)
               });
+
             }
           }
         );
+
+        // Assign the propertyGroups (with their properties) as an object
+        // to the relevant channelGroups[table.id].itemGroups
+        // e.g. itemGroups = {'_UNGROUPED_': {id: 'Info', name: 'Variant Info', properties: [...]}, ...}
+        channelGroups[table.id].itemGroups = propertiesByPropertyGroupId;
+
+        // Add table positions as a PerRowIndicatorChannel component.
+        channelGroups[table.id].itemGroups[undefinedPropertyGroupId] = channelGroups[table.id].itemGroups[undefinedPropertyGroupId] || {
+            items: []
+        };
+        channelGroups[table.id].itemGroups[undefinedPropertyGroupId].items.unshift(
+          {
+            name: table.capNamePlural,
+            description: `Positions of ${table.namePlural}`,
+            icon: 'caret-up',
+            payload: serialiseComponent(<PerRowIndicatorChannel table={table.id} />)
+          }
+        );
+
       }
     });
+
+    // If there are any 2D tables...
     if (this.config.twoDTables.length > 0) {
-      groups['_twoD'] = {
+
+      // Use a group named "_2D_tables_" to collect the twoDTables as its items.
+      let groupId = '_2D_tables_';
+
+      channelGroups[groupId] = {
         name: 'Genotypes',
         icon: 'bitmap:genomebrowser.png',
-        items: _map(_filter(this.config.twoDTables, 'showInGenomeBrowser'), (table) => (
-          {
-            name: table.namePlural,
-            description: table.description,
-            icon: 'table',
-            payload: serialiseComponent(<GenotypesChannel table={table.id}/>)
-          })
-        )
       };
+
+      let items = _map(
+        _filter(this.config.twoDTables, 'showInGenomeBrowser'),
+        (twoDTable) => ({
+          name: twoDTable.namePlural,
+          description: twoDTable.description,
+          icon: 'table',
+          payload: serialiseComponent(<GenotypesChannel table={twoDTable.id}/>)
+        })
+      );
+
+      channelGroups[groupId].items = _values(items);
     }
 
     //Per-row based summaries
+    // For each visible table...
     _forEach(this.config.visibleTables, (table) => {
+
+      // If there are any tableBasedSummaryValues for this table...
       if (table.tableBasedSummaryValues.length > 0) {
-        groups[`_per_${table.id}`] = {
+
+        // Use a groupId named `_per_${table.id}` to collect the tableBasedSummaryValues as its items.
+        let groupId = `_per_${table.id}`;
+
+        channelGroups[groupId] = {
           name: `Per ${table.capNameSingle}`,
-          icon: table.icon,
-          items: _map(table.tableBasedSummaryValuesById, (channel) => (
+          icon: table.icon
+        };
+
+        let items = _map(
+          table.tableBasedSummaryValuesById,
+          (channel) => (
             {
               name: channel.name,
               description: 'Description needs to be implemented',
@@ -121,11 +198,13 @@ let GenomeBrowserWithActions = React.createClass({
                 />
               )
             }
-          ))
-        };
+          )
+        );
+
+        channelGroups[groupId].items = _values(items);
       }
     });
-    return groups;
+    return channelGroups;
   },
 
 
@@ -150,6 +229,7 @@ let GenomeBrowserWithActions = React.createClass({
     let actions = this.getFlux().actions;
     let {sidebar, setProps, ...subProps} = this.props;
     let genomePositionTableButtons = [];
+
     _forEach(this.config.visibleTables, (table) => {
       if (table.hasGenomePositions || table.isRegionOnGenome) {
         let genomePositionTableButton = (
@@ -192,24 +272,33 @@ let GenomeBrowserWithActions = React.createClass({
         genomePositionTableButtons.push(genomePositionTableButton);
       }
     });
+
     let sidebarContent = (
       <div className="sidebar">
-        <SidebarHeader icon={this.icon()}
-                       description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
-        <FlatButton label="Add Channels"
-                    primary={true}
-                    icon={<Icon fixedWidth={true} name="plus"/>}
-                    onClick={() => actions.session.modalOpen(<ItemPicker
-                      title="Pick channels to be added"
-                      itemName="channel"
-                      itemVerb="add"
-                      groups={this.channelGroups()}
-                      onPick={this.handleChannelAdd}
-                    />)}/>
+        <SidebarHeader
+          icon={this.icon()}
+          description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."
+        />
+        <FlatButton
+          label="Add Channels"
+          primary={true}
+          icon={<Icon fixedWidth={true} name="plus"/>}
+          onClick={() => actions.session.modalOpen(
+            <ItemPicker
+              title="Pick channels to be added"
+              itemName="channel"
+              groupName="group"
+              pickVerb="add"
+              groups={this.channelGroups()}
+              onPick={this.handleChannelAdd}
+            />
+          )}
+        />
         <Divider />
         {genomePositionTableButtons}
       </div>
     );
+
     return (
       <Sidebar
         styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
@@ -217,10 +306,11 @@ let GenomeBrowserWithActions = React.createClass({
         sidebar={sidebarContent}>
         <div className="vertical stack">
           <div className="top-bar">
-            <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  onClick={() => setProps({sidebar: !sidebar})}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
+            <Icon
+              className="pointer icon"
+              name={sidebar ? 'arrow-left' : 'bars'}
+              onClick={() => setProps({sidebar: !sidebar})}
+              title={sidebar ? 'Expand' : 'Sidebar'}
             />
           </div>
           <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} />
