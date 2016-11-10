@@ -48,7 +48,14 @@ export const plotTypes = {
   scatter: {
     displayName: 'Scatter',
     dimensions: ['horizontal', 'vertical', 'colour'],
-    layout: {showlegend: true, legend: {orientation: 'h'}},
+    layout: {
+      showlegend: true,
+      legend: {
+        orientation: 'v',
+        x: 1,
+        y: 1
+      }
+    },
     plotlyTraces: (data, metadata) => {
 
       // The data object contains an array of values for each dimension.
