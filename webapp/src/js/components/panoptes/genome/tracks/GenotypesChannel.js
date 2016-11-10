@@ -17,6 +17,7 @@ import _unique from 'lodash/uniq';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
+import FlatButton from 'material-ui/FlatButton';
 
 import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet, combineBlocks} from 'util/PropertyRegionCache';
@@ -30,6 +31,9 @@ import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
 import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericInput from 'ui/NumericInput';
+import DataDownloader from 'util/DataDownloader';
+import Icon from 'ui/Icon';
+import queryToString from 'util/queryToString';
 
 const FAN_HEIGHT = 60;
 
@@ -179,9 +183,9 @@ let GenotypesChannel = React.createClass({
   },
 
   getDefinedQuery(query, table) {
-    return query
-      || ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null)
-      || SQL.nullQuery;
+    return query ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -190,8 +194,7 @@ let GenotypesChannel = React.createClass({
     let config = this.config.twoDTablesById[table];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
-    // console.log(this.config);
-    // console.log(config);
+
     const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, null);
@@ -398,6 +401,16 @@ let GenotypesChannel = React.createClass({
     });
   },
 
+  getDataForDownload() {
+    let rowPrimaryKey = this.state.rowData ? this.state.rowData.id.array : [];
+
+    return {
+      rowPrimaryKey,
+      callData,
+      alleleDepthData,
+      positions
+    };
+  },
 
   render() {
     let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
@@ -424,6 +437,7 @@ let GenotypesChannel = React.createClass({
         configComponent={<GenotypesControls {...this.props}
                                             columnQuery={columnQuery}
                                             rowQuery={rowQuery}
+                                            getDataForDownload={this.getDataForDownload}
                                             setProps={this.redirectedProps.setProps}/>}
         legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
@@ -491,6 +505,39 @@ const GenotypesControls = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
+    getDataForDownload: React.PropTypes.func
+  },
+
+  handleDownload() {
+    let tableConfig = this.config.twoDTablesById[this.props.table];
+    let columnTableConfig = this.config.tablesById[tableConfig.columnDataTable];
+    let rowTableConfig = this.config.tablesById[tableConfig.rowDataTable];
+    let {
+      rowPrimaryKey,
+      callData,
+      alleleDepthData,
+      positions
+    } = this.props.getDataForDownload();
+    let params = {
+      dataset: this.config.dataset,
+      tableNamePlural: tableConfig.namePlural,
+      colTableCapNamePlural: columnTableConfig.capNamePlural,
+      rowTableCapNamePlural: rowTableConfig.capNamePlural,
+      columnQueryAsString: queryToString({
+        query: this.props.columnQuery,
+        properties: columnTableConfig.properties
+      }),
+      rowQueryAsString: queryToString({
+        query: this.props.rowQuery,
+        properties: rowTableConfig.properties
+      }),
+      rowPrimaryKey,
+      callData,
+      alleleDepthData,
+      positions
+    };
+
+    DataDownloader.downloadGenotypeData({...params, ...this.props});
   },
 
   render() {
@@ -507,6 +554,13 @@ const GenotypesControls = React.createClass({
           <FilterButton table={config.rowDataTable} query={rowQuery}
                         name={this.config.tablesById[config.rowDataTable].capNamePlural}
                         onPick={(rowQuery) => this.redirectedProps.setProps({rowQuery})}/>
+        </div>
+        <div className="control">
+          <FlatButton label="Download data"
+                      primary={true}
+                      onClick={() => this.handleDownload()}
+                      icon={<Icon fixedWidth={true} name="download" />}
+          />
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}

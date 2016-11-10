@@ -529,7 +529,7 @@ let MapActions = React.createClass({
             <span className="text">{mapTitle}</span>
             {table ?
               <span className="block text">
-                <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/>
+                <QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/>
               </span>
               : null}
           </div>

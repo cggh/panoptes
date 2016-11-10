@@ -169,7 +169,7 @@ let QueryPicker = React.createClass({
             <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
           </div>
           <div className="centering-container">
-            <QueryString className="text" prepend="" table={table} query={query}/>
+            <QueryString className="text" table={table} query={query}/>
           </div>
           <div className="centering-container">
             {
