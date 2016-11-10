@@ -32,7 +32,7 @@ let ItemPicker = React.createClass({
       React.PropTypes.shape({
         name: React.PropTypes.string.isRequired,
         icon: React.PropTypes.string,
-        items: React.PropTypes.arrayOf(
+        items: React.PropTypes.objectOf(
           React.PropTypes.shape({
             name: React.PropTypes.string.isRequired,
             icon: React.PropTypes.string,

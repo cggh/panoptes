@@ -170,40 +170,40 @@ let GenomeBrowserWithActions = React.createClass({
 
     //Per-row based summaries
     // For each visible table...
-    _forEach(this.config.visibleTables, (table) => {
-
-      // If there are any tableBasedSummaryValues for this table...
-      if (table.tableBasedSummaryValues.length > 0) {
-
-        // Use a groupId named `_per_${table.id}` to collect the tableBasedSummaryValues as its items.
-        let groupId = `_per_${table.id}`;
-
-        channelGroups[groupId] = {
-          name: `Per ${table.capNameSingle}`,
-          icon: table.icon
-        };
-
-        let items = _map(
-          table.tableBasedSummaryValuesById,
-          (channel) => (
-            {
-              name: channel.name,
-              description: 'Description needs to be implemented',
-              icon: 'line-chart',
-              payload: serialiseComponent(
-                <PerRowNumericalChannel
-                  name={channel.name}
-                  table={table.id}
-                  channel={channel.id}
-                />
-              )
-            }
-          )
-        );
-
-        channelGroups[groupId].items = _values(items);
-      }
-    });
+    // _forEach(this.config.visibleTables, (table) => {
+    //
+    //   // If there are any tableBasedSummaryValues for this table...
+    //   if (table.tableBasedSummaryValues.length > 0) {
+    //
+    //     // Use a groupId named `_per_${table.id}` to collect the tableBasedSummaryValues as its items.
+    //     let groupId = `_per_${table.id}`;
+    //
+    //     channelGroups[groupId] = {
+    //       name: `Per ${table.capNameSingle}`,
+    //       icon: table.icon
+    //     };
+    //
+    //     let items = _map(
+    //       table.tableBasedSummaryValuesById,
+    //       (channel) => (
+    //         {
+    //           name: channel.name,
+    //           description: 'Description needs to be implemented',
+    //           icon: 'line-chart',
+    //           payload: serialiseComponent(
+    //             <PerRowNumericalChannel
+    //               name={channel.name}
+    //               table={table.id}
+    //               channel={channel.id}
+    //             />
+    //           )
+    //         }
+    //       )
+    //     );
+    //
+    //     channelGroups[groupId].items = _values(items);
+    //   }
+    // });
     return channelGroups;
   },
 

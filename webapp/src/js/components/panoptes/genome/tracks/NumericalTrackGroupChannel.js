@@ -174,7 +174,7 @@ let NumericalTrackGroupControls = React.createClass({
         groups[table.id] = {
           name: table.capNamePlural,
           icon: table.icon,
-          items: []
+          items: {}
         };
         _forEach(table.properties, (prop) => {
           if (prop.showInBrowser && prop.isNumerical) {
