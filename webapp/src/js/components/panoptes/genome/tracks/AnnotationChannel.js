@@ -182,7 +182,7 @@ let AnnotationChannel = React.createClass({
             grd.addColorStop(0.000, 'rgba(255, 255, 255, 0)');
             grd.addColorStop(1.000, 'rgba(255, 255, 255, 1.000)');
             ctx.fillStyle = grd;
-            ctx.fillRect(x1 - 12, (rows[i] * ROW_HEIGHT) + 4, 12 + names[i].length * 6, 10);
+            ctx.fillRect(x1 - 12, (rows[i] * ROW_HEIGHT) + 4, 12 + text.length * 6, 10);
             ctx.fillStyle = '#000';
             ctx.fillText(text, x1, (rows[i] * ROW_HEIGHT) + 14);
           }
