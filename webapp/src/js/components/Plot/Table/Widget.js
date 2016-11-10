@@ -112,7 +112,7 @@ let TablePlot = React.createClass({
               // Decide which properties of the dimensionProperty to pass forward as metadata.
               // TODO: just pass all properties, i.e. the object?
               let {id, channelColor, description, name, isCategorical, isNumerical} = this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]];
-              let colourFunction = propertyColour(dimensionProperties[dimensionProperty]);
+              let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[dimensionProperties[dimensionProperty]]);
               let formatterFunction = (value) => Formatter(this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]], value);
               dimensionData[dimensionProperty] = data[dimensionProperties[dimensionProperty]];
               dimensionMetadata[dimensionProperty] = {id, channelColor, description, name, isCategorical, isNumerical, colourFunction, formatterFunction};

@@ -1,6 +1,7 @@
 import _reduce from 'lodash/reduce';
 import _uniq from 'lodash/uniq';
 import _values from 'lodash/values';
+import _map from 'lodash/map';
 
 export const plotTypes = {
   bar: {
@@ -59,23 +60,13 @@ export const plotTypes = {
       // The metadata object contains an object for each dimension.
       // e.g. metadata.colour might contain {id: "Extra_1", ...}
 
-      // NB: A different default marker could be specified here.
-      let defaultMarker = {};
-
-      // let defaultMarker = {
-      //   color: 'rgb(0,0,0)',
-      //   line: {color: 'rgba(217, 217, 217, 1.0)', width: 1},
-      //   symbol: 'circle',
-      //   size: 16
-      // };
-
       // If there are no data for a colour dimension,
       // then just return one trace using the horizontal and vertical.
       if (!data.colour) {
         return [{
           x: data.horizontal,
           y: data.vertical,
-          marker: defaultMarker,
+          marker: {},
           type: 'scatter',
           mode: 'markers'
         }];
@@ -125,11 +116,10 @@ export const plotTypes = {
           colourTraces[colour] = {
             x: [],
             y: [],
-            marker: defaultMarker,
+            marker: {color: metadata.colour.colourFunction(colour)},
             type: 'scatter',
             mode: 'markers',
-            name: legendColourName,
-            color: metadata.colour.colourFunction(colour)
+            name: legendColourName
           };
         }
 

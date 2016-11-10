@@ -41,7 +41,9 @@ export function scaleColour(domain) {
 
 export function booleanColours() {
   return (val) => {
-    if (val === '1' || val === true || val === 1 || (val.toLower && val.toLower() === 't') || (val.toLower && val.toLower() === 'true'))
+    if (val === null)
+      return '#777777';
+    else if (val === '1' || val === true || val === 1 || (val.toLower && val.toLower() === 't') || (val.toLower && val.toLower() === 'true'))
       return '#388E3C';
     else
       return '#D32F2F';
@@ -68,8 +70,3 @@ export function propertyColour(propConfig, min = null, max = null) {
     return categoryColours(`${propConfig.tableId}_${propConfig.id}`);
   return scaleColour([min || propConfig.minVal, max || propConfig.maxVal]);
 }
-
-
-
-
-
