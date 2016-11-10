@@ -331,7 +331,10 @@ let PerRowIndicatorChannel = React.createClass({
         height={HEIGHT}
         sideComponent={
           <div className="side-name">
-            <span>{name || this.config.tablesById[table].capNamePlural}</span>
+            <span>
+              {this.getDefinedQuery() !== SQL.nullQuery ? <span>Filtered<br/></span> : null}
+              {name || this.config.tablesById[table].capNamePlural}
+            </span>
           </div>
         }
         //Override component update to get latest in case of skipped render
