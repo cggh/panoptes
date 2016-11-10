@@ -89,7 +89,6 @@ let GenomeBrowserWithActions = React.createClass({
             if (!propertiesByPropertyGroupId.hasOwnProperty(definedPropertyGroupId)) {
               propertiesByPropertyGroupId[definedPropertyGroupId] = {
                 name: table.propertyGroupsById[definedPropertyGroupId].name,
-                icon: 'columns',
                 items: []
               };
             }

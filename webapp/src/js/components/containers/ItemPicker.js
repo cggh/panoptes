@@ -4,7 +4,7 @@ import Highlight from 'react-highlighter';
 import Pluralise from 'ui/Pluralise';
 
 import _map from 'lodash/map';
-import _filter from 'lodash/map';
+import _some from 'lodash/some';
 
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -120,7 +120,7 @@ let ItemPicker = React.createClass({
           key={itemId}
           primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
           secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-          leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+          leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
           onClick={() => this.handleAdd({groupId, itemId, payload, itemGroupId})}
         />
       ) : null;
@@ -145,7 +145,7 @@ let ItemPicker = React.createClass({
             primaryText={<div> {name} ({nestedItems.length} <Pluralise text={itemName} ord={nestedItems.length}/>)</div>}
             key={groupId + !!search}
             initiallyOpen={!!search}
-            leftIcon={<Icon fixedWidth={true} name={icon}/>}
+            leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
             primaryTogglesNestedList={true}
             nestedItems={nestedItems}
           />
@@ -164,16 +164,16 @@ let ItemPicker = React.createClass({
         // Convert all of the items in this itemGroup into ListItem components.
         let itemGroupNestedItems = _map(itemGroup.items, (item, itemId) => this.convertItemTolistItem(item, itemId, search, groupId, itemGroupId));
         totalItemGroupItemsCount += itemGroupNestedItems.length;
-        return (
+        return _some(itemGroupNestedItems) ? (
           <ListItem
             primaryText={<div> {itemGroup.name} ({itemGroupNestedItems.length} <Pluralise text={itemName} ord={itemGroupNestedItems.length}/>)</div>}
             key={groupId + itemGroupId + !!search}
             initiallyOpen={!!search}
-            leftIcon={<Icon fixedWidth={true} name={itemGroup.icon}/>}
+            leftIcon={itemGroup.icon ? <Icon fixedWidth={true} name={itemGroup.icon}/> : null}
             primaryTogglesNestedList={true}
             nestedItems={itemGroupNestedItems}
           />
-        );
+        ) : null;
       }));
       tolalItemsCount += totalItemGroupItemsCount;
       // If there are any nestedItemGroups for this group (after search exclusions),
@@ -181,10 +181,10 @@ let ItemPicker = React.createClass({
       if (nestedItemGroups.length !== 0) {
         listItems.push(
           <ListItem
-            primaryText={<div> {name} ({nestedItemGroups.length} <Pluralise text={groupName} ord={nestedItemGroups.length}/>, {totalItemGroupItemsCount} <Pluralise text={itemName} ord={totalItemGroupItemsCount}/>)</div>}
+            primaryText={<div> {name} ({totalItemGroupItemsCount} <Pluralise text={itemName} ord={totalItemGroupItemsCount}/>)</div>}
             key={groupId + !!search}
             initiallyOpen={!!search}
-            leftIcon={<Icon fixedWidth={true} name={icon}/>}
+            leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
             primaryTogglesNestedList={true}
             nestedItems={nestedItemGroups}
           />
