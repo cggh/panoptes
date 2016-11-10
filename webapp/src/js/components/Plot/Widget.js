@@ -34,15 +34,13 @@ let Plot = React.createClass({
     const defaultLayout = {
       barmode: 'overlay',
       autosize: false,
-      width: width,
-      height: height,
+      width,
+      height,
       showlegend: false,
       title,
-      scene: {
-        xaxis: {title: dimensionMetadata.horizontal !== undefined ? dimensionMetadata.horizontal.name : ''},
-        yaxis: {title: dimensionMetadata.vertical !== undefined ? dimensionMetadata.vertical.name : ''},
-        zaxis: {title: dimensionMetadata.colour !== undefined ? dimensionMetadata.colour.name : ''}
-      }
+      xaxis: {title: dimensionMetadata.horizontal !== undefined ? dimensionMetadata.horizontal.name : ''},
+      yaxis: {title: dimensionMetadata.vertical !== undefined ? dimensionMetadata.vertical.name : ''},
+      zaxis: {title: dimensionMetadata.colour !== undefined ? dimensionMetadata.colour.name : ''}
     };
     const config = {
       showLink: false,
