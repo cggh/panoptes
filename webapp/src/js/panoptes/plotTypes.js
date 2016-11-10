@@ -87,8 +87,7 @@ export const plotTypes = {
           x: data.horizontal,
           y: data.vertical,
           marker: {
-            color: _map(data.colour, (colour) => isNaN(colour) ? 0 : metadata.colour.colourFunction(colour)),
-            //colorscale: _map(_uniq(data.colour).sort(), (colour) => isNaN(colour) ? [0, metadata.colour.colourFunction(colour)] : [colour, metadata.colour.colourFunction(colour)]),
+            color: data.colour,
             autocolorscale: true,
             showscale: true
           },
