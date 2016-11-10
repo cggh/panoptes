@@ -3,6 +3,8 @@ import _uniq from 'lodash/uniq';
 import _values from 'lodash/values';
 import _map from 'lodash/map';
 
+import {scaleColours} from 'util/Colours';
+
 export const plotTypes = {
   bar: {
     displayName: 'Bar',
@@ -88,9 +90,10 @@ export const plotTypes = {
           y: data.vertical,
           marker: {
             color: data.colour,
-            autocolorscale: true,
+            colorscale: _map(scaleColours(), (scaleColour, index) => [index, scaleColour]),
             showscale: true
           },
+          text: _map(data.colour, (colour) =>  metadata.colour.name + ': ' + colour.toFixed()),
           type: 'scatter',
           mode: 'markers'
         }];

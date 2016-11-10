@@ -26,6 +26,13 @@ let colours = [
   '#9edae5'
 ];
 
+export function scaleColours() {
+  return [
+    '#3d8bd5',
+    '#ff4081'
+  ];
+}
+
 export function categoryColours(identifier) {
   if (!exisitingScales[identifier])
     exisitingScales[identifier] = d3.scale.ordinal().range(colours);
@@ -35,7 +42,7 @@ export function categoryColours(identifier) {
 export function scaleColour(domain) {
   return d3.scale.linear()
     .domain(domain)  // min/max of data
-    .range(['#3d8bd5', '#ff4081'])
+    .range(scaleColours())
     .interpolate(d3.interpolateHcl);
 }
 
