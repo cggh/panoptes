@@ -15,21 +15,23 @@ import FluxMixin from 'mixins/FluxMixin';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-
 import Loading from 'ui/Loading';
+import {propertyColour} from 'util/Colours';
 
 let TreeContainer = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('tree', 'table')
+    DataFetcherMixin('tree', 'table', 'nodeColourProperty', 'branchColourProperty')
   ],
 
   propTypes: {
     table: React.PropTypes.string,
     tree: React.PropTypes.string,
-    treeType: React.PropTypes.oneOf(_keys(treeTypes))
+    treeType: React.PropTypes.oneOf(_keys(treeTypes)),
+    nodeColourProperty: React.PropTypes.string,
+    branchColourProperty: React.PropTypes.string
   },
 
   getInitialState() {
@@ -41,7 +43,8 @@ let TreeContainer = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    const {table, tree} = props;
+    const {table, tree, nodeColourProperty, branchColourProperty} = props;
+
     if (table && tree) {
       this.setState({loadStatus: 'loading'});
 
@@ -81,9 +84,21 @@ let TreeContainer = React.createClass({
           )
       )
       .then((data) => {
+
+        let nodeColourFunction = propertyColour(this.config.tablesById[table].propertiesById[nodeColourProperty]);
+        let branchColourFunction = propertyColour(this.config.tablesById[table].propertiesById[branchColourProperty]);
+
+        let metadata = _map(data[1], (obj) => ({
+          key: obj.key,
+          nodeColour: nodeColourFunction(obj[nodeColourProperty]),
+          branchColour: branchColourFunction(obj[branchColourProperty])
+        }));
+
+        let metadataByKey = _keyBy(metadata, (obj) => obj.key);
+
         this.setState({
           data: data[0].data,
-          metadata: _keyBy(data[1], (obj) => obj.key),
+          metadata: metadataByKey,
           loadStatus: 'loaded'
         });
       })

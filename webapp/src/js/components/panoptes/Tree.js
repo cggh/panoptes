@@ -1,6 +1,7 @@
 import React from 'react';
 import Phylocanvas from 'react-phylocanvas';
 import {treeTypes} from 'phylocanvas';
+
 import _keys from 'lodash/keys';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -21,27 +22,23 @@ let Tree = React.createClass({
 
   componentDidMount() {
 
-    console.log('Tree this.refs.phylocanvas.tree: %o', this.refs.phylocanvas.tree);
-    console.log('Tree this.props.metadata: %o', this.props.metadata);
-
-    console.log('Tree this.props: %o', this.props);
-
     for (let i = 0, len = this.refs.phylocanvas.tree.leaves.length; i < len; i++) {
 
-      this.refs.phylocanvas.tree.leaves[i].setDisplay({
-        colour: 'red',
+      let leaf = this.refs.phylocanvas.tree.leaves[i];
+
+      let nodeColour = this.props.metadata[leaf.label] !== undefined ? this.props.metadata[leaf.label].nodeColour : 'inherit';
+      let branchColour = this.props.metadata[leaf.label] !== undefined ? this.props.metadata[leaf.label].branchColour : 'inherit';
+
+      leaf.setDisplay({
+        colour: branchColour,
         shape: 'circle', // or square, triangle, star
-        size: 3, // ratio of the base node size
+        size: 10, // ratio of the base node size
         leafStyle: {
-          strokeStyle: '#0000ff',
-          fillStyle: 'rgb(0, 255, 0)',
-          lineWidth: 2,
+          strokeStyle: nodeColour,
+          fillStyle: nodeColour
         },
         labelStyle: {
-          colour: 'black',
-          textSize: 20, // points
-          font: 'Arial',
-          format: 'bold',
+          colour: nodeColour
         },
       });
 

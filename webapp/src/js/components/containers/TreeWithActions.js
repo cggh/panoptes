@@ -19,6 +19,8 @@ import Icon from 'ui/Icon';
 import TreeContainer from 'containers/TreeContainer';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import PropertySelector from 'panoptes/PropertySelector';
+import {propertyColour} from 'util/Colours';
+import PropertyLegend from 'panoptes/PropertyLegend';
 
 import 'tree.scss';
 
@@ -136,9 +138,10 @@ let TreeWithActions = React.createClass({
             />
             : null }
           {treeInfo && treeInfo.crossLink && _has(this.config.tablesById, treeInfo.crossLink.split('::')[0]) ?
-            <RaisedButton onClick={this.handleCrossLink}
-                        label={`Show ${this.config.tablesById[treeInfo.crossLink.split('::')[0]].capNameSingle}`}
-                        icon={<Icon fixedWidth={true} name={this.config.tablesById[treeInfo.crossLink.split('::')[0]].icon} />}
+            <RaisedButton
+              onClick={this.handleCrossLink}
+              label={`Show ${this.config.tablesById[treeInfo.crossLink.split('::')[0]].capNameSingle}`}
+              icon={<Icon fixedWidth={true} name={this.config.tablesById[treeInfo.crossLink.split('::')[0]].icon} />}
             />
             : null}
           {treeInfo ?
@@ -167,6 +170,25 @@ let TreeWithActions = React.createClass({
                 onSelect={this.handleChangeBranchColourProperty}
                 allowNull={true}
               />
+            : null }
+            { /* TODO: Make component render pretty in both contexts */ }
+            {nodeColourProperty ?
+              <div>
+              <p>Node colours</p>
+              <PropertyLegend
+                table={table}
+                property={nodeColourProperty}
+              />
+              </div>
+            : null }
+            {branchColourProperty ?
+              <div>
+              <p>Branch colours</p>
+              <PropertyLegend
+                table={table}
+                property={branchColourProperty}
+              />
+              </div>
             : null }
         </div>
       </div>
