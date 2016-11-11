@@ -1,7 +1,10 @@
 import React from 'react';
 import {treeTypes} from 'phylocanvas';
-import _keys from 'lodash/keys';
 
+import _keys from 'lodash/keys';
+import _map from 'lodash/map';
+import _filter from 'lodash/filter';
+import _keyBy from 'lodash/keyBy';
 
 import Tree from 'panoptes/Tree';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -32,6 +35,7 @@ let TreeContainer = React.createClass({
   getInitialState() {
     return {
       data: null,
+      metadata: null,
       loadStatus: 'loaded'
     };
   },
@@ -40,32 +44,57 @@ let TreeContainer = React.createClass({
     const {table, tree} = props;
     if (table && tree) {
       this.setState({loadStatus: 'loading'});
-      let APIargs = {
+
+      let columns = _map(_filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable), (prop) => prop.id);
+
+      let treeAPIargs = {
         database: this.config.dataset,
         table,
         tree
       };
-      requestContext.request((componentCancellation) =>
-          LRUCache.get(
-            'treeData' + JSON.stringify(APIargs),
-            (cacheCancellation) =>
-              API.treeData({cancellation: cacheCancellation, ...APIargs}),
-            componentCancellation
+
+      let tableAPIargs = {
+        database: this.config.dataset,
+        table,
+        columns,
+        start: 0,
+        transpose: true
+      };
+
+      requestContext.request(
+        (componentCancellation) =>
+          Promise.all(
+            [
+              LRUCache.get(
+                'treeData' + JSON.stringify(treeAPIargs),
+                (cacheCancellation) =>
+                  API.treeData({cancellation: cacheCancellation, ...treeAPIargs}),
+                componentCancellation
+              ),
+              LRUCache.get(
+                'query' + JSON.stringify(tableAPIargs),
+                (cacheCancellation) =>
+                  API.query({cancellation: cacheCancellation, ...tableAPIargs}),
+                componentCancellation
+              )
+            ]
           )
-        )
-        .then((data) => {
-          this.setState({
-            data: data.data,
-            loadStatus: 'loaded'
-          });
-        })
-        .catch((error) => {
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-          this.setState({loadStatus: 'error'});
+      )
+      .then((data) => {
+        this.setState({
+          data: data[0].data,
+          metadata: _keyBy(data[1], (obj) => obj.key),
+          loadStatus: 'loaded'
         });
+      })
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        this.setState({loadStatus: 'error'});
+      });
     } else {
       this.setState({
         data: null,
+        metadata: null,
         loadStatus: 'loaded'
       });
     }
@@ -73,13 +102,15 @@ let TreeContainer = React.createClass({
 
 
   render() {
-    const {data, loadStatus} = this.state;
+    const {data, loadStatus, metadata} = this.state;
+
     return (
       <div className="tree-container">
         {data ?
           <Tree
             {...this.props}
             data={data}
+            metadata={metadata}
           />
         : null}
         <Loading status={loadStatus}/>

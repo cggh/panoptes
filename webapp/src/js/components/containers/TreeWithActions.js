@@ -4,27 +4,21 @@ import {treeTypes} from 'phylocanvas';
 import titleCase from 'title-case';
 import Sidebar from 'react-sidebar';
 
-// Lodash
 import _map from 'lodash/map';
 import _has from 'lodash/has';
 import _filter from 'lodash/filter';
 import _keys from 'lodash/keys';
 
-// Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-// Material UI
 import RaisedButton from 'material-ui/RaisedButton';
-
-// Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
-
-// Panoptes
 import TreeContainer from 'containers/TreeContainer';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
+import PropertySelector from 'panoptes/PropertySelector';
 
 import 'tree.scss';
 
@@ -41,7 +35,9 @@ let TreeWithActions = React.createClass({
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
     tree: React.PropTypes.string,
-    treeType: React.PropTypes.oneOf(_keys(treeTypes))
+    treeType: React.PropTypes.oneOf(_keys(treeTypes)),
+    nodeColourProperty: React.PropTypes.string,
+    branchColourProperty: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -81,8 +77,16 @@ let TreeWithActions = React.createClass({
     this.props.setProps({treeType});
   },
 
+  handleChangeNodeColourProperty(nodeColourProperty) {
+    this.props.setProps({nodeColourProperty});
+  },
+
+  handleChangeBranchColourProperty(branchColourProperty) {
+    this.props.setProps({branchColourProperty});
+  },
+
   render() {
-    const {sidebar, table, tree, treeType, setProps} = this.props;
+    const {sidebar, table, tree, treeType, setProps, nodeColourProperty, branchColourProperty} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.trees),
       (table) => ({
@@ -145,6 +149,24 @@ let TreeWithActions = React.createClass({
               onChange={this.handleChangeTreeType}
               options={treeTypeOptions}
             />
+            : null }
+            {table ?
+              <PropertySelector
+                table={table}
+                value={nodeColourProperty}
+                label="Node colour"
+                onSelect={this.handleChangeNodeColourProperty}
+                allowNull={true}
+              />
+            : null }
+            {table ?
+              <PropertySelector
+                table={table}
+                value={branchColourProperty}
+                label="Branch colour"
+                onSelect={this.handleChangeBranchColourProperty}
+                allowNull={true}
+              />
             : null }
         </div>
       </div>
