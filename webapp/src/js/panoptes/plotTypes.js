@@ -90,7 +90,7 @@ export const plotTypes = {
           y: data.vertical,
           marker: {
             color: data.colour,
-            colorscale: _map(scaleColours(), (scaleColour, index) => [index, scaleColour]),
+            colorscale: _map(scaleColours, (scaleColour, index) => [index, scaleColour]),
             showscale: true
           },
           text: _map(data.colour, (colour) =>  metadata.colour.name + ': ' + colour.toFixed()),
