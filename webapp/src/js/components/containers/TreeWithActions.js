@@ -19,7 +19,6 @@ import Icon from 'ui/Icon';
 import TreeContainer from 'containers/TreeContainer';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import PropertySelector from 'panoptes/PropertySelector';
-import {propertyColour} from 'util/Colours';
 import PropertyLegend from 'panoptes/PropertyLegend';
 
 import 'tree.scss';
