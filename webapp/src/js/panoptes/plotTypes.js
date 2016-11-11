@@ -91,7 +91,8 @@ export const plotTypes = {
           marker: {
             color: data.colour,
             colorscale: _map(scaleColours, (scaleColour, index) => [index, scaleColour]),
-            showscale: true
+            showscale: true,
+            colorbar: {showticklabels: false}
           },
           text: _map(data.colour, (colour) =>  metadata.colour.name + ': ' + colour.toFixed()),
           type: 'scatter',
