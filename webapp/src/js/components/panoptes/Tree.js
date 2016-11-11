@@ -22,7 +22,6 @@ let Tree = React.createClass({
   },
 
   componentDidMount() {
-    this.refs.phylocanvas.tree.setNodeSize(8);
     this.updateTree();
   },
 
@@ -33,17 +32,20 @@ let Tree = React.createClass({
   },
 
   handleResize(size) {
-    if (this.refs.phylocanvas.tree) {
-      this.refs.phylocanvas.tree.resizeToContainer();
-      this.refs.phylocanvas.tree.fitInPanel();
-      this.refs.phylocanvas.tree.draw();
+    if (this.phylocanvas.tree) {
+      this.phylocanvas.tree.resizeToContainer();
+      this.phylocanvas.tree.fitInPanel();
+      this.phylocanvas.tree.draw();
     }
   },
 
   updateTree() {
-    for (let i = 0, len = this.refs.phylocanvas.tree.leaves.length; i < len; i++) {
 
-      let leaf = this.refs.phylocanvas.tree.leaves[i];
+    this.phylocanvas.tree.setNodeSize(8);
+
+    for (let i = 0, len = this.phylocanvas.tree.leaves.length; i < len; i++) {
+
+      let leaf = this.phylocanvas.tree.leaves[i];
       let nodeColour = this.props.metadata[leaf.label] !== undefined ? this.props.metadata[leaf.label].nodeColour : 'inherit';
       let branchColour = this.props.metadata[leaf.label] !== undefined ? this.props.metadata[leaf.label].branchColour : 'inherit';
 
@@ -59,13 +61,15 @@ let Tree = React.createClass({
       });
 
     }
+
+    this.phylocanvas.tree.draw();
   },
 
   render() {
     return (
       <DetectResize onResize={this.handleResize}>
         <Phylocanvas
-          ref="phylocanvas"
+          ref={(ref) => this.phylocanvas = ref}
           className="tree"
           {...this.props}
         />
