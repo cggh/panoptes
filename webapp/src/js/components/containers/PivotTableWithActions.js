@@ -123,7 +123,7 @@ let PivotTableWithActions = React.createClass({
                   name={sidebar ? 'arrow-left' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
-            <span className="text"><QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/></span>
+            <span className="text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Column sort: {this.orderDescriptionString(columnSortOrder)}</span>
             <span className="block text">Row sort: {this.orderDescriptionString(rowSortOrder)}</span>
           </div>

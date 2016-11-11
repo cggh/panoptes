@@ -2,12 +2,11 @@ import Immutable from 'immutable';
 import LZString from 'lz-string';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
-import Base64 from 'panoptes/Base64';
 
 const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
 // TODO: migrate to API.js ???
-function downloadTableData(payload) {
+export function downloadTableData(payload) {
 
   let defaults = {
     query: SQL.nullQuery
@@ -52,10 +51,5 @@ function downloadTableData(payload) {
   if (order instanceof Array && order.length > 0) {
     downloadURL += '&orderBy=' + JSON.stringify(order);
   }
-
   window.location.href = downloadURL;
 }
-
-module.exports = {
-  downloadTableData
-};

@@ -151,7 +151,7 @@ let TablePlotActions = React.createClass({
             <span className="text">{table && plotType ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
             {table && plotType ?
               <span className="block text">
-                <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
+                <QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()} />
               </span>
             : null}
           </div>

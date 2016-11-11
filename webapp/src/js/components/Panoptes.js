@@ -162,7 +162,7 @@ let Header = React.createClass({
   },
 
   handlePageLinkClick() {
-    let introContent = 'Here is the link for this page, which you can copy and paste elsewhere: ';
+    let introContent = 'Here\'s the link for this page, which you can copy and paste elsewhere: ';
     let selectedContent = window.location.href;
     this.getFlux().actions.session.modalOpen(<Copy title="Page Link" introContent={introContent} selectedContent={selectedContent}/>);
   },
