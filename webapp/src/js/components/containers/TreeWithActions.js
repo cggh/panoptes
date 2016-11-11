@@ -15,8 +15,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-// Material U(I
-import {RaisedButton} from 'material-ui';
+// Material UI
+import RaisedButton from 'material-ui/RaisedButton';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';

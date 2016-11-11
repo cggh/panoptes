@@ -1,6 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import {FlatButton} from 'material-ui';
+import FlatButton from 'material-ui/FlatButton';
 import SQL from 'panoptes/SQL';
 import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
