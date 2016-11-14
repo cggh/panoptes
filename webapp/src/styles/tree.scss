@@ -30,6 +30,18 @@
       padding-right: 7px;
     }
   }
+  .legend {
+    .legend-element {
+      min-height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 16px;
+      .label {
+        padding-left: 8px;
+      }
+    }
+  }
 }
 
 //Inside the popover menu we are not inside tree-controls

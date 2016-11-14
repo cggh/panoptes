@@ -36,8 +36,12 @@ let PropertyLegend = React.createClass({
         <LegendElement key="false" name="False" colour={colourFunc(false)} />
       ];
     } else if (propConfig.isCategorical || propConfig.isText) {
-      elements = _map(propConfig.distinctValues || knownValues || [], (value) => (
-        <LegendElement key={value} name={value} colour={colourFunc(value)} />));
+      elements = _map(
+        propConfig.distinctValues || knownValues || [],
+        (value) => (
+          <LegendElement key={value} name={value !== null ? value : 'NULL'} colour={colourFunc(value)} />
+        )
+      );
     } else {
       const colour = scaleColour([0, 1]);
       let background = `linear-gradient(to right, ${colour(0)} 0%`;
@@ -45,14 +49,16 @@ let PropertyLegend = React.createClass({
         background += `,${colour(i)} ${i * 100}%`;
       }
       background += ')';
-      elements = [<div key="min" className="legend-element">{min || propConfig.minVal}</div>,
-                  <div key="bar" className="legend-element">
-                    <div style={{width: '100px',
-                                 height: '10px',
-                                 background: background}}>
-                    </div>
-                  </div>,
-                  <div key="max" className="legend-element">{max || propConfig.maxVal}</div>];
+      elements = [
+        <div key="min" className="legend-element">{min || propConfig.minVal}</div>,
+        <div key="bar" className="legend-element">
+          <div
+            style={{width: '100px', height: '10px', background: background}}
+          >
+          </div>
+        </div>,
+        <div key="max" className="legend-element">{max || propConfig.maxVal}</div>
+      ];
     }
 
     return <div className="legend">

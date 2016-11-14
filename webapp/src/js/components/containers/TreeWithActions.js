@@ -171,6 +171,7 @@ let TreeWithActions = React.createClass({
               />
             : null }
             { /* TODO: Make component render pretty in both contexts */ }
+            <div className="legend">
             {nodeColourProperty ?
               <div>
               <p>Node colours</p>
@@ -189,6 +190,7 @@ let TreeWithActions = React.createClass({
               />
               </div>
             : null }
+            </div>
         </div>
       </div>
     );
