@@ -23,14 +23,14 @@ let QueryString = React.createClass({
     return {
       prefix: '',
       query: SQL.nullQuery
-    }
+    };
   },
 
   render() {
     let {query, prefix} = this.props;
-    let properties = this.tableConfig().properties;
+    let properties = this.tableConfig() !== undefined ? this.tableConfig().properties : undefined;
     return <span>
-        { prefix + queryToString({properties, query})}
+        {prefix + queryToString({properties, query})}
       </span>;
   }
 });
