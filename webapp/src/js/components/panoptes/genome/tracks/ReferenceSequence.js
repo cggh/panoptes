@@ -1,5 +1,5 @@
 import React from 'react';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -19,7 +19,18 @@ const HEIGHT = 26;
 
 let ReferenceSequence = React.createClass({
   mixins: [
-    PureRenderMixin,
+    PureRenderWithRedirectedProps({
+      redirect: [
+        //'setProps',
+        //'onClose'
+      ],
+      check: [
+        'chromosome',
+        'width',
+        'sideWidth',
+        'name'
+      ]
+    }),
     FluxMixin,
     ConfigMixin,
     DataFetcherMixin('chromosome', 'start', 'end', 'width', 'sideWidth')
@@ -249,8 +260,13 @@ let ReferenceSequence = React.createClass({
 
 });
 
-let Legend = () =>
-  <div className="legend">
+let Legend = React.createClass({
+  shouldComponentUpdate() {
+    return false;
+  },
+
+  render() {
+    return <div className="legend">
     {[
       ['A', 'rgb(255, 50, 50)'],
       ['T', 'rgb(255, 170, 0)'],
@@ -262,7 +278,7 @@ let Legend = () =>
     ))}
     <div style={{paddingLeft: '10px'}}>(Majority base over window)</div>
   </div>;
-Legend.shouldComponentUpdate = () => false;
-
+  }
+});
 
 export default ReferenceSequence;

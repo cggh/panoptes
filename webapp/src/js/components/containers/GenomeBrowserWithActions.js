@@ -50,41 +50,64 @@ let GenomeBrowserWithActions = React.createClass({
     };
   },
 
+  icon() {
+    return 'bitmap:genomebrowser.png';
+  },
+
+  title() {
+    return this.props.title || 'Genome Browser';
+  },
+
+  render() {
+    let {sidebar, setProps, ...subProps} = this.props;
+    return (
+      <Sidebar
+        styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
+        docked={sidebar}
+        sidebar={<SidebarContent {...this.props} />}>
+        <div className="vertical stack">
+          <div className="top-bar">
+            <Icon
+              className="pointer icon"
+              name={sidebar ? 'arrow-left' : 'bars'}
+              onClick={() => setProps({sidebar: !sidebar})}
+              title={sidebar ? 'Expand' : 'Sidebar'}
+            />
+          </div>
+          <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} />
+        </div>
+      </Sidebar>
+    );
+  }
+});
+
+let SidebarContent = React.createClass({
+  mixins: [FluxMixin, ConfigMixin],
+
+  shouldComponentUpdate() {
+    return false;
+  },
 
   channelGroups() {
-
     // NB: table properties (columns) will be grouped by their propertyGroup
     // and assigned to channelGroups[table.id].itemGroups
     // In contrast, twoDTables will be assigned to channelGroups['_2D_tables_'].items
     // tableBasedSummaryValues for each table will be assigned to channelGroups[`_per_${table.id}`].items
     let channelGroups = {};
-
     //Normal summaries
-
-    // For each table...
     _forEach(this.config.tables, (table) => {
-
-      // Only include properties for tables that have genome positions and are not hidden.
       if (table.hasGenomePositions && !table.isHidden) {
-
         channelGroups[table.id] = {
           name: table.capNamePlural,
           icon: table.icon
         };
-
         let propertiesByPropertyGroupId = {};
-
         //_UNGROUPED_ items will be placed above groups in the picker
         let undefinedPropertyGroupId = '_UNGROUPED_';
-
-        // For each table property...
         _forEach(
-          // NB: The table's chromosome and position properties are excluded.
           _filter(table.properties, (prop) => prop.id !== table.chromosome && prop.id !== table.position),
           (prop) => {
-
             let definedPropertyGroupId = prop.groupId !== undefined ? prop.groupId : undefinedPropertyGroupId;
-
             // If this propertyGroup hasn't been created yet, create it.
             if (!propertiesByPropertyGroupId.hasOwnProperty(definedPropertyGroupId)) {
               propertiesByPropertyGroupId[definedPropertyGroupId] = {
@@ -92,12 +115,9 @@ let GenomeBrowserWithActions = React.createClass({
                 items: []
               };
             }
-
             if (prop.showInBrowser && (prop.isCategorical || prop.isBoolean)) {
-
               // If this property is showInBrowser and either categorical or boolean,
               // then add it with a CategoricalChannel component payload.
-
               propertiesByPropertyGroupId[definedPropertyGroupId].items.push({
                 name: prop.name,
                 description: prop.description,
@@ -106,10 +126,8 @@ let GenomeBrowserWithActions = React.createClass({
               });
 
             } else if (prop.showInBrowser && prop.isNumerical) {
-
               // Otherwise, if this property is showInBrowser and numerical,
               // then add it with a NumericalTrackGroupChannel component payload.
-
               propertiesByPropertyGroupId[definedPropertyGroupId].items.push({
                 name: prop.name,
                 description: prop.description,
@@ -118,7 +136,6 @@ let GenomeBrowserWithActions = React.createClass({
                   <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id}/>
                 </NumericalTrackGroupChannel>)
               });
-
             }
           }
         );
@@ -127,34 +144,27 @@ let GenomeBrowserWithActions = React.createClass({
         // to the relevant channelGroups[table.id].itemGroups
         // e.g. itemGroups = {'_UNGROUPED_': {id: 'Info', name: 'Variant Info', properties: [...]}, ...}
         channelGroups[table.id].itemGroups = propertiesByPropertyGroupId;
-
         // Add table positions as a PerRowIndicatorChannel component.
         channelGroups[table.id].itemGroups[undefinedPropertyGroupId] = channelGroups[table.id].itemGroups[undefinedPropertyGroupId] || {
             items: []
-        };
+          };
         channelGroups[table.id].itemGroups[undefinedPropertyGroupId].items.unshift(
           {
             name: table.capNamePlural,
             description: `Positions of ${table.namePlural}`,
             icon: 'caret-up',
-            payload: serialiseComponent(<PerRowIndicatorChannel table={table.id} />)
+            payload: serialiseComponent(<PerRowIndicatorChannel table={table.id}/>)
           }
         );
-
       }
     });
 
-    // If there are any 2D tables...
     if (this.config.twoDTables.length > 0) {
-
-      // Use a group named "_2D_tables_" to collect the twoDTables as its items.
       let groupId = '_2D_tables_';
-
       channelGroups[groupId] = {
         name: 'Genotypes',
         icon: 'bitmap:genomebrowser.png',
       };
-
       let items = _map(
         _filter(this.config.twoDTables, 'showInGenomeBrowser'),
         (twoDTable) => ({
@@ -164,7 +174,6 @@ let GenomeBrowserWithActions = React.createClass({
           payload: serialiseComponent(<GenotypesChannel table={twoDTable.id}/>)
         })
       );
-
       channelGroups[groupId].items = _values(items);
     }
 
@@ -207,15 +216,6 @@ let GenomeBrowserWithActions = React.createClass({
     return channelGroups;
   },
 
-
-  icon() {
-    return 'bitmap:genomebrowser.png';
-  },
-
-  title() {
-    return this.props.title || 'Genome Browser';
-  },
-
   handleChannelAdd(newChannels) {
     this.getFlux().actions.session.modalClose();
     this.props.setProps(
@@ -227,97 +227,70 @@ let GenomeBrowserWithActions = React.createClass({
 
   render() {
     let actions = this.getFlux().actions;
-    let {sidebar, setProps, ...subProps} = this.props;
-    let genomePositionTableButtons = [];
+    return <div className="sidebar">
+      <SidebarHeader
+        icon="bitmap:genomebrowser.png"
+        description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."
+      />
+      <FlatButton
+        label="Add Channels"
+        primary={true}
+        icon={<Icon fixedWidth={true} name="plus"/>}
+        onClick={() => actions.session.modalOpen(
+          <ItemPicker
+            title="Pick channels to be added"
+            itemName="channel"
+            groupName="group"
+            pickVerb="add"
+            groups={this.channelGroups()}
+            onPick={this.handleChannelAdd}
+          />
+        )}
+      />
+      <Divider />
+      {    _map(this.config.visibleTables, (table) => {
+        if (table.hasGenomePositions || table.isRegionOnGenome) {
+          return <FlatButton key={table.id}
+                             label={table.namePlural + ' in view'}
+                             primary={true}
+                             icon={<Icon fixedWidth={true} name={table.icon}/>}
+                             onClick={() => {
+                               let {chromosome, start, end} = this.props;
+                               //Set default bounds
+                               start = _isNumber(start) ? start : 0;
+                               end = (_isNumber(end) ? end : this.config.chromosomes[chromosome]) || 10000;
+                               chromosome = chromosome || _head(_keys(this.config.chromosomes));
+                               let genomePositionTableQuery = null;
+                               if (table.hasGenomePositions) {
+                                 genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
+                                   SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
+                                   SQL.WhereClause.CompareFixed(table.position, '>=', Math.floor(start)),
+                                   SQL.WhereClause.CompareFixed(table.position, '<=', Math.ceil(end))
+                                 ]));
+                               } else if (table.isRegionOnGenome) {
+                                 genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
+                                   SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
+                                   SQL.WhereClause.CompareFixed(table.regionStart, '<=', Math.ceil(end)),
+                                   SQL.WhereClause.CompareFixed(table.regionStop, '>=', Math.floor(start))
+                                 ]));
+                               }
+                               if (table.listView) {
+                                 this.flux.actions.session.tabOpen(<ListWithActions table={table.id}
+                                                                                    query={genomePositionTableQuery}/>, true);
+                               } else {
+                                 this.flux.actions.session.tabOpen(<DataTableWithActions table={table.id}
+                                                                                         query={genomePositionTableQuery}/>, true);
+                               }
 
-    _forEach(this.config.visibleTables, (table) => {
-      if (table.hasGenomePositions || table.isRegionOnGenome) {
-        let genomePositionTableButton = (
-          <FlatButton key={table.id}
-                      label={table.namePlural + ' in view'}
-                      primary={true}
-                      icon={<Icon fixedWidth={true} name={table.icon}/>}
-                      onClick={() => {
-                        let {chromosome, start, end} = this.props;
-                        //Set default bounds
-                        start = _isNumber(start) ? start : 0;
-                        end = (_isNumber(end) ? end : this.config.chromosomes[chromosome]) || 10000;
-                        chromosome = chromosome || _head(_keys(this.config.chromosomes));
-                        let genomePositionTableQuery = null;
-                        if (table.hasGenomePositions) {
-                          genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
-                            SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
-                            SQL.WhereClause.CompareFixed(table.position, '>=', Math.floor(start)),
-                            SQL.WhereClause.CompareFixed(table.position, '<=', Math.ceil(end))
-                          ]));
-                        } else if (table.isRegionOnGenome) {
-                          genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
-                            SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
-                            SQL.WhereClause.CompareFixed(table.regionStart, '<=', Math.ceil(end)),
-                            SQL.WhereClause.CompareFixed(table.regionStop, '>=', Math.floor(start))
-                          ]));
-                        }
-                        if (table.listView) {
-                          this.flux.actions.session.tabOpen(<ListWithActions table={table.id}
-                                                                             query={genomePositionTableQuery}/>, true);
-                        } else {
-                          this.flux.actions.session.tabOpen(<DataTableWithActions table={table.id}
-                                                                                  query={genomePositionTableQuery}/>, true);
-                        }
-
-                      }}
+                             }}
           >
-          </FlatButton>
-        );
-        genomePositionTableButtons.push(genomePositionTableButton);
-      }
-    });
+          </FlatButton>;
 
-    let sidebarContent = (
-      <div className="sidebar">
-        <SidebarHeader
-          icon={this.icon()}
-          description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."
-        />
-        <FlatButton
-          label="Add Channels"
-          primary={true}
-          icon={<Icon fixedWidth={true} name="plus"/>}
-          onClick={() => actions.session.modalOpen(
-            <ItemPicker
-              title="Pick channels to be added"
-              itemName="channel"
-              groupName="group"
-              pickVerb="add"
-              groups={this.channelGroups()}
-              onPick={this.handleChannelAdd}
-            />
-          )}
-        />
-        <Divider />
-        {genomePositionTableButtons}
-      </div>
-    );
-
-    return (
-      <Sidebar
-        styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
-        docked={sidebar}
-        sidebar={sidebarContent}>
-        <div className="vertical stack">
-          <div className="top-bar">
-            <Icon
-              className="pointer icon"
-              name={sidebar ? 'arrow-left' : 'bars'}
-              onClick={() => setProps({sidebar: !sidebar})}
-              title={sidebar ? 'Expand' : 'Sidebar'}
-            />
-          </div>
-          <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} />
-        </div>
-      </Sidebar>
-    );
+        }
+      })}
+    </div>
   }
 });
+
 
 export default GenomeBrowserWithActions;

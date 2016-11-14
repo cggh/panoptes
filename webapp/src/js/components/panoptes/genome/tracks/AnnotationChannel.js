@@ -252,11 +252,16 @@ let AnnotationChannel = React.createClass({
   }
 });
 
-let Legend = () =>
-    <div className="legend">
+let Legend = React.createClass({
+  shouldComponentUpdate() {
+    return false;
+  },
+
+  render() {
+    return <div className="legend">
       <div className="legend-element">
         <svg width="50" height="26">
-          <rect x="0" y="12" width="50" height="2" style={{fill: '#000'}} />
+          <rect x="0" y="12" width="50" height="2" style={{fill: '#000'}}/>
         </svg>
         <div className="label">
           Gene
@@ -264,14 +269,15 @@ let Legend = () =>
       </div>
       <div className="legend-element">
         <svg width="50" height="26">
-          <rect x="0" y ="8" width="50" height="10" style={{fill: '#3d8bd5'}} />
+          <rect x="0" y="8" width="50" height="10" style={{fill: '#3d8bd5'}}/>
         </svg>
         <div className="label">
           Coding Sequence
         </div>
       </div>
     </div>;
-Legend.shouldComponentUpdate = () => false;
+  }
+});
 
 export default AnnotationChannel;
 
