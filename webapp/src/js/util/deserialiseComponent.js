@@ -26,6 +26,9 @@ export default function deserialiseComponent(component, path = null, mappedFunct
         }
       });
     }
+    if (type.propTypes.childrenHash) {
+
+    }
     return React.createElement(type, {children, ...otherProps});
   }
 
