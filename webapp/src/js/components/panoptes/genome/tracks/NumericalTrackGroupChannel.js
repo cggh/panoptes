@@ -44,7 +44,8 @@ let NumericalTrackGroupChannel = React.createClass({
     name: React.PropTypes.string,
     sideWidth: React.PropTypes.number,
     children: React.PropTypes.node,
-    setProps: React.PropTypes.func
+    setProps: React.PropTypes.func,
+    childrenHash: React.PropTypes.number  //Perf
   },
 
   getInitialState() {
@@ -58,7 +59,7 @@ let NumericalTrackGroupChannel = React.createClass({
   },
 
   handleTap(e) {
-    const {width, sideWidth, start, end, chromosome} = this.props;
+    const {width, sideWidth, start, end} = this.props;
     const rect = e.target.getBoundingClientRect();
     const x = e.center.x - rect.left;
     const y = e.center.y - rect.top;
@@ -92,19 +93,14 @@ let NumericalTrackGroupChannel = React.createClass({
   },
 
   render() {
-    let {width, sideWidth, children, name} = this.props;
+    let {width, sideWidth, children, name, childrenHash} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     return (
       <CanvasGroupChannel onTap={this.handleTap} {...this.props}
-        side={name ? name : ValidComponentChildren.map(children, (child) =>
-              <div style={{whiteSpace: 'nowrap'}}>
-                <i className="fa fa-square" style={{color:child.props.colour || colourFunc(child.props.track)}}/>
-                {child.props.track}<br/>
-              </div>
-        )}
+        side={<Side {...this.props} />}
         onClose={this.redirectedProps.onClose}
         controls={<NumericalTrackGroupControls {...this.props} setProps={this.redirectedProps.setProps} />}
-        legend={<Legend>{children}</Legend>}
+        legend={<Legend childrenHash={childrenHash}>{children}</Legend>}
         >
         {React.Children.map(children,
           (child) => React.cloneElement(child, {
@@ -116,11 +112,34 @@ let NumericalTrackGroupChannel = React.createClass({
   }
 });
 
+let Side = React.createClass({
+  mixins: [
+    PureRenderWithRedirectedProps({
+      check: [
+        'name',
+        'childrenHash'
+      ],
+    })
+  ],
+  render() {
+    let {children, name} = this.props;
+    return <div>
+      {name ? name : ValidComponentChildren.map(children, (child) =>
+              <div style={{whiteSpace: 'nowrap'}}>
+                <i className="fa fa-schildrenHashquare" style={{color:child.props.colour || colourFunc(child.props.track)}}/>
+                {child.props.track}<br/>
+              </div>
+        )}
+    </div>;
+  }
+
+});
+
 let Legend = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
-        'children'
+        'childrenHash'
       ],
     })
   ],
@@ -149,7 +168,7 @@ let NumericalTrackGroupControls = React.createClass({
         'autoYScale',
         'yMin',
         'yMax',
-        'children'
+        'childrenHash'
       ],
       redirect: ['setProps']
     })

@@ -36,7 +36,7 @@ let SessionComponent = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.updateTitleIcon && (prevState.component !== this.state.component)) {
+    if (this.props.updateTitleIcon && (prevState.component.get('type') !== this.state.component.get('type'))) {
       this.props.updateTitleIcon()
     }
   },

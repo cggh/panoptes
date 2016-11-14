@@ -12,9 +12,10 @@ export default function deserialiseComponent(component, path = null, mappedFunct
     component = component.toObject();
     let {type, props} = component;
     type = ComponentRegistry(type) || type;
-    let children = props ? props.get('children') : null;  //eslint-disable-line react/prop-types
-    if (List.isList(children)) {  //We don't check for element type as on serialisation lone children are placed in an array.
-      children = children.map((child, i) =>
+    const serialisedChildren = props ? props.get('children') : null;  //eslint-disable-line react/prop-types
+    let children = null;
+    if (List.isList(serialisedChildren)) {  //We don't check for element type as on serialisation lone children are placed in an array.
+      children = serialisedChildren.map((child, i) =>
         _deserialiseComponent(child, path ? path.concat('props', 'children', i) : null)
       ).toArray();
     }
@@ -26,8 +27,8 @@ export default function deserialiseComponent(component, path = null, mappedFunct
         }
       });
     }
-    if (type.propTypes.childrenHash) {
-
+    if (type.propTypes.childrenHash && serialisedChildren && serialisedChildren.hashCode) {
+      otherProps.childrenHash = serialisedChildren.hashCode();
     }
     return React.createElement(type, {children, ...otherProps});
   }
