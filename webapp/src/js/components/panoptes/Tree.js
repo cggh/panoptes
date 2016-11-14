@@ -1,7 +1,9 @@
 import React from 'react';
 import Phylocanvas from 'react-phylocanvas';
 import {treeTypes} from 'phylocanvas';
+
 import _keys from 'lodash/keys';
+import _isEqual from 'lodash/isEqual';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';
@@ -15,22 +17,59 @@ let Tree = React.createClass({
 
   propTypes: {
     data: React.PropTypes.string,
+    metadata: React.PropTypes.object,
     treeType: React.PropTypes.oneOf(_keys(treeTypes))
   },
 
-  handleResize(size) {
-    if (this.refs.phylocanvas.tree) {
-      this.refs.phylocanvas.tree.resizeToContainer();
-      this.refs.phylocanvas.tree.fitInPanel();
-      this.refs.phylocanvas.tree.draw();
+  componentDidMount() {
+    this.updateTree();
+  },
+
+  componentDidUpdate(prevProps) {
+    if (!_isEqual(this.props.metadata, prevProps.metadata)) {
+      this.updateTree();
     }
+  },
+
+  handleResize(size) {
+    if (this.phylocanvas.tree) {
+      this.phylocanvas.tree.resizeToContainer();
+      this.phylocanvas.tree.fitInPanel();
+      this.phylocanvas.tree.draw();
+    }
+  },
+
+  updateTree() {
+
+    this.phylocanvas.tree.setNodeSize(8);
+
+    for (let i = 0, len = this.phylocanvas.tree.leaves.length; i < len; i++) {
+
+      let leaf = this.phylocanvas.tree.leaves[i];
+      let nodeColour = this.props.metadata[leaf.label] !== undefined ? this.props.metadata[leaf.label].nodeColour : 'inherit';
+      let branchColour = this.props.metadata[leaf.label] !== undefined ? this.props.metadata[leaf.label].branchColour : 'inherit';
+
+      leaf.setDisplay({
+        colour: branchColour,
+        leafStyle: {
+          strokeStyle: nodeColour,
+          fillStyle: nodeColour
+        },
+        labelStyle: {
+          colour: nodeColour
+        },
+      });
+
+    }
+
+    this.phylocanvas.tree.draw();
   },
 
   render() {
     return (
       <DetectResize onResize={this.handleResize}>
         <Phylocanvas
-          ref="phylocanvas"
+          ref={(ref) => this.phylocanvas = ref}
           className="tree"
           {...this.props}
         />

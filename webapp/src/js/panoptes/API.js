@@ -314,15 +314,16 @@ function fetchGene(options) {
 function fetchImportStatusData(options) {
   assertRequired(options, ['dataset']);
   // let {dataset} = options;
-  let columns = ['id',
-                 'user',
-                 'timestamp',
-                 'name',
-                 'status',
-                 'progress',
-                 'completed',
-                 'failed',
-                 'scope'
+  let columns = [
+    'id',
+    'user',
+    'timestamp',
+    'name',
+    'status',
+    'progress',
+    'completed',
+    'failed',
+    'scope'
   ];
   // TODO: only get logs for this dataset
   //SQL.WhereClause.encode(SQL.WhereClause.CompareFixed("dataset", '=', dataset))
