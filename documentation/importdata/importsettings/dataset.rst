@@ -23,16 +23,6 @@ nameBanner
   *Text.* Visible name of the dataset, as it appears on the top banner of the app.
   Note: this text may contain html markup.
 
-description
-  *Text.* A description of the dataset that appears on the start page.
-  Note: this text may contain html markup, and documentation links (see :ref:`def-source-docs`).
-  A longer description can be split over several lines by writing a ``>`` sign on the key line,
-  and indent subsequent lines::
-
-     Description: >
-        This web application provides an interactive view
-        on the data ...
-
 dataTables
   *List.* A list of the data table identifiers in the dataset.
   These names should correspond to directory names in the *datatables* source directory (see :ref:`def-source-datatable`).

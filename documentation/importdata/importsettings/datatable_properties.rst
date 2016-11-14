@@ -55,7 +55,7 @@ valueDisplays
   *Block.* Specifies display html for specific values of this property. The html will replace this value when it is displayed.
 
 defaultWidth
-  *Value.* Sets the deafult column width in pixels.(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']).
+  *Value.* Sets the default column width in pixels..
 
 showBar
   *Boolean.* Draws a bar in the background of the table, indicating the value.
