@@ -19,7 +19,11 @@
       height: 100%;
     }
     .tab-pane.inactive {
-      rect {
+      //Chrome bug where scroll bars remain visible
+      ::-webkit-scrollbar {
+      visibility: hidden;
+    }
+    rect {
         pointer-events: none !important; //Plotly has some elements with pointer-events all that change respond to clicks even when tab not selected
       }
     }
