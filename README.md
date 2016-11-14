@@ -48,3 +48,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 A copy of the license is at <http://opensource.org/licenses/AGPL-3.0>
+
+
+Shoutout
+--------
+Panoptes was largely developed whilst under the magical influence of the music of [Erothyme](https://erothyme.bandcamp.com/).
