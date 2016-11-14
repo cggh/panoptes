@@ -7,7 +7,7 @@ static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../weba
 
 def application(environ, start_response):
     #Whatever the path we return index.html as API and static requests are not passed to us
-    start_response('200 OK', [])
+    start_response('200 OK', [('Content-type', 'text/html')])
     with open(os.path.join(static_path, 'panoptes/index.html')) as page:
         yield page.read()
     return
