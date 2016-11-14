@@ -35,6 +35,12 @@ let SessionComponent = React.createClass({
     this.setState(this.getStateFromFlux(nextProps));
   },
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.updateTitleIcon && (prevState.component !== this.state.component)) {
+      this.props.updateTitleIcon()
+    }
+  },
+
   render() {
     const {compId} = this.props;
     const {component} = this.state;
