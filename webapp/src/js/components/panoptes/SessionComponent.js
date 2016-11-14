@@ -36,11 +36,11 @@ let SessionComponent = React.createClass({
   },
 
   title() {
-    return this.state.component.getIn(['props', 'title']) || this.refs.child.title ? this.refs.child.title() : null || ''
+    return this.state.component.getIn(['props', 'title']) || this.refs.child.title ? this.refs.child.title() : null || '';
   },
 
   icon() {
-    return this.state.component.getIn(['props', 'icon']) || this.refs.child.icon ? this.refs.child.icon() : null || ''
+    return this.state.component.getIn(['props', 'icon']) || this.refs.child.icon ? this.refs.child.icon() : null || '';
   },
 
   componentWillReceiveProps(nextProps) {
