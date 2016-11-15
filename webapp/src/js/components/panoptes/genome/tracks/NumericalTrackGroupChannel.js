@@ -126,7 +126,7 @@ let Side = React.createClass({
     return <div>
       {name ? name : ValidComponentChildren.map(children, (child) =>
               <div style={{whiteSpace: 'nowrap'}}>
-                <i className="fa fa-schildrenHashquare" style={{color:child.props.colour || colourFunc(child.props.track)}}/>
+                <i className="fa fa-square" style={{color:child.props.colour || colourFunc(child.props.track)}}/>
                 {child.props.track}<br/>
               </div>
         )}
