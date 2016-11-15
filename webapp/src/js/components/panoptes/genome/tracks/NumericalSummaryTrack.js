@@ -3,6 +3,8 @@ import Color from 'color';
 
 import _min from 'lodash/min';
 import _max from 'lodash/max';
+import _sum from 'lodash/sum';
+import _sumBy from 'lodash/sumBy';
 import _debounce from 'lodash/debounce';
 import _sortedIndex from 'lodash/sortedIndex';
 import _sortedLastIndex from 'lodash/sortedLastIndex';
@@ -19,6 +21,7 @@ import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
+const DRAW_POINTS_THRESHOLD = 1000;
 
 let NumericalSummaryTrack = React.createClass({
   mixins: [
@@ -58,6 +61,7 @@ let NumericalSummaryTrack = React.createClass({
 
   componentWillMount() {
     this.blocks = [];
+    this.pointsBlocks = [];
     this.debouncedYScale = _debounce(this.calculateYScale, 200);
   },
   componentWillUnmount() {
@@ -128,15 +132,42 @@ let NumericalSummaryTrack = React.createClass({
         queryField: 'query',
         start,
         end,
-        useWiderBlocksIfInCache: false,
-        isBlockTooBig: () => false
+        useWiderBlocksIfInCache: true,
+        isBlockTooBig: () => false,
+        postProcessBlock: (block) => {
+          block.numPoints = _sum(block.count.array);
+          return block;
+        }
       };
 
       requestContext.request((componentCancellation) =>
         regionCacheGet(APIargs, cacheArgs, componentCancellation)
           .then((blocks) => {
-            this.props.onChangeLoadStatus('DONE');
-            this.applyData(this.props, blocks, summaryWindow);
+            const numPoints = _sumBy(blocks, 'numPoints');
+            this.applyData(this.props, blocks, summaryWindow, numPoints > DRAW_POINTS_THRESHOLD);
+            if (numPoints <= DRAW_POINTS_THRESHOLD) {
+              return regionCacheGet(
+                {
+                  ...APIargs,
+                  columns: [
+                    {expr: tableConfig.position, as: 'pos'},
+                    {expr: track, as: 'value'}
+                  ],
+                  groupBy: [],
+                  orderBy: []
+                },
+                {
+                  ...cacheArgs,
+                  postProcessBlock: undefined
+                },
+                componentCancellation)
+                .then((pointsBlocks) => {
+                  this.applyPointsData(this.props, pointsBlocks);
+                  this.props.onChangeLoadStatus('DONE');
+                });
+            } else {
+              this.props.onChangeLoadStatus('DONE');
+            }
           })
           .catch((err) => {
             this.props.onChangeLoadStatus('DONE');
@@ -160,11 +191,19 @@ let NumericalSummaryTrack = React.createClass({
     }
   },
 
-  applyData(props, blocks, summaryWindow) {
+  applyData(props, blocks, summaryWindow, clearPoints) {
     this.blocks = blocks;
+    if (clearPoints) {
+      this.pointsBlocks = [];
+    }
     this.summaryWindow = summaryWindow;
     this.draw(props);
     this.debouncedYScale(props);
+  },
+
+  applyPointsData(props, blocks) {
+    this.pointsBlocks = blocks;
+    this.draw(props);
   },
 
   draw(props) {
@@ -206,7 +245,7 @@ let NumericalSummaryTrack = React.createClass({
           lastWindow = window[i];
         }
       });
-      ctx.fillStyle = Color(colour).clearer(0.7).rgbString();
+      ctx.fillStyle = Color(colour).clearer(0.8).rgbString();
       ctx.fill();
     }
     let lastPointNull = true;
@@ -235,21 +274,20 @@ let NumericalSummaryTrack = React.createClass({
     ctx.stroke();
     // Circles for single data points
     ctx.beginPath();
-    this.blocks.forEach((block) => {
-      const window = block.window.array;
-      const avg = block.avg.array;
-      const count = block.count.array;
-      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
-        if (count[i] === 1 && avg[i] !== nullVal && avg[i] == +avg[i]) {
-          const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
-          const yPixel = height - (yScaleFactor * (avg[i] - yMin));
-          ctx.moveTo(xPixel, yPixel);
-          ctx.arc(xPixel + (pixelWindowSize / 2), yPixel, Math.max(1, Math.min(pixelWindowSize - 4, 4)), 0, 2 * Math.PI, false);
-        }
+    this.pointsBlocks.forEach((block) => {
+      const pos = block.pos.array;
+      const value = block.value.array;
+      for (let i = 0, iEnd = pos.length; i < iEnd; i++) {
+        const xPixel = xScaleFactor * (-0.5 + pos[i] - start);
+        const yPixel = height - (yScaleFactor * (value[i] - yMin));
+        ctx.moveTo(xPixel, yPixel);
+        ctx.arc(xPixel, yPixel, 2, 0, 2 * Math.PI, false);
       }
     });
-    ctx.fillStyle = '#222222';
+    ctx.fillStyle = Color(colour).clearer(0.8).rgbString();
     ctx.fill();
+    ctx.strokeStyle = Color(colour).clearer(0.5).rgbString()
+    ctx.stroke();
   },
 
   calculateYScale(props) {
