@@ -284,8 +284,10 @@ let NumericalSummaryTrack = React.createClass({
         ctx.arc(xPixel, yPixel, 2, 0, 2 * Math.PI, false);
       }
     });
-    ctx.fillStyle = colour;
+    ctx.fillStyle = Color(colour).clearer(0.8).rgbString();
     ctx.fill();
+    ctx.strokeStyle = Color(colour).clearer(0.5).rgbString()
+    ctx.stroke();
   },
 
   calculateYScale(props) {
