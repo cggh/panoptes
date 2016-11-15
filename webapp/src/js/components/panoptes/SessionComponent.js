@@ -2,18 +2,30 @@ import React from  'react';
 import deserialiseComponent from 'util/deserialiseComponent';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
-import PureRenderMixin from 'mixins/PureRenderMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 let SessionComponent = React.createClass({
   mixins: [
     FluxMixin,
-    PureRenderMixin,
-    StoreWatchMixin('SessionStore')],
+    StoreWatchMixin('SessionStore')
+  ],
 
   propTypes: {
     compId: React.PropTypes.string,
     updateTitleIcon: React.PropTypes.func
+  },
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (nextProps.compId !== this.props.compId) ||
+      (nextState.component !== this.state.component);
+  },
+
+  componentWillMount() {
+    //Store this so that we can access changes without render.
+    this.updateTitleIcon =
+          (function() {
+            return this.props.updateTitleIcon.apply(this, arguments);
+          }).bind(this);
   },
 
   getStateFromFlux(props) {
@@ -48,7 +60,7 @@ let SessionComponent = React.createClass({
     return React.cloneElement(deserialiseComponent(component, [compId], {
       setProps: actions.componentSetProps,
       replaceSelf: actions.componentReplace,
-      updateTitleIcon: this.props.updateTitleIcon
+      updateTitleIcon: this.updateTitleIcon
     }), {ref: 'child'});
   }
 });
