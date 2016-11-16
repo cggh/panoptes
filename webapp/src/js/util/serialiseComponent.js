@@ -20,13 +20,11 @@ export default function serialiseComponent(component) {
   let {children, ...other} = component.props;
   const otherFiltered = {};
   _map(other, (val, key) => {
-    if (_isFunction(val)) {
-      console.warn(`Can't serialise function prop ${key} on ${displayName}`);
-    } else {
+    if (!_isFunction(val)) {
       otherFiltered[key] = val;
     }
   });
-  children = React.Children.map(children, serialiseComponent);
+  children = React.Children.map(children, serialiseComponent) || undefined;
   return Immutable.fromJS({
     type: displayName,
     props: {children, ...otherFiltered}

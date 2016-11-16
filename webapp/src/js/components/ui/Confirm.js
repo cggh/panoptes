@@ -59,19 +59,21 @@ let Confirm = React.createClass({
       <div style={{padding: '10px', maxWidth: '80vw'}}>
         <div style={{padding: '10px'}}>{message}</div>
         <div style={{padding: '5px 0 0 0', textAlign: 'center'}}>
-          <RaisedButton
-            style={{marginRight: '10px'}}
-            label={confirmButtonLabel}
-            primary={true}
-            icon={<Icon name="check" inverse={true} />}
-            onClick={this.handleConfirm}
-          />
           <FlatButton
             label={cancelButtonLabel}
             primary={false}
             icon={<Icon name="close" inverse={false} />}
             onClick={this.handleCancel}
           />
+          <RaisedButton
+            autoFocus={true}
+            style={{marginRight: '10px'}}
+            label={confirmButtonLabel}
+            primary={true}
+            icon={<Icon name="check" inverse={true} />}
+            onClick={this.handleConfirm}
+          />
+
         </div>
       </div>
     );
