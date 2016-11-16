@@ -55,6 +55,7 @@ let APIActions = {
           ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
         }))
       .catch((error) => {
+        console.error(error);
         this.dispatch(APICONST.FETCH_USER_FAIL);
         ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
       });

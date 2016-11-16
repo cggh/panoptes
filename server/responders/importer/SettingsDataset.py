@@ -36,7 +36,31 @@ class SettingsDataset(ImportSettings):
                                         'type': 'Block',
                                         'required': False,
                                         'description': 'The default tabs, popups and recently used genes and queries for a new session. Most easily set by using the save button on the header (only shown to managers)',
-                                    })
+                                    }),
+                                    ('genomeBrowserChannelSets', {
+                                        'type': 'List',
+                                        'required': False,
+                                        'default': [],
+                                        'description': 'A list of exmaple channel configurations that will be shown on the genome browser sidebar',
+                                        'children': {
+                                            'name': {
+                                                'type': 'Text',
+                                                'required': True,
+                                                'description': 'Channel set name'
+                                            },
+                                            'description': {
+                                                'type': 'Text',
+                                                'required': True,
+                                                'description': 'Channel set description'
+                                            },
+                                            'channels': {
+                                                'type': 'List',
+                                                'required': True,
+                                                'description': 'List of serialised channels'
+                                            },
+                                        }
+                                    }),
+
             ))
             return datasetSettings
 
