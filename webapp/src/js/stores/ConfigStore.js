@@ -272,7 +272,7 @@ const ConfigStore = Fluxxor.createStore({
         'Date': 'center'
       }[prop.dataType];
       prop.description = prop.description || '';
-      prop.showBar = prop.ShowBar || (prop.barWidth > 0);
+      prop.showBar = prop.showBar || (prop.barWidth > 0);
       prop.showByDefault = 'tableDefaultVisible' in prop ? prop.tableDefaultVisible :
       prop.isPrimKey ||
       prop.id == table.chromosome ||
