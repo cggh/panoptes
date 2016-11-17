@@ -100,7 +100,10 @@ let NumericalTrackGroupChannel = React.createClass({
         side={<Side {...this.props} />}
         onClose={this.redirectedProps.onClose}
         controls={<NumericalTrackGroupControls {...this.props} setProps={this.redirectedProps.setProps} />}
-        legend={<Legend childrenHash={childrenHash}>{children}</Legend>}
+        legend={
+          <Legend childrenHash={childrenHash} setProps={this.redirectedProps.setProps}>
+            {children}
+          </Legend>}
         >
         {React.Children.map(children,
           (child) => React.cloneElement(child, {
@@ -141,6 +144,9 @@ let Legend = React.createClass({
       check: [
         'childrenHash'
       ],
+      redirect: [
+        'setProps'
+      ]
     })
   ],
 
@@ -148,10 +154,16 @@ let Legend = React.createClass({
     return <div className="legend">
       <div className="legend-element">Tracks:</div>
       {React.Children.map(this.props.children,
-          (child) => <LegendElement
+          (child, i) => <LegendElement
             key={child.props.track}
             name={child.props.track}
-            colour={child.props.colour || colourFunc(child.props.track)} />)}
+            colour={child.props.colour || colourFunc(child.props.track)}
+            onPickColour={(colour) =>
+              this.redirectedProps.setProps(
+                (props) => props.setIn(['children', i, 'props', 'colour'], colour)
+              )
+            }
+          />)}
     </div>
   }
 
