@@ -3,7 +3,7 @@ import d3 from 'd3';
 
 let exisitingScales = {};
 
-let colours = [
+export const colours = [
   '#1f77b4',
   '#ff7f0e',
   '#2ca02c',
