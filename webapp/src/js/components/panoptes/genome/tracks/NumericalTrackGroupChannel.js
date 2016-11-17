@@ -21,6 +21,7 @@ import SQL from 'panoptes/SQL';
 import DataTableWithActions from 'containers/DataTableWithActions';
 import {categoryColours} from 'util/Colours';
 import LegendElement from 'panoptes/LegendElement';
+import _filter from 'lodash/filter';
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
@@ -64,11 +65,11 @@ let NumericalTrackGroupChannel = React.createClass({
     const x = e.center.x - rect.left;
     const y = e.center.y - rect.top;
     const scaleFactor = ((width - sideWidth) / (end - start));
-    const windowStart = ((x-3) / scaleFactor) + start;
-    const windowEnd = ((x+3) / scaleFactor) + start;
+    const windowStart = ((x - 3) / scaleFactor) + start;
+    const windowEnd = ((x + 3) / scaleFactor) + start;
     const {summaryWindow} = findBlock({start, end, width});
-    const floor = Math.floor((windowStart+0.5)/summaryWindow) * summaryWindow;
-    const ceil = Math.floor((windowEnd+0.5)/summaryWindow) * summaryWindow;
+    const floor = Math.floor((windowStart + 0.5) / summaryWindow) * summaryWindow;
+    const ceil = Math.floor((windowEnd + 0.5) / summaryWindow) * summaryWindow;
     const toOpen = {};
     React.Children.forEach(this.props.children, (child) => {
       if (child.props.table && child.props.track) {
@@ -97,19 +98,20 @@ let NumericalTrackGroupChannel = React.createClass({
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     return (
       <CanvasGroupChannel onTap={this.handleTap} {...this.props}
-        side={<Side {...this.props} />}
-        onClose={this.redirectedProps.onClose}
-        controls={<NumericalTrackGroupControls {...this.props} setProps={this.redirectedProps.setProps} />}
-        legend={
-          <Legend childrenHash={childrenHash} setProps={this.redirectedProps.setProps}>
-            {children}
-          </Legend>}
+                          side={<Side {...this.props} />}
+                          onClose={this.redirectedProps.onClose}
+                          controls={<NumericalTrackGroupControls {...this.props}
+                                                                 setProps={this.redirectedProps.setProps}/>}
+                          legend={<Legend childrenHash={childrenHash} setProps={this.redirectedProps.setProps}>
+                                    {children}
+                                  </Legend>}
         >
         {React.Children.map(children,
           (child) => React.cloneElement(child, {
             ...this.props,
             width: width - sideWidth,
-            colour: child.props.colour || colourFunc(child.props.track)}))}
+            colour: child.props.colour || colourFunc(child.props.track)
+          }))}
       </CanvasGroupChannel>
     );
   }
@@ -128,11 +130,11 @@ let Side = React.createClass({
     let {children, name} = this.props;
     return <div>
       {name ? name : ValidComponentChildren.map(children, (child) =>
-              <div style={{whiteSpace: 'nowrap'}}>
-                <i className="fa fa-square" style={{color:child.props.colour || colourFunc(child.props.track)}}/>
-                {child.props.track}<br/>
-              </div>
-        )}
+        <div style={{whiteSpace: 'nowrap'}}>
+          <i className="fa fa-square" style={{color: child.props.colour || colourFunc(child.props.track)}}/>
+          {child.props.track}<br/>
+        </div>
+      )}
     </div>;
   }
 
@@ -154,16 +156,16 @@ let Legend = React.createClass({
     return <div className="legend">
       <div className="legend-element">Tracks:</div>
       {React.Children.map(this.props.children,
-          (child, i) => <LegendElement
-            key={child.props.track}
-            name={child.props.track}
-            colour={child.props.colour || colourFunc(child.props.track)}
-            onPickColour={(colour) =>
-              this.redirectedProps.setProps(
-                (props) => props.setIn(['children', i, 'props', 'colour'], colour)
-              )
-            }
-          />)}
+        (child, i) => <LegendElement
+          key={child.props.track}
+          name={child.props.track}
+          colour={child.props.colour || colourFunc(child.props.track)}
+          onPickColour={(colour) =>
+            this.redirectedProps.setProps(
+              (props) => props.setIn(['children', i, 'props', 'colour'], colour)
+            )
+          }
+        />)}
     </div>
   }
 
@@ -197,31 +199,46 @@ let NumericalTrackGroupControls = React.createClass({
   },
 
   trackGroups() {
-    let groups = {
-    };
-
-    _forEach(this.config.tables, (table) => {
-      if (table.hasGenomePositions && !table.isHidden) {
-        groups[table.id] = {
-          name: table.capNamePlural,
-          icon: table.icon,
-          items: {}
+    const {table} = this.props;
+    let trackGroups = {};
+    _forEach(this.config.tables, (iTable) => {
+      if (iTable.id === table || !table) {
+        trackGroups[iTable.id] = {
+          name: iTable.capNamePlural,
+          icon: iTable.icon,
         };
-        _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser && prop.isNumerical) {
-            groups[table.id].items[prop.id] = {
-              name: prop.name,
-              description: prop.description,
-              icon: 'line-chart',
-              payload: serialiseComponent(
-                <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id} />
-              )
-            };
-          }
-        });
+        let propertiesByPropertyGroupId = {};
+        //_UNGROUPED_ items will be placed above groups in the picker
+        let undefinedPropertyGroupId = '_UNGROUPED_';
+        _forEach(
+          _filter(iTable.properties,
+            (prop) => prop.showInBrowser &&
+              prop.id !== iTable.chromosome &&
+              prop.id !== iTable.position &&
+              prop.isNumerical &&
+              !prop.isCategorical),
+            (prop) => {
+              let definedPropertyGroupId = prop.groupId !== undefined ? prop.groupId : undefinedPropertyGroupId;
+              // If this propertyGroup hasn't been created yet, create it.
+              if (!propertiesByPropertyGroupId.hasOwnProperty(definedPropertyGroupId)) {
+                propertiesByPropertyGroupId[definedPropertyGroupId] = {
+                  name: iTable.propertyGroupsById[definedPropertyGroupId].name,
+                  items: {}
+                };
+              }
+              propertiesByPropertyGroupId[definedPropertyGroupId].items[prop.id] = {
+                name: prop.name,
+                description: prop.description,
+                icon: prop.icon,
+                payload: serialiseComponent(
+                  <NumericalSummaryTrack name={prop.name} table={iTable.id} track={prop.id}/>
+                )
+              };
+          });
+        trackGroups[iTable.id].itemGroups = propertiesByPropertyGroupId;
       }
     });
-    return groups;
+    return trackGroups;
   },
 
 
@@ -247,6 +264,7 @@ let NumericalTrackGroupControls = React.createClass({
                         groups={this.trackGroups()}
                         initialSelection={React.Children.map(children, (child) => ({
                           groupId: child.props.table,
+                          itemGroupId: this.config.tablesById[child.props.table].propertiesById[child.props.track].groupId || '_UNGROUPED_',
                           itemId: child.props.track,
                         }))}
                         onPick={this.handleTrackChange}
@@ -274,7 +292,7 @@ let NumericalTrackGroupControls = React.createClass({
                    if (_isFinite(value))
                      this.redirectedProps.setProps({yMin: value});
                  }
-                                }/>
+                 }/>
         </div>
           : null}
         {!autoYScale ? <div className="control">
@@ -288,7 +306,7 @@ let NumericalTrackGroupControls = React.createClass({
                    if (_isFinite(value))
                      this.redirectedProps.setProps({yMax: value});
                  }
-                                }/>
+                 }/>
         </div>
           : null}
 

@@ -5,6 +5,7 @@ import Pluralise from 'ui/Pluralise';
 
 import _map from 'lodash/map';
 import _some from 'lodash/some';
+import _keys from 'lodash/keys';
 
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -25,6 +26,7 @@ let ItemPicker = React.createClass({
     initialSelection: React.PropTypes.arrayOf(
       React.PropTypes.shape({
         groupId: React.PropTypes.string.isRequired,
+        itemGroupId: React.PropTypes.string.isRequired,
         itemId: React.PropTypes.string.isRequired,
         payload: React.PropTypes.any
       })),
@@ -44,7 +46,7 @@ let ItemPicker = React.createClass({
           React.PropTypes.shape({
             name: React.PropTypes.string.isRequired,
             icon: React.PropTypes.string,
-            items: React.PropTypes.arrayOf(
+            items: React.PropTypes.objectOf(
               React.PropTypes.shape({
                 name: React.PropTypes.string.isRequired,
                 icon: React.PropTypes.string,
@@ -105,7 +107,9 @@ let ItemPicker = React.createClass({
   },
   handlePick() {
     const {groups} = this.props;
-    this.props.onPick(_map(this.state.picked, (item) => item.payload || groups[item.groupId].items[item.itemId].payload));
+    this.props.onPick(_map(this.state.picked,
+      (item) => item.payload ||
+      (item.itemGroupId ? groups[item.groupId].itemGroups[item.itemGroupId].items[item.itemId].payload : groups[item.groupId].items[item.itemId].payload)));
   },
   handleSearchChange(event) {
     this.setState({'search': event.target.value});
@@ -129,14 +133,14 @@ let ItemPicker = React.createClass({
   render() {
     let {picked, search} = this.state;
     let {itemName, pickVerb, groups, groupName} = this.props;
-    let tolalItemsCount = 0;
+    let totalItemsCount = 0;
     let listItems = _map(groups, (group, groupId) => {
       let {name, icon, items, itemGroups} = group;
       // Initialize an array to collect all of the ListItem components.
       let listItems = [];
       // Convert all of the items in this group into ListItem components.
       let nestedItems = _map(items, (item, itemId) => this.convertItemTolistItem(item, itemId, search, groupId));
-      tolalItemsCount += nestedItems.length;
+      totalItemsCount += nestedItems.length;
       // If there are any nestedItems for this group (after search exclusions),
       // then convert this group to a ListItem component containing the nestedItems.
       if (nestedItems.length !== 0) {
@@ -177,7 +181,7 @@ let ItemPicker = React.createClass({
             />
           ) : null;
         }));
-        tolalItemsCount += totalItemGroupItemsCount;
+        totalItemsCount += totalItemGroupItemsCount;
         // If there are any nestedItemGroups for this group (after search exclusions),
         // then convert this group to a ListItem component containing the nestedItemGroups (along with their nestedItems).
         if (nestedItemGroups.length !== 0) {
@@ -186,7 +190,7 @@ let ItemPicker = React.createClass({
               primaryText={<div> {name} ({totalItemGroupItemsCount} <Pluralise text={itemName}
                                                                                ord={totalItemGroupItemsCount}/>)</div>}
               key={groupId + !!search}
-              initiallyOpen={!!search}
+              initiallyOpen={!!search || _keys(groups).length === 1}
               leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
               primaryTogglesNestedList={true}
               nestedItems={nestedItemGroups}
@@ -202,7 +206,7 @@ let ItemPicker = React.createClass({
         <div className="horizontal stack">
           <div className="grow stack vertical scroll-within">
             <div>
-              <div className="header">{tolalItemsCount} <Pluralise text={itemName} ord={tolalItemsCount}/> available</div>
+              <div className="header">{totalItemsCount} <Pluralise text={itemName} ord={totalItemsCount}/> available</div>
               <div className="search">
                 <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
               </div>

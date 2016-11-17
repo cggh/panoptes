@@ -131,6 +131,7 @@ properties:
 
 - id: int8
   dataType: Int8
+  isCategorical: false
 
 - id: int16
   dataType: Int16
