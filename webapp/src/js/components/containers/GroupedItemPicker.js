@@ -105,7 +105,7 @@ let GroupedItemPicker = React.createClass({
             <div>
               <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
               <div className="search">
-                <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
+                <TextField autoFocus floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
               </div>
             </div>
             <div style={{overflow: 'auto'}}>

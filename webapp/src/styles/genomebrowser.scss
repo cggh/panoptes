@@ -95,6 +95,14 @@
   flex-direction: row;
   align-items: stretch;
   border-bottom: 1px solid $light-primary-color;
+  .legend-element {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    .label {
+      padding-left: 6px;
+    }
+  }
 
   .channel-side {
     position: relative;
@@ -175,15 +183,10 @@
         justify-content: flex-start;
         flex-wrap: wrap;
         padding-right: 16px;
+        padding-top: 6px;
+        padding-bottom: 6px;
         .legend-element {
-          min-height: 26px;
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
           padding-left: 16px;
-          .label {
-            padding-left: 8px;
-          }
         }
       }
       .channel-controls {
@@ -191,6 +194,12 @@
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
+        .control-group {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+        }
         .control {
           min-height: 50px;
           display: flex;
@@ -226,7 +235,8 @@
 }
 
 .side-name {
-  padding: 5px 35px 5px 30px;
+  padding: 5px 0px 5px 30px;
+  max-width: 125px;
 }
 
 .genotypes-table {

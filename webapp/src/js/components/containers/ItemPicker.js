@@ -208,7 +208,7 @@ let ItemPicker = React.createClass({
             <div>
               <div className="header">{totalItemsCount} <Pluralise text={itemName} ord={totalItemsCount}/> available</div>
               <div className="search">
-                <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
+                <TextField autoFocus floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
               </div>
             </div>
             <div style={{overflow: 'auto'}}>

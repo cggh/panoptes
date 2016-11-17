@@ -22,6 +22,8 @@ import DataTableWithActions from 'containers/DataTableWithActions';
 import {categoryColours} from 'util/Colours';
 import LegendElement from 'panoptes/LegendElement';
 import _filter from 'lodash/filter';
+import QueryString from 'panoptes/QueryString';
+import FilterButton from 'panoptes/FilterButton';
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
@@ -41,12 +43,13 @@ let NumericalTrackGroupChannel = React.createClass({
   ],
 
   propTypes: {
+    table: React.PropTypes.string, //If specified limits choices in add/remove and enables query picking
+    query: React.PropTypes.string, //Only used if table specified
     width: React.PropTypes.number,
-    name: React.PropTypes.string,
     sideWidth: React.PropTypes.number,
     children: React.PropTypes.node,
     setProps: React.PropTypes.func,
-    childrenHash: React.PropTypes.number  //Perf
+    childrenHash: React.PropTypes.number  //Perf - passed down to Legend and Side
   },
 
   getInitialState() {
@@ -93,15 +96,25 @@ let NumericalTrackGroupChannel = React.createClass({
     });
   },
 
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
+  },
+
   render() {
-    let {width, sideWidth, children, name, childrenHash} = this.props;
+    let {width, sideWidth, children, table, query, childrenHash} = this.props;
+    if (table) {
+      query = this.getDefinedQuery(query, table);
+    }
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     return (
       <CanvasGroupChannel onTap={this.handleTap} {...this.props}
-                          side={<Side {...this.props} />}
+                          side={<Side {...this.props} setProps={this.redirectedProps.setProps} query={query}/>}
                           onClose={this.redirectedProps.onClose}
                           controls={<NumericalTrackGroupControls {...this.props}
-                                                                 setProps={this.redirectedProps.setProps}/>}
+                                                                 setProps={this.redirectedProps.setProps}
+                                                                 query={query} />}
                           legend={<Legend childrenHash={childrenHash} setProps={this.redirectedProps.setProps}>
                                     {children}
                                   </Legend>}
@@ -110,7 +123,8 @@ let NumericalTrackGroupChannel = React.createClass({
           (child) => React.cloneElement(child, {
             ...this.props,
             width: width - sideWidth,
-            colour: child.props.colour || colourFunc(child.props.track)
+            colour: child.props.colour || colourFunc(child.props.track),
+            query: table ? query : undefined
           }))}
       </CanvasGroupChannel>
     );
@@ -119,22 +133,41 @@ let NumericalTrackGroupChannel = React.createClass({
 
 let Side = React.createClass({
   mixins: [
+    FluxMixin,
+    ConfigMixin,
     PureRenderWithRedirectedProps({
       check: [
-        'name',
+        'table',
+        'query',
         'childrenHash'
       ],
+      redirect: [
+        'setProps'
+      ]
     })
   ],
   render() {
-    let {children, name} = this.props;
+    let {children, query, table} = this.props;
+    children = React.Children.toArray(children);
+    let trackNames = ValidComponentChildren.map(children, (child, i) =>
+      <LegendElement
+        key={child.props.track}
+        name={child.props.track}
+        colour={child.props.colour || colourFunc(child.props.track)}
+        onPickColour={(colour) =>
+          this.redirectedProps.setProps(
+            (props) => props.setIn(['children', i, 'props', 'colour'], colour)
+          )
+        }
+
+    />);
+    if (trackNames.length > 3) {
+      let n = trackNames.length;
+      trackNames = trackNames.slice(0,2).concat(<div>+ {n-2} more</div>)
+    }
     return <div>
-      {name ? name : ValidComponentChildren.map(children, (child) =>
-        <div style={{whiteSpace: 'nowrap'}}>
-          <i className="fa fa-square" style={{color: child.props.colour || colourFunc(child.props.track)}}/>
-          {child.props.track}<br/>
-        </div>
-      )}
+      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural+':' : '')}</div>
+      <div>{trackNames}</div>
     </div>;
   }
 
@@ -182,7 +215,8 @@ let NumericalTrackGroupControls = React.createClass({
         'autoYScale',
         'yMin',
         'yMax',
-        'childrenHash'
+        'childrenHash',
+        'query'
       ],
       redirect: ['setProps']
     })
@@ -195,6 +229,7 @@ let NumericalTrackGroupControls = React.createClass({
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
     setProps: React.PropTypes.func,
+    query: React.PropTypes.string,
     children: React.PropTypes.node
   },
 
@@ -247,68 +282,84 @@ let NumericalTrackGroupControls = React.createClass({
     this.redirectedProps.setProps((props) => props.set('children', Immutable.List(tracks)));
   },
 
+  handleQueryPick(query) {
+    this.redirectedProps.setProps({query});
+  },
+
+
   render() {
-    let {autoYScale, yMin, yMax, children} = this.props;
+    let {autoYScale, yMin, yMax, children, table, query} = this.props;
 
     let actions = this.getFlux().actions;
 
     return (
       <div className="channel-controls">
-        <div className="control">
-          <FlatButton label="Add/Remove Tracks"
-                      primary={true}
-                      onClick={() => actions.session.modalOpen(<ItemPicker
-                        title="Pick tracks to be displayed"
-                        itemName="numerical track"
-                        pickVerb="display"
-                        groups={this.trackGroups()}
-                        initialSelection={React.Children.map(children, (child) => ({
-                          groupId: child.props.table,
-                          itemGroupId: this.config.tablesById[child.props.table].propertiesById[child.props.track].groupId || '_UNGROUPED_',
-                          itemId: child.props.track,
-                        }))}
-                        onPick={this.handleTrackChange}
-                      />)}
-          />
+        <div className="control-group">
+          <div className="control">
+            <FlatButton label="Add/Remove Tracks"
+                        primary={true}
+                        onClick={() => actions.session.modalOpen(<ItemPicker
+                          title="Pick tracks to be displayed"
+                          itemName="numerical track"
+                          pickVerb="display"
+                          groups={this.trackGroups()}
+                          initialSelection={React.Children.map(children, (child) => ({
+                            groupId: child.props.table,
+                            itemGroupId: this.config.tablesById[child.props.table].propertiesById[child.props.track].groupId || '_UNGROUPED_',
+                            itemId: child.props.track,
+                          }))}
+                          onPick={this.handleTrackChange}
+                        />)}
+            />
+          </div>
         </div>
-
-        <div className="control">
-          <div className="label">Auto Y Scale:</div>
-          <Checkbox
-            name="autoYScale"
-            value="toggleValue1"
-            defaultChecked={autoYScale}
-            style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
+        <div className="control-group">
+          {table ? <div className="control">
+            <QueryString prepend="Filter:" table={table} query={query} />
+          </div> : null}
+          {table ? <div className="control">
+            <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+          </div> : null}
         </div>
-        {!autoYScale ? <div className="control">
-          <div className="label">Y Min:</div>
-          <input className="numeric-input"
-                 ref="yMin"
-                 type="number"
-                 value={yMin}
-                 onChange={() => {
-                   let value = parseFloat(this.refs.yMin.value);
-                   if (_isFinite(value))
-                     this.redirectedProps.setProps({yMin: value});
-                 }
-                 }/>
+        <div className="control-group">
+          <div className="control">
+            <div className="label">Auto Y Scale:</div>
+            <Checkbox
+              name="autoYScale"
+              value="toggleValue1"
+              checked={autoYScale}
+              style={{width: 'inherit'}}
+              onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
+          </div>
+          {!autoYScale ? <div className="control">
+            <div className="label">Y Min:</div>
+            <input className="numeric-input"
+                   ref="yMin"
+                   type="number"
+                   value={yMin}
+                   onChange={() => {
+                     let value = parseFloat(this.refs.yMin.value);
+                     if (_isFinite(value))
+                       this.redirectedProps.setProps({yMin: value});
+                   }
+                   }/>
+          </div>
+            : null}
+          {!autoYScale ? <div className="control">
+            <div className="label">Y Max:</div>
+            <input className="numeric-input"
+                   ref="yMax"
+                   type="number"
+                   value={yMax}
+                   onChange={() => {
+                     let value = parseFloat(this.refs.yMax.value);
+                     if (_isFinite(value))
+                       this.redirectedProps.setProps({yMax: value});
+                   }
+                   }/>
+          </div>
+            : null}
         </div>
-          : null}
-        {!autoYScale ? <div className="control">
-          <div className="label">Y Max:</div>
-          <input className="numeric-input"
-                 ref="yMax"
-                 type="number"
-                 value={yMax}
-                 onChange={() => {
-                   let value = parseFloat(this.refs.yMax.value);
-                   if (_isFinite(value))
-                     this.redirectedProps.setProps({yMax: value});
-                 }
-                 }/>
-        </div>
-          : null}
 
       </div>
     );
