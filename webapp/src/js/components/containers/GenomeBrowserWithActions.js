@@ -63,7 +63,11 @@ let GenomeBrowserWithActions = React.createClass({
   },
 
   render() {
-    let {sidebar, setProps, ...subProps} = this.props;
+    let {sidebar, setProps, children, ...subProps} = this.props;
+    //Insert an extra child to hint to the user how to add tracks
+    children = React.Children.toArray(children);
+    children.push(<AddChannelMessage setProps={this.props.setProps}/>);
+
     return (
       <Sidebar
         styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
@@ -78,14 +82,37 @@ let GenomeBrowserWithActions = React.createClass({
               title={sidebar ? 'Expand' : 'Sidebar'}
             />
           </div>
-          <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} />
+          <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} >
+            {children}
+          </GenomeBrowser>
         </div>
       </Sidebar>
     );
   }
 });
 
-let SidebarContent = React.createClass({
+let AddChannelMessage = React.createClass({
+  mixins: [FluxMixin, ConfigMixin],
+
+  shouldComponentUpdate() {
+    return false;
+  },
+  setProps(u) {  //Redirect setProps so we never need to re-render
+    this.props.setProps(u)
+  },
+  render() {
+    return <div className="centering-container"> <div style={{backgroundColor: 'white'}}>
+      <AddChannelsButton setProps={this.setProps}/>
+      {this.config.settings.genomeBrowserChannelSets.length > 0 ?
+        <span> or pick from example channel sets on the sidebar</span>
+        : null
+      }
+    </div></div>;
+  }
+});
+
+
+let AddChannelsButton = React.createClass({
   mixins: [FluxMixin, ConfigMixin],
 
   shouldComponentUpdate() {
@@ -229,6 +256,40 @@ let SidebarContent = React.createClass({
     );
   },
 
+
+  render() {
+    const actions = this.getFlux().actions;
+    return <FlatButton
+      label="Add Channels"
+      primary={true}
+      icon={<Icon fixedWidth={true} name="plus"/>}
+      onClick={() => actions.session.modalOpen(
+        <ItemPicker
+          title="Pick channels to be added"
+          itemName="channel"
+          groupName="group"
+          pickVerb="add"
+          groups={this.channelGroups()}
+          onPick={this.handleChannelAdd}
+        />
+      )}
+    />
+  }
+
+});
+
+
+let SidebarContent = React.createClass({
+  mixins: [FluxMixin, ConfigMixin],
+
+  shouldComponentUpdate() {
+    return false;
+  },
+
+  setProps(u) {  //Redirect setProps so we never need to rerender
+    this.props.setProps(u)
+  },
+
   render() {
     const actions = this.getFlux().actions;
     return <div className="sidebar">
@@ -236,21 +297,7 @@ let SidebarContent = React.createClass({
         icon="bitmap:genomebrowser.png"
         description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."
       />
-      <FlatButton
-        label="Add Channels"
-        primary={true}
-        icon={<Icon fixedWidth={true} name="plus"/>}
-        onClick={() => actions.session.modalOpen(
-          <ItemPicker
-            title="Pick channels to be added"
-            itemName="channel"
-            groupName="group"
-            pickVerb="add"
-            groups={this.channelGroups()}
-            onPick={this.handleChannelAdd}
-          />
-        )}
-      />
+      <AddChannelsButton setProps={this.setProps}/>
       <Divider />
       {this.config.settings.genomeBrowserChannelSets.length ?
         <List>
@@ -263,17 +310,17 @@ let SidebarContent = React.createClass({
                                secondaryText={description}
                                onClick={() => this.props.setProps((props) => props.set('children', Immutable.fromJS(channels)))}
                                rightIconButton={this.config.user.isManager ?
-                                <IconButton
-                                  tooltip="Delete"
-                                  onClick={(e) => actions.api.modifyConfig({
-                                    dataset: this.config.dataset,
-                                    path: `settings.genomeBrowserChannelSets.${i}`,
-                                    action: 'delete'
-                                  })}
-                                >
-                                  <Icon name={'trash-o'} inverse={false} />
-                                </IconButton>
-              : null}
+                                 <IconButton
+                                   tooltip="Delete"
+                                   onClick={(e) => actions.api.modifyConfig({
+                                     dataset: this.config.dataset,
+                                     path: `settings.genomeBrowserChannelSets.${i}`,
+                                     action: 'delete'
+                                   })}
+                                 >
+                                   <Icon name={'trash-o'} inverse={false}/>
+                                 </IconButton>
+                                 : null}
               />
             })
           }
@@ -287,27 +334,29 @@ let SidebarContent = React.createClass({
           icon={<Icon fixedWidth={true} name="floppy-o"/>}
           onClick={() => actions.session.modalOpen(
             <ModalInput
-              inputs={['name','description']}
-              names={['Name','Description']}
+              inputs={['name', 'description']}
+              names={['Name', 'Description']}
               action="save"
               actionIcon="floppy-o"
               onCancel={actions.session.modalClose}
               onAction={({name, description}) => {
                 actions.api.modifyConfig({
-                    dataset: this.config.dataset,
-                    path: 'settings.genomeBrowserChannelSets',
-                    action: 'merge',
-                    content: [{
-                      name,
-                      description,
-                      channels: React.Children.map(this.props.children, serialiseComponent)}]
+                  dataset: this.config.dataset,
+                  path: 'settings.genomeBrowserChannelSets',
+                  action: 'merge',
+                  content: [{
+                    name,
+                    description,
+                    channels: React.Children.map(this.props.children, serialiseComponent)
+                  }]
                 });
                 actions.session.modalClose();
               }}
             />
-        )}
+          )}
         /> : null}
-      <Divider />
+      {this.config.user.isManager ?
+        <Divider /> : null}
       <Subheader>Open tables for:</Subheader>
       {_map(this.config.visibleTables, (table) => {
         if (table.hasGenomePositions || table.isRegionOnGenome) {
