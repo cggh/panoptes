@@ -13,11 +13,6 @@ primKey: SnpName
 sortDefault: Value1               # Specify this property as the default sort field
 
 
-# The following tags set limits on the data volumes that can be queried
-maxCountQueryRecords: 250000      # Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots)
-maxCountQueryAggregated: 1000000  # Defines the maximum number of records that will be queried on the server for aggregation (e.g. for creating histograms)
-
-
 # The following set of tags is used to define the items in this data table as positions on the genome
 isPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
 chromosome: chromosome            # Speficies the table column ID that contains the chromosome
@@ -172,10 +167,8 @@ dataItemViews:
 
 - type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
   name: Map                                            # Name of the view
-  pieChartSize: 1000                                   # Size of the largest pie chart
   mapCenter: {longitude: 10, latitude: 0}             # Start location of the map
   dataType: Fraction                                   # Type of values used to create the pie chart
-  positionOffsetFraction: 0.5                          # An offset between the pie chart location and the actual chart, used to achieve a nice (nonoverlapping) view
   locationDataTable: populations                       # Datatable containing the locations (should have a Longitude & Latitude property)
   locationSizeProperty: SampleCount                    # Property of the locations datatable containing the size of the pie chart
   locationNameProperty: Name                           # Property of the locations datatable containing the name of the pie chart
