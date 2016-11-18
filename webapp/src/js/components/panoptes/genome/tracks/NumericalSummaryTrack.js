@@ -289,7 +289,7 @@ let NumericalSummaryTrack = React.createClass({
     });
     ctx.fillStyle = Color(colour).clearer(0.8).rgbString();
     ctx.fill();
-    ctx.strokeStyle = Color(colour).clearer(0.5).rgbString()
+    ctx.strokeStyle = Color(colour).clearer(0.5).rgbString();
     ctx.stroke();
   },
 

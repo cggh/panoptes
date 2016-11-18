@@ -15,6 +15,7 @@ import _last from 'lodash/last';
 import _some from 'lodash/some';
 import _takeRight from 'lodash/takeRight';
 import _unique from 'lodash/uniq';
+import _isFinite from 'lodash/isFinite';
 
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -35,6 +36,7 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import NumericInput from 'ui/NumericInput';
 import Icon from 'ui/Icon';
 import queryToString from 'util/queryToString';
+import {Motion, spring} from 'react-motion';
 
 const FAN_HEIGHT = 60;
 
@@ -414,6 +416,14 @@ let GenotypesChannel = React.createClass({
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
     const numRows = rowData ? rowData.id.shape[0] : 0;
+
+    let initColWidthSpring = {
+      colWidth: _isFinite(colWidth) ? colWidth : null,
+    };
+    let colWidthSpring = {
+      colWidth: spring(initColWidthSpring.colWidth),
+    };
+
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -436,30 +446,35 @@ let GenotypesChannel = React.createClass({
         legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
       >
-        <GenotypesFan
-          genomicPositions={genomicPositions}
-          layoutBlocks={layoutBlocks}
-          dataBlocks={dataBlocks}
-          width={width - sideWidth}
-          height={FAN_HEIGHT}
-          start={start}
-          end={end}
-          colWidth={colWidth}/>
-        <GenotypesTable
-          table={table}
-          rowData={rowData}
-          dataBlocks={dataBlocks}
-          layoutBlocks={layoutBlocks}
-          width={width - sideWidth}
-          height={rowHeight * numRows}
-          start={start}
-          end={end}
-          colWidth={colWidth}
-          cellColour={cellColour}
-          cellAlpha={cellAlpha}
-          cellHeight={cellHeight}
-          rowHeight={rowHeight}
-        />
+        <Motion style={colWidthSpring} defaultStyle={initColWidthSpring}>
+          {(interpolated) => {
+            let {colWidth} = interpolated;
+            return <div>
+              <GenotypesFan
+              genomicPositions={genomicPositions}
+              layoutBlocks={layoutBlocks}
+              dataBlocks={dataBlocks}
+              width={width - sideWidth}
+              height={FAN_HEIGHT}
+              start={start}
+              end={end}
+              colWidth={colWidth}/>
+              <GenotypesTable
+                table={table}
+                rowData={rowData}
+                dataBlocks={dataBlocks}
+                layoutBlocks={layoutBlocks}
+                width={width - sideWidth}
+                height={rowHeight * numRows}
+                start={start}
+                end={end}
+                colWidth={colWidth}
+                cellColour={cellColour}
+                cellAlpha={cellAlpha}
+                cellHeight={cellHeight}
+                rowHeight={rowHeight}/>
+            </div>;
+            }}</Motion>
       </ChannelWithConfigDrawer>);
   }
 });
