@@ -199,14 +199,15 @@
           align-items: center;
           justify-content: flex-start;
           flex-wrap: wrap;
+          padding-left: 10px;
         }
         .control {
           min-height: 50px;
           display: flex;
           align-items: center;
           justify-content: flex-start;
+          padding-left: 10px;
           .label {
-            padding-left: 10px;
             padding-right: 5px;
           }
           .dropdown {

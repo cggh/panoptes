@@ -581,87 +581,98 @@ const GenotypesControls = React.createClass({
     const config = this.config.twoDTablesById[table];
     return (
       <div className="channel-controls">
-        <div className="control">
-          <FilterButton table={config.columnDataTable} query={columnQuery}
-                        name={this.config.tablesById[config.columnDataTable].capNamePlural}
-                        onPick={(columnQuery) => this.redirectedProps.setProps({columnQuery})}/>
+        <div className="control-group">
+          <div className="control">
+            <FilterButton table={config.columnDataTable} query={columnQuery}
+                          name={this.config.tablesById[config.columnDataTable].capNamePlural}
+                          onPick={(columnQuery) => this.redirectedProps.setProps({columnQuery})}/>
+          </div>
         </div>
         <div className="control">
-          <FilterButton table={config.rowDataTable} query={rowQuery}
-                        name={this.config.tablesById[config.rowDataTable].capNamePlural}
-                        onPick={(rowQuery) => this.redirectedProps.setProps({rowQuery})}/>
+          <div className="control-group">
+            <FilterButton table={config.rowDataTable} query={rowQuery}
+                          name={this.config.tablesById[config.rowDataTable].capNamePlural}
+                          onPick={(rowQuery) => this.redirectedProps.setProps({rowQuery})}/>
+          </div>
         </div>
-        <div className="control">
-          <FlatButton label="Download data"
-                      primary={true}
-                      onClick={() => this.handleDownload()}
-                      icon={<Icon fixedWidth={true} name="download"/>}
-          />
+        <div className="control-group">
+          <div className="control">
+            <FlatButton label="Download data"
+                        primary={true}
+                        onClick={() => this.handleDownload()}
+                        icon={<Icon fixedWidth={true} name="download"/>}
+            />
+          </div>
         </div>
-        <div className="control">
-          <PropertySelector table={config.rowDataTable}
-                            value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
-                            label="Row Label"
-                            onSelect={(rowLabel) => this.redirectedProps.setProps({
+        <div className="control-group">
+          <div className="control">
+            <PropertySelector table={config.rowDataTable}
+                              value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
+                              label="Row Label"
+                              onSelect={(rowLabel) => this.redirectedProps.setProps({
                               rowLabel,
                               rowSort: rowSort || rowLabel
                             })}/>
+          </div>
+          <div className="control">
+            <PropertySelector table={config.rowDataTable}
+                              value={rowSort}
+                              label="Row Sort"
+                              allowNull={true}
+                              onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
+          </div>
+          <div className="control">
+            <NumericInput debounce width={3} label="Row Height" value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
+          </div>
         </div>
-        <div className="control">
-          <PropertySelector table={config.rowDataTable}
-                            value={rowSort}
-                            label="Row Sort"
-                            allowNull={true}
-                            onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
+        <div className="control-group">
+          <div className="control">
+            <NumericInput debounce width={5} label="Page Size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
+          </div>
+          <div className="control">
+            <NumericInput debounce width={3} label="Page" value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
+          </div>
         </div>
-        <div className="control">
-          <NumericInput value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
+        <div className="control-group">
+          <div className="control">
+            <SelectField value={cellColour}
+                         autoWidth={true}
+                         floatingLabelText="Cell Colour"
+                         onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
+              <MenuItem value="call" primaryText="Call"/>
+              <MenuItem value="fraction" primaryText="Ref fraction"/>
+            </SelectField>
+          </div>
+          <div className="control">
+            <SelectField value={cellAlpha}
+                         autoWidth={true}
+                         floatingLabelText="Cell Opacity"
+                         onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
+              <MenuItem value="none" primaryText="None"/>
+              {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
+                                                                                  primaryText={config.propertiesById[prop].name}/>)}
+            </SelectField>
+          </div>
+          <div className="control">
+            <SelectField value={cellHeight}
+                         autoWidth={true}
+                         floatingLabelText="Cell Height"
+                         onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
+              <MenuItem value="none" primaryText="None"/>
+              {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
+                                                                                  primaryText={config.propertiesById[prop].name}/>)}
+            </SelectField>
+          </div>
         </div>
-        <div className="control">
-          <NumericInput value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
-        </div>
-        <div className="control">
-          <NumericInput value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
-        </div>
-        <div className="control">
-          <SelectField style={{width: '140px'}}
-                       value={cellColour}
-                       autoWidth={true}
-                       floatingLabelText="Cell Colour"
-                       onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
-            <MenuItem value="call" primaryText="Call"/>
-            <MenuItem value="fraction" primaryText="Ref fraction"/>
-          </SelectField>
-        </div>
-        <div className="control">
-          <SelectField style={{width: '256px'}}
-                       value={cellAlpha}
-                       autoWidth={true}
-                       floatingLabelText="Cell Opacity"
-                       onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
-            <MenuItem value="none" primaryText="None"/>
-            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
-                                                                                primaryText={config.propertiesById[prop].name}/>)}
-          </SelectField>
-        </div>
-        <div className="control">
-          <SelectField style={{width: '256px'}}
-                       value={cellHeight}
-                       autoWidth={true}
-                       floatingLabelText="Cell Height"
-                       onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
-            <MenuItem value="none" primaryText="None"/>
-            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
-                                                                                primaryText={config.propertiesById[prop].name}/>)}
-          </SelectField>
-        </div>
-        <div className="control">
-          <div className="label">Space columns:</div>
-          <Checkbox
-            name="layoutGaps"
-            defaultChecked={layoutGaps}
-            style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.setProps({layoutGaps: checked})}/>
+        <div className="control-group">
+          <div className="control">
+            <div className="label">Space columns:</div>
+            <Checkbox
+              name="layoutGaps"
+              defaultChecked={layoutGaps}
+              style={{width: 'inherit'}}
+              onCheck={(e, checked) => this.redirectedProps.setProps({layoutGaps: checked})}/>
+          </div>
         </div>
 
       </div>
