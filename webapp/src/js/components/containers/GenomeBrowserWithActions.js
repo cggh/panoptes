@@ -308,6 +308,7 @@ let SidebarContent = React.createClass({
               return <ListItem key={i}
                                primaryText={name}
                                secondaryText={description}
+                               secondaryTextLines={2}
                                onClick={() => this.props.setProps((props) => props.set('children', Immutable.fromJS(channels)))}
                                rightIconButton={this.config.user.isManager ?
                                  <IconButton
