@@ -20,7 +20,7 @@ export function findBlock({start, end, width}) {
     blockLevel,
     blockIndex,
     needNext: end >= Math.pow(2.0, blockLevel) + Math.pow(2.0, blockLevel) * blockIndex,
-    summaryWindow: Math.max(16, Math.pow(2.0, Math.ceil(Math.log(blockSize / (width/2)) / Math.log(2))))
+    summaryWindow: Math.max(1, Math.pow(2.0, Math.ceil(Math.log(blockSize / (width/2)) / Math.log(2))))
   };
 }
 
