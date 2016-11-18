@@ -35,7 +35,7 @@ let NumericalSummaryTrack = React.createClass({
     }),
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'start', 'end', 'table,', 'track', 'width', 'height', 'yMin', 'yMax', 'autoYScale')
+    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'track', 'width', 'height', 'yMin', 'yMax', 'autoYScale')
   ],
 
   propTypes: {
@@ -52,6 +52,7 @@ let NumericalSummaryTrack = React.createClass({
     onYLimitChange: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string,
     onChangeLoadStatus: React.PropTypes.func,
   },
 
@@ -74,10 +75,11 @@ let NumericalSummaryTrack = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(nextProps, requestContext) {
-    let {chromosome, start, end, width, table, track, autoYScale} = nextProps;
+    let {chromosome, start, end, width, table, query, track, autoYScale} = nextProps;
     const tableConfig = this.config.tablesById[table];
     if (this.props.chromosome !== chromosome ||
       this.props.track !== track ||
+      this.props.query !== query ||
       this.props.table !== table) {
       this.applyData(nextProps, []);
     }
@@ -96,6 +98,7 @@ let NumericalSummaryTrack = React.createClass({
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
        this.props.track !== track ||
+       this.props.query !== query ||
        this.props.table !== table ||
        !(this.blockLevel === blockLevel
          && this.blockIndex === blockIndex
@@ -115,7 +118,7 @@ let NumericalSummaryTrack = React.createClass({
         {expr: ['min', [track]], as: 'min'},
         {expr: ['max', [track]], as: 'max'}
       ];
-      const query = SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome);
+      query = SQL.WhereClause.AND([query ? SQL.WhereClause.decode(query) : SQL.WhereClause.Trivial(), SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome)]);
       let APIargs = {
         database: this.config.dataset,
         table,

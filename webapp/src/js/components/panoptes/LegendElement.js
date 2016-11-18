@@ -4,6 +4,7 @@ import ColourPicker from 'ui/ColourPicker';
 import FluxMixin from 'mixins/FluxMixin';
 import {colours} from 'util/Colours';
 import Tooltip from 'rc-tooltip';
+import TooltipEllipsis from 'ui/TooltipEllipsis';
 
 let LegendElement = React.createClass({
   mixins: [
@@ -34,7 +35,6 @@ let LegendElement = React.createClass({
 
   render() {
     const {name, colour, onPickColour} = this.props;
-    let actions = this.getFlux().actions;
     return (
       <div className="legend-element" key={name}>
         <Tooltip placement={'bottom'}
@@ -44,13 +44,11 @@ let LegendElement = React.createClass({
                    colours={colours}
                    onPick={this.handlePickColour}
                    />}>
-          <svg width="14" height="26" style={{cursor: onPickColour ? 'pointer' : 'inherit'}}>
-            <rect x="0" y="6" width="14" height="14" style={{fill: colour}}/>
-          </svg>
+          <i className="fa fa-square" style={{color: colour, cursor:(onPickColour ? 'pointer' : 'inherit')}}/>
         </Tooltip>
-        <div className="label">
+        <TooltipEllipsis className="label">
           {name}
-        </div>
+        </TooltipEllipsis>
       </div>
     );
   }

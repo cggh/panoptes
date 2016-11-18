@@ -136,7 +136,7 @@ let AddChannelsButton = React.createClass({
         //_UNGROUPED_ items will be placed above groups in the picker
         let undefinedPropertyGroupId = '_UNGROUPED_';
         _forEach(
-          _filter(table.properties, (prop) => prop.id !== table.chromosome && prop.id !== table.position),
+          _filter(table.properties, (prop) => prop.showInBrowser && prop.id !== table.chromosome && prop.id !== table.position),
           (prop) => {
             let definedPropertyGroupId = prop.groupId !== undefined ? prop.groupId : undefinedPropertyGroupId;
             // If this propertyGroup hasn't been created yet, create it.
@@ -146,7 +146,7 @@ let AddChannelsButton = React.createClass({
                 items: []
               };
             }
-            if (prop.showInBrowser && (prop.isCategorical || prop.isBoolean)) {
+            if (prop.isCategorical || prop.isBoolean) {
               // If this property is showInBrowser and either categorical or boolean,
               // then add it with a CategoricalChannel component payload.
               propertiesByPropertyGroupId[definedPropertyGroupId].items.push({
@@ -156,14 +156,14 @@ let AddChannelsButton = React.createClass({
                 payload: serialiseComponent(<CategoricalChannel name={prop.name} table={table.id} track={prop.id}/>)
               });
 
-            } else if (prop.showInBrowser && prop.isNumerical) {
+            } else if (prop.isNumerical) {
               // Otherwise, if this property is showInBrowser and numerical,
               // then add it with a NumericalTrackGroupChannel component payload.
               propertiesByPropertyGroupId[definedPropertyGroupId].items.push({
                 name: prop.name,
                 description: prop.description,
                 icon: prop.icon,
-                payload: serialiseComponent(<NumericalTrackGroupChannel>
+                payload: serialiseComponent(<NumericalTrackGroupChannel table={table.id}>
                   <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id}/>
                 </NumericalTrackGroupChannel>)
               });

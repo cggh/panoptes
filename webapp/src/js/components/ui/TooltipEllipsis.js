@@ -11,9 +11,14 @@ let TooltipEllipsis = React.createClass({
     children: React.PropTypes.any
   },
 
+  componentDidMount() {
+    this.componentDidUpdate();
+  },
+
   componentDidUpdate() {
-    if (this.element.offsetWidth < this.element.scrollWidth)
+    if (this.element.offsetWidth < this.element.scrollWidth) {
       this.element.title = this.props.children;
+    }
   },
 
   render() {
