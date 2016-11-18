@@ -81,14 +81,14 @@ properties:
   showBar: true                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
   minVal: 0                       # Optional: For Value types, specifies the minimum value that can be reached.
   maxVal: 1                       # Optional: For Value types, specifies the maximum value that can be reached.
-  channelColor: rgb(0,80,200)     # Colour used to display this property
+  colour: rgb(0,80,200)     # Colour used to display this property
   browserDefaultVisible: true
 
 - id: Value2
   name: Value 2
   dataType: Float
   description: The second numerical value
-  channelColor: rgb(200,80,0)
+  colour: rgb(200,80,0)
 
 - id: Value_three                   # NOTE: datatable file column headers can contain whitespaces, but these will be replaced by underscores during import. The identifiers in the settings files should also replace the whitespaces by underscores.
   name: Value 3
