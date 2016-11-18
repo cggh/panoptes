@@ -25,7 +25,7 @@ properties:
 - id: Uniqueness
   name: Uniqueness
   description: How unique this region is compared to the rest of the genome
-  channelColor: rgb(255,0,0)
+  colour: rgb(255,0,0)
   dataType: Int16
   minVal: 0
   maxVal: 200

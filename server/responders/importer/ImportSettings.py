@@ -209,12 +209,10 @@ class ImportSettings:
                                    'description': 'Indicates that the track will be shown in the top (non-scrolling) area of the genome browser.\n  In this case, it will always be visible ',
                                    'siblingOptional': { 'name': 'showInBrowser', 'value': True}
                                    }),
-                            ('channelColor', {
+                            ('colour', {
                                    'type': 'Text',
                                    'required': False,
-                                   'default': 'rgb(0,0,0)',
-                                   'description': 'Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``\n  ',
-                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True}
+                                   'description': 'Colour used to display this property. Formatted as ``"rgb(r,g,b)"`` or ``"#HHHHHH"``\n  ',
                                    }),
                             ('defaultVisible', {
                                                 'type': 'Boolean',

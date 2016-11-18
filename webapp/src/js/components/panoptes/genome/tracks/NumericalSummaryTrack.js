@@ -249,7 +249,7 @@ let NumericalSummaryTrack = React.createClass({
           lastWindow = window[i];
         }
       });
-      ctx.fillStyle = Color(colour).clearer(0.8).rgbString();
+      ctx.fillStyle = Color(colour).clearer(0.9).rgbString();
       ctx.fill();
     }
     let lastPointNull = true;

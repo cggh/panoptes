@@ -108,9 +108,18 @@ let NumericalTrackGroupChannel = React.createClass({
       query = this.getDefinedQuery(query, table);
     }
     children = filterChildren(this, children, ALLOWED_CHILDREN);
+    children = React.Children.map(children,
+          (child) => React.cloneElement(child, {
+            ...this.props,
+            width: width - sideWidth,
+            colour: child.props.colour || this.tableConfig().propertiesById[child.props.track].colour || colourFunc(child.props.track),
+            query: table ? query : undefined
+          }));
     return (
       <CanvasGroupChannel onTap={this.handleTap} {...this.props}
-                          side={<Side {...this.props} setProps={this.redirectedProps.setProps} query={query}/>}
+                          side={<Side {...this.props} setProps={this.redirectedProps.setProps} query={query}>
+                            {children}
+                            </Side>}
                           onClose={this.redirectedProps.onClose}
                           controls={<NumericalTrackGroupControls {...this.props}
                                                                  setProps={this.redirectedProps.setProps}
@@ -119,13 +128,7 @@ let NumericalTrackGroupChannel = React.createClass({
                                     {children}
                                   </Legend>}
         >
-        {React.Children.map(children,
-          (child) => React.cloneElement(child, {
-            ...this.props,
-            width: width - sideWidth,
-            colour: child.props.colour || colourFunc(child.props.track),
-            query: table ? query : undefined
-          }))}
+        {children}
       </CanvasGroupChannel>
     );
   }
@@ -153,7 +156,7 @@ let Side = React.createClass({
       <LegendElement
         key={child.props.track}
         name={child.props.track}
-        colour={child.props.colour || colourFunc(child.props.track)}
+        colour={child.props.colour}
         onPickColour={(colour) =>
           this.redirectedProps.setProps(
             (props) => props.setIn(['children', i, 'props', 'colour'], colour)
@@ -192,7 +195,7 @@ let Legend = React.createClass({
         (child, i) => <LegendElement
           key={child.props.track}
           name={child.props.track}
-          colour={child.props.colour || colourFunc(child.props.track)}
+          colour={child.props.colour}
           onPickColour={(colour) =>
             this.redirectedProps.setProps(
               (props) => props.setIn(['children', i, 'props', 'colour'], colour)
