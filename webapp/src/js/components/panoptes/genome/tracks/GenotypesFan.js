@@ -99,6 +99,13 @@ let GenotypesFan = React.createClass({
       ctx.fillStyle = 'rgb(0,0,0)';
       ctx.strokeStyle = 'rgba(0,0,0,0.2)';
       ctx.lineWidth = 1;
+      //Reduce the width if things are big
+      let drawPixColWidth = pixColWidth;
+      if (pixColWidth > 120) {
+        drawPixColWidth = 120;
+      } else if (pixColWidth > 40) {
+        drawPixColWidth = pixColWidth - 2;
+      }
       for (let i = 0, iend = layoutBlocks.length; i < iend; ++i) {
         const [blockStart, blockEnd, colStart] = layoutBlocks[i];
         for (let j = blockStart, jCol = colStart + 0.5; j < blockEnd; ++j, ++jCol) {
@@ -111,14 +118,14 @@ let GenotypesFan = React.createClass({
           // }
           ctx.fillStyle = colour;
           const spos = jCol * pixColWidth;
-          let middle = pixColWidth / 2;
+          let middle = drawPixColWidth / 2;
 
           ctx.save();
           ctx.translate(spos - middle, height);
           ctx.beginPath();
           ctx.moveTo(0, 0);
           ctx.bezierCurveTo(0, -10, middle, -10, middle, -HAT_HEIGHT);
-          ctx.bezierCurveTo(middle, -10, pixColWidth, -10, pixColWidth, 0);
+          ctx.bezierCurveTo(middle, -10, drawPixColWidth, -10, drawPixColWidth, 0);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();

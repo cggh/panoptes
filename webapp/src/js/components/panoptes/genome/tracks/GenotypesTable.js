@@ -97,6 +97,7 @@ let GenotypesTable = React.createClass({
       offscreenCanvas.width = rowLen;
       offscreenCanvas.height = colShape[0] * rowHeight;
       let ctx = offscreenCanvas.getContext('2d');
+
       function draw(x) {
         for (let y = 0, iEnd = colShape[0]; y < iEnd; y++) {
           const index = y * rowLen + x;
@@ -130,9 +131,11 @@ let GenotypesTable = React.createClass({
           ctx.fillRect(x, (y * rowHeight) + ((1 - height) * rowHeight * 0.5), 1, height * rowHeight);
         }
       }
+
       function update() {
-          this.paint(this.refs.gridCanvas, this.refs.overlayCanvas);
+        this.paint(this.refs.gridCanvas, this.refs.overlayCanvas);
       }
+
       chunkedMap([0, rowLen], draw, update, 100, 50, this);
       block.len = rowLen || 0;
       block.cache = offscreenCanvas;
@@ -179,6 +182,7 @@ let GenotypesTable = React.createClass({
           const source = currentDataBlock.cache;
           gCtx.drawImage(source, sourceStart, 0, sourceWidth, source.height, //Source params
             colStart * pixColWidth, 0, sourceWidth * pixColWidth, source.height); //Destination params
+          this.drawColumnGaps(gCtx, sourceWidth, colStart, source.height);
           this.drawOverlay(oCtx, currentDataBlock, sourceStart, sourceWidth, colStart);
           if (blockEnd - dataBlockOffset > currentDataBlock.len) {  //Not all was drawn, need to go to next data
             blockStart += sourceWidth;
@@ -187,6 +191,24 @@ let GenotypesTable = React.createClass({
             break;
           }
         }
+      }
+    }
+  },
+
+  drawColumnGaps(ctx, sourceWidth, colStart, height) {
+    const {width, start, end, colWidth} = this.props;
+    const pixColWidth = colWidth * (width / (end - start));
+    //Draw some gaps if the columns are wide
+    let drawPixColWidth = pixColWidth;
+    if (pixColWidth > 120) {
+      drawPixColWidth = 120;
+    } else if (pixColWidth > 40) {
+      drawPixColWidth = pixColWidth - 2;
+    }
+    let gapWidth = pixColWidth - drawPixColWidth;
+    if (gapWidth > 0) {
+      for (let i = 0; i < sourceWidth + 1; ++i) {
+        ctx.clearRect(((colStart + i) * pixColWidth) - (gapWidth / 2), 0, gapWidth, height);
       }
     }
   },
