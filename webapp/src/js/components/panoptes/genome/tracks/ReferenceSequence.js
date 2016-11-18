@@ -13,9 +13,16 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import LegendElement from 'panoptes/LegendElement';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
-
+import FlatButton from 'material-ui/FlatButton';
+import Tooltip from 'rc-tooltip';
 
 const HEIGHT = 26;
+const SEQ_LOOKUP = {
+  97: 'A',
+  116: 'T',
+  99: 'C',
+  103: 'G'
+};
 
 let ReferenceSequence = React.createClass({
   mixins: [
@@ -65,8 +72,7 @@ let ReferenceSequence = React.createClass({
 
     const {blockLevel, blockIndex, needNext, summaryWindow} = findBlock({start, end, width});
     //If we already at this block then don't change it!
-    if (this.props.chromosome !== chromosome ||
-      !(this.blockLevel === blockLevel
+    if (this.props.chromosome !== chromosome || !(this.blockLevel === blockLevel
         && this.blockIndex === blockIndex
         && this.needNext === needNext
         && this.requestSummaryWindow === summaryWindow
@@ -156,31 +162,31 @@ let ReferenceSequence = React.createClass({
     for (let i = 0, iEnd = sequence.length; i < iEnd; ++i) {
       data[i * 4 + 3] = 255;
       switch (sequence[i]) {
-      case 97: //a
-        data[i * 4] = 255;
-        data[i * 4 + 1] = 50;
-        data[i * 4 + 2] = 50;
-        break;
-      case 116: //t
-        data[i * 4] = 255;
-        data[i * 4 + 1] = 170;
-        data[i * 4 + 2] = 0;
-        break;
-      case 99: //c
-        data[i * 4] = 0;
-        data[i * 4 + 1] = 128;
-        data[i * 4 + 2] = 192;
-        break;
-      case 103: //g
-        data[i * 4] = 0;
-        data[i * 4 + 1] = 192;
-        data[i * 4 + 2] = 120;
-        break;
-      default:
-        data[i * 4] = 0;
-        data[i * 4 + 1] = 0;
-        data[i * 4 + 2] = 0;
-        break;
+        case 97: //a
+          data[i * 4] = 255;
+          data[i * 4 + 1] = 50;
+          data[i * 4 + 2] = 50;
+          break;
+        case 116: //t
+          data[i * 4] = 255;
+          data[i * 4 + 1] = 170;
+          data[i * 4 + 2] = 0;
+          break;
+        case 99: //c
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 128;
+          data[i * 4 + 2] = 192;
+          break;
+        case 103: //g
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 192;
+          data[i * 4 + 2] = 120;
+          break;
+        default:
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 0;
+          data[i * 4 + 2] = 0;
+          break;
       }
     }
     ctx.putImageData(imageData, 0, 0);
@@ -218,12 +224,6 @@ let ReferenceSequence = React.createClass({
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = '14px Roboto,sans-serif';
-    const lookup = {
-      97: 'A',
-      116: 'T',
-      99: 'C',
-      103: 'G'
-    };
     const maxDraw = canvas.width + 15;
     this.blocks.forEach((block) => {
       if (block.cache) {
@@ -235,12 +235,33 @@ let ReferenceSequence = React.createClass({
           for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
             const x = xScaleFactor * (block._blockStart - start) + ((i + 1) * pixelWindowSize);
             if (x > 0 && x < maxDraw) {
-              ctx.fillText(lookup[base[i]] || '', x, HEIGHT / 2);
+              ctx.fillText(SEQ_LOOKUP[base[i]] || '', x, HEIGHT / 2);
             }
           }
         }
       }
     });
+  },
+
+  getSeq() {
+    if (this.summaryWindow === 1) {
+      let seq = '';
+      const {start, end, width, sideWidth} = this.props;
+      const xScaleFactor = (width - sideWidth) / (end - start);
+      const pixelWindowSize = this.summaryWindow * xScaleFactor;
+      this.blocks.forEach((block) => {
+        const base = block.base.array;
+        for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
+          const x = xScaleFactor * (block._blockStart - start) + ((i + 1) * pixelWindowSize);
+          if (x > 0 && x < width - sideWidth) {
+            seq = seq + SEQ_LOOKUP[base[i]] || 'N';
+          }
+        }
+      });
+      return seq;
+    } else {
+      return 'Zoom in until sequence is not summarised'
+    }
   },
 
   render() {
@@ -251,7 +272,7 @@ let ReferenceSequence = React.createClass({
         width={width}
         sideWidth={sideWidth}
         sideComponent={<div className="side-name">Ref. Seq.</div>}
-        legendComponent={<Legend/>}
+        legendComponent={<Legend getSeq={this.getSeq}/>}
       >
         <canvas ref="canvas" width={width - sideWidth} height={HEIGHT}/>
       </ChannelWithConfigDrawer>
@@ -261,23 +282,38 @@ let ReferenceSequence = React.createClass({
 });
 
 let Legend = React.createClass({
-  shouldComponentUpdate() {
-    return false;
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.seq !== this.state.seq;
+  },
+
+  getInitialState() {
+    return {seq:''};
   },
 
   render() {
     return <div className="legend">
-    {[
-      ['A', 'rgb(255, 50, 50)'],
-      ['T', 'rgb(255, 170, 0)'],
-      ['C', 'rgb(0, 128, 192)'],
-      ['G', 'rgb(0, 192, 120)'],
-      ['N', 'rgb(0,0,0)']
-    ].map(([base, colour]) => (
-     <LegendElement key={base} name={base} colour={colour} />
-    ))}
-    <div style={{paddingLeft: '10px'}}>(Majority base over window)</div>
-  </div>;
+      {[
+        ['A', 'rgb(255, 50, 50)'],
+        ['T', 'rgb(255, 170, 0)'],
+        ['C', 'rgb(0, 128, 192)'],
+        ['G', 'rgb(0, 192, 120)'],
+        ['N', 'rgb(0,0,0)']
+      ].map(([base, colour]) => (
+        <LegendElement key={base} name={base} colour={colour}/>
+      ))}
+      <div style={{paddingLeft: '10px'}}>(Majority base over window)</div>
+      <Tooltip placement={'bottom'}
+               trigger={'click'}
+               overlay={<div style={{overflowWrap: 'break-word', overflow:'auto', maxWidth:'500px'}}>{this.state.seq}</div>}>
+        <FlatButton
+          label="Copy sequence"
+          primary={true}
+          onClick={() => this.setState({seq: this.props.getSeq()})}
+        />
+      </Tooltip>
+
+
+    </div>;
   }
 });
 

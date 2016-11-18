@@ -94,7 +94,8 @@ let NumericalSummaryTrack = React.createClass({
       ErrorReport(this.getFlux(), `${table}/${track} is not a valid numerical summary track`);
       return;
     }
-    const {blockLevel, blockIndex, needNext, summaryWindow} = findBlock({start, end, width});
+    let {blockLevel, blockIndex, needNext, summaryWindow} = findBlock({start, end, width});
+    summaryWindow = Math.max(16, summaryWindow);
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
        this.props.track !== track ||
