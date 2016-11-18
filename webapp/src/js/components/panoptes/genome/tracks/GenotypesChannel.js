@@ -622,21 +622,20 @@ const GenotypesControls = React.createClass({
                               onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
           </div>
           <div className="control">
-            <NumericInput value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
+            <NumericInput debounce width={3} label="Row Height" value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
           </div>
         </div>
         <div className="control-group">
           <div className="control">
-            <NumericInput value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
+            <NumericInput debounce width={5} label="Page Size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
           </div>
           <div className="control">
-            <NumericInput value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
+            <NumericInput debounce width={3} label="Page" value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
           </div>
         </div>
         <div className="control-group">
           <div className="control">
-            <SelectField style={{width: '140px'}}
-                         value={cellColour}
+            <SelectField value={cellColour}
                          autoWidth={true}
                          floatingLabelText="Cell Colour"
                          onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
@@ -645,8 +644,7 @@ const GenotypesControls = React.createClass({
             </SelectField>
           </div>
           <div className="control">
-            <SelectField style={{width: '256px'}}
-                         value={cellAlpha}
+            <SelectField value={cellAlpha}
                          autoWidth={true}
                          floatingLabelText="Cell Opacity"
                          onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
@@ -656,8 +654,7 @@ const GenotypesControls = React.createClass({
             </SelectField>
           </div>
           <div className="control">
-            <SelectField style={{width: '256px'}}
-                         value={cellHeight}
+            <SelectField value={cellHeight}
                          autoWidth={true}
                          floatingLabelText="Cell Height"
                          onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>

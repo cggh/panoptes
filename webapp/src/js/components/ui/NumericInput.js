@@ -1,7 +1,8 @@
 import _isFinite from 'lodash/isFinite';
-import classnames from 'classnames';
+import _debounce from 'lodash/debounce';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
+import TextField from 'material-ui/TextField';
 
 
 let NumericInput = React.createClass({
@@ -10,55 +11,71 @@ let NumericInput = React.createClass({
   ],
 
   propTypes: {
+    label: React.PropTypes.string,
     value: React.PropTypes.number,
+    debounce: React.PropTypes.bool,
     onChange: React.PropTypes.func.isRequired
   },
 
+  getDefaultProps() {
+    return {
+      width: 6,
+      debounce: false
+    }
+  },
+
+  getInitialState() {
+    return {
+      value: this.props.value.toString(),
+      error: undefined
+    }
+  },
 
   componentWillMount() {
-    this.setFromProps(this.props);
+    this.debouncedNotify = _debounce(this.notify, 500);
   },
 
   componentWillReceiveProps(nextProps) {
-    this.setFromProps(nextProps);
-  },
-
-  setFromProps(props) {
-    let {value} = props;
-    try {
-      this.setState({
-        text: value.toString(),
-        valid: true
-      });
-    } catch (e) {
-      this.setState({
-        text: value,
-        valid: false
-      });
+    let focused = this.textField.state.isFocused;
+    if (!focused) {
+      this.setState({value: nextProps.value.toString()})
     }
   },
 
-  handleChange() {
-    let text = this.refs.input.value;
-    this.setState({text});
-    let number = parseInt(text);
-    if (_isFinite(number)) {
-      this.setState({valid: true});
-      this.props.onChange(number);
-      return;
+  notify(value) {
+    this.props.onChange(value)
+  },
+
+  handleChange(event) {
+    let value = event.target.value;
+    let valueNumber = parseFloat(value);
+    let error = undefined;
+    if (_isFinite(valueNumber)) {
+      (this.props.debounce ? this.debouncedNotify : this.notify)(valueNumber)
+    } else {
+      error = "Not a number";
     }
-    this.setState({valid: false});
+    this.setState({value, error});
+  },
+
+  handleBlur() {
+    this.setState({value: this.props.value.toString()});
   },
 
   render() {
-    let {text, valid} = this.state;
+    let {label, width} = this.props;
+    let {error, value} = this.state;
     return (
-          <input className={classnames({wide: true, invalid: !valid})}
-                 ref="input"
-                 type="number"
-                 spellCheck="false"
-                 value={text}
-                 onChange={this.handleChange}/>
+        <TextField
+          type="number"
+          style={{width: `${width * 30}px`}}
+          ref={(node) => this.textField = node}
+          floatingLabelText={label}
+          errorText={error}
+          value={value}
+          onBlur={this.handleBlur}
+          onChange={this.handleChange}
+        />
     );
   }
 });

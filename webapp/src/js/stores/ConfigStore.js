@@ -162,13 +162,13 @@ const ConfigStore = Fluxxor.createStore({
       // Human friendly data type string  - this is legacy and can be removed as all using sites have type info available
       prop.dispDataType = 'Text';
       prop.icon = 'font';
-      if (prop.isCategorical) {
-        prop.dispDataType = 'Categorical';
-        prop.icon = 'bar-chart';
-      }
       if (prop.isFloat || prop.isInt) {
         prop.dispDataType = 'Value';
         prop.icon = 'line-chart';
+      }
+      if (prop.isCategorical) {
+        prop.dispDataType = 'Categorical';
+        prop.icon = 'bar-chart';
       }
       if (prop.isBoolean) {
         prop.dispDataType = 'Boolean';
