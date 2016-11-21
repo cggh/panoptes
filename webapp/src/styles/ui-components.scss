@@ -194,6 +194,7 @@
   .popup-body {
     position: relative;
     flex: 1;
+    flex-basis: auto;  //IE11 https://github.com/philipwalton/flexbugs number 4 I believe.
     overflow: auto;
   }
 }
