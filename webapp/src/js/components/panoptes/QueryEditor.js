@@ -17,6 +17,7 @@ import PropertyInput from 'panoptes/PropertyInput';
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Icon from 'ui/Icon';
+import _assign from 'lodash/assign';
 
 
 let Component = React.createClass({
@@ -129,7 +130,7 @@ let Criterion = React.createClass({
     });
 
     // Swap the specified component for the new component.
-    Object.assign(component, newComponent);
+    _assign(component, newComponent);
 
     // Set the CompValue to the property's default.
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
@@ -146,7 +147,7 @@ let Criterion = React.createClass({
   handleRemove() {
     let {component, onChange} = this.props;
     if (component.isRoot) {
-      Object.assign(component, SQL.WhereClause.Trivial());
+      _assign(component, SQL.WhereClause.Trivial());
     } else {
       component.parent.removeChild(component);
     }
@@ -172,7 +173,7 @@ let Criterion = React.createClass({
       newOr.addComponent(this.newComponent());
       newOr.parent = component.parent;
       newOr.isRoot = component.isRoot;
-      Object.assign(component, newOr);
+      _assign(component, newOr);
     } else {
       component.parent.addComponent(this.newComponent());
     }
@@ -189,7 +190,7 @@ let Criterion = React.createClass({
       newAnd.addComponent(this.newComponent());
       newAnd.parent = component.parent;
       newAnd.isRoot = component.isRoot;
-      Object.assign(component, newAnd);
+      _assign(component, newAnd);
     } else {
       component.parent.addComponent(this.newComponent());
     }
@@ -229,7 +230,7 @@ let Criterion = React.createClass({
     if (component.Subset || this.state.subsets[0])
       newComponent.Subset = component.Subset || this.state.subsets[0];
 
-    Object.assign(component, newComponent);
+    _assign(component, newComponent);
   },
 
   handlePropertyChange() {

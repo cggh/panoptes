@@ -27,6 +27,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Slider from 'material-ui/Slider';
 import FilterButton from 'panoptes/FilterButton';
+import _assign from 'lodash/assign';
 
 
 const INTERPOLATIONS = [
@@ -247,7 +248,7 @@ let PerRowNumericalTrack = React.createClass({
               .then(({columns, dataStart, dataStep}) => {
                 this.data.dataStart = dataStart;
                 this.data.dataStep = dataStep;
-                Object.assign(this.data.columns, columns);
+                _assign(this.data.columns, columns);
                 this.applyData(props);
                 this.calculateYScale(props);
               }), 'colourProperty'

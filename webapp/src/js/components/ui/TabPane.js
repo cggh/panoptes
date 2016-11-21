@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import PureRenderMixin from 'mixins/PureRenderMixin';
+import _assign from 'lodash/assign';
 
 let TabPane = React.createClass({
   mixins: [PureRenderMixin],
@@ -35,7 +36,7 @@ let TabPane = React.createClass({
   },
 
   render() {
-    const divProps = Object.assign({}, this.props);
+    const divProps = _assign({}, this.props);
     delete divProps.active;
     delete divProps.compId;
     delete divProps.updateTitleIcon;

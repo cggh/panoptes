@@ -2,6 +2,8 @@ import React from  'react';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent';
 import {Map} from 'immutable';
+import _assign from 'lodash/assign';
+
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -58,7 +60,7 @@ let Panoptes = React.createClass({
     let store = this.getFlux().store('SessionStore');
     store.on('notify',
       () => this.refs.notificationSystem.addNotification(
-        Object.assign(store.getLastNotification(), {position: 'tc'})));
+        _assign(store.getLastNotification(), {position: 'tc'})));
     //We don't need this as it will come to us in page load json
     //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
   },

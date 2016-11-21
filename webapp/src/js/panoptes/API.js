@@ -7,6 +7,7 @@ import {assertRequired} from 'util/Assert';
 import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';
 import Base64 from 'panoptes/Base64';
+import _assign from 'lodash/assign';
 
 const serverURL = '/panoptes/api';
 
@@ -70,7 +71,7 @@ function request(options, method = 'GET', data = null) {
     return Promise.reject('__CANCELLED__');
   }
   //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with qajax.
-  return qajax(Object.assign(defaults, options))
+  return qajax(_assign(defaults, options))
     .then(qajax.filterSuccess);
 }
 
@@ -134,7 +135,7 @@ function annotationData(options) {
     fsubtype: 'CDS',
     subfeatures: '1'
   };
-  let params = Object.assign(defaults, options);
+  let params = _assign(defaults, options);
   delete params.cancellation;
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestJSON({
@@ -162,7 +163,7 @@ function annotationData(options) {
 function summaryData(options) {
   assertRequired(options, ['chromosome', 'columns', 'blocksize', 'blockstart', 'blockcount']);
   let defaults = {};
-  let {chromosome, columns, blocksize, blockstart, blockcount} = Object.assign(defaults, options);
+  let {chromosome, columns, blocksize, blockstart, blockcount} = _assign(defaults, options);
 
   let collist = '';
   _forEach(columns, (column) => {
