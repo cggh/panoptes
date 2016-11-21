@@ -7,6 +7,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
 import Draggable from 'react-draggable';
 import filterChildren from 'util/filterChildren';
+import _assign from 'lodash/assign';
 
 let TabbedArea = React.createClass({
   mixins: [PureRenderMixin],
@@ -148,7 +149,7 @@ let TabbedArea = React.createClass({
   },
 
   render() {
-    const divProps = Object.assign({}, this.props);
+    const divProps = _assign({}, this.props);
     delete divProps.unclosableTab;
     delete divProps.activeTab;
     delete divProps.onSwitch;

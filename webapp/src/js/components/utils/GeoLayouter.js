@@ -5,6 +5,7 @@ import React from 'react';
 import _forEach from 'lodash/forEach';
 import _values from 'lodash/values';
 import _cloneDeep from 'lodash/cloneDeep';
+import _assign from 'lodash/assign';
 
 let GeoLayouter = React.createClass({
   propTypes: {
@@ -42,8 +43,8 @@ let GeoLayouter = React.createClass({
         updatedFixedNodesByKey[key] = this.fixedNodesByKey[key];
         updatedRenderNodesByKey[key] = this.renderNodesByKey[key];
         let {x, y, px, py, index, weight, ...others} = node;
-        Object.assign(updatedFixedNodesByKey[key], {x, y}); //For the fixed node just move it so the linked node gets dragged towards it
-        Object.assign(updatedRenderNodesByKey[key], others); //For the render node change everything but force-related quantities
+        _assign(updatedFixedNodesByKey[key], {x, y}); //For the fixed node just move it so the linked node gets dragged towards it
+        _assign(updatedRenderNodesByKey[key], others); //For the render node change everything but force-related quantities
       } else {
         //This node is new
         let {x, y, lat, lng} = node;

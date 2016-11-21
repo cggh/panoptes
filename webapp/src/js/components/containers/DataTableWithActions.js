@@ -7,6 +7,7 @@ import _clone from 'lodash/clone';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _forEach from 'lodash/forEach';
+import _assign from 'lodash/assign';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -221,7 +222,7 @@ let DataTableWithActions = React.createClass({
           let child = _clone(searchQueryUnencoded);
           newOr.addComponent(child);
           newOr.addComponent(newComponent);
-          Object.assign(searchQueryUnencoded, newOr);
+          _assign(searchQueryUnencoded, newOr);
         } else {
           searchQueryUnencoded.addComponent(newComponent);
         }

@@ -1,5 +1,6 @@
 import _cloneDeep from 'lodash/cloneDeep';
 import _filter from 'lodash/filter';
+import _assign from 'lodash/assign';
 
 let SQL = {};
 
@@ -560,7 +561,7 @@ SQL.WhereClause.Compound = function(icompoundtype, components) {
     if (that.getComponentCount() === 1) {
       let parent = that.parent;
       let isRoot = that.isRoot;
-      Object.assign(that, that.components[0]);
+      _assign(that, that.components[0]);
       that.parent = parent;
       that.isRoot = isRoot;
     }
