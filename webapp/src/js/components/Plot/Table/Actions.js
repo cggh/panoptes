@@ -1,7 +1,7 @@
 import React from 'react';
 import titleCase from 'title-case';
 import scrollbarSize from 'scrollbar-size';
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 
 // Lodash
 import _map from 'lodash/map';

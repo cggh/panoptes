@@ -14,7 +14,7 @@ import _head from 'lodash/head';
 import _keys from 'lodash/keys';
 import _values from 'lodash/values';
 
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 import Divider from 'material-ui/Divider';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';

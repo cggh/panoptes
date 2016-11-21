@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 import {HotKeys} from 'react-hotkeys'; // 0.9.0 needs {...}
 import scrollbarSize from 'scrollbar-size';
 

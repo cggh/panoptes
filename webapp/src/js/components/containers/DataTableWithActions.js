@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 import scrollbarSize from 'scrollbar-size';
 
 // Lodash

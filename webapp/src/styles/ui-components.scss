@@ -9,7 +9,7 @@
     width: 100%;
     height: calc(100% - #{$tab-height} - #{$tab-border} - #{$tab-padding-top}); /*4px for the border*/
     .tab-pane {
-      visibility: hidden;
+      display: none;
       position: absolute;
       top: 0;
       left: 0;
@@ -18,18 +18,9 @@
       width: 100%;
       height: 100%;
     }
-    .tab-pane.inactive {
-      //Chrome bug where scroll bars remain visible
-      ::-webkit-scrollbar {
-      visibility: hidden;
-    }
-    rect {
-        pointer-events: none !important; //Plotly has some elements with pointer-events all that change respond to clicks even when tab not selected
-      }
-    }
     .tab-pane.active {
       overflow: auto;
-      visibility: inherit;
+      display: inherit;
     }
   }
   .tabs {

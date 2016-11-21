@@ -3,7 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 
 import jsxToString from 'jsx-to-string';
 import scrollbarSize from 'scrollbar-size';
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 
 // Lodash
 import _clone from 'lodash/clone';
