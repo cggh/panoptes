@@ -153,7 +153,7 @@ let AddChannelsButton = React.createClass({
                 name: prop.name,
                 description: prop.description,
                 icon: prop.icon,
-                payload: serialiseComponent(<CategoricalChannel name={prop.name} table={table.id} track={prop.id}/>)
+                payload: serialiseComponent(<CategoricalChannel table={table.id} track={prop.id}/>)
               });
 
             } else if (prop.isNumerical) {
@@ -164,7 +164,7 @@ let AddChannelsButton = React.createClass({
                 description: prop.description,
                 icon: prop.icon,
                 payload: serialiseComponent(<NumericalTrackGroupChannel table={table.id}>
-                  <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id}/>
+                  <NumericalSummaryTrack table={table.id} track={prop.id}/>
                 </NumericalTrackGroupChannel>)
               });
             }
@@ -232,7 +232,6 @@ let AddChannelsButton = React.createClass({
     //           icon: 'line-chart',
     //           payload: serialiseComponent(
     //             <PerRowNumericalChannel
-    //               name={channel.name}
     //               table={table.id}
     //               channel={channel.id}
     //             />

@@ -24,6 +24,7 @@ import PropertyLegend from 'panoptes/PropertyLegend';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import QueryString from 'panoptes/QueryString';
 import FilterButton from 'panoptes/FilterButton';
+import TooltipEllipsis from 'ui/TooltipEllipsis';
 
 import Checkbox from 'material-ui/Checkbox';
 
@@ -52,7 +53,6 @@ let CategoricalChannel = React.createClass({
     fractional: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
-    name: React.PropTypes.string,
     onClose: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
@@ -84,7 +84,7 @@ let CategoricalChannel = React.createClass({
     query = this.getDefinedQuery(query, table);
     return (
       <CanvasGroupChannel {...this.props}
-                          side={<span>{name}</span>}
+                          side={<Side {...this.props} query={query}/>}
                           onClose={this.redirectedProps.onClose}
                           controls={<CategoricalTrackControls {...this.props} query={query} setProps={this.redirectedProps.setProps} />}
                           legend={<PropertyLegend table={table} property={track} knownValues={knownValues} />}
@@ -448,6 +448,34 @@ let CategoricalTrackControls = React.createClass({
   }
 
 });
+
+let Side = React.createClass({
+  mixins: [
+    FluxMixin,
+    ConfigMixin,
+    PureRenderWithRedirectedProps({
+      check: [
+        'table',
+        'query',
+        'track'
+      ],
+    })
+  ],
+  render() {
+    let {query, table, track} = this.props;
+    return <div>
+      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural+':' : '')}</div>
+      <div className="legend-element">
+
+      <TooltipEllipsis className="label">
+          {this.tableConfig().propertiesById[track].name}
+      </TooltipEllipsis>
+        </div>
+    </div>;
+  }
+
+});
+
 
 
 export default CategoricalChannel;
