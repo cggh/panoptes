@@ -269,7 +269,7 @@ let NumericalTrackGroupControls = React.createClass({
                 description: prop.description,
                 icon: prop.icon,
                 payload: serialiseComponent(
-                  <NumericalSummaryTrack name={prop.name} table={iTable.id} track={prop.id}/>
+                  <NumericalSummaryTrack table={iTable.id} track={prop.id}/>
                 )
               };
           });
@@ -288,7 +288,6 @@ let NumericalTrackGroupControls = React.createClass({
   handleQueryPick(query) {
     this.redirectedProps.setProps({query});
   },
-
 
   render() {
     let {autoYScale, yMin, yMax, children, table, query} = this.props;
