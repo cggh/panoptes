@@ -22,12 +22,16 @@ import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 import PropertyLegend from 'panoptes/PropertyLegend';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
+import QueryString from 'panoptes/QueryString';
+import FilterButton from 'panoptes/FilterButton';
 
 import Checkbox from 'material-ui/Checkbox';
 
 
 let CategoricalChannel = React.createClass({
   mixins: [
+    FluxMixin,
+    ConfigMixin,
     PureRenderWithRedirectedProps({
       redirect: [
         'setProps',
@@ -51,7 +55,8 @@ let CategoricalChannel = React.createClass({
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
-    track: React.PropTypes.string.isRequired
+    track: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string
   },
 
   getInitialState() {
@@ -67,17 +72,24 @@ let CategoricalChannel = React.createClass({
     };
   },
 
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
+  },
+
   render() {
-    const {table, track, width, sideWidth, name} = this.props;
+    let {table, track, width, sideWidth, name, query} = this.props;
     const {knownValues} = this.state;
+    query = this.getDefinedQuery(query, table);
     return (
       <CanvasGroupChannel {...this.props}
                           side={<span>{name}</span>}
                           onClose={this.redirectedProps.onClose}
-                          controls={<CategoricalTrackControls {...this.props} setProps={this.redirectedProps.setProps} />}
+                          controls={<CategoricalTrackControls {...this.props} query={query} setProps={this.redirectedProps.setProps} />}
                           legend={<PropertyLegend table={table} property={track} knownValues={knownValues} />}
       >
-        <CategoricalTrack {...this.props} width={width - sideWidth} onChangeKnownValues={(knownValues) => this.setState({knownValues})}/>
+        <CategoricalTrack {...this.props} query={query} width={width - sideWidth} onChangeKnownValues={(knownValues) => this.setState({knownValues})}/>
       </CanvasGroupChannel>
     );
   }
@@ -94,7 +106,7 @@ let CategoricalTrack = React.createClass({
     }),
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'start', 'end', 'table,', 'track', 'width', 'height', 'yMin', 'yMax', 'fractional', 'autoYScale')
+    DataFetcherMixin('chromosome', 'start', 'end', 'table,', 'track', 'query', 'width', 'height', 'yMin', 'yMax', 'fractional', 'autoYScale')
   ],
 
   propTypes: {
@@ -109,6 +121,7 @@ let CategoricalTrack = React.createClass({
     yMax: React.PropTypes.number,
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string,
     onChangeKnownValues: React.PropTypes.func,
     onChangeLoadStatus: React.PropTypes.func,
     onYLimitChange: React.PropTypes.func
@@ -131,10 +144,11 @@ let CategoricalTrack = React.createClass({
   },
 
   fetchData(nextProps, requestContext) {
-    let {chromosome, start, end, width, table, track, autoYScale} = nextProps;
+    let {chromosome, start, end, width, table, track, query, autoYScale} = nextProps;
     const tableConfig = this.config.tablesById[table];
     if (this.props.chromosome !== chromosome ||
       this.props.track !== track ||
+      this.props.query !== query ||
       this.props.table !== table) {
       this.applyData(nextProps, []);
     }
@@ -153,6 +167,7 @@ let CategoricalTrack = React.createClass({
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
       this.props.track !== track ||
+      this.props.query !== query ||
       this.props.table !== table ||
       !(this.blockLevel === blockLevel
         && this.blockIndex === blockIndex
@@ -170,7 +185,7 @@ let CategoricalTrack = React.createClass({
         {expr: ['count', ['*']], as: 'count'},
         track
       ];
-      const query = SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome);
+      query = SQL.WhereClause.AND([query ? SQL.WhereClause.decode(query) : SQL.WhereClause.Trivial(), SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome)]);
       let APIargs = {
         database: this.config.dataset,
         table,
@@ -349,7 +364,9 @@ let CategoricalTrackControls = React.createClass({
       check: [
         'autoYScale',
         'yMin',
-        'yMax'
+        'yMax',
+        'table',
+        'query'
       ],
       redirect: ['setProps']
     })
@@ -360,12 +377,26 @@ let CategoricalTrackControls = React.createClass({
     fractional: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
+    query: React.PropTypes.string,
+    table: React.PropTypes.string
+  },
+
+  handleQueryPick(query) {
+    this.redirectedProps.setProps({query});
   },
 
   render() {
-    let {fractional, autoYScale, yMin, yMax} = this.props;
+    let {fractional, autoYScale, yMin, yMax, table, query} = this.props;
     return (
       <div className="channel-controls">
+        <div className="control-group">
+          {table ? <div className="control">
+            <QueryString prepend="Filter:" table={table} query={query} />
+          </div> : null}
+          {table ? <div className="control">
+            <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+          </div> : null}
+        </div>
         <div className="control">
           <div className="label">Fractional:</div>
           <Checkbox
@@ -374,43 +405,44 @@ let CategoricalTrackControls = React.createClass({
             style={{width: 'inherit'}}
             onCheck={(e, checked) => this.redirectedProps.setProps({fractional: checked})}/>
         </div>
-        <div className="control">
-          <div className="label">Auto Y Scale:</div>
-          <Checkbox
-            name="autoYScale"
-            defaultChecked={autoYScale}
-            style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
-        </div>
-        {!autoYScale ? <div className="control">
-          <div className="label">Y Min:</div>
-          <input className="numeric-input"
-                 ref="yMin"
-                 type="number"
-                 value={yMin}
-                 onChange={() => {
-                   let value = parseFloat(this.refs.yMin.value);
-                   if (_isFinite(value))
-                     this.redirectedProps.setProps({yMin: value});
-                 }
-                                }/>
-        </div>
-          : null}
-        {!autoYScale ? <div className="control">
-          <div className="label">Y Max:</div>
-          <input className="numeric-input"
-                 ref="yMax"
-                 type="number"
-                 value={yMax}
-                 onChange={() => {
-                   let value = parseFloat(this.refs.yMax.value);
-                   if (_isFinite(value))
-                     this.redirectedProps.setProps({yMax: value});
-                 }
-                                }/>
-        </div>
-          : null}
-
+        <div className="control-group">
+          <div className="control">
+            <div className="label">Auto Y Scale:</div>
+            <Checkbox
+              name="autoYScale"
+              defaultChecked={autoYScale}
+              style={{width: 'inherit'}}
+              onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
+          </div>
+          {!autoYScale ? <div className="control">
+            <div className="label">Y Min:</div>
+            <input className="numeric-input"
+                   ref="yMin"
+                   type="number"
+                   value={yMin}
+                   onChange={() => {
+                     let value = parseFloat(this.refs.yMin.value);
+                     if (_isFinite(value))
+                       this.redirectedProps.setProps({yMin: value});
+                   }
+                                  }/>
+          </div>
+            : null}
+          {!autoYScale ? <div className="control">
+            <div className="label">Y Max:</div>
+            <input className="numeric-input"
+                   ref="yMax"
+                   type="number"
+                   value={yMax}
+                   onChange={() => {
+                     let value = parseFloat(this.refs.yMax.value);
+                     if (_isFinite(value))
+                       this.redirectedProps.setProps({yMax: value});
+                   }
+                                  }/>
+          </div>
+            : null}
+          </div>
       </div>
     );
   }
