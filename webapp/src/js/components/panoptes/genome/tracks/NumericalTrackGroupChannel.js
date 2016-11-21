@@ -112,7 +112,7 @@ let NumericalTrackGroupChannel = React.createClass({
           (child) => React.cloneElement(child, {
             ...this.props,
             width: width - sideWidth,
-            colour: child.props.colour || this.tableConfig().propertiesById[child.props.track].colour || colourFunc(child.props.track),
+            colour: child.props.colour || this.config.tablesById[child.props.table].propertiesById[child.props.track].colour || colourFunc(child.props.track),
             query: table ? query : undefined
           }));
     return (
