@@ -1,5 +1,5 @@
 import React from 'react';
-import Hammer from 'react-hammerjs';
+import Tooltip from 'rc-tooltip';
 import Color from 'color';
 
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -36,6 +36,8 @@ let PerRowIndicatorChannel = React.createClass({
         'onClose'
       ],
       check: [
+        'start',
+        'end',
         'chromosome',
         'width',
         'sideWidth',
@@ -76,7 +78,8 @@ let PerRowIndicatorChannel = React.createClass({
 
   getInitialState() {
     return {
-      knownValues: null
+      knownValues: null,
+      hover: null
     };
   },
 
@@ -215,7 +218,9 @@ let PerRowIndicatorChannel = React.createClass({
 
   draw(props) {
     const {table, width, sideWidth, start, end, colourProperty} = props;
+    const {hover} = this.state;
     const positions = this.positions;
+    const primKeys = this.primKeys;
     const colours = this.colourVals;
     const coloursTranslucent = this.colourValsTranslucent;
     const colourData = this.colourData;
@@ -255,6 +260,7 @@ let PerRowIndicatorChannel = React.createClass({
     psy = (HEIGHT / 2) - 6;
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
+    let hoverIndex = null;
     ctx.strokeStyle = triangleMode ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.4)';
     ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
     for (let i = 0, l = numPositions; i < l; ++i) {
@@ -283,6 +289,36 @@ let PerRowIndicatorChannel = React.createClass({
           ctx.stroke();
         }
       }
+      if (primKeys[i] === hover) {
+        hoverIndex = i;
+      }
+    }
+    //HIGHLIGHT HOVER
+    if (hoverIndex !== null) {
+      const psx = scaleFactor * (positions[hoverIndex] - start);
+      if (psx > -6 && psx < width + 6) {
+        ctx.strokeStyle = 'rgb(0, 0, 0)';
+        ctx.fillStyle = 'rgb(214, 39, 40)';
+        if (colours) {
+          if (triangleMode) {
+            ctx.fillStyle = colours[hoverIndex];
+          } else {
+            ctx.strokeStyle = colours[hoverIndex];
+          }
+        }
+        ctx.beginPath();
+        ctx.moveTo(psx, psy);
+        if (triangleMode) {
+          ctx.lineTo(psx + 6, psy + 12);
+          ctx.lineTo(psx - 6, psy + 12);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.lineTo(psx, psy + 12);
+          ctx.stroke();
+        }
+      }
     }
     //Record drawn values for legend
     drawnColourVals = Array.from(drawnColourVals.values());
@@ -296,34 +332,73 @@ let PerRowIndicatorChannel = React.createClass({
 
   },
 
-  handleTap(e) {
-    let rect = this.refs.canvas.getBoundingClientRect();
-    let x = e.center.x - rect.left;
+  handleClick(e) {
+    let [x, y] = this.convertXY(e);
+    let id = this.xyToId(x, y);
+    if (id)
+      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: id});
+  },
+
+  xyToId(x, y) {
+    const psx = (HEIGHT / 2) - 7;
+    if (y <  psx || y > psx + 12) {
+      return null;
+    }
     const {width, sideWidth, start, end} = this.props;
     const positions = this.positions;
     const scaleFactor = ((width - sideWidth) / (end - start));
     //Triangles/Lines
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
+    let best = 99999;
+    let bestPrimKey = null;
     for (let i = 0, l = numPositions; i < l; ++i) {
       const psx = scaleFactor * (positions[i] - start);
       if (triangleMode) {
-        if (x < psx + 6 && x > psx - 6) {
-          this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
-          return;
+        if (x < psx + 7 && x > psx - 7 && Math.abs(x - psx) < best) {
+          best = Math.abs(x - psx);
+          bestPrimKey = this.primKeys[i];
         }
       } else {
         if (x < Math.ceil(psx) && x > Math.floor(psx)) {
-          this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
-          return;
+          return this.primKeys[i];
         }
       }
     }
+    return bestPrimKey;
+  },
+
+  convertXY(e) {
+    let rect = this.refs.canvas.getBoundingClientRect();
+    return [e.clientX - rect.left, e.clientY - rect.top];
+  },
+
+  handleMouseMove(e) {
+    let [x, y] = this.convertXY(e);
+    let id = this.xyToId(x, y);
+    this.setState({hover: id});
+  },
+  handleMouseOver(e) {
+    let [x, y] = this.convertXY(e);
+    let id = this.xyToId(x, y);
+    this.setState({hover: id});
+  },
+  handleMouseOut(e) {
+    this.setState({hover: null})
   },
 
   render() {
-    const {width, sideWidth, table, colourProperty} = this.props;
-    const {knownValues} = this.state;
+    const {start, end, width, sideWidth, table, colourProperty} = this.props;
+    const {knownValues, hover} = this.state;
+    let hoverPos = null;
+    const scaleFactor = ((width - sideWidth) / (end - start));
+    if (hover) {
+      for (let i = 0, l = this.positions.length; i < l; ++i) {
+        if (this.primKeys[i] === hover) {
+          hoverPos = scaleFactor * (this.positions[i] - start);
+        }
+      }
+    }
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -344,9 +419,22 @@ let PerRowIndicatorChannel = React.createClass({
           <PropertyLegend table={table} property={colourProperty} knownValues={knownValues}/> : null}
         onClose={this.redirectedProps.onClose}
       >
-        <Hammer onTap={this.handleTap}>
-          <canvas ref="canvas" width={width} height={HEIGHT} />
-        </Hammer>
+        <canvas ref="canvas"
+                style={{cursor: hover ? 'pointer' : 'inherit'}}
+                width={width} height={HEIGHT}
+                onClick={this.handleClick}
+                onMouseOver={this.handleMouseOver}
+                onMouseMove={this.handleMouseMove}
+                onMouseOut={this.handleMouseOut}
+        />
+        {hoverPos !== null ?
+          <Tooltip placement={'bottom'}
+                 visible={true}
+                 overlay={<div>{hover}</div>}>
+            <div style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPos-6}px`, height: '12px', width: '12px'}}/>
+          </Tooltip>
+        : null}
+
       </ChannelWithConfigDrawer>);
   }
 });
@@ -385,7 +473,7 @@ const PerRowIndicatorControls = React.createClass({
     return (
       <div className="channel-controls">
         <div className="control">
-          <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
+          <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/>
         </div>
         <div className="control">
           <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>

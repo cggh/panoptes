@@ -225,7 +225,6 @@ let AnnotationChannel = React.createClass({
   convertXY(e) {
     let rect = this.refs.canvas.getBoundingClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top];
-
   },
 
   xyToGene(x,y) {
