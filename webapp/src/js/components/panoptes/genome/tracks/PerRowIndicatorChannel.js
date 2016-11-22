@@ -6,7 +6,6 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-
 import _map from 'lodash/map';
 import _isEqual from 'lodash/isEqual';
 import _transform from 'lodash/transform';
@@ -21,10 +20,11 @@ import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import {hatchRect} from 'util/CanvasDrawing';
 import QueryString from 'panoptes/QueryString';
+import PropertyCell from 'panoptes/PropertyCell';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FilterButton from 'panoptes/FilterButton';
 import {propertyColour} from 'util/Colours';
-
+import _forEach from 'lodash/forEach';
 
 const HEIGHT = 50;
 
@@ -105,7 +105,7 @@ let PerRowIndicatorChannel = React.createClass({
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
-
+    const config = this.config.tablesById[table];
     if (this.props.chromosome !== chromosome ||
       this.props.table !== table) {
       this.applyData(props, []);
@@ -130,11 +130,14 @@ let PerRowIndicatorChannel = React.createClass({
       this.blockIndex = blockIndex;
       this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
-      let columns = [this.tableConfig().primKey, this.tableConfig().position];
+      let columns = [config.primKey, config.position];
       if (colourProperty)
         columns.push(colourProperty);
+      if (config.previewProperties) {
+        columns = columns.concat(config.previewProperties);
+      }
       let decodedQuery = SQL.WhereClause.decode(this.getDefinedQuery(query, table));
-      decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(this.tableConfig().chromosome, '=', chromosome), decodedQuery]);
+      decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(config.chromosome, '=', chromosome), decodedQuery]);
       let APIargs = {
         database: this.config.dataset,
         table,
@@ -172,19 +175,23 @@ let PerRowIndicatorChannel = React.createClass({
           throw error;
         });
     }
-    this.draw(props);
   },
 
   applyData(props, blocks) {
     let {table, colourProperty} = props;
-    this.positions = combineBlocks(blocks, this.tableConfig().position);
-    this.primKeys = combineBlocks(blocks, this.tableConfig().primKey);
+    const config = this.config.tablesById[table];
+    this.positions = combineBlocks(blocks, config.position);
+    this.primKeys = combineBlocks(blocks, config.primKey);
+    this.previewData = {};
+    if (config.previewProperties) {
+      _forEach(config.previewProperties, (prop) => this.previewData[prop] = combineBlocks(blocks, prop));
+    }
     if (colourProperty) {
       this.colourData = combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
         propertyColour(this.config.tablesById[table].propertiesById[colourProperty]));
-      this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.2).rgbString());
-      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.4).rgbString());
+      this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.1).rgbString());
+      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.3).rgbString());
     } else {
       this.colourVals = null;
       this.colourData = null;
@@ -341,7 +348,7 @@ let PerRowIndicatorChannel = React.createClass({
 
   xyToId(x, y) {
     const psx = (HEIGHT / 2) - 7;
-    if (y <  psx || y > psx + 12) {
+    if (y < psx || y > psx + 12) {
       return null;
     }
     const {width, sideWidth, start, end} = this.props;
@@ -390,12 +397,15 @@ let PerRowIndicatorChannel = React.createClass({
   render() {
     const {start, end, width, sideWidth, table, colourProperty} = this.props;
     const {knownValues, hover} = this.state;
+    const config = this.config.tablesById[table];
     let hoverPos = null;
+    let hoverIndex = null;
     const scaleFactor = ((width - sideWidth) / (end - start));
     if (hover) {
       for (let i = 0, l = this.positions.length; i < l; ++i) {
         if (this.primKeys[i] === hover) {
           hoverPos = scaleFactor * (this.positions[i] - start);
+          hoverIndex = i;
         }
       }
     }
@@ -419,7 +429,7 @@ let PerRowIndicatorChannel = React.createClass({
           <PropertyLegend table={table} property={colourProperty} knownValues={knownValues}/> : null}
         onClose={this.redirectedProps.onClose}
       >
-        <canvas ref="canvas"
+        <div className="canvas-container"><canvas ref="canvas"
                 style={{cursor: hover ? 'pointer' : 'inherit'}}
                 width={width} height={HEIGHT}
                 onClick={this.handleClick}
@@ -429,11 +439,18 @@ let PerRowIndicatorChannel = React.createClass({
         />
         {hoverPos !== null ?
           <Tooltip placement={'bottom'}
-                 visible={true}
-                 overlay={<div>{hover}</div>}>
+                   visible={true}
+                   overlay={<div>
+                              <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hover}/></div>
+                              <table><tbody>
+                              {_map(config.previewProperties, (prop) =>
+                                <tr key={prop}><td style={{paddingRight: '5px'}}>{config.propertiesById[prop].name}:</td><td><PropertyCell noLinks prop={config.propertiesById[prop]} value={this.previewData[prop][hoverIndex]} /></td></tr>)
+                              }
+                              </tbody></table>
+                            </div>}>
             <div style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPos-6}px`, height: '12px', width: '12px'}}/>
           </Tooltip>
-        : null}
+          : null}</div>
 
       </ChannelWithConfigDrawer>);
   }

@@ -162,6 +162,9 @@
     flex-direction: column;
     .channel-data {
       overflow: hidden;
+      .canvas-container {
+        position: relative;
+      }
       canvas {
         display: block;
       }

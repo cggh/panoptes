@@ -66,7 +66,7 @@ let GenomeBrowserWithActions = React.createClass({
     let {sidebar, setProps, children, ...subProps} = this.props;
     //Insert an extra child to hint to the user how to add tracks
     children = React.Children.toArray(children);
-    children.push(<AddChannelMessage setProps={this.props.setProps}/>);
+    children.push(<AddChannelMessage key="_ACM_" setProps={this.props.setProps}/>);
 
     return (
       <Sidebar

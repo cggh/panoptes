@@ -26,7 +26,7 @@ position: position                # Specifies the table column ID that contains 
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
 quickFindFields: SnpName
-
+previewProperties: Value1, Extra_1
 
 propertyGroups:
 - id: Info
