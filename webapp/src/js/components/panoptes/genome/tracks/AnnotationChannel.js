@@ -1,5 +1,4 @@
 import React from 'react';
-import Hammer from 'react-hammerjs';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -48,7 +47,8 @@ let AnnotationChannel = React.createClass({
 
   getInitialState() {
     return {
-      height: 50
+      height: 50,
+      hover: null
     };
   },
 
@@ -154,7 +154,7 @@ let AnnotationChannel = React.createClass({
 
   draw(props) {
     const {width, sideWidth, start, end} = props || this.props;
-    const {height} = this.state;
+    const {height, hover} = this.state;
 
     const canvas = this.refs.canvas;
     if (!canvas)
@@ -202,17 +202,35 @@ let AnnotationChannel = React.createClass({
         }
       }
     }
+    if (hover) {
+      for (let i = 0, l = starts.length; i < l; ++i) {
+      if (ids[i] === hover) {
+        const x1 = scaleFactor * (starts[i] - start);
+        let text = ids[i] + (names[i] && names[i] !== ids[i] ? ` - ${names[i]}` : '');
+        if (text) {
+            ctx.fillStyle = '#FFF';
+            ctx.fillRect(x1 - 12, (rows[i] * ROW_HEIGHT) + 4, 14 + text.length * 6, 10);
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 10px monospace';
+            ctx.fillText(text, x1, (rows[i] * ROW_HEIGHT) + 14);
+          }
+        }
+      }
+    }
     const desiredHeight = Math.max((maxRow + 1) * ROW_HEIGHT + 10, 40);
     if (desiredHeight !== height)
       this.setState({height: desiredHeight});
   },
 
-  handleTap(e) {
-    const {width, sideWidth, start, end} = this.props;
+  convertXY(e) {
     let rect = this.refs.canvas.getBoundingClientRect();
-    let x = e.center.x - rect.left;
-    let y = e.center.y - rect.top;
-    if (!(this.data && this.data.starts)) return;
+    return [e.clientX - rect.left, e.clientY - rect.top];
+
+  },
+
+  xyToGene(x,y) {
+    const {width, sideWidth, start, end} = this.props;
+    if (!(this.data && this.data.starts)) return null;
     const {ids, sizes, starts, types, rows} = this.data;
     let scaleFactor = ((width - sideWidth) / (end - start));
     for (let i = 0, l = starts.length; i < l; ++i) {
@@ -220,18 +238,40 @@ let AnnotationChannel = React.createClass({
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
         if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < 5 + ((rows[i]+1) * ROW_HEIGHT)) {
-          this.flux.actions.session.popupOpen(<Gene geneId={ids[i]} />, false);
+          return ids[i]
         }
       }
     }
+    return null;
 
+  },
 
+  handleClick(e) {
+    let [x, y] = this.convertXY(e);
+    let gene = this.xyToGene(x,y);
+    if (gene) {
+      this.flux.actions.session.popupOpen(<Gene geneId={gene}/>, false);
+    }
+  },
+
+  handleMouseMove(e) {
+    let [x, y] = this.convertXY(e);
+    let gene = this.xyToGene(x,y);
+    this.setState({hover: gene});
+  },
+  handleMouseOver(e) {
+    let [x, y] = this.convertXY(e);
+    let gene = this.xyToGene(x,y);
+    this.setState({hover: gene});
+  },
+  handleMouseOut(e) {
+    this.setState({hover: null})
   },
 
   render() {
     let {width, sideWidth, name} = this.props;
-    let {height} = this.state;
-    return (
+    let {height, hover} = this.state;
+     return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
@@ -245,9 +285,14 @@ let AnnotationChannel = React.createClass({
         legendComponent={<Legend/>}
         onClose={null}
       >
-        <Hammer onTap={this.handleTap}>
-          <canvas ref="canvas" width={width} height={height} />
-        </Hammer>
+          <canvas ref="canvas"
+                  style={{cursor: hover ? 'pointer' : 'inherit'}}
+                  width={width} height={height}
+                  onClick={this.handleClick}
+                  onMouseOver={this.handleMouseOver}
+                  onMouseMove={this.handleMouseMove}
+                  onMouseOut={this.handleMouseOut}
+          />
       </ChannelWithConfigDrawer>);
   }
 });
