@@ -1,4 +1,5 @@
 import React from 'react';
+import Tooltip from 'rc-tooltip';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -23,6 +24,8 @@ let AnnotationChannel = React.createClass({
         //'onClose'
       ],
       check: [
+        'start',
+        'end',
         'chromosome',
         'width',
         'sideWidth',
@@ -48,7 +51,7 @@ let AnnotationChannel = React.createClass({
   getInitialState() {
     return {
       height: 50,
-      hover: null
+      hoverIndex: null
     };
   },
 
@@ -72,9 +75,8 @@ let AnnotationChannel = React.createClass({
     }
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
     //If we already are at an acceptable block then don't change it!
-    if (this.props.chromosome !== chromosome ||
-        !((this.blockEnd === block1End && this.blockStart === block1Start) ||
-          (this.blockEnd === block2End && this.blockStart === block2Start))) {
+    if (this.props.chromosome !== chromosome || !((this.blockEnd === block1End && this.blockStart === block1Start) ||
+      (this.blockEnd === block2End && this.blockStart === block2Start))) {
       //Current block was unacceptable so choose best one
       this.blockStart = block1Start;
       this.blockEnd = block1End;
@@ -94,9 +96,9 @@ let AnnotationChannel = React.createClass({
             API.annotationData({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
         )).then((data) => {
-          if (onChangeLoadStatus) onChangeLoadStatus('DONE');
-          this.applyData(this.props, data);
-        })
+        if (onChangeLoadStatus) onChangeLoadStatus('DONE');
+        this.applyData(this.props, data);
+      })
         .catch((err) => {
           if (onChangeLoadStatus) onChangeLoadStatus('DONE');
           throw err;
@@ -108,7 +110,6 @@ let AnnotationChannel = React.createClass({
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
         });
     }
-    this.draw(props);
   },
 
   applyData(props, data) {
@@ -154,7 +155,7 @@ let AnnotationChannel = React.createClass({
 
   draw(props) {
     const {width, sideWidth, start, end} = props || this.props;
-    const {height, hover} = this.state;
+    const {height, hoverIndex} = this.state;
 
     const canvas = this.refs.canvas;
     if (!canvas)
@@ -176,7 +177,7 @@ let AnnotationChannel = React.createClass({
         if (x2 > -60 && x1 < width + 4) {
           ctx.fillRect(x1, (rows[i] * ROW_HEIGHT) + 20, Math.max(1, x2 - x1), 2);   //Gene bar
           let text = names[i] || ids[i];
-          if (text && (lastTextAt[rows[i]] + 30 < x1  || typeof lastTextAt[rows[i]] === 'undefined')) {
+          if (text && (lastTextAt[rows[i]] + 30 < x1 || typeof lastTextAt[rows[i]] === 'undefined')) {
             lastTextAt[rows[i]] = x1;
             let grd = ctx.createLinearGradient(x1 - 12, 0, x1, 0);
             grd.addColorStop(0.000, 'rgba(255, 255, 255, 0)');
@@ -202,19 +203,15 @@ let AnnotationChannel = React.createClass({
         }
       }
     }
-    if (hover) {
-      for (let i = 0, l = starts.length; i < l; ++i) {
-      if (ids[i] === hover) {
-        const x1 = scaleFactor * (starts[i] - start);
-        let text = ids[i] + (names[i] && names[i] !== ids[i] ? ` - ${names[i]}` : '');
-        if (text) {
-            ctx.fillStyle = '#FFF';
-            ctx.fillRect(x1 - 12, (rows[i] * ROW_HEIGHT) + 4, 14 + text.length * 6, 10);
-            ctx.fillStyle = '#000';
-            ctx.font = 'bold 10px monospace';
-            ctx.fillText(text, x1, (rows[i] * ROW_HEIGHT) + 14);
-          }
-        }
+    if (hoverIndex !== null) {
+      const x1 = scaleFactor * (starts[hoverIndex] - start);
+      let text = ids[hoverIndex] + (names[hoverIndex] && names[hoverIndex] !== ids[hoverIndex] ? ` - ${names[hoverIndex]}` : '');
+      if (text) {
+        ctx.fillStyle = '#FFF';
+        ctx.fillRect(x1 - 12, (rows[hoverIndex] * ROW_HEIGHT) + 4, 14 + text.length * 6, 10);
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 10px monospace';
+        ctx.fillText(text, x1, (rows[hoverIndex] * ROW_HEIGHT) + 14);
       }
     }
     const desiredHeight = Math.max((maxRow + 1) * ROW_HEIGHT + 10, 40);
@@ -227,7 +224,7 @@ let AnnotationChannel = React.createClass({
     return [e.clientX - rect.left, e.clientY - rect.top];
   },
 
-  xyToGene(x,y) {
+  xyToGene(x, y) {
     const {width, sideWidth, start, end} = this.props;
     if (!(this.data && this.data.starts)) return null;
     const {ids, sizes, starts, types, rows} = this.data;
@@ -236,7 +233,7 @@ let AnnotationChannel = React.createClass({
       if (types[i] === 'gene') {
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
-        if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < 5 + ((rows[i]+1) * ROW_HEIGHT)) {
+        if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < 5 + ((rows[i] + 1) * ROW_HEIGHT)) {
           return ids[i]
         }
       }
@@ -247,30 +244,47 @@ let AnnotationChannel = React.createClass({
 
   handleClick(e) {
     let [x, y] = this.convertXY(e);
-    let gene = this.xyToGene(x,y);
+    let gene = this.xyToGene(x, y);
     if (gene) {
       this.flux.actions.session.popupOpen(<Gene geneId={gene}/>, false);
     }
   },
 
+  setHover(hoverId) {
+    if (hoverId) {
+      for (let i = 0, l = this.data.ids.length; i < l; ++i) {
+        if (this.data.ids[i] === hoverId) {
+          this.setState({hoverIndex: i});
+          return;
+        }
+      }
+    } else {
+      this.setState({hoverIndex: null});
+    }
+  },
+
+
   handleMouseMove(e) {
     let [x, y] = this.convertXY(e);
-    let gene = this.xyToGene(x,y);
-    this.setState({hover: gene});
+    let id = this.xyToGene(x, y);
+    this.setHover(id);
   },
   handleMouseOver(e) {
     let [x, y] = this.convertXY(e);
-    let gene = this.xyToGene(x,y);
-    this.setState({hover: gene});
+    let id = this.xyToGene(x, y);
+    this.setHover(id);
   },
   handleMouseOut(e) {
-    this.setState({hover: null})
+    this.setState({hoverIndex: null})
   },
 
   render() {
-    let {width, sideWidth, name} = this.props;
-    let {height, hover} = this.state;
-     return (
+    let {start, end, width, sideWidth, name} = this.props;
+    let {height, hoverIndex} = this.state;
+    let hoverId = this.data && this.data.ids ? this.data.ids[hoverIndex] : null;
+    let scaleFactor = ((width - sideWidth) / (end - start));
+
+    return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
@@ -284,14 +298,32 @@ let AnnotationChannel = React.createClass({
         legendComponent={<Legend/>}
         onClose={null}
       >
+        <div className="canvas-container">
           <canvas ref="canvas"
-                  style={{cursor: hover ? 'pointer' : 'inherit'}}
+                  style={{cursor: hoverId !== null ? 'pointer' : 'inherit'}}
                   width={width} height={height}
                   onClick={this.handleClick}
                   onMouseOver={this.handleMouseOver}
                   onMouseMove={this.handleMouseMove}
                   onMouseOut={this.handleMouseOut}
           />
+          {hoverIndex !== null ?
+            <Tooltip placement={'bottom'}
+                     visible={true}
+                     overlay={<div>
+                              {this.data.ids[hoverIndex] + (this.data.names[hoverIndex] && this.data.names[hoverIndex] !== this.data.ids[hoverIndex] ? ` - ${this.data.names[hoverIndex]}` : '')}
+                            </div>}>
+              <div
+                style={{
+                pointerEvents: 'none',
+                position: 'absolute',
+                top: `${(this.data.rows[hoverIndex] * ROW_HEIGHT) + 10}px`,
+                left: `${scaleFactor * ((this.data.starts[hoverIndex] + (this.data.sizes[hoverIndex]/2)) - start)}px`,
+                height: '12px',
+                width: '1px'}}></div>
+            </Tooltip>
+            : null}</div>
+
       </ChannelWithConfigDrawer>);
   }
 });

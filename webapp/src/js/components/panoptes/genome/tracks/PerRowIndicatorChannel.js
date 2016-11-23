@@ -79,7 +79,7 @@ let PerRowIndicatorChannel = React.createClass({
   getInitialState() {
     return {
       knownValues: null,
-      hover: null
+      hoverIndex: null
     };
   },
 
@@ -225,9 +225,8 @@ let PerRowIndicatorChannel = React.createClass({
 
   draw(props) {
     const {table, width, sideWidth, start, end, colourProperty} = props;
-    const {hover} = this.state;
+    const {hoverIndex} = this.state;
     const positions = this.positions;
-    const primKeys = this.primKeys;
     const colours = this.colourVals;
     const coloursTranslucent = this.colourValsTranslucent;
     const colourData = this.colourData;
@@ -267,7 +266,6 @@ let PerRowIndicatorChannel = React.createClass({
     psy = (HEIGHT / 2) - 6;
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
-    let hoverIndex = null;
     ctx.strokeStyle = triangleMode ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.4)';
     ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
     for (let i = 0, l = numPositions; i < l; ++i) {
@@ -295,9 +293,6 @@ let PerRowIndicatorChannel = React.createClass({
           ctx.lineTo(psx, psy + 12);
           ctx.stroke();
         }
-      }
-      if (primKeys[i] === hover) {
-        hoverIndex = i;
       }
     }
     //HIGHLIGHT HOVER
@@ -380,35 +375,40 @@ let PerRowIndicatorChannel = React.createClass({
     return [e.clientX - rect.left, e.clientY - rect.top];
   },
 
+  setHover(hoverId) {
+    if (hoverId) {
+      for (let i = 0, l = this.positions.length; i < l; ++i) {
+        if (this.primKeys[i] === hoverId) {
+          this.setState({hoverIndex: i});
+          return;
+        }
+      }
+    } else {
+      this.setState({hoverIndex: null});
+    }
+  },
+
   handleMouseMove(e) {
     let [x, y] = this.convertXY(e);
     let id = this.xyToId(x, y);
-    this.setState({hover: id});
+    this.setHover(id);
   },
   handleMouseOver(e) {
     let [x, y] = this.convertXY(e);
     let id = this.xyToId(x, y);
-    this.setState({hover: id});
+    this.setHover(id);
   },
   handleMouseOut(e) {
-    this.setState({hover: null})
+    this.setState({hoverIndex: null});
   },
 
   render() {
     const {start, end, width, sideWidth, table, colourProperty} = this.props;
-    const {knownValues, hover} = this.state;
+    const {knownValues, hoverIndex} = this.state;
     const config = this.config.tablesById[table];
-    let hoverPos = null;
-    let hoverIndex = null;
+    let hoverId = this.primKeys ? this.primKeys[hoverIndex] : null;
     const scaleFactor = ((width - sideWidth) / (end - start));
-    if (hover) {
-      for (let i = 0, l = this.positions.length; i < l; ++i) {
-        if (this.primKeys[i] === hover) {
-          hoverPos = scaleFactor * (this.positions[i] - start);
-          hoverIndex = i;
-        }
-      }
-    }
+    let hoverPos = hoverId ? scaleFactor * (this.positions[hoverIndex] - start) : null;
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -429,28 +429,30 @@ let PerRowIndicatorChannel = React.createClass({
           <PropertyLegend table={table} property={colourProperty} knownValues={knownValues}/> : null}
         onClose={this.redirectedProps.onClose}
       >
-        <div className="canvas-container"><canvas ref="canvas"
-                style={{cursor: hover ? 'pointer' : 'inherit'}}
-                width={width} height={HEIGHT}
-                onClick={this.handleClick}
-                onMouseOver={this.handleMouseOver}
-                onMouseMove={this.handleMouseMove}
-                onMouseOut={this.handleMouseOut}
-        />
-        {hoverPos !== null ?
-          <Tooltip placement={'bottom'}
-                   visible={true}
-                   overlay={<div>
-                              <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hover}/></div>
+        <div className="canvas-container">
+          <canvas ref="canvas"
+                  style={{cursor: hoverId ? 'pointer' : 'inherit'}}
+                  width={width} height={HEIGHT}
+                  onClick={this.handleClick}
+                  onMouseOver={this.handleMouseOver}
+                  onMouseMove={this.handleMouseMove}
+                  onMouseOut={this.handleMouseOut}
+          />
+          {hoverPos !== null ?
+            <Tooltip placement={'bottom'}
+                     visible={true}
+                     overlay={<div>
+                              <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hoverId}/></div>
                               <table><tbody>
                               {_map(config.previewProperties, (prop) =>
                                 <tr key={prop}><td style={{paddingRight: '5px'}}>{config.propertiesById[prop].name}:</td><td><PropertyCell noLinks prop={config.propertiesById[prop]} value={this.previewData[prop][hoverIndex]} /></td></tr>)
                               }
                               </tbody></table>
                             </div>}>
-            <div style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPos-6}px`, height: '12px', width: '12px'}}/>
-          </Tooltip>
-          : null}</div>
+              <div
+                style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPos-6}px`, height: '12px', width: '12px'}}/>
+            </Tooltip>
+            : null}</div>
 
       </ChannelWithConfigDrawer>);
   }
