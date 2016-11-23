@@ -24,13 +24,14 @@ let PropertyCell = React.createClass({
 
   propTypes: {
     prop: React.PropTypes.object,
-    value: React.PropTypes.any
+    value: React.PropTypes.any,
+    noLinks: React.PropTypes.bool
   },
 
   render() {
-    let {prop, value} = this.props;
+    let {prop, value, noLinks} = this.props;
     let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
-    let descriptionIcon = prop.valueDescriptions && prop.valueDescriptions[value] ?
+    let descriptionIcon = !noLinks && prop.valueDescriptions && prop.valueDescriptions[value] ?
       <Tooltip placement="bottom"
                  trigger={['click']}
                  overlay={htmlToReactParser.parse('<span>' + prop.valueDescriptions[value] + '</span>')}>
@@ -38,7 +39,7 @@ let PropertyCell = React.createClass({
         </Tooltip> :
       null;
 
-    if (prop.externalUrl) {
+    if (prop.externalUrl && !noLinks) {
       if (prop.valueDisplays) {
         console.error(`Properties cannot have externalUrl and valueDisplays: ${prop.id}`);
       }
@@ -68,9 +69,9 @@ let PropertyCell = React.createClass({
       return <Icon className={(val ? 'prop bool true' : 'prop bool false')}
                    fixedWidth={false}
                    name={val ? 'check' : 'times'} />;
-    } else if (prop.relation) {
+    } else if (!noLinks && prop.relation) {
       return <ItemLink table={prop.relation.tableId} primKey={value} />;
-    } else if (prop.isPrimKey) {
+    } else if (!noLinks && prop.isPrimKey) {
       return <ItemLink table={prop.tableId} primKey={value} />;
     }
     return <span className="prop">

@@ -1,12 +1,11 @@
 import React from 'react';
-import Hammer from 'react-hammerjs';
+import Tooltip from 'rc-tooltip';
 import Color from 'color';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-
 import _map from 'lodash/map';
 import _isEqual from 'lodash/isEqual';
 import _transform from 'lodash/transform';
@@ -21,10 +20,11 @@ import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import {hatchRect} from 'util/CanvasDrawing';
 import QueryString from 'panoptes/QueryString';
+import PropertyCell from 'panoptes/PropertyCell';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FilterButton from 'panoptes/FilterButton';
 import {propertyColour} from 'util/Colours';
-
+import _forEach from 'lodash/forEach';
 
 const HEIGHT = 50;
 
@@ -36,6 +36,8 @@ let PerRowIndicatorChannel = React.createClass({
         'onClose'
       ],
       check: [
+        'start',
+        'end',
         'chromosome',
         'width',
         'sideWidth',
@@ -76,7 +78,8 @@ let PerRowIndicatorChannel = React.createClass({
 
   getInitialState() {
     return {
-      knownValues: null
+      knownValues: null,
+      hoverIndex: null
     };
   },
 
@@ -102,7 +105,7 @@ let PerRowIndicatorChannel = React.createClass({
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
-
+    const config = this.config.tablesById[table];
     if (this.props.chromosome !== chromosome ||
       this.props.table !== table) {
       this.applyData(props, []);
@@ -127,11 +130,14 @@ let PerRowIndicatorChannel = React.createClass({
       this.blockIndex = blockIndex;
       this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
-      let columns = [this.tableConfig().primKey, this.tableConfig().position];
+      let columns = [config.primKey, config.position];
       if (colourProperty)
         columns.push(colourProperty);
+      if (config.previewProperties) {
+        columns = columns.concat(config.previewProperties);
+      }
       let decodedQuery = SQL.WhereClause.decode(this.getDefinedQuery(query, table));
-      decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(this.tableConfig().chromosome, '=', chromosome), decodedQuery]);
+      decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(config.chromosome, '=', chromosome), decodedQuery]);
       let APIargs = {
         database: this.config.dataset,
         table,
@@ -169,19 +175,23 @@ let PerRowIndicatorChannel = React.createClass({
           throw error;
         });
     }
-    this.draw(props);
   },
 
   applyData(props, blocks) {
     let {table, colourProperty} = props;
-    this.positions = combineBlocks(blocks, this.tableConfig().position);
-    this.primKeys = combineBlocks(blocks, this.tableConfig().primKey);
+    const config = this.config.tablesById[table];
+    this.positions = combineBlocks(blocks, config.position);
+    this.primKeys = combineBlocks(blocks, config.primKey);
+    this.previewData = {};
+    if (config.previewProperties) {
+      _forEach(config.previewProperties, (prop) => this.previewData[prop] = combineBlocks(blocks, prop));
+    }
     if (colourProperty) {
       this.colourData = combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
         propertyColour(this.config.tablesById[table].propertiesById[colourProperty]));
-      this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.2).rgbString());
-      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.4).rgbString());
+      this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.1).rgbString());
+      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.3).rgbString());
     } else {
       this.colourVals = null;
       this.colourData = null;
@@ -215,6 +225,7 @@ let PerRowIndicatorChannel = React.createClass({
 
   draw(props) {
     const {table, width, sideWidth, start, end, colourProperty} = props;
+    const {hoverIndex} = this.state;
     const positions = this.positions;
     const colours = this.colourVals;
     const coloursTranslucent = this.colourValsTranslucent;
@@ -284,6 +295,33 @@ let PerRowIndicatorChannel = React.createClass({
         }
       }
     }
+    //HIGHLIGHT HOVER
+    if (hoverIndex !== null) {
+      const psx = scaleFactor * (positions[hoverIndex] - start);
+      if (psx > -6 && psx < width + 6) {
+        ctx.strokeStyle = 'rgb(0, 0, 0)';
+        ctx.fillStyle = 'rgb(214, 39, 40)';
+        if (colours) {
+          if (triangleMode) {
+            ctx.fillStyle = colours[hoverIndex];
+          } else {
+            ctx.strokeStyle = colours[hoverIndex];
+          }
+        }
+        ctx.beginPath();
+        ctx.moveTo(psx, psy);
+        if (triangleMode) {
+          ctx.lineTo(psx + 6, psy + 12);
+          ctx.lineTo(psx - 6, psy + 12);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.lineTo(psx, psy + 12);
+          ctx.stroke();
+        }
+      }
+    }
     //Record drawn values for legend
     drawnColourVals = Array.from(drawnColourVals.values());
     if (recordColours) {
@@ -296,34 +334,81 @@ let PerRowIndicatorChannel = React.createClass({
 
   },
 
-  handleTap(e) {
-    let rect = this.refs.canvas.getBoundingClientRect();
-    let x = e.center.x - rect.left;
+  handleClick(e) {
+    let [x, y] = this.convertXY(e);
+    let id = this.xyToId(x, y);
+    if (id)
+      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: id});
+  },
+
+  xyToId(x, y) {
+    const psx = (HEIGHT / 2) - 7;
+    if (y < psx || y > psx + 12) {
+      return null;
+    }
     const {width, sideWidth, start, end} = this.props;
     const positions = this.positions;
     const scaleFactor = ((width - sideWidth) / (end - start));
     //Triangles/Lines
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
+    let best = 99999;
+    let bestPrimKey = null;
     for (let i = 0, l = numPositions; i < l; ++i) {
       const psx = scaleFactor * (positions[i] - start);
       if (triangleMode) {
-        if (x < psx + 6 && x > psx - 6) {
-          this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
-          return;
+        if (x < psx + 7 && x > psx - 7 && Math.abs(x - psx) < best) {
+          best = Math.abs(x - psx);
+          bestPrimKey = this.primKeys[i];
         }
       } else {
         if (x < Math.ceil(psx) && x > Math.floor(psx)) {
-          this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
-          return;
+          return this.primKeys[i];
         }
       }
     }
+    return bestPrimKey;
+  },
+
+  convertXY(e) {
+    let rect = this.refs.canvas.getBoundingClientRect();
+    return [e.clientX - rect.left, e.clientY - rect.top];
+  },
+
+  setHover(hoverId) {
+    if (hoverId) {
+      for (let i = 0, l = this.positions.length; i < l; ++i) {
+        if (this.primKeys[i] === hoverId) {
+          this.setState({hoverIndex: i});
+          return;
+        }
+      }
+    } else {
+      this.setState({hoverIndex: null});
+    }
+  },
+
+  handleMouseMove(e) {
+    let [x, y] = this.convertXY(e);
+    let id = this.xyToId(x, y);
+    this.setHover(id);
+  },
+  handleMouseOver(e) {
+    let [x, y] = this.convertXY(e);
+    let id = this.xyToId(x, y);
+    this.setHover(id);
+  },
+  handleMouseOut(e) {
+    this.setState({hoverIndex: null});
   },
 
   render() {
-    const {width, sideWidth, table, colourProperty} = this.props;
-    const {knownValues} = this.state;
+    const {start, end, width, sideWidth, table, colourProperty} = this.props;
+    const {knownValues, hoverIndex} = this.state;
+    const config = this.config.tablesById[table];
+    let hoverId = this.primKeys ? this.primKeys[hoverIndex] : null;
+    const scaleFactor = ((width - sideWidth) / (end - start));
+    let hoverPos = hoverId ? scaleFactor * (this.positions[hoverIndex] - start) : null;
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -344,9 +429,31 @@ let PerRowIndicatorChannel = React.createClass({
           <PropertyLegend table={table} property={colourProperty} knownValues={knownValues}/> : null}
         onClose={this.redirectedProps.onClose}
       >
-        <Hammer onTap={this.handleTap}>
-          <canvas ref="canvas" width={width} height={HEIGHT} />
-        </Hammer>
+        <div className="canvas-container">
+          <canvas ref="canvas"
+                  style={{cursor: hoverId ? 'pointer' : 'inherit'}}
+                  width={width} height={HEIGHT}
+                  onClick={this.handleClick}
+                  onMouseOver={this.handleMouseOver}
+                  onMouseMove={this.handleMouseMove}
+                  onMouseOut={this.handleMouseOut}
+          />
+          {hoverPos !== null ?
+            <Tooltip placement={'bottom'}
+                     visible={true}
+                     overlay={<div>
+                              <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hoverId}/></div>
+                              <table><tbody>
+                              {_map(config.previewProperties, (prop) =>
+                                <tr key={prop}><td style={{paddingRight: '5px'}}>{config.propertiesById[prop].name}:</td><td><PropertyCell noLinks prop={config.propertiesById[prop]} value={this.previewData[prop][hoverIndex]} /></td></tr>)
+                              }
+                              </tbody></table>
+                            </div>}>
+              <div
+                style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPos-6}px`, height: '12px', width: '12px'}}/>
+            </Tooltip>
+            : null}</div>
+
       </ChannelWithConfigDrawer>);
   }
 });
@@ -385,7 +492,7 @@ const PerRowIndicatorControls = React.createClass({
     return (
       <div className="channel-controls">
         <div className="control">
-          <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
+          <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/>
         </div>
         <div className="control">
           <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>

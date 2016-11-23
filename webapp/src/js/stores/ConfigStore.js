@@ -8,6 +8,7 @@ import SQL from 'panoptes/SQL';
 import _values from 'lodash/values';
 import _each from 'lodash/each';
 import _filter from 'lodash/filter';
+import _map from 'lodash/map';
 import _sortBy from 'lodash/sortBy';
 import _keys from 'lodash/keys';
 import _cloneDeep from 'lodash/cloneDeep';
@@ -99,7 +100,8 @@ const ConfigStore = Fluxxor.createStore({
       table.namePlural = table.namePlural || table.name;
       table.capNameSingle = table.nameSingle.charAt(0).toUpperCase() + table.nameSingle.slice(1);
       table.capNamePlural = table.namePlural.charAt(0).toUpperCase() + table.namePlural.slice(1);
-      table.quickFindFields = table.quickFindFields ? table.quickFindFields.split(',') : [table.primKey];
+      table.quickFindFields = table.quickFindFields ? _map(table.quickFindFields.split(','), (s) => s.trim()) : [table.primKey];
+      table.previewProperties = table.previewProperties ? _map(table.previewProperties.split(','), (s) => s.trim()) : null;
       //TODO Remove the fa here for now - should be in settings
       if (table.icon)
         table.icon = table.icon.substring(3);

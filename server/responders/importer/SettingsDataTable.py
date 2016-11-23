@@ -94,6 +94,11 @@ class SettingsDataTable(ImportSettings):
                                    'required': False,
                                    'description': 'The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s)'
                                 }),
+                         ('previewProperties', {
+                             'type': 'PropertyIDs',
+                             'required': False,
+                             'description': 'The list of properties that will be shown (along with the primary key) when the item is previewed such as in genome browser '
+                         }),
                          ('disableSubsets', {
                                    'type': 'Boolean',
                                    'required': False,

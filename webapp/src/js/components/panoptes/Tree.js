@@ -32,10 +32,11 @@ let Tree = React.createClass({
   },
 
   handleResize(size) {
-    if (this.phylocanvas.tree) {
-      this.phylocanvas.tree.resizeToContainer();
-      this.phylocanvas.tree.fitInPanel();
-      this.phylocanvas.tree.draw();
+    var tree = this.phylocanvas.tree;
+    if (tree) {
+      tree.resizeToContainer();
+      tree.fitInPanel();
+      tree.draw();
     }
   },
 
