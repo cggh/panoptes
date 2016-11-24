@@ -14,6 +14,8 @@ import Icon from 'ui/Icon';
 // Lodash
 import _forEach from 'lodash/forEach';
 
+const TOPBAR_HEIGHT = 33; //Mirrors css variable
+
 let Popup = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -129,7 +131,7 @@ let Popup = React.createClass({
               <Icon className="pointer close" name="folder-o" onClick={this.handleMaximise}/>
               <Icon className="pointer close" name="close" onClick={this.handleClose}/>
             </div>
-            <div className="popup-body">
+            <div className="popup-body" style={{width, height: height - TOPBAR_HEIGHT}}>
               {React.cloneElement(children, {ref: 'child'})}
             </div>
             <div className="popup-drag"></div>
