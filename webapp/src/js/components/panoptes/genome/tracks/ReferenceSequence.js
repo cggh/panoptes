@@ -35,12 +35,12 @@ let ReferenceSequence = React.createClass({
         'chromosome',
         'width',
         'sideWidth',
-        'name'
+        'name',
       ]
     }),
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'start', 'end', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'start', 'end', 'width', 'sideWidth', 'hilightPosition')
   ],
 
   propTypes: {
@@ -48,6 +48,7 @@ let ReferenceSequence = React.createClass({
     start: React.PropTypes.number,
     end: React.PropTypes.number,
     width: React.PropTypes.number,
+    hilightPosition: React.PropTypes.number,
     sideWidth: React.PropTypes.number,
     onChangeLoadStatus: React.PropTypes.func
   },
@@ -201,7 +202,7 @@ let ReferenceSequence = React.createClass({
   },
 
   draw(props) {
-    const {start, end, width, sideWidth} = props;
+    const {start, end, width, sideWidth, hilightPosition} = props;
     if (!this.refs.canvas) {
       return;
     }
@@ -235,7 +236,15 @@ let ReferenceSequence = React.createClass({
           for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
             const x = xScaleFactor * (block._blockStart - start) + ((i + 1) * pixelWindowSize);
             if (x > 0 && x < maxDraw) {
+              if (block._blockStart + i + 1 === hilightPosition) {
+                ctx.font = '24px Roboto,sans-serif';
+                // ctx.fillStyle = 'black';
+              }
               ctx.fillText(SEQ_LOOKUP[base[i]] || '', x, HEIGHT / 2);
+              if (block._blockStart + i + 1 === hilightPosition) {
+                ctx.font = '14px Roboto,sans-serif';
+                // ctx.fillStyle = 'white';
+              }
             }
           }
         }

@@ -48,6 +48,9 @@ let GenotypesChannel = React.createClass({
         'onClose'
       ],
       check: [
+        'start',
+        'end',
+        'hilightPosition',
         'chromosome',
         'width',
         'sideWidth',
@@ -82,9 +85,8 @@ let GenotypesChannel = React.createClass({
       'cellAlpha',
       'cellHeight',
       'layoutGaps',
-      'rowHeight',
       'pageSize',
-      'page'
+      'page',
     ),
   ],
 
@@ -93,6 +95,7 @@ let GenotypesChannel = React.createClass({
     chromosome: React.PropTypes.string,
     start: React.PropTypes.number,
     end: React.PropTypes.number,
+    hilightPosition: React.PropTypes.number,
     width: React.PropTypes.number,
     sideWidth: React.PropTypes.number,
     name: React.PropTypes.string,
@@ -409,7 +412,7 @@ let GenotypesChannel = React.createClass({
   },
 
   render() {
-    let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
+    let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, hilightPosition} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
@@ -458,7 +461,9 @@ let GenotypesChannel = React.createClass({
               height={FAN_HEIGHT}
               start={start}
               end={end}
-              colWidth={colWidth}/>
+              colWidth={colWidth}
+              hilightPosition={hilightPosition}
+              />
               <GenotypesTable
                 table={table}
                 rowData={rowData}

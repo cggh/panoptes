@@ -20,7 +20,8 @@ let GenotypesFan = React.createClass({
     width: React.PropTypes.number,
     height: React.PropTypes.number,
     layoutBlocks: React.PropTypes.array,
-    dataBlocks: React.PropTypes.array
+    dataBlocks: React.PropTypes.array,
+    hilightPosition: React.PropTypes.number
   },
 
   componentDidMount() {
@@ -50,7 +51,7 @@ let GenotypesFan = React.createClass({
   },
 
   paint(canvas, props) {
-    const {genomicPositions, layoutBlocks, start, end, width, height, colWidth} = props;
+    const {genomicPositions, layoutBlocks, start, end, width, height, colWidth, hilightPosition} = props;
     const ctx = canvas.getContext('2d');
     const scale =  width / (end - start);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -81,14 +82,24 @@ let GenotypesFan = React.createClass({
         if (pixColWidth > 2 ||    //Skip some if things are dense
             !lastDrawn ||
             genomicPixel - lastDrawn[0] > 2 ||
-            columnPixel - lastDrawn[1] > 2) {
+            columnPixel - lastDrawn[1] > 2 ||
+            hilightPosition === genomicPositions[j]
+        ) {
           ctx.beginPath();
           ctx.moveTo(genomicPixel, 0);
           ctx.bezierCurveTo(genomicPixel, mid, columnPixel, mid, columnPixel, lineHeight);
           if (alpha === 0) {
             ctx.lineTo(columnPixel, height);
           }
-          ctx.stroke();
+          if (hilightPosition === genomicPositions[j]) {
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(80,80,80, 0.6)';
+          } else {
+            ctx.stroke();
+          }
           lastDrawn = [genomicPixel, columnPixel];
         }
       }
@@ -97,8 +108,10 @@ let GenotypesFan = React.createClass({
       //Little hat and area fill
       ctx.font = '12px Roboto';
       ctx.fillStyle = 'rgb(0,0,0)';
-      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
       ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(120,120,120, 0.75)';
+      ctx.fillStyle = 'rgba(190,190,190, 0.75)';
+
       //Reduce the width if things are big
       let drawPixColWidth = pixColWidth;
       if (pixColWidth > 120) {
@@ -109,18 +122,15 @@ let GenotypesFan = React.createClass({
       for (let i = 0, iend = layoutBlocks.length; i < iend; ++i) {
         const [blockStart, blockEnd, colStart] = layoutBlocks[i];
         for (let j = blockStart, jCol = colStart + 0.5; j < blockEnd; ++j, ++jCol) {
-          // var key = col_primary_key[i];
-          let colour = 'rgba(190,190,190, 0.75)';
-          ctx.strokeStyle = 'rgba(120,120,120, 0.75)';
-          // if (fncIsColSelected(key)) {
-          //   var colour = 'rgba(190,80,80, 0.75)';
-          //   ctx.strokeStyle = 'rgba(150, 0, 0, 0.75)';
-          // }
-          ctx.fillStyle = colour;
           const spos = jCol * pixColWidth;
           let middle = drawPixColWidth / 2;
 
           ctx.save();
+          if (hilightPosition === genomicPositions[j]) {
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'black';
+            ctx.fillStyle = 'black';
+          }
           ctx.translate(spos - middle, height);
           ctx.beginPath();
           ctx.moveTo(0, 0);

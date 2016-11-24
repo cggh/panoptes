@@ -62,7 +62,8 @@ let GenomeBrowser = React.createClass({
       springConfig: DEFAULT_SPRING,
       loading: 0,
       width: 0,
-      height: 0
+      height: 0,
+      hoverItem: null
     };
   },
 
@@ -218,12 +219,16 @@ let GenomeBrowser = React.createClass({
     this.setState({loading: this.loading});
   },
 
+  handleHover(hoverPos) {
+    this.setState({hoverPos});
+  },
+
   render() {
     let {start, end, sideWidth, chromosome, children} = this.props;
     children = filterChildren(this, children); //Remove whitespace children from template padding
 
     chromosome = chromosome || this.defaultChrom;
-    let {loading} = this.state;
+    let {loading, hoverPos} = this.state;
     if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
 
@@ -277,7 +282,9 @@ let GenomeBrowser = React.createClass({
                     end: end,
                     width: width,
                     sideWidth: sideWidth,
-                    onChangeLoadStatus: this.handleChangeLoadStatus
+                    onChangeLoadStatus: this.handleChangeLoadStatus,
+                    onPositionHover: this.handleHover,
+                    hilightPosition: hoverPos,
                   };
                   return (
                     <div className="tracks vertical stack">

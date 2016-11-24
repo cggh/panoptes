@@ -45,7 +45,8 @@ let PerRowIndicatorChannel = React.createClass({
         'name',
         'table',
         'colourProperty',
-        'query'
+        'query',
+        'hilightPosition'
       ]
     }),
     FluxMixin,
@@ -65,7 +66,9 @@ let PerRowIndicatorChannel = React.createClass({
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
     colourProperty: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func
+    hilightPosition: React.PropTypes.number,
+    onChangeLoadStatus: React.PropTypes.func,
+    onPositionHover: React.PropTypes.func,
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -225,8 +228,8 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   draw(props) {
-    const {table, width, sideWidth, start, end, colourProperty} = props;
-    const {hoverIndex} = this.state;
+    const {table, width, sideWidth, start, end, colourProperty, hilightPosition} = props;
+    let {hoverIndex} = this.state;
     const positions = this.positions;
     const colours = this.colourVals;
     const coloursTranslucent = this.colourValsTranslucent;
@@ -270,6 +273,9 @@ let PerRowIndicatorChannel = React.createClass({
     ctx.strokeStyle = triangleMode ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.4)';
     ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
     for (let i = 0, l = numPositions; i < l; ++i) {
+      if (positions[i] === hilightPosition) {
+        hoverIndex = i;
+      }
       const psx = scaleFactor * (positions[i] - start);
       if (psx > -6 && psx < width + 6) {
         if (colours) {
@@ -310,15 +316,15 @@ let PerRowIndicatorChannel = React.createClass({
           }
         }
         ctx.beginPath();
-        ctx.moveTo(psx, psy);
+        ctx.moveTo(psx, psy-6);
         if (triangleMode) {
-          ctx.lineTo(psx + 6, psy + 12);
-          ctx.lineTo(psx - 6, psy + 12);
+          ctx.lineTo(psx + 12, psy + 18);
+          ctx.lineTo(psx - 12, psy + 18);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
         } else {
-          ctx.lineTo(psx, psy + 12);
+          ctx.lineTo(psx, psy + 18);
           ctx.stroke();
         }
       }
@@ -386,11 +392,17 @@ let PerRowIndicatorChannel = React.createClass({
       for (let i = 0, l = this.positions.length; i < l; ++i) {
         if (this.primKeys[i] === hoverId) {
           this.setState({hoverIndex: i});
+          if (this.props.onPositionHover) {
+            this.props.onPositionHover(this.positions[i]);
+          }
           return;
         }
       }
     } else {
       this.setState({hoverIndex: null});
+      if (this.props.onPositionHover) {
+        this.props.onPositionHover(null);
+      }
     }
   },
 
@@ -405,7 +417,7 @@ let PerRowIndicatorChannel = React.createClass({
     this.setHover(id);
   },
   handleMouseOut(e) {
-    this.setState({hoverIndex: null});
+    this.setHover(null);
   },
 
   render() {
@@ -451,7 +463,7 @@ let PerRowIndicatorChannel = React.createClass({
             />
           </Hammer>
           {hoverPos !== null ?
-            <Tooltip placement={'bottom'}
+            <Tooltip placement={'right'}
                      visible={true}
                      overlay={<div>
                               <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hoverId}/></div>
