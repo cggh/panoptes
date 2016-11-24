@@ -1,6 +1,7 @@
 import React from 'react';
 import Tooltip from 'rc-tooltip';
 import Color from 'color';
+import Hammer from 'react-hammerjs'
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -337,8 +338,9 @@ let PerRowIndicatorChannel = React.createClass({
   handleClick(e) {
     let [x, y] = this.convertXY(e);
     let id = this.xyToId(x, y);
-    if (id)
+    if (id) {
       this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: id});
+    }
   },
 
   xyToId(x, y) {
@@ -372,7 +374,11 @@ let PerRowIndicatorChannel = React.createClass({
 
   convertXY(e) {
     let rect = this.refs.canvas.getBoundingClientRect();
-    return [e.clientX - rect.left, e.clientY - rect.top];
+    if (e.center) {
+      return [e.center.x - rect.left, e.center.y - rect.top];
+    } else {
+      return [e.clientX - rect.left, e.clientY - rect.top];
+    }
   },
 
   setHover(hoverId) {
@@ -409,6 +415,11 @@ let PerRowIndicatorChannel = React.createClass({
     let hoverId = this.primKeys ? this.primKeys[hoverIndex] : null;
     const scaleFactor = ((width - sideWidth) / (end - start));
     let hoverPos = hoverId ? scaleFactor * (this.positions[hoverIndex] - start) : null;
+    const hammerOptions = {
+      recognizers: {
+        tap: {enable: true}
+      }
+    };
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -430,14 +441,15 @@ let PerRowIndicatorChannel = React.createClass({
         onClose={this.redirectedProps.onClose}
       >
         <div className="canvas-container">
-          <canvas ref="canvas"
-                  style={{cursor: hoverId ? 'pointer' : 'inherit'}}
-                  width={width} height={HEIGHT}
-                  onClick={this.handleClick}
-                  onMouseOver={this.handleMouseOver}
-                  onMouseMove={this.handleMouseMove}
-                  onMouseOut={this.handleMouseOut}
-          />
+          <Hammer onTap={this.handleClick} options={hammerOptions}>
+            <canvas ref="canvas"
+                    style={{cursor: hoverId ? 'pointer' : 'inherit'}}
+                    width={width} height={HEIGHT}
+                    onMouseOver={this.handleMouseOver}
+                    onMouseMove={this.handleMouseMove}
+                    onMouseOut={this.handleMouseOut}
+            />
+          </Hammer>
           {hoverPos !== null ?
             <Tooltip placement={'bottom'}
                      visible={true}

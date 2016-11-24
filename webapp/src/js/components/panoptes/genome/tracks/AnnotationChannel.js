@@ -13,6 +13,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
+import Hammer from 'react-hammerjs'
 
 const ROW_HEIGHT = 24;
 
@@ -205,6 +206,7 @@ let AnnotationChannel = React.createClass({
     }
     if (hoverIndex !== null) {
       const x1 = scaleFactor * (starts[hoverIndex] - start);
+      const x2 = scaleFactor * ((starts[hoverIndex] + sizes[hoverIndex]) - start);
       let text = ids[hoverIndex] + (names[hoverIndex] && names[hoverIndex] !== ids[hoverIndex] ? ` - ${names[hoverIndex]}` : '');
       if (text) {
         ctx.fillStyle = '#FFF';
@@ -213,6 +215,7 @@ let AnnotationChannel = React.createClass({
         ctx.font = 'bold 10px monospace';
         ctx.fillText(text, x1, (rows[hoverIndex] * ROW_HEIGHT) + 14);
       }
+      ctx.fillRect(x1, (rows[hoverIndex] * ROW_HEIGHT) + 19, Math.max(1, x2 - x1), 4);   //Gene bar
     }
     const desiredHeight = Math.max((maxRow + 1) * ROW_HEIGHT + 10, 40);
     if (desiredHeight !== height)
@@ -221,7 +224,11 @@ let AnnotationChannel = React.createClass({
 
   convertXY(e) {
     let rect = this.refs.canvas.getBoundingClientRect();
-    return [e.clientX - rect.left, e.clientY - rect.top];
+    if (e.center) {
+      return [e.center.x - rect.left, e.center.y - rect.top];
+    } else {
+      return [e.clientX - rect.left, e.clientY - rect.top];
+    }
   },
 
   xyToGene(x, y) {
@@ -281,8 +288,13 @@ let AnnotationChannel = React.createClass({
   render() {
     let {start, end, width, sideWidth, name} = this.props;
     let {height, hoverIndex} = this.state;
-    let hoverId = this.data && this.data.ids ? this.data.ids[hoverIndex] : null;
+    let hoverId = (this.data && this.data.ids) ? this.data.ids[hoverIndex] : null;
     let scaleFactor = ((width - sideWidth) / (end - start));
+    const hammerOptions = {
+      recognizers: {
+        tap: {enable: true}
+      }
+    };
 
     return (
       <ChannelWithConfigDrawer
@@ -299,14 +311,15 @@ let AnnotationChannel = React.createClass({
         onClose={null}
       >
         <div className="canvas-container">
-          <canvas ref="canvas"
-                  style={{cursor: hoverId !== null ? 'pointer' : 'inherit'}}
-                  width={width} height={height}
-                  onClick={this.handleClick}
-                  onMouseOver={this.handleMouseOver}
-                  onMouseMove={this.handleMouseMove}
-                  onMouseOut={this.handleMouseOut}
-          />
+          <Hammer onTap={this.handleClick} options={hammerOptions}>
+            <canvas ref="canvas"
+                    style={{cursor: hoverId !== null && hoverId !== undefined ? 'pointer' : 'inherit'}}
+                    width={width} height={height}
+                    onMouseOver={this.handleMouseOver}
+                    onMouseMove={this.handleMouseMove}
+                    onMouseOut={this.handleMouseOut}
+            />
+          </Hammer>
           {hoverIndex !== null ?
             <Tooltip placement={'bottom'}
                      visible={true}

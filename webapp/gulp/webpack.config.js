@@ -61,8 +61,8 @@ module.exports = {
         'NODE_ENV': JSON.stringify('production')
       }
     }),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin(),
+    // new webpack.optimize.DedupePlugin(),
+    // new webpack.optimize.UglifyJsPlugin(),
     new CopyWebpackPlugin([
       //Using this method for the favicons - this method should not be used generally, esp in JS where one can require(IMAGE_PATH)
       {from: 'src/images/favicons', to: 'images/favicons'},
