@@ -20,7 +20,7 @@ from PanoptesConfig import PanoptesConfig
 from ImportSettings import valueTypes
 from dates import datetimeToJulianDay
 
-pool = multiprocessing.dummy.Pool(multiprocessing.cpu_count()/2)
+pool = multiprocessing.dummy.Pool(max(int(multiprocessing.cpu_count()/2),1))
 
 class ImportDataTable(BaseImport):
 
