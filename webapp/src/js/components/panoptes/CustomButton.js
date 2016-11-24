@@ -1,10 +1,7 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
-import Icon from 'ui/Icon';
-import RaisedButton from 'material-ui/RaisedButton';
 import filterChildren from 'util/filterChildren';
-import _isArray from 'lodash/isArray';
 import Anchor from 'panoptes/Anchor';
 import Content from 'panoptes/Content';
 

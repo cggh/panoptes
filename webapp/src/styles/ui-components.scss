@@ -196,6 +196,7 @@
     flex: 1;
     flex-basis: auto;  //IE11 https://github.com/philipwalton/flexbugs number 4 I believe.
     overflow: auto;
+    height: 100%;
   }
 }
 
@@ -242,6 +243,11 @@
 //Had to inline as npm dir not accesible on build.
 .react-resizable {
   position: relative;
+}
+
+.react-resizable-handle {
+  z-index: 9999;
+  background-color: rgba(255,255,255,0.6);
 }
 
 .react-resizable-handle.react-draggable {
