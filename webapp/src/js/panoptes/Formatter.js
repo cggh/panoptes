@@ -41,10 +41,10 @@ export default function(property, value) {
   }
 
   // Convert to LocaleString if numeric and not a year, e.g. 2016
-  if (!isNaN(value) && value >= 10000) {
+  if (!isNaN(value) && value < 10000) {
     // Preserve years, e.g. 2016
-    return value.toLocaleString();
+    return value;
   }
 
-  return value;
+  return value.toLocaleString();
 }
