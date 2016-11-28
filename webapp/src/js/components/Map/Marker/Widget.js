@@ -53,13 +53,10 @@ let Marker = React.createClass({
       children = React.Children.only(children);
     }
 
-    // FIXME: Works around broken default marker icon in react-leaflet v1.0.0-rc.1
-    let icon = window.L.icon({
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/images/marker-icon.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/images/marker-shadow.png',
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/images/marker-icon-2x.png',
-      iconAnchor: [12.5, 41]
-    });
+    //FIXME: If no Default.imagePath is specified, get errors (ERR_INVALID_URL):
+    // data:image/png;base64,iVBORw0...5CYII=")marker-icon.png
+
+    window.L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/';
 
     return (
       <LeafletMarker
@@ -70,7 +67,6 @@ let Marker = React.createClass({
         children={children}
         opacity={opacity}
         zIndexOffset={zIndexOffset}
-        icon={icon}
       />
     );
 
