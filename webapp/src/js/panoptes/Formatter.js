@@ -4,6 +4,7 @@ let JD2DateTime = function(JD) {
 };
 
 export default function(property, value) {
+
   if (property.isText) {
     return value === null ? '' : value;
   }
@@ -32,9 +33,18 @@ export default function(property, value) {
 
     // Try to convert string representations to float, e.g. "1.01" => 1.01
     // Strings do not have a toFixed() method.
-    let parsedValue = parseFloat(value);
+    // Then fix to property.decimDigits.
+    // Then convert to LocaleString.
+    return parseFloat(value).toFixed(property.decimDigits).toLocaleString();
 
-    return parsedValue.toFixed(property.decimDigits).toLocaleString();
+    // NB: assuming isFloat never represent years, e.g. 2016
   }
-  return value.toLocaleString();
+
+  // Convert to LocaleString if numeric and not a year, e.g. 2016
+  if (!isNaN(value) && value >= 10000) {
+    // Preserve years, e.g. 2016
+    return value.toLocaleString();
+  }
+
+  return value;
 }
