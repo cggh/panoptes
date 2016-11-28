@@ -9,6 +9,7 @@ import _keys from 'lodash/keys';
 import d3 from 'd3';
 import scrollbarSize from 'scrollbar-size';
 import ValidComponentChildren from 'util/ValidComponentChildren';
+import normalizeWheel from 'normalize-wheel';
 
 import Hammer from 'react-hammerjs';
 import {Motion, spring} from 'react-motion';
@@ -162,7 +163,7 @@ let GenomeBrowser = React.createClass({
   handleMouseWheel(e) {
     if (!this.isEventInPanningArea(e))
       return;
-    this.handleZoom(e.clientX - offset(e.currentTarget).left, e.deltaY);
+    this.handleZoom(e.clientX - offset(e.currentTarget).left, normalizeWheel(e).pixelY);
     e.stopPropagation();
     e.preventDefault();
   },
@@ -314,5 +315,3 @@ let GenomeBrowser = React.createClass({
 });
 
 export default GenomeBrowser;
-
-
