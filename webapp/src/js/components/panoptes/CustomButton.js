@@ -13,7 +13,7 @@ let CustomButton = React.createClass({
 
   propTypes: {
     target: React.PropTypes.string,
-    children: function (props, propName, componentName) {
+    children: function(props, propName, componentName) {
       // Only accept a single child, of the appropriate type
       let children = filterChildren(this, React.Children.toArray(props[propName]));
       if (!(children[0].type === Anchor && children[1].type === Content))
@@ -31,11 +31,15 @@ let CustomButton = React.createClass({
   },
 
   handleClick(e) {
-    let {children} = this.props;
+    let {children, target} = this.props;
     children = filterChildren(this, React.Children.toArray(children));
     let [anchor, content] = children;
     const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
-    this.getFlux().actions.session.popupOpen(content, !middleClick);
+    if (target === 'tab') {
+      this.getFlux().actions.session.tabOpen(content, !middleClick);
+    } else {
+      this.getFlux().actions.session.popupOpen(content, !middleClick);
+    }
   },
 
   render() {

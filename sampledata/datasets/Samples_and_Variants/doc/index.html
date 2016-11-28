@@ -22,16 +22,19 @@
         <PopupButton>
             <div>Some <b>config specified</b> content</div>
         </PopupButton>
-        <p>A custom button targeting a tab:
-            <CustomButton target="tab">
-                <Anchor>
-                    <span style="background-color: lightblue"><i class="fa fa-globe" /> Click here for the same thing</span>
-                </Anchor>
-                <Content>
-                    <span><i class="fa fa-globe" /> The same thing</span>
-                </Content>
-            </CustomButton>
-        </p>
+        <p>A popup button targeting a tab:</p>
+        <PopupButton label="Tree of samples" target="tab">
+            <TreeContainer table="samples" tree="tree2"/>
+        </PopupButton>
+        <p>A custom button targeting a tab:</p>
+	<CustomButton target="tab">
+            <Anchor>
+                <span style="background-color: lightblue"><i class="fa fa-globe" /> Click here for the same thing</span>
+            </Anchor>
+            <Content>
+                <span><i class="fa fa-globe" /> The same thing</span>
+            </Content>
+	</CustomButton>
         <p>A table, with styled headers</p>
         <div style="position:relative;height:150px">
             <PivotTableView table="variants" columnProperty="Extra_1" rowProperty="HighQuality"/>

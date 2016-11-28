@@ -16,19 +16,25 @@ let PopupButton = React.createClass({
     label: React.PropTypes.string,
     icon: React.PropTypes.string,
     children: React.PropTypes.node,
+    target: React.PropTypes.string
   },
 
   getDefaultProps() {
     return {
       label: 'Untitled',
       icon: 'circle',
+      target: 'popup'
     };
   },
 
   handleClick(e) {
-    let {children} = this.props;
+    let {children, target} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    this.getFlux().actions.session.popupOpen(filterChildren(this, children), !middleClick);
+    if (target === 'tab') {
+      this.getFlux().actions.session.tabOpen(filterChildren(this, children), !middleClick);
+    } else {
+      this.getFlux().actions.session.popupOpen(filterChildren(this, children), !middleClick);
+    }
   },
 
   render() {
