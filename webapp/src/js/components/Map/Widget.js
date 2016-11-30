@@ -90,9 +90,13 @@ let Map = React.createClass({
     changeLayerStatus: React.PropTypes.func
   },
 
+  getCRS() {
+    return (this.map !== undefined && this.map !== null) ? this.map.leafletElement.options.crs : window.L.CRS.EPSG3857;
+  },
+
   getChildContext() {
     return {
-      crs: (this.map !== undefined && this.map !== null) ? this.map.leafletElement.options.crs : window.L.CRS.EPSG3857,
+      crs: this.getCRS(),
       changeLayerStatus: this.handleChangeLayerStatus
     };
   },
@@ -272,6 +276,11 @@ let Map = React.createClass({
     // TODO: boundsOptions: {padding: [1, 1]},
 
     // NB: if bounds is undefined then it will not be regarded as a prop (and therefore not an invalid prop).
+
+    let crs = window.L.extend({}, this.getCRS(), {
+      scale: (zoom) => 256 * Math.pow(2, zoom)
+    });
+
     let commonMapProps = {
       bounds: center && (zoom !== undefined) ? undefined : bounds,
       center: center,
@@ -280,7 +289,8 @@ let Map = React.createClass({
       style: widgetStyle,
       ref: (ref) => this.map = ref,
       zoom: zoom,
-      zoomAnimation: false
+      zoomAnimation: false,
+      crs: crs
     };
 
     let mapComponent = null;
