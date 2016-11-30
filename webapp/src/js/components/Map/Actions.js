@@ -34,6 +34,8 @@ import SQL from 'panoptes/SQL';
 import TableMap from 'Map/Table/Widget';
 import TableMarkersLayer from 'Map/TableMarkersLayer/Widget';
 import TileLayer from 'Map/TileLayer/Widget';
+import PropertySelector from 'panoptes/PropertySelector';
+import PropertyLegend from 'panoptes/PropertyLegend';
 
 import 'map.scss';
 
@@ -57,6 +59,7 @@ let MapActions = React.createClass({
     sidebar: React.PropTypes.bool,
     baseTileLayer: React.PropTypes.string,
     baseTileLayerProps: React.PropTypes.object,
+    markerColourProperty: React.PropTypes.string,
     overlayLayer: React.PropTypes.string,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
@@ -252,6 +255,10 @@ let MapActions = React.createClass({
 
   },
 
+  handleChangeMarkerColourProperty(markerColourProperty) {
+    this.props.setProps({markerColourProperty});
+  },
+
   // Other functions
   icon() {
     return 'globe';
@@ -287,7 +294,7 @@ let MapActions = React.createClass({
   },
 
   render() {
-    let {center, setProps, baseTileLayer, baseTileLayerProps, overlayLayer, sidebar, table, zoom} = this.props;
+    let {center, setProps, baseTileLayer, baseTileLayerProps, markerColourProperty, overlayLayer, sidebar, table, zoom} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -492,6 +499,15 @@ let MapActions = React.createClass({
           >
             {this.overlayLayersMenu}
           </SelectField>
+          {table ?
+            <PropertySelector
+              table={table}
+              value={markerColourProperty}
+              label="Marker colour"
+              onSelect={this.handleChangeMarkerColourProperty}
+              allowNull={true}
+            />
+          : null }
           {
             this.config.user.isManager ?
               <TextField
@@ -502,6 +518,17 @@ let MapActions = React.createClass({
               />
             : null
           }
+          <div className="legend">
+          {markerColourProperty ?
+            <div>
+            <p>Marker colours</p>
+            <PropertyLegend
+              table={table}
+              property={markerColourProperty}
+            />
+            </div>
+          : null }
+          </div>
         </div>
       </div>
     );
