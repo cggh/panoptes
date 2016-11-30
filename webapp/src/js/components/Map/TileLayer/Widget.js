@@ -83,13 +83,17 @@ let TileLayer = React.createClass({
     // Perhaps use bounds instead, if possible, which will prevent 404 errors.
     // errorTileUrl="/dist/mapTiles/invisible.png"
 
+    // NB: "If [detectRetina: true] and user is on a retina display, it will
+    // request four tiles of half the specified size and a bigger zoom level in
+    // place of one to utilize the high resolution."
+
     return (
       <LeafletTileLayer
         {...adaptedProps}
         attribution={attribution}
         bounds={bounds}
         children={undefined}
-        detectRetinea="true"
+        detectRetina="true"
         ext={ext}
         format={format}
         key={JSON.stringify({attribution, maxNativeZoom, maxZoom, minZoom, variant})}
