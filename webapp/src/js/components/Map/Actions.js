@@ -466,7 +466,6 @@ let MapActions = React.createClass({
     // Wrap the map template code in a container with dimensions.
     let templateCode = '<div style="width:300px;height:300px">' + jsxToString(map, {ignoreProps: ['setProps', 'onChange']}) + '</div>';
 
-
     let sidebarContent = (
       <div className="sidebar map-sidebar">
         <SidebarHeader icon={this.icon()} description="View data geographically"/>
@@ -479,7 +478,7 @@ let MapActions = React.createClass({
             value={table}
           />
           {
-            table ?
+            table !== undefined && table !== NULL_MARKER_LAYER ?
               <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null
           }
@@ -499,7 +498,7 @@ let MapActions = React.createClass({
           >
             {this.overlayLayersMenu}
           </SelectField>
-          {table ?
+          {table !== undefined && table !== NULL_MARKER_LAYER ?
             <PropertySelector
               table={table}
               value={markerColourProperty}
@@ -508,6 +507,17 @@ let MapActions = React.createClass({
               allowNull={true}
             />
           : null }
+          <div className="legend">
+          {table !== undefined && table !== NULL_MARKER_LAYER && markerColourProperty ?
+            <div>
+            <p>Marker colours</p>
+            <PropertyLegend
+              table={table}
+              property={markerColourProperty}
+            />
+            </div>
+          : null }
+          </div>
           {
             this.config.user.isManager ?
               <TextField
@@ -518,17 +528,6 @@ let MapActions = React.createClass({
               />
             : null
           }
-          <div className="legend">
-          {markerColourProperty ?
-            <div>
-            <p>Marker colours</p>
-            <PropertyLegend
-              table={table}
-              property={markerColourProperty}
-            />
-            </div>
-          : null }
-          </div>
         </div>
       </div>
     );
