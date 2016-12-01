@@ -178,9 +178,12 @@ let TableMarkersLayer = React.createClass({
             isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
           }
 
-          let markerColourFunction = propertyColour(this.config.tablesById[table].propertiesById[markerColourProperty]);
-
-          let nullifiedFillColourValue = (data[i][markerColourProperty] === '' ? null : data[i][markerColourProperty]);
+          let fillColour = '#3D8BD5';
+          if (markerColourProperty !== undefined) {
+            let markerColourFunction = propertyColour(this.config.tablesById[table].propertiesById[markerColourProperty]);
+            let nullifiedFillColourValue = (data[i][markerColourProperty] === '' ? null : data[i][markerColourProperty]);
+            fillColour = markerColourFunction(nullifiedFillColourValue);
+          }
 
           markers.push({
             isHighlighted: isHighlighted,
@@ -189,7 +192,7 @@ let TableMarkersLayer = React.createClass({
             lng: parseFloat(data[i][locationTableConfig.longitude]),
             primKey: locationDataPrimKey,
             title: locationDataPrimKey,
-            fillColour: markerColourFunction(nullifiedFillColourValue)
+            fillColour
           });
 
         }
