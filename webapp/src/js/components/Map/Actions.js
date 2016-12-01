@@ -439,7 +439,7 @@ let MapActions = React.createClass({
           <BaseLayer
             checked={true}
           >
-            <TileLayer zIndex="1" />
+            <TileLayer zIndex={1} />
           </BaseLayer>
         );
       }
