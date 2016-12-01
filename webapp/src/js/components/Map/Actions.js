@@ -309,13 +309,11 @@ let MapActions = React.createClass({
     // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
     tableOptions = [{value: NULL_MARKER_LAYER, leftIcon: undefined, label: NULL_MARKER_LAYER}].concat(tableOptions);
 
-
     // If no table has been selected, just show a map with the other selected layers (if any).
 
     let markersLayerComponent = null;
     let baseLayerComponent = null;
     let overlayLayerComponent = null;
-
 
     let adaptedMarkersLayerProps = {};
 
@@ -323,6 +321,10 @@ let MapActions = React.createClass({
 
       if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
         adaptedMarkersLayerProps.query = this.getDefinedQuery();
+      }
+
+      if (markerColourProperty !== undefined) {
+        adaptedMarkersLayerProps.markerColourProperty = markerColourProperty;
       }
 
       // NB: This might not be used, if/when only a table has been selected.
