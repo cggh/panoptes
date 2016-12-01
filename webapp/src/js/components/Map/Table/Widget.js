@@ -42,6 +42,7 @@ let TableMap = React.createClass({
   propTypes: {
     center: React.PropTypes.object,
     highlight: React.PropTypes.string,
+    markerColourProperty: React.PropTypes.string,
     onChange: React.PropTypes.func,
     primKey: React.PropTypes.string,
     query: React.PropTypes.string,
@@ -66,6 +67,7 @@ let TableMap = React.createClass({
     let {
       center,
       highlight,
+      markerColourProperty,
       onChange,
       primKey,
       setProps,
@@ -97,6 +99,7 @@ let TableMap = React.createClass({
           table={table}
           primKey={primKey}
           query={this.getDefinedQuery()}
+          markerColourProperty={markerColourProperty}
         />
       </Map>
     );

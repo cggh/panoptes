@@ -13,13 +13,14 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroup from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
+import {propertyColour} from 'util/Colours';
 
 let TableMarkersLayer = React.createClass({
 
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('highlight', 'primKey', 'query', 'table')
+    DataFetcherMixin('highlight', 'primKey', 'query', 'table', 'markerColourProperty')
   ],
 
   //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
@@ -36,7 +37,8 @@ let TableMarkersLayer = React.createClass({
     map: React.PropTypes.object,
     primKey: React.PropTypes.string, // if not specified then all table records are used
     query: React.PropTypes.string,
-    table: React.PropTypes.string
+    table: React.PropTypes.string,
+    markerColourProperty: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -75,7 +77,7 @@ let TableMarkersLayer = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {highlight, primKey, table, query} = props;
+    let {highlight, primKey, table, query, markerColourProperty} = props;
 
     let {changeLayerStatus} = this.context;
 
@@ -119,6 +121,14 @@ let TableMarkersLayer = React.createClass({
         } else {
           locationColumns.push(highlightField);
         }
+      }
+    }
+
+    if (markerColourProperty !== undefined && typeof markerColourProperty === 'string' && markerColourProperty !== '') {
+      if (tableConfig.propertiesById[markerColourProperty] === undefined) {
+        console.error('The specified markerColourProperty field ' + markerColourProperty + ' was not found in the table ' + table);
+      } else {
+        locationColumns.push(markerColourProperty);
       }
     }
 
@@ -168,6 +178,10 @@ let TableMarkersLayer = React.createClass({
             isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
           }
 
+          let markerColourFunction = propertyColour(this.config.tablesById[table].propertiesById[markerColourProperty]);
+
+          let nullifiedFillColourValue = (data[i][markerColourProperty] === '' ? null : data[i][markerColourProperty]);
+
           markers.push({
             isHighlighted: isHighlighted,
             table,
@@ -175,6 +189,7 @@ let TableMarkersLayer = React.createClass({
             lng: parseFloat(data[i][locationTableConfig.longitude]),
             primKey: locationDataPrimKey,
             title: locationDataPrimKey,
+            fillColour: markerColourFunction(nullifiedFillColourValue)
           });
 
         }
@@ -228,7 +243,7 @@ let TableMarkersLayer = React.createClass({
             zIndexOffset={i}
           >
             <svg height="12" width="12">
-              <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />
+              <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill={marker.fillColour} />
             </svg>
           </ComponentMarker>
         );
