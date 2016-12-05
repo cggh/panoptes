@@ -79,6 +79,7 @@ let Map = React.createClass({
   propTypes: {
     center: React.PropTypes.object,
     children: React.PropTypes.node,
+    customControls: React.PropTypes.array,
     setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
     onChange: React.PropTypes.func,
     title: React.PropTypes.string,
@@ -111,6 +112,17 @@ let Map = React.createClass({
     };
   },
 
+  componentDidMount() {
+
+    let {customControls} = this.props;
+
+    if (this.map !== undefined && customControls !== undefined) {
+      for (let i = 0, len = customControls.length; i < len; i++) {
+        customControls[i].addTo(this.map.leafletElement);
+      }
+    }
+
+  },
 
   // Event handlers
   handleChangeLayerStatus(payload) {
@@ -203,7 +215,7 @@ let Map = React.createClass({
   },
 
   render() {
-    let {center, children, zoom} = this.props;
+    let {center, children, controls, zoom} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     let {bounds, loadStatus} = this.state;
 
