@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 import jsxToString from 'jsx-to-string';
 import scrollbarSize from 'scrollbar-size';
@@ -326,25 +327,20 @@ let MapActions = React.createClass({
       }
 
       if (markerColourProperty !== undefined) {
+
         adaptedMarkersLayerProps.markerColourProperty = markerColourProperty;
 
-        let legend = window.L.control({position: 'bottomleft'});
+        let legend = ReactDOMServer.renderToStaticMarkup(
+            <PropertyLegend
+              flux={this.flux}
+              property={markerColourProperty}
+              table={table}
+            />
+        );
+        let position = 'bottomleft';
+        let className = 'legend';
 
-        legend.onAdd = function(map) {
-
-          let div = window.L.DomUtil.create('div', 'map-legend');
-          let grades = [0, 10, 20, 50, 100, 200, 500, 1000];
-
-          for (let i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background: #000000"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-          }
-
-          return div;
-        };
-
-        customMapControls.push(legend);
+        customMapControls.push({component: legend, position, className});
       }
 
       // NB: This might not be used, if/when only a table has been selected.

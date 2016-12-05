@@ -112,14 +112,44 @@ let Map = React.createClass({
     };
   },
 
-  componentDidMount() {
+  componentDidUpdate() {
+    this.updateCustomControls();
+  },
+
+  updateCustomControls() {
 
     let {customControls} = this.props;
 
-    if (this.map !== undefined && customControls !== undefined) {
-      for (let i = 0, len = customControls.length; i < len; i++) {
-        customControls[i].addTo(this.map.leafletElement);
+    if (this.map !== undefined) {
+
+      // TODO: performance & parsimony
+
+      // Remove all the previous controls
+      if (this.customControls !== undefined && this.customControls.length > 0) {
+        for (let i = 0, len = this.customControls.length; i < len; i++) {
+          this.map.leafletElement.removeControl(this.customControls[i]);
+        }
       }
+      // Reset the register of custom controls.
+      this.customControls = [];
+
+      if (customControls !== undefined) {
+        for (let i = 0, len = customControls.length; i < len; i++) {
+
+          let control = window.L.control({position: customControls[i].position});
+
+          control.onAdd = function(map) {
+            let div = window.L.DomUtil.create('div', 'map-custom-control ' + customControls[i].className);
+            div.innerHTML = customControls[i].component;
+            return div;
+          };
+
+          control.addTo(this.map.leafletElement);
+
+          this.customControls.push(control);
+        }
+      }
+
     }
 
   },
@@ -215,7 +245,7 @@ let Map = React.createClass({
   },
 
   render() {
-    let {center, children, controls, zoom} = this.props;
+    let {center, children, zoom} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     let {bounds, loadStatus} = this.state;
 
