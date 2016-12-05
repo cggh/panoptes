@@ -4,6 +4,7 @@
   width: 280px;
 }
 
+// NB: .map-controls is on the sidebar
 .map-controls {
   align-items: flex-start;
   .dropdown-option {
@@ -42,10 +43,22 @@
   }
 }
 
-// NB: .map-controls.legend is on the sidebar, whereas this one is on the map
-.map-legend {
+// Custom controls (e.g. legend) on the map itself
+.map-custom-control {
   background-color: white;
   opacity: 0.7;
-  padding: 8px 10px 8px 10px;
   border-radius: 10px;
+  .legend {
+    padding: 5px 10px 5px 10px;
+    // NB: copied from genomebrowser.scss (and tree.scss)
+    .legend-element {
+      min-height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      .label {
+        padding-left: 8px;
+      }
+    }
+  }
 }
