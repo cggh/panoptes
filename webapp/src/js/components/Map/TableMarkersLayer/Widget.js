@@ -179,7 +179,7 @@ let TableMarkersLayer = React.createClass({
           }
 
           let fillColour = '#3D8BD5';
-          if (markerColourProperty !== undefined) {
+          if (markerColourProperty !== undefined && markerColourProperty !== null) {
             let markerColourFunction = propertyColour(this.config.tablesById[table].propertiesById[markerColourProperty]);
             let nullifiedFillColourValue = (data[i][markerColourProperty] === '' ? null : data[i][markerColourProperty]);
             fillColour = markerColourFunction(nullifiedFillColourValue);
