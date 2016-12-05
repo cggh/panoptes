@@ -15,6 +15,8 @@ import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';
 
+const DEFAULT_MARKER_FILL_COLOUR = '#3D8BD5';
+
 let TableMarkersLayer = React.createClass({
 
   mixins: [
@@ -178,7 +180,7 @@ let TableMarkersLayer = React.createClass({
             isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
           }
 
-          let fillColour = '#3D8BD5';
+          let fillColour = DEFAULT_MARKER_FILL_COLOUR;
           if (markerColourProperty !== undefined && markerColourProperty !== null) {
             let markerColourFunction = propertyColour(this.config.tablesById[table].propertiesById[markerColourProperty]);
             let nullifiedFillColourValue = (data[i][markerColourProperty] === '' ? null : data[i][markerColourProperty]);
