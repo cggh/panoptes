@@ -41,3 +41,11 @@
     padding-right: 7px;
   }
 }
+
+// NB: .map-controls.legend is on the sidebar, whereas this one is on the map
+.map-legend {
+  background-color: white;
+  opacity: 0.7;
+  padding: 8px 10px 8px 10px;
+  border-radius: 10px;
+}

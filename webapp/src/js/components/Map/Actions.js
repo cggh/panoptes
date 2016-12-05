@@ -317,6 +317,8 @@ let MapActions = React.createClass({
 
     let adaptedMarkersLayerProps = {};
 
+    let customMapControls = [];
+
     if (table !== undefined && table !== NULL_MARKER_LAYER) {
 
       if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
@@ -325,6 +327,24 @@ let MapActions = React.createClass({
 
       if (markerColourProperty !== undefined) {
         adaptedMarkersLayerProps.markerColourProperty = markerColourProperty;
+
+        let legend = window.L.control({position: 'bottomleft'});
+
+        legend.onAdd = function(map) {
+
+          let div = window.L.DomUtil.create('div', 'map-legend');
+          let grades = [0, 10, 20, 50, 100, 200, 500, 1000];
+
+          for (let i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background: #000000"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+          }
+
+          return div;
+        };
+
+        customMapControls.push(legend);
       }
 
       // NB: This might not be used, if/when only a table has been selected.
@@ -410,6 +430,7 @@ let MapActions = React.createClass({
     let map = (
       <Map
         center={center}
+        customControls={customMapControls}
         setProps={setProps}
         onChange={this.handleChangeMap}
         zoom={zoom}
@@ -422,6 +443,7 @@ let MapActions = React.createClass({
         <TableMap
           {...adaptedMarkersLayerProps}
           center={center}
+          customControls={customMapControls}
           setProps={setProps}
           table={table}
           onChange={this.handleChangeMap}
@@ -447,6 +469,7 @@ let MapActions = React.createClass({
       map = (
         <Map
           center={center}
+          customControls={customMapControls}
           setProps={setProps}
           onChange={this.handleChangeMap}
           zoom={zoom}
