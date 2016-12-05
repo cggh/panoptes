@@ -318,7 +318,7 @@ let MapActions = React.createClass({
 
     let adaptedMarkersLayerProps = {};
 
-    let customMapControls = [];
+    let customMapControls = undefined;
 
     if (table !== undefined && table !== NULL_MARKER_LAYER) {
 
@@ -326,7 +326,7 @@ let MapActions = React.createClass({
         adaptedMarkersLayerProps.query = this.getDefinedQuery();
       }
 
-      if (markerColourProperty !== undefined) {
+      if (markerColourProperty !== undefined && markerColourProperty !== null) {
 
         adaptedMarkersLayerProps.markerColourProperty = markerColourProperty;
 
@@ -340,6 +340,9 @@ let MapActions = React.createClass({
         let position = 'bottomleft';
         let className = 'legend';
 
+        if (customMapControls === undefined) {
+          customMapControls = [];
+        }
         customMapControls.push({component: legend, position, className});
       }
 

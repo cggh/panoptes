@@ -129,9 +129,12 @@ let Map = React.createClass({
         }
       }
       // Reset the register of custom controls.
-      this.customControls = [];
+      this.customControls = undefined;
 
       if (customControls !== undefined) {
+
+        this.customControls = [];
+
         for (let i = 0, len = customControls.length; i < len; i++) {
 
           let control = window.L.control({position: customControls[i].position});
