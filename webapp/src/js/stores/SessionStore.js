@@ -91,6 +91,14 @@ let SessionStore = Fluxxor.createStore({
   popupClose({compId}) {
     let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
     this.state = this.state.setIn(['popups', 'components'], list);
+    let popupSlots = this.state.get('popupSlots') || [];
+    for (let i = 0, len = popupSlots.length; i < len; i++) {
+      if (popupSlots[i] === compId) {
+        popupSlots[i] = null;
+        break;
+      }
+    }
+    this.state = this.state.set('popupSlots', popupSlots);
   },
 
   popupFocus({compId}) {
@@ -116,15 +124,23 @@ let SessionStore = Fluxxor.createStore({
     }
     //Set an initial position to prevent opening over an existing popup
     if (!this.state.getIn(['popups', 'state', compId])) {
-      let numPopups = this.state.get('numPopupsOpened') || 0;
       //150 accommodates header and allows some part of popup to be shown
       let maxPopupsDown = Math.floor((window.innerHeight  - 200) / CASCADE_OFFSET_PIXELS);
       let maxPopupsAcross = Math.floor((window.innerWidth  - 200) / CASCADE_OFFSET_PIXELS);
-      this.state = this.state.set('numPopupsOpened', numPopups + 1);
+      let popupSlots = this.state.get('popupSlots') || [];
+      let nextPopupSlotIndex = popupSlots.length;
+      for (let i = 0, len = popupSlots.length; i < len; i++) {
+        if (popupSlots[i] === null) {
+          nextPopupSlotIndex = i;
+          break;
+        }
+      }
+      popupSlots[nextPopupSlotIndex] = compId;
+      this.state = this.state.set('popupSlots', popupSlots);
       this.state = this.state.setIn(['popups', 'state', compId, 'position'], Immutable.Map(
         {
-          x: 50 + (numPopups % maxPopupsDown * CASCADE_OFFSET_PIXELS) + ((Math.floor(numPopups / maxPopupsDown) % maxPopupsAcross) * CASCADE_OFFSET_PIXELS),
-          y: 50 + (numPopups % maxPopupsDown * CASCADE_OFFSET_PIXELS)
+          x: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS) + ((Math.floor(nextPopupSlotIndex / maxPopupsDown) % maxPopupsAcross) * CASCADE_OFFSET_PIXELS),
+          y: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS)
         }
       ));
     }
