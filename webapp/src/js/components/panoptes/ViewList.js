@@ -29,7 +29,7 @@ let ViewList = React.createClass({
     style: React.PropTypes.object,
     onClick: React.PropTypes.func
   },
-  
+
   handleOpen(e, component) {
     const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
     (this.props.onClick || this.handleClick)({component, middleClick});
@@ -46,6 +46,8 @@ let ViewList = React.createClass({
   render() {
     const hasShowableTables = _some(this.config.visibleTables);
     const hasTrees = _some(_filter(this.config.visibleTables, (table) => table.trees));
+    const hasShowableGeoCoordTables = _some(_filter(this.config.visibleTables, (table) => table.hasGeoCoord));
+    const hasMapLayers = _some(this.config.mapLayers);
 
     return (
       <List style={this.props.style}>
@@ -67,21 +69,22 @@ let ViewList = React.createClass({
                       )}/>
           <ListItem primaryText="Table Plotter"
                     disabled={!hasShowableTables}
-                    innerDivStyle={{opacity: hasShowableTables ? 'inherit' :0.5}}
-                    secondaryText={hasShowableTables ? "View table data graphically" : "No table data to plot"}
+                    innerDivStyle={{opacity: hasShowableTables ? 'inherit' : 0.5}}
+                    secondaryText={hasShowableTables ? 'View table data graphically' : 'No table data to plot'}
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
-                    onClick={(e) => this.handleOpen(e, <PlotWithActions />)}/>
+                    onClick={hasShowableTables ? (e) => this.handleOpen(e, <PlotWithActions />) : () => null}/>
           <ListItem primaryText="Map Composer"
-                    style={{opacity: 1}}
+                    disabled={!(hasShowableGeoCoordTables || hasMapLayers)}
+                    innerDivStyle={{opacity: (hasShowableGeoCoordTables || hasMapLayers) ? 'inherit' : 0.5}}
                     secondaryText={'View data geographically'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
-                    onClick={(e) => this.handleOpen(e, <MapActions />)}/>
+                    onClick={(hasShowableGeoCoordTables || hasMapLayers) ? (e) => this.handleOpen(e, <MapActions />) : () => null}/>
           <ListItem primaryText="Tree Plotter"
                     disabled={!hasTrees}
-                    innerDivStyle={{opacity: hasTrees ? 'inherit' :0.5}}
-                    secondaryText={hasTrees ? "View a neighbour joining tree" : "No tree data to plot"}
+                    innerDivStyle={{opacity: hasTrees ? 'inherit' : 0.5}}
+                    secondaryText={hasTrees ? 'View a neighbour joining tree' : 'No tree data to plot'}
                     leftIcon={<div><Icon fixedWidth={true} name="tree"/></div>}
-                    onClick={(e) => this.handleOpen(e, <TreeWithActions />)}/>
+                    onClick={hasTrees ? (e) => this.handleOpen(e, <TreeWithActions />) : () => null}/>
       </List>
     );
   }
