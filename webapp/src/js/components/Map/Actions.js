@@ -19,6 +19,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import MenuItem from 'material-ui/MenuItem';
 import SelectField from 'material-ui/SelectField';
 import TextField from 'material-ui/TextField';
+import Slider from 'material-ui/Slider';
 
 // Panoptes
 import BaseLayer from 'Map/BaseLayer/Widget';
@@ -64,7 +65,8 @@ let MapActions = React.createClass({
     overlayLayer: React.PropTypes.string,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
-    zoom: React.PropTypes.number
+    zoom: React.PropTypes.number,
+    markerLocationGridScale: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -74,6 +76,7 @@ let MapActions = React.createClass({
     return {
       query: undefined,
       baseTileLayer: NULL_BASE_TILE_LAYER,
+      markerLocationGridScale: 5,
       overlayLayer: NULL_OVERLAY_LAYER,
       sidebar: true,
       table: NULL_MARKER_LAYER
@@ -204,6 +207,15 @@ let MapActions = React.createClass({
 
   },
 
+  componentDidUpdate(prevProps, prevState) {
+    // Automatically select the table's primKey property as the markerColourProperty
+    if (this.props.table !== undefined && this.props.table !== null && this.props.table !== NULL_MARKER_LAYER) {
+      if (this.props.markerColourProperty === undefined || this.props.markerColourProperty === null) {
+        this.props.setProps({markerColourProperty: this.tableConfig().primKey});
+      }
+    }
+  },
+
   // Event handlers
   handleQueryPick(query) {
     this.props.setProps({query});
@@ -255,9 +267,11 @@ let MapActions = React.createClass({
     }
 
   },
-
   handleChangeMarkerColourProperty(markerColourProperty) {
     this.props.setProps({markerColourProperty});
+  },
+  handleChangemarkerLocationGridScale(markerLocationGridScale) {
+    this.props.setProps({markerLocationGridScale});
   },
 
   // Other functions
@@ -295,7 +309,25 @@ let MapActions = React.createClass({
   },
 
   render() {
-    let {center, setProps, baseTileLayer, baseTileLayerProps, markerColourProperty, overlayLayer, sidebar, table, zoom} = this.props;
+    let {
+      center,
+      setProps,
+      baseTileLayer,
+      baseTileLayerProps,
+      markerColourProperty,
+      overlayLayer,
+      sidebar,
+      table,
+      zoom,
+      markerLocationGridScale
+    } = this.props;
+
+    const markerLocationGridScaleInMeters = (1 * Math.pow(10, (5 - markerLocationGridScale)));
+    const markerLocationGridScaleInKilometers = markerLocationGridScaleInMeters / 1000;
+    let markerLocationGridScaleInWords = markerLocationGridScaleInMeters + ' ' + (markerLocationGridScaleInMeters > 1 ? 'meters' : 'meter');
+    if (markerLocationGridScaleInMeters >= 1000) {
+      markerLocationGridScaleInWords = markerLocationGridScaleInKilometers + ' ' + (markerLocationGridScaleInKilometers > 1 ? 'kilometers' : 'kilometer');
+    }
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -316,35 +348,29 @@ let MapActions = React.createClass({
     let baseLayerComponent = null;
     let overlayLayerComponent = null;
 
-    let adaptedMarkersLayerProps = {};
-
     let customMapControls = undefined;
+    let query = undefined;
 
     if (table !== undefined && table !== NULL_MARKER_LAYER) {
 
       if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
-        adaptedMarkersLayerProps.query = this.getDefinedQuery();
+        query = this.getDefinedQuery();
       }
 
-      if (markerColourProperty !== undefined && markerColourProperty !== null) {
+      let legend = ReactDOMServer.renderToStaticMarkup(
+          <PropertyLegend
+            flux={this.flux}
+            property={markerColourProperty}
+            table={table}
+          />
+      );
+      let position = 'bottomleft';
+      let className = 'legend';
 
-        adaptedMarkersLayerProps.markerColourProperty = markerColourProperty;
-
-        let legend = ReactDOMServer.renderToStaticMarkup(
-            <PropertyLegend
-              flux={this.flux}
-              property={markerColourProperty}
-              table={table}
-            />
-        );
-        let position = 'bottomleft';
-        let className = 'legend';
-
-        if (customMapControls === undefined) {
-          customMapControls = [];
-        }
-        customMapControls.push({component: legend, position, className});
+      if (customMapControls === undefined) {
+        customMapControls = [];
       }
+      customMapControls.push({component: legend, position, className});
 
       // NB: This might not be used, if/when only a table has been selected.
       markersLayerComponent = (
@@ -352,7 +378,12 @@ let MapActions = React.createClass({
           checked={true}
           name={this.config.tablesById[table].capNamePlural}
         >
-          <TableMarkersLayer table={table} {...adaptedMarkersLayerProps} />
+          <TableMarkersLayer
+            table={table}
+            query={query}
+            markerColourProperty={markerColourProperty}
+            markerLocationGridScale={markerLocationGridScale}
+          />
         </Overlay>
       );
     }
@@ -440,7 +471,9 @@ let MapActions = React.createClass({
 
       map = (
         <TableMap
-          {...adaptedMarkersLayerProps}
+          query={query}
+          markerColourProperty={markerColourProperty}
+          markerLocationGridScale={markerLocationGridScale}
           center={center}
           customControls={customMapControls}
           setProps={setProps}
@@ -530,6 +563,19 @@ let MapActions = React.createClass({
               onSelect={this.handleChangeMarkerColourProperty}
               allowNull={true}
             />
+          : null }
+          {table !== undefined && table !== NULL_MARKER_LAYER ?
+            <div style={{width: '100%'}}>
+              <p>Location grid scale: {markerLocationGridScaleInWords}</p>
+              <Slider
+                min={0}
+                max={5}
+                step={1}
+                defaultValue={5}
+                value={markerLocationGridScale}
+                onChange={(event, value) => this.handleChangemarkerLocationGridScale(value)}
+              />
+            </div>
           : null }
           <div className="legend">
           {table !== undefined && table !== NULL_MARKER_LAYER && markerColourProperty ?

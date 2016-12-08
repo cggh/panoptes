@@ -14,7 +14,7 @@ let GeoLayouter = React.createClass({
   },
 
   shouldComponentUpdate() {
-    return false
+    return false;
   },
 
   getDefaultProps() {
@@ -34,7 +34,7 @@ let GeoLayouter = React.createClass({
     let updatedFixedNodesByKey = {};
     let updateLinks = [];
     _forEach(_cloneDeep(nodes), (node) => {
-      let {x, y} = map.project(node,0);
+      let {x, y} = map.project(node, 0);
       node.x = x;
       node.y = y;
       let key = node.key;
@@ -59,7 +59,7 @@ let GeoLayouter = React.createClass({
     this.renderNodesByKey = updatedRenderNodesByKey;
     this.renderNodes = _values(updatedRenderNodesByKey);
     //Update the collision radius
-    let radiusScale = map.project(map.unproject({y:0, x:1}),0).x;
+    let radiusScale = map.project(map.unproject({y: 0, x: 1}), 0).x;
     _forEach(this.renderNodes, (node) => node.collisionRadius = node.radius * radiusScale);
     this.force.nodes(_values(updatedFixedNodesByKey).concat(this.renderNodes));
     this.force.links(updateLinks);
@@ -100,28 +100,28 @@ let GeoLayouter = React.createClass({
   handleTick() {
     let q = d3.geom.quadtree(this.renderNodes);
     _forEach(this.renderNodes, (node) => {
-        let r = node.collisionRadius + 16;
-        let nx1 = node.x - r;
-        let nx2 = node.x + r;
-        let ny1 = node.y - r;
-        let ny2 = node.y + r;
-        q.visit((quad, x1, y1, x2, y2) => {
-          if (quad.point && (quad.point !== node)) {
-            let x = node.x - quad.point.x,
-              y = node.y - quad.point.y,
-              l = Math.sqrt(x * x + y * y),
-              r = node.collisionRadius + quad.point.collisionRadius;
-            if (l < r) {
-              l = (l - r) / l * .5;
-              node.x -= x *= l * 0.15;
-              node.y -= y *= l * 0.15;
-              quad.point.x += x;
-              quad.point.y += y;
-            }
+      let r = node.collisionRadius + 16;
+      let nx1 = node.x - r;
+      let nx2 = node.x + r;
+      let ny1 = node.y - r;
+      let ny2 = node.y + r;
+      q.visit((quad, x1, y1, x2, y2) => {
+        if (quad.point && (quad.point !== node)) {
+          let x = node.x - quad.point.x,
+            y = node.y - quad.point.y,
+            l = Math.sqrt(x * x + y * y),
+            r = node.collisionRadius + quad.point.collisionRadius;
+          if (l < r) {
+            l = (l - r) / l * .5;
+            node.x -= x *= l * 0.15;
+            node.y -= y *= l * 0.15;
+            quad.point.x += x;
+            quad.point.y += y;
           }
-          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-        });
-      }
+        }
+        return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+      });
+    }
     );
     this.forceUpdate();
   },

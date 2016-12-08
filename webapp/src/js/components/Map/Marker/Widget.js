@@ -23,6 +23,7 @@ let Marker = React.createClass({
   propTypes: {
     alt: React.PropTypes.string,
     children: React.PropTypes.node,
+    fillColour: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
     onClick: React.PropTypes.func,
@@ -45,7 +46,8 @@ let Marker = React.createClass({
 
   render() {
 
-    let {alt, children, onClick, opacity, position, title, zIndexOffset} = this.props;
+    // TODO: use fillColour or its default
+    let {alt, children, fillColour, onClick, opacity, position, title, zIndexOffset} = this.props;
 
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
@@ -53,6 +55,7 @@ let Marker = React.createClass({
       children = React.Children.only(children);
     }
 
+    // TODO: Use SVG markers instead, so we can easily change the colour, etc.
     // FIXME: Works around broken default marker icon in react-leaflet v1.0.0-rc.1
     let icon = window.L.icon({
       iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/images/marker-icon.png',
