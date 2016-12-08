@@ -204,15 +204,6 @@ let MapActions = React.createClass({
 
   },
 
-  componentDidUpdate(prevProps, prevState) {
-    // Automatically select the table's primKey property as the markerColourProperty
-    if (this.props.table !== undefined && this.props.table !== null && this.props.table !== NULL_MARKER_LAYER) {
-      if (this.props.markerColourProperty === undefined || this.props.markerColourProperty === null) {
-        this.props.setProps({markerColourProperty: this.tableConfig().primKey});
-      }
-    }
-  },
-
   // Event handlers
   handleQueryPick(query) {
     this.props.setProps({query});
@@ -548,17 +539,6 @@ let MapActions = React.createClass({
               allowNull={true}
             />
           : null }
-          <div className="legend">
-          {table !== undefined && table !== NULL_MARKER_LAYER && markerColourProperty ?
-            <div>
-            <p>Marker colours</p>
-            <PropertyLegend
-              table={table}
-              property={markerColourProperty}
-            />
-            </div>
-          : null }
-          </div>
           {
             this.config.user.isManager ?
               <TextField
