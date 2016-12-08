@@ -34,7 +34,7 @@ let TableMarkersLayer = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('highlight', 'primKey', 'query', 'table', 'markerColourProperty', 'markerLocationGridScale')
+    DataFetcherMixin('highlight', 'primKey', 'query', 'table', 'markerColourProperty')
   ],
 
   //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
@@ -53,8 +53,7 @@ let TableMarkersLayer = React.createClass({
     primKey: React.PropTypes.string, // if not specified then all table records are used
     query: React.PropTypes.string,
     table: React.PropTypes.string,
-    markerColourProperty: React.PropTypes.string,
-    markerLocationGridScale: React.PropTypes.number
+    markerColourProperty: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -73,12 +72,6 @@ let TableMarkersLayer = React.createClass({
   getInitialState() {
     return {
       markersGroupedByLocation: {}
-    };
-  },
-
-  getDefaultProps() {
-    return {
-      markerLocationGridScale: 5
     };
   },
 
@@ -123,7 +116,7 @@ let TableMarkersLayer = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {highlight, primKey, table, query, markerColourProperty, markerLocationGridScale} = props;
+    let {highlight, primKey, table, query, markerColourProperty} = props;
     let {changeLayerStatus} = this.context;
 
     changeLayerStatus({loadStatus: 'loading'});
@@ -239,7 +232,7 @@ let TableMarkersLayer = React.createClass({
           let lng = parseFloat(data[i][locationTableConfig.longitude]);
 
           // Compose a unique key string using the location latLng
-          let location = lat.toFixed(markerLocationGridScale).toString() + '_' + lng.toFixed(markerLocationGridScale).toString();
+          let location = data[i][locationTableConfig.latitude] + '_' + data[i][locationTableConfig.longitude];
 
           let marker = {
             isHighlighted,

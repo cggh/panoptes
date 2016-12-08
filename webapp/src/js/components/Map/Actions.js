@@ -19,7 +19,6 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import MenuItem from 'material-ui/MenuItem';
 import SelectField from 'material-ui/SelectField';
 import TextField from 'material-ui/TextField';
-import Slider from 'material-ui/Slider';
 
 // Panoptes
 import BaseLayer from 'Map/BaseLayer/Widget';
@@ -65,8 +64,7 @@ let MapActions = React.createClass({
     overlayLayer: React.PropTypes.string,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
-    zoom: React.PropTypes.number,
-    markerLocationGridScale: React.PropTypes.number
+    zoom: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -76,7 +74,6 @@ let MapActions = React.createClass({
     return {
       query: undefined,
       baseTileLayer: NULL_BASE_TILE_LAYER,
-      markerLocationGridScale: 5,
       overlayLayer: NULL_OVERLAY_LAYER,
       sidebar: true,
       table: NULL_MARKER_LAYER
@@ -270,9 +267,6 @@ let MapActions = React.createClass({
   handleChangeMarkerColourProperty(markerColourProperty) {
     this.props.setProps({markerColourProperty});
   },
-  handleChangemarkerLocationGridScale(markerLocationGridScale) {
-    this.props.setProps({markerLocationGridScale});
-  },
 
   // Other functions
   icon() {
@@ -318,16 +312,8 @@ let MapActions = React.createClass({
       overlayLayer,
       sidebar,
       table,
-      zoom,
-      markerLocationGridScale
+      zoom
     } = this.props;
-
-    const markerLocationGridScaleInMeters = (1 * Math.pow(10, (5 - markerLocationGridScale)));
-    const markerLocationGridScaleInKilometers = markerLocationGridScaleInMeters / 1000;
-    let markerLocationGridScaleInWords = markerLocationGridScaleInMeters + ' ' + (markerLocationGridScaleInMeters > 1 ? 'meters' : 'meter');
-    if (markerLocationGridScaleInMeters >= 1000) {
-      markerLocationGridScaleInWords = markerLocationGridScaleInKilometers + ' ' + (markerLocationGridScaleInKilometers > 1 ? 'kilometers' : 'kilometer');
-    }
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -382,7 +368,6 @@ let MapActions = React.createClass({
             table={table}
             query={query}
             markerColourProperty={markerColourProperty}
-            markerLocationGridScale={markerLocationGridScale}
           />
         </Overlay>
       );
@@ -473,7 +458,6 @@ let MapActions = React.createClass({
         <TableMap
           query={query}
           markerColourProperty={markerColourProperty}
-          markerLocationGridScale={markerLocationGridScale}
           center={center}
           customControls={customMapControls}
           setProps={setProps}
@@ -563,19 +547,6 @@ let MapActions = React.createClass({
               onSelect={this.handleChangeMarkerColourProperty}
               allowNull={true}
             />
-          : null }
-          {table !== undefined && table !== NULL_MARKER_LAYER ?
-            <div style={{width: '100%'}}>
-              <p>Location grid scale: {markerLocationGridScaleInWords}</p>
-              <Slider
-                min={0}
-                max={5}
-                step={1}
-                defaultValue={5}
-                value={markerLocationGridScale}
-                onChange={(event, value) => this.handleChangemarkerLocationGridScale(value)}
-              />
-            </div>
           : null }
           <div className="legend">
           {table !== undefined && table !== NULL_MARKER_LAYER && markerColourProperty ?
