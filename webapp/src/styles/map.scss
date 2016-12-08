@@ -65,12 +65,22 @@
 
 .panoptes-chart-pie-sector {
   stroke: rgb(0, 0, 0);
-  stroke-width: 0.7;
-  stroke-opacity: 0.9;
+  stroke-width: 0.5;
 }
 
 .panoptes-cluster-bubble {
   stroke: rgb(0, 0, 0);
-  stroke-width: 0.7;
-  stroke-opacity: 0.9;
+  stroke-width: 0.5;
+}
+
+.panoptes-table-markers-layer-polyline {
+  stroke: $primary-color;
+  fill: none;
+  stroke-width: 1;
+}
+
+.panoptes-pie-chart-markers-layer-polyline {
+  stroke: $primary-color;
+  fill: none;
+  stroke-width: 1;
 }
