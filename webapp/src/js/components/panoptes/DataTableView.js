@@ -8,6 +8,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _some from 'lodash/some';
 import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
+import _map from 'lodash/map';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -219,7 +220,7 @@ let DataTableView = React.createClass({
     }
 
     if (MEASURED_COLUMN_WIDTHS[this.props.table] && MEASURED_COLUMN_WIDTHS[this.props.table][column]) {
-      return MEASURED_COLUMN_WIDTHS[this.props.table][column]
+      return MEASURED_COLUMN_WIDTHS[this.props.table][column];
     }
     // NB: Columns need to be initialized with at least a non-null.
     let columnWidthPx = 0;
@@ -245,7 +246,7 @@ let DataTableView = React.createClass({
       canvas2dContext.font = propertyHeaderTextElementStyles['fontStyle'] + ' ' + propertyHeaderTextElementStyles['fontWeight'] + ' ' + propertyHeaderTextElementStyles['fontSize'] + ' "' + propertyHeaderTextElementStyles['fontFamily'] + '"';
       columnWidthPx = Math.ceil(canvas2dContext.measureText(columnData.name).width) + paddingWidthPx;
       MEASURED_COLUMN_WIDTHS[this.props.table] = MEASURED_COLUMN_WIDTHS[this.props.table] || {};
-      MEASURED_COLUMN_WIDTHS[this.props.table][column] = columnWidthPx
+      MEASURED_COLUMN_WIDTHS[this.props.table][column] = columnWidthPx;
     }
 
     return columnWidthPx;
@@ -259,7 +260,13 @@ let DataTableView = React.createClass({
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    if (columns.length > 0)
+
+    if (!columns) {
+      columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
+      columns = _map(columns, (prop) => prop.id);
+    }
+
+    if (columns.length > 0) {
       return (
         <DetectResize onResize={this.handleResize}>
           <div className={classNames('load-container', className)}>
@@ -355,12 +362,13 @@ let DataTableView = React.createClass({
           </div>
         </DetectResize>
       );
-    else
+    } else {
       return (
         <div className={classNames('load-container', className)}>
           <Loading status="custom">No columns selected</Loading>
         </div>
       );
+    }
   }
 
 });

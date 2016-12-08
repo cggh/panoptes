@@ -44,6 +44,7 @@ let TableMap = React.createClass({
     customControls: React.PropTypes.array,
     highlight: React.PropTypes.string,
     markerColourProperty: React.PropTypes.string,
+    markerLocationGridScale: React.PropTypes.number,
     onChange: React.PropTypes.func,
     primKey: React.PropTypes.string,
     query: React.PropTypes.string,
@@ -70,6 +71,7 @@ let TableMap = React.createClass({
       customControls,
       highlight,
       markerColourProperty,
+      markerLocationGridScale,
       onChange,
       primKey,
       setProps,
@@ -103,6 +105,7 @@ let TableMap = React.createClass({
           primKey={primKey}
           query={this.getDefinedQuery()}
           markerColourProperty={markerColourProperty}
+          markerLocationGridScale={markerLocationGridScale}
         />
       </Map>
     );

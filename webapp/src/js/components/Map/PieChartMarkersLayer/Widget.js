@@ -202,7 +202,7 @@ let PieChartMarkersLayer = React.createClass({
 
           markers.push({
             chartDataTable: chartDataTable,
-            key: locationData[i][locationPrimKeyProperty],
+            key: locationDataPrimKey,
             lat: locationData[i][locationTableConfig.latitude],
             lng: locationData[i][locationTableConfig.longitude],
             name: locationData[i][locationNameProperty],

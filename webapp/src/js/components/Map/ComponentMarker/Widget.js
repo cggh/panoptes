@@ -4,9 +4,6 @@ import DivIcon from 'Map/DivIcon/Widget';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-const DEFAULT_MARKER_FILL_COLOUR = '#3D8BD5';
-const DEFAULT_MARKER_ICON_COLOUR = 'white';
-
 let ComponentMarker = React.createClass({
 
   mixins: [
@@ -25,7 +22,10 @@ let ComponentMarker = React.createClass({
     alt: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
+    opacity: React.PropTypes.number,
     zIndexOffset: React.PropTypes.number,
+    fillColour: React.PropTypes.string,
+    iconColour: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -39,13 +39,20 @@ let ComponentMarker = React.createClass({
     };
   },
 
+  getDefaultProps() {
+    return {
+      fillColour: '#3D8BD5',
+      iconColour: 'white'
+    };
+  },
+
   // Event handlers
   handleClick(e) {
     this.props.onClick(e);
   },
 
   render() {
-    let {alt, children, onClick, position, title, zIndexOffset} = this.props;
+    let {alt, children, fillColour, iconColour, onClick, opacity, position, title, zIndexOffset} = this.props;
 
     if (alt === undefined && title !== undefined) {
       // If not alt has been specified, then use the title.
@@ -61,12 +68,12 @@ let ComponentMarker = React.createClass({
           <g transform="translate(-6, -14)">
             <g transform="scale(0.4) translate(18, 10)">
               <path
-                fill={DEFAULT_MARKER_ICON_COLOUR}
+                fill={iconColour}
                 d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
               />
             </g>
             <path
-              fill={DEFAULT_MARKER_FILL_COLOUR}
+              fill={fillColour}
               d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"
               stroke="black"
               strokeWidth="1"
@@ -83,6 +90,7 @@ let ComponentMarker = React.createClass({
         alt={alt}
         className={null}
         onClick={(e) => onClick(e, this)}
+        opacity={opacity}
         position={position}
         title={title}
         zIndexOffset={zIndexOffset}

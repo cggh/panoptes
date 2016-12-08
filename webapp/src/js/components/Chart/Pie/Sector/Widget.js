@@ -1,8 +1,6 @@
 import React from 'react';
 import d3 from 'd3';
 
-import 'Chart/Pie/Sector/widget-styles.css';
-
 let PieChartSector = React.createClass({
 
   propTypes: {
