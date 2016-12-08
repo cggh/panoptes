@@ -440,17 +440,11 @@ let TableMarkersLayer = React.createClass({
                         let arc = d3.svg.arc().outerRadius(marker.radius).innerRadius(0);
 
                         let clusterComponent = (
-                          <svg
-                            style={{overflow: 'visible'}}
-                            width="1"
-                            height="1"
-                          >
-                            <g transform={'translate(5, 5)'}>
-                              <g className="panoptes-cluster-bubble" style={{fill: marker.fillColour}}>
-                                <title>{marker.title}</title>
-                                <path d={arc(arcDescriptors[0])}></path>
-                                <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle">{marker.count}</text>
-                              </g>
+                          <svg style={{overflow: 'visible'}} width="1" height="1">
+                            <g className="panoptes-cluster-bubble" style={{fill: marker.fillColour}}>
+                              <title>{marker.title}</title>
+                              <path d={arc(arcDescriptors[0])}></path>
+                              <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle">{marker.count}</text>
                             </g>
                           </svg>
                         );
@@ -482,7 +476,7 @@ let TableMarkersLayer = React.createClass({
 
                         return (
                           <ComponentMarker
-                            key={'ComponentMarker' + i}
+                            key={'ComponentMarker_' + i}
                             position={{lat: marker.lat, lng: marker.lng}}
                             onClick={(e) => this.handleClickClusterMarker(e, onClickPayload)}
                             opacity={0.8}
@@ -498,7 +492,8 @@ let TableMarkersLayer = React.createClass({
                       renderNodes.map(
                         (marker, i) =>
                           <Polyline
-                            key={'Polyline' + i}
+                            className="panoptes-table-markers-layer-polyline"
+                            key={'Polyline_' + i}
                             positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
                           />
                       )
