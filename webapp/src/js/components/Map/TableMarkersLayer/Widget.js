@@ -30,6 +30,8 @@ import PieChart from 'Chart/Pie/Widget';
 import DataTableView from 'panoptes/DataTableView';
 import ListWithActions from 'containers/ListWithActions';
 
+const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
+
 let TableMarkersLayer = React.createClass({
 
   mixins: [
@@ -218,14 +220,10 @@ let TableMarkersLayer = React.createClass({
             isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
           }
 
-          let fillColour = undefined;
+          let fillColour = DEFAULT_MARKER_FILL_COLOUR;
           if (markerColourProperty !== undefined && markerColourProperty !== null) {
             let markerColourFunction = propertyColour(this.config.tablesById[table].propertiesById[markerColourProperty]);
             let nullifiedFillColourValue = (data[i][markerColourProperty] === '' ? null : data[i][markerColourProperty]);
-            fillColour = markerColourFunction(nullifiedFillColourValue);
-          } else {
-            let markerColourFunction = propertyColour(this.config.tablesById[table].propertiesById[locationPrimKeyProperty]);
-            let nullifiedFillColourValue = (data[i][locationPrimKeyProperty] === '' ? null : data[i][locationPrimKeyProperty]);
             fillColour = markerColourFunction(nullifiedFillColourValue);
           }
 
