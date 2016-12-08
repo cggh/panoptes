@@ -13,6 +13,7 @@ import _sum from 'lodash/sum';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _forEach from 'lodash/forEach';
+import _size from 'lodash/size';
 
 // Panoptes
 import API from 'panoptes/API';
@@ -246,7 +247,7 @@ let TableMarkersLayer = React.createClass({
             lngProperty: locationTableConfig.longitude
           };
 
-          markers.push(marker); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
+          markers.push({lat, lng}); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
 
           if (!(location in markersGroupedByLocation)) {
             markersGroupedByLocation[location] = [];
@@ -281,6 +282,7 @@ let TableMarkersLayer = React.createClass({
     let clusterMarkers = [];
 
     const locationsCount = Object.keys(markersGroupedByLocation).length;
+    const markersCount = _size(markersGroupedByLocation);
 
     for (let location in markersGroupedByLocation) {
 
@@ -300,7 +302,7 @@ let TableMarkersLayer = React.createClass({
               position={{lat: marker.lat, lng: marker.lng}}
               title={marker.title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
-              zIndexOffset={2}
+              zIndexOffset={markersCount + 2}
               fillColour={marker.fillColour}
             />
           );
@@ -313,8 +315,8 @@ let TableMarkersLayer = React.createClass({
               position={{lat: marker.lat, lng: marker.lng}}
               title={marker.title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
-              opacity={0.9}
-              zIndexOffset={2}
+              opacity={0.8}
+              zIndexOffset={1}
             >
               <svg height="12" width="12">
                 <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill={marker.fillColour} />
@@ -411,7 +413,7 @@ let TableMarkersLayer = React.createClass({
       );
       let lengthRatio = this.lastLengthRatio || 1;
       if (pieAreaSum > 0) {
-        lengthRatio = Math.sqrt(0.001 / (pieAreaSum / pixelArea));
+        lengthRatio = Math.sqrt(0.005 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(clusterMarkers, (marker) => marker.radius = marker.originalRadius * lengthRatio);
@@ -483,8 +485,8 @@ let TableMarkersLayer = React.createClass({
                             key={'ComponentMarker' + i}
                             position={{lat: marker.lat, lng: marker.lng}}
                             onClick={(e) => this.handleClickClusterMarker(e, onClickPayload)}
-                            opacity={0.9}
-                            zIndexOffset={i}
+                            opacity={0.8}
+                            zIndexOffset={0}
                           >
                             {clusterComponent}
                           </ComponentMarker>
