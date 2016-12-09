@@ -1,6 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import Draggable from 'react-draggable';
 import {Resizable} from 'react-resizable';
 import 'react-resizable/css/styles.css';
