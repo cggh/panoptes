@@ -22,10 +22,10 @@ let Popup = React.createClass({
   propTypes: {
     className: React.PropTypes.string,
     style: React.PropTypes.object,
-    x: React.PropTypes.number,
-    y: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
+    initialX: React.PropTypes.number,
+    initialY: React.PropTypes.number,
+    initialWidth: React.PropTypes.number,
+    initialHeight: React.PropTypes.number,
     onMoveStop: React.PropTypes.func,
     onResizeStop: React.PropTypes.func,
     onClose: React.PropTypes.func,
@@ -36,16 +36,21 @@ let Popup = React.createClass({
 
   getDefaultProps() {
     return {
-      x: 100,
-      y: 100,
-      width: 700,
-      height: 500
+      initialX: 100,
+      initialY: 100,
+      initialWidth: 700,
+      initialHeight: 500
     };
   },
 
   getInitialState() {
-    let {x, y, width, height} = this.props; // NB: anti-pattern?
-    return {x, y, width, height};
+    let {initialX, initialY, initialWidth, initialHeight} = this.props;
+    return {
+      x: initialX,
+      y: initialY,
+      width: initialWidth,
+      height: initialHeight
+    };
   },
 
   componentDidMount() {
