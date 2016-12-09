@@ -34,15 +34,6 @@ let Popup = React.createClass({
     children: React.PropTypes.element,
   },
 
-  getDefaultProps() {
-    return {
-      initialX: 100,
-      initialY: 100,
-      initialWidth: 700,
-      initialHeight: 500
-    };
-  },
-
   getInitialState() {
     let {initialX, initialY, initialWidth, initialHeight} = this.props;
     return {
@@ -58,9 +49,15 @@ let Popup = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    _forEach('x', 'y', 'width', 'height', (prop) => {
-      if (nextProps[prop] !== this.props[prop]) {
-        this.setState({[prop]: nextProps[prop]});
+    let propNameToStateNameMap = {
+      initialX: 'x',
+      initialY: 'y',
+      initialWidth: 'width',
+      initialHeight: 'height'
+    };
+    _forEach(Object.keys(propNameToStateNameMap), (propName) => {
+      if (nextProps[propName] !== this.props[propName]) {
+        this.setState({[propNameToStateNameMap[propName]]: nextProps[propName]});
       }
     });
   },
@@ -114,11 +111,13 @@ let Popup = React.createClass({
 
     if (!children)
       return null;
+
     return (
       <Draggable handle=".popup-drag"
                  defaultPosition={{x, y}}
                  onStart={this.handleClick}
-                 onStop={this.handleMoveStop}>
+                 onStop={this.handleMoveStop}
+                 position={{x, y}}>
         <Resizable width={width} height={height}
                    minConstraints={[50, 50]}
                    handleSize={[20, 20]}
