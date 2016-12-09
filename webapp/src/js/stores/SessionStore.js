@@ -98,7 +98,7 @@ let SessionStore = Fluxxor.createStore({
         break;
       }
     }
-    
+
   },
 
   popupFocus({compId}) {
@@ -125,9 +125,6 @@ let SessionStore = Fluxxor.createStore({
     //Set an initial position to prevent opening over an existing popup
     if (!this.state.getIn(['popups', 'state', compId])) {
 
-      //150 accommodates header and allows some part of popup to be shown
-      let maxPopupsDown = Math.floor((window.innerHeight  - 200) / CASCADE_OFFSET_PIXELS);
-      let maxPopupsAcross = Math.floor((window.innerWidth  - 200) / CASCADE_OFFSET_PIXELS);
       let nextPopupSlotIndex = this.state.get('popupSlots').size;
 
       for (let i = 0, len = this.state.get('popupSlots').size; i < len; i++) {
@@ -148,10 +145,14 @@ let SessionStore = Fluxxor.createStore({
         this.state = this.state.setIn(['popupSlots', nextPopupSlotIndex], compId);
       }
 
+      const headerAllowancePixels = 200; // Accommodate header and show at least part of popup
+      let maxPopupsDown = Math.floor((window.innerHeight - headerAllowancePixels) / CASCADE_OFFSET_PIXELS);
+      let maxPopupsAcross = Math.floor((window.innerWidth - headerAllowancePixels) / CASCADE_OFFSET_PIXELS);
+
       this.state = this.state.setIn(['popups', 'state', compId, 'position'], Immutable.Map(
         {
           x: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS) + ((Math.floor(nextPopupSlotIndex / maxPopupsDown) % maxPopupsAcross) * CASCADE_OFFSET_PIXELS),
-          y: 50 + (nextPopupSlotIndex % maxPopupsAcross * CASCADE_OFFSET_PIXELS)
+          y: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS)
         }
       ));
 
