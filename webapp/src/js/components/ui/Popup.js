@@ -46,7 +46,7 @@ let Popup = React.createClass({
   },
 
   getInitialState() {
-    let {x, y, width, height} = this.props;
+    let {x, y, width, height} = this.props; // NB: anti-pattern?
     return {x, y, width, height};
   },
 
