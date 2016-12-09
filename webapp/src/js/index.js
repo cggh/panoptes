@@ -81,7 +81,7 @@ if (dataset) {
   </div>, document.getElementById('main'));
   let promises = [InitialConfig(dataset)];
   if (stateUID) {
-    promises.push(API.fetchData(stateUID))
+    promises.push(API.fetchData(stateUID));
   }
   Promise.all(promises)
     .then(([config, appState]) => {
@@ -107,7 +107,8 @@ if (dataset) {
             state: {}
           },
           foundGenes: [],
-          usedTableQueries: []
+          usedTableQueries: [],
+          popupSlots: []
         }
       };
       appState = appState ? appState : (

@@ -91,14 +91,14 @@ let SessionStore = Fluxxor.createStore({
   popupClose({compId}) {
     let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
     this.state = this.state.setIn(['popups', 'components'], list);
-    let popupSlots = this.state.get('popupSlots') || [];
-    for (let i = 0, len = popupSlots.length; i < len; i++) {
-      if (popupSlots[i] === compId) {
-        popupSlots[i] = null;
+
+    for (let i = 0, len = this.state.get('popupSlots').size; i < len; i++) {
+      if (this.state.getIn(['popupSlots', i]) === compId) {
+        this.state = this.state.setIn(['popupSlots', i], null);
         break;
       }
     }
-    this.state = this.state.set('popupSlots', popupSlots);
+    
   },
 
   popupFocus({compId}) {
@@ -124,27 +124,38 @@ let SessionStore = Fluxxor.createStore({
     }
     //Set an initial position to prevent opening over an existing popup
     if (!this.state.getIn(['popups', 'state', compId])) {
+
       //150 accommodates header and allows some part of popup to be shown
       let maxPopupsDown = Math.floor((window.innerHeight  - 200) / CASCADE_OFFSET_PIXELS);
       let maxPopupsAcross = Math.floor((window.innerWidth  - 200) / CASCADE_OFFSET_PIXELS);
-      let popupSlots = this.state.get('popupSlots') || [];
-      let nextPopupSlotIndex = popupSlots.length;
-      for (let i = 0, len = popupSlots.length; i < len; i++) {
-        if (popupSlots[i] === null) {
+      let nextPopupSlotIndex = this.state.get('popupSlots').size;
+
+      for (let i = 0, len = this.state.get('popupSlots').size; i < len; i++) {
+        if (this.state.getIn(['popupSlots', i]) === null) {
           nextPopupSlotIndex = i;
           break;
         }
       }
-      popupSlots[nextPopupSlotIndex] = compId;
-      this.state = this.state.set('popupSlots', popupSlots);
+
+      if (nextPopupSlotIndex === this.state.get('popupSlots').size) {
+        this.state = this.state.set('popupSlots', this.state.get('popupSlots').push(compId));
+      } else if (nextPopupSlotIndex > this.state.get('popupSlots').size) {
+        console.error('nextPopupSlotIndex > this.state.get(\'popupSlots\').size');
+        console.info('nextPopupSlotIndex: %o', nextPopupSlotIndex);
+        console.info('this.state.get(\'popupSlots\').size: %o', this.state.get('popupSlots').size);
+        return null;
+      } else {
+        this.state = this.state.setIn(['popupSlots', nextPopupSlotIndex], compId);
+      }
+
       this.state = this.state.setIn(['popups', 'state', compId, 'position'], Immutable.Map(
         {
           x: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS) + ((Math.floor(nextPopupSlotIndex / maxPopupsDown) % maxPopupsAcross) * CASCADE_OFFSET_PIXELS),
-          y: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS)
+          y: 50 + (nextPopupSlotIndex % maxPopupsAcross * CASCADE_OFFSET_PIXELS)
         }
       ));
-    }
 
+    }
   },
 
   popupResize({compId, size}) {
