@@ -56,11 +56,10 @@ let Popup = React.createClass({
 
   componentWillReceiveProps(nextProps) {
     _forEach('x', 'y', 'width', 'height', (prop) => {
-        if (nextProps[prop] !== this.props[prop]) {
-          this.setState({[prop]: nextProps[prop]})
-        }
+      if (nextProps[prop] !== this.props[prop]) {
+        this.setState({[prop]: nextProps[prop]});
       }
-    );
+    });
   },
 
   /*eslint-disable react/no-did-update-set-state*/
