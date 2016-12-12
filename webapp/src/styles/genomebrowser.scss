@@ -26,6 +26,10 @@
           width: 200px
         }
       }
+      span.block {
+        display: inline-block;
+        white-space: nowrap;
+      }
     }
     .controls > * {
       padding-left: 10px;
