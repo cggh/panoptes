@@ -7,8 +7,6 @@ description: A synthetic set of samples collected from a large area of Africa. T
 primKey: ID
 quickFindFields: ID,CatId,RegionId
 
-maxCountQueryRecords: 250000
-maxCountQueryAggregated: 500000
 
 #DisableNotes: Yes
 #DisableSubsets: Yes
@@ -69,4 +67,3 @@ dataItemViews:
   type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
   name: Location                                       # Name of the view
   mapZoom: 5                                           # Start zoom factor of the map
-

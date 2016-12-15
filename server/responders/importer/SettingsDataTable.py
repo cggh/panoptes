@@ -5,7 +5,7 @@ from collections import OrderedDict
 import copy
 
 class SettingsDataTable(ImportSettings):
-    
+
     def getSettings(self):
         dataTableSettings = OrderedDict((
                          ('nameSingle', {
@@ -71,18 +71,6 @@ class SettingsDataTable(ImportSettings):
                                  }
                              }
                          }),
-                         ('maxCountQueryRecords', {
-                                   'type': 'Value',
-                                   'required': False,
-                                   'default': 200000,
-                                   'description': 'Defines the maximum number of records that will be downloaded to the client.\n  This limit influences views that display individual data items, such as scatter plots and geographical map views.\n  If not specified, this defaults to 200,000'
-                                }),
-                         ('maxCountQueryAggregated', {
-                                   'type': 'Value',
-                                   'required': False,
-                                   'default': 1000000,
-                                   'description': 'Defines the maximum number of records that will be queried on the server for views that present\n  data items in an aggregated way, such as histograms and bar graphs.\n  If not specified, this defaults to 1,000,000'
-                                }),
                          ('fetchRecordCount', {
                                               'type': 'Boolean',
                                               'required': False,
@@ -145,12 +133,12 @@ class SettingsDataTable(ImportSettings):
                                    'type': 'List',
                                    'required': False,
                                    'description': 'Definitions of custom views that will appear in the popup for an individual data table item',
-                                   'children': OrderedDict(( 
+                                   'children': OrderedDict((
                                                             ('type', {
                                                              'type': 'Text',
                                                              'required': True,
                                                              'description': 'Identifier of the custom view type (can be Overview, PropertyGroup, FieldList, ItemMap, PieChartMap) See DataItemViews settings for more details about defining custom data item views',
-                                                             'values':  OrderedDict(( 
+                                                             'values':  OrderedDict((
                                                                         ('Overview', {
                                                                                  'description': 'Specifies the default data item view of Panoptes, including all fields'
                                                                         }),
@@ -181,7 +169,7 @@ A set of properties of the current table is used to define pie sizes on all pie 
 ::::::::
 Specifies the default data item view of Panoptes, including all fields'''
                                                                 }),
-                                                            
+
                                                 ('name', {
                                                          'type': 'Text',
                                                          'required': True,
@@ -246,11 +234,6 @@ A set of properties of the current table is used to define pie sizes on all pie 
 For each pie and location combination there should be a property in the data table,
 containing the relative size of that specific pie'''
                                                                 }),
-                                                ('pieChartSize', {
-                                                            'type': 'Value',
-                                                            'siblingRequired': { 'name': 'type', 'value': 'PieChartMap'},
-                                                            'description': 'Displayed size of the largest pie chart'
-                                                            }),
                                                 ('mapCenter', {
                                                             'type': 'Block',
                                                             'siblingRequired': { 'name': 'type', 'value': 'PieChartMap'},
@@ -282,11 +265,6 @@ containing the relative size of that specific pie'''
                                                                                     'description': ''
                                                                                     }
                                                                        }
-                                                            }),
-                                                ('positionOffsetFraction', {
-                                                            'type': 'Value',
-                                                            'siblingRequired': { 'name': 'type', 'value': 'PieChartMap'},
-                                                            'description': 'An offset between the pie chart location and the actual chart,\n  used to achieve a nice (ideally non-overlapping) view'
                                                             }),
                                                 ('locationDataTable', {
                                                             'type': 'Text',
@@ -437,7 +415,7 @@ containing the relative size of that specific pie'''
   The Id corresponds to the column name instead of the directory name with the directory details given in the FilePattern expression
   The name is the first match in the FilePattern expression
 ''',
-                                   'children': OrderedDict(( 
+                                   'children': OrderedDict((
                                                 ('id', {
                                                        'type': 'Text',
                                                        'required': True,
@@ -485,7 +463,7 @@ containing the relative size of that specific pie'''
                                                       })
                                 ))
 
-  
+
         dataTableSettings["properties"]["children"] = self._propertiesDefault
         return dataTableSettings
 
@@ -508,7 +486,7 @@ This YAML_ file contains settings for a :ref:`data table<dataconcept_datatable>`
 Possible keys
 .............
 '''
-        
+
     def _getDocFooter(self):
         return '''
 
@@ -522,7 +500,7 @@ Possible keys
 
     def _getDocFilename(self):
         return 'documentation/importdata/importsettings/datatable.rst'
-    
+
     def _getDocSettings(self):
         tableSettings = copy.deepcopy(self.getSettings())
         del tableSettings['properties']['children']
@@ -537,10 +515,10 @@ Possible keys
                                                       }
 
         return tableSettings
-    
+
     def generateDocs(self):
         ImportSettings.generateDocs(self)
-        
+
         f = open('documentation/importdata/importsettings/datatable_dataitemviews.rst', 'w')
         print('''.. _def-settings-datatable-dataitemviews:
 
@@ -554,6 +532,3 @@ The key *Type* for member of the data table settings key *DataItemViews* can hav
             detail = tableSettings[key]
             self._printProperty(key, detail, f)
         f.close()
-
-        
-        

@@ -29,7 +29,7 @@ let PropertyList = React.createClass({
           {
             propertiesData.map(
               (propertyData, index) =>
-                <PropertyListItem key={index} rowIndex={index} propertyData={propertyData} tooltipPlacement={"right"} tooltipTrigger={['click']} />
+                <PropertyListItem key={index} rowIndex={index} propertyData={propertyData} tooltipPlacement={'right'} tooltipTrigger={['click']} />
             )
           }
         </tbody>

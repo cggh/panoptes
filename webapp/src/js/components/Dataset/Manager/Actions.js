@@ -41,7 +41,7 @@ let DatasetManagerActions = React.createClass({
   },
 
   title() {
-    return this.props.title || 'Dataset manager';
+    return this.props.title || 'Dataset Manager';
   },
 
   handleReloadConfig() {

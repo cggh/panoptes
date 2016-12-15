@@ -167,7 +167,7 @@ class ImportSettingsTest(unittest.TestCase):
 		
 		settingsLoaded.loadProps(testProps)
 		
-		self.assertEquals(200000,settingsLoaded['maxCountQueryRecords'])
+		self.assertFalse(settingsLoaded['fetchRecordCount'])
 		
 		
 	def testSiblingOptional(self):
@@ -256,7 +256,7 @@ class ImportSettingsTest(unittest.TestCase):
 #					print "Looking for configType:"+ configType
 					ct = os.path.basename(configType)
 #					print "Checking:" + ct + ':' + os.path.join(dirName, 'settings')
-					result = method(ct, os.path.join(dirName, 'settings')) 
+					result = method(ct, os.path.join(dirName, 'settings'))
 					if result is not None:
 						found = True
 #						print "Found:" + ct + ':' + os.path.join(dirName, 'settings')

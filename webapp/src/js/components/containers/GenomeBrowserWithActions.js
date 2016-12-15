@@ -23,7 +23,6 @@ import CategoricalChannel from 'panoptes/genome/tracks/CategoricalChannel';
 import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
 import NumericalTrackGroupChannel from 'panoptes/genome/tracks/NumericalTrackGroupChannel';
 import GenotypesChannel from 'panoptes/genome/tracks/GenotypesChannel';
-import PerRowNumericalChannel from 'panoptes/genome/tracks/PerRowNumericalChannel';
 import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChannel';
 import ItemPicker from 'containers/ItemPicker';
 import ModalInput from 'ui/ModalInput';
@@ -310,18 +309,18 @@ let SidebarContent = React.createClass({
                                secondaryTextLines={2}
                                onClick={() => this.props.setProps((props) => props.set('children', Immutable.fromJS(channels)))}
                                rightIconButton={this.config.user.isManager ?
-                                 <IconButton
-                                   tooltip="Delete"
-                                   onClick={(e) => actions.api.modifyConfig({
-                                     dataset: this.config.dataset,
-                                     path: `settings.genomeBrowserChannelSets.${i}`,
-                                     action: 'delete'
-                                   })}
-                                 >
-                                   <Icon name={'trash-o'} inverse={false}/>
-                                 </IconButton>
-                                 : null}
-              />
+                                <IconButton
+                                  tooltip="Delete"
+                                  onClick={(e) => actions.api.modifyConfig({
+                                    dataset: this.config.dataset,
+                                    path: `settings.genomeBrowserChannelSets.${i}`,
+                                    action: 'delete'
+                                  })}
+                                >
+                                  <Icon name={'trash-o'} inverse={false} />
+                                </IconButton>
+              : null}
+              />;
             })
           }
         </List>
@@ -397,7 +396,7 @@ let SidebarContent = React.createClass({
           </FlatButton>;
         }
       })}
-    </div>
+    </div>;
   }
 });
 

@@ -17,20 +17,30 @@
       margin: 0;
     }
 
-    #JSwarning {
-      padding: 20px;
-      font-family: sans-serif;
+    #javascriptWarning {
+      /* Show the #javascriptWarning by default; hide it using JavaScript */
+      padding: 10px;
+      font-family: Arial, Helvetica, sans-serif;
       border-bottom: 4px solid #3d8bd5;
     }
 
     #widthWarning {
-      display: none;
-      padding: 20px;
-      font-family: sans-serif;
+      display: none; /* Hide the #widthWarning by default; show it using CSS media queries */
+      padding: 10px;
+      font-family: Arial, Helvetica, sans-serif;
+      border-bottom: 4px solid #3d8bd5;
+    }
+
+    #browserWarning {
+      display: none; /* Hide the #browserWarning by default; show it using JavaScript */
+      background-color: orange;
+      padding: 10px;
+      font-family: Arial, Helvetica, sans-serif;
       border-bottom: 4px solid #3d8bd5;
     }
 
     @media only screen and (max-width: 749px) {
+      /* If the screen is fewer than 750px wide then show the #widthWarning. */
       #widthWarning {
         display: block;
       }
@@ -109,15 +119,135 @@
   </style>
 </head>
 <body id="body">
-<div id="JSwarning">Panoptes requires JavaScript.</div>
-<div id="widthWarning">Panoptes requires a screen width of at least 750 pixels.</div>
+<div id="javascriptWarning">Panoptes requires JavaScript.</div>
+<div id="widthWarning">
+  Panoptes requires a screen width of at least 750 pixels.
+  You may experience problems.
+  <button
+    style="margin-left: 10px;"
+    onClick="document.getElementById('body').removeChild(document.getElementById('widthWarning'));"
+  >OK</button>
+</div>
+<div id="browserWarning">
+  Panoptes is not compatible with <span id="clientBrowser"></span> v<span id="clientBrowserVersion"></span> on <span id="clientOS"></span> (min. v<span id="minBrowserVersion"></span>).
+  You may experience problems.
+  <button
+    style="margin-left: 10px;"
+    onClick="document.getElementById('body').removeChild(document.getElementById('browserWarning'));"
+  >OK</button>
+</div>
 <script>
-  document.getElementById('body').removeChild(document.getElementById('JSwarning'));
+  // If JavaScript can run then use JavaScript to remove the #javascriptWarning.
+  document.getElementById('body').removeChild(document.getElementById('javascriptWarning'));
+</script>
+<script>
+
+  // NB: This code needs to have high(er) compatibility than the minimum compatibility.
+
+  minCompatiblePlatforms = {
+    'linux': {
+      'chrome': 29,
+      'firefox': 25,
+      'opera': 16
+    },
+    'win': {
+      'edge': 14,
+      'chrome': 29,
+      'firefox': 25,
+      'ie': 11,
+      'opera': 16
+    },
+    'mac': {
+      'safari': 601,
+      'chrome': 29,
+      'firefox': 25
+    },
+  };
+
+
+  function getClientPlatformCompatibility() {
+
+    // NB: IE 8 doesn't support Object.keys, Array.prototype.indexOf, console.warning
+    var uniqueCompatibleOSs = ['linux', 'mac', 'win'];
+    var uniqueCompatibleBrowsers = ['chrome', 'firefox', 'opera', 'ie', 'safari', 'edge'];
+
+    // Credit: https://www.npmjs.com/package/browser-detection
+
+    var userAgentLC = navigator.userAgent.toLowerCase();
+
+    var os = undefined;
+    var browser = undefined;
+    var browserVersion = undefined;
+
+    var osParts = new RegExp('(' + uniqueCompatibleOSs.join('|') + ')').exec(userAgentLC);
+    if (osParts && osParts.length > 1) {
+      os = osParts[1];
+    }
+
+    var browserParts = new RegExp('(' + uniqueCompatibleBrowsers.join('|') + ')(?:.*version)?(?:[ \\/])?([\\w.]+)').exec(userAgentLC);
+
+    if (userAgentLC.match(/trident\/7\./)) {
+      browser = 'ie';
+      browserVersion = 11;
+    } else if (browserParts && browserParts.length > 2) {
+      browser = browserParts[1];
+      browserVersion = browserParts[2];
+    }
+
+    // Convert the version number to a base 10 integer
+    var browserVersionInt = parseInt(browserVersion, 10) || null;
+
+    // Convert the OS and browser names to title case.
+    var toTCFunc = function(str) {return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase();};
+    var OSTC = os.replace(/\w\S*/g, toTCFunc);
+    var browserTC = browser.replace(/\w\S*/g, toTCFunc);
+
+    // Some custom conversions.
+    OSTC = OSTC == 'Win' ? 'Windows' : OSTC;
+    browserTC = browserTC == 'Ie' ? 'IE' : browserTC;
+    browserTC = browserTC == 'Safari' ? 'Safari (WebKit)' : browserTC;
+
+    var clientOS = OSTC;
+    var clientBrowser = browserTC;
+    var clientBrowserVersion = browserVersionInt;
+    var minBrowserVersion = minCompatiblePlatforms[os][browser];
+    var isIncompatible = false;
+    if (
+      minCompatiblePlatforms[os] === undefined
+      || minCompatiblePlatforms[os][browser] === undefined
+      || minCompatiblePlatforms[os][browser] > browserVersionInt
+    ) {
+      isIncompatible = true;
+    }
+
+    return {
+      isIncompatible: isIncompatible,
+      clientOS: clientOS,
+      clientBrowser: clientBrowser,
+      clientBrowserVersion: clientBrowserVersion,
+      minBrowserVersion: minBrowserVersion
+    };
+  }
+
+  var compatibility = getClientPlatformCompatibility();
+
+  if (compatibility.isIncompatible) {
+    document.getElementById("clientOS").textContent = compatibility.clientOS;
+    document.getElementById("clientBrowser").textContent = compatibility.clientBrowser;
+    document.getElementById("clientBrowserVersion").textContent = compatibility.clientBrowserVersion;
+    document.getElementById("minBrowserVersion").textContent = compatibility.minBrowserVersion;
+    document.getElementById("browserWarning").style.display = 'block';
+    console.log('compatibility: %o', compatibility);
+    console.log('navigator: %o', navigator);
+  } else {
+    document.getElementById('body').removeChild(document.getElementById('browserWarning'));
+  }
+
 </script>
 <div id="main" class="main">
   <div class="non-js-spinner">
     <div class="logo"></div>
-    <div class="error-text">Loading panoptes...</div>
+    <div class="error-text">Loading Panoptes...</div>
   </div>
 </div>
 </body>
