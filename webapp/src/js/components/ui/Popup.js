@@ -1,6 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import Draggable from 'react-draggable';
 import {Resizable} from 'react-resizable';
 import 'react-resizable/css/styles.css';
@@ -24,10 +22,10 @@ let Popup = React.createClass({
   propTypes: {
     className: React.PropTypes.string,
     style: React.PropTypes.object,
-    x: React.PropTypes.number,
-    y: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
+    initialX: React.PropTypes.number,
+    initialY: React.PropTypes.number,
+    initialWidth: React.PropTypes.number,
+    initialHeight: React.PropTypes.number,
     onMoveStop: React.PropTypes.func,
     onResizeStop: React.PropTypes.func,
     onClose: React.PropTypes.func,
@@ -36,18 +34,14 @@ let Popup = React.createClass({
     children: React.PropTypes.element,
   },
 
-  getDefaultProps() {
-    return {
-      x: 100,
-      y: 100,
-      width: 700,
-      height: 500
-    };
-  },
-
   getInitialState() {
-    let {x, y, width, height} = this.props;
-    return {x, y, width, height};
+    let {initialX, initialY, initialWidth, initialHeight} = this.props;
+    return {
+      x: initialX,
+      y: initialY,
+      width: initialWidth,
+      height: initialHeight
+    };
   },
 
   componentDidMount() {
@@ -55,12 +49,17 @@ let Popup = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    _forEach('x', 'y', 'width', 'height', (prop) => {
-        if (nextProps[prop] !== this.props[prop]) {
-          this.setState({[prop]: nextProps[prop]})
-        }
+    let propNameToStateNameMap = {
+      initialX: 'x',
+      initialY: 'y',
+      initialWidth: 'width',
+      initialHeight: 'height'
+    };
+    _forEach(Object.keys(propNameToStateNameMap), (propName) => {
+      if (nextProps[propName] !== this.props[propName]) {
+        this.setState({[propNameToStateNameMap[propName]]: nextProps[propName]});
       }
-    );
+    });
   },
 
   /*eslint-disable react/no-did-update-set-state*/
@@ -112,11 +111,13 @@ let Popup = React.createClass({
 
     if (!children)
       return null;
+
     return (
       <Draggable handle=".popup-drag"
                  defaultPosition={{x, y}}
                  onStart={this.handleClick}
-                 onStop={this.handleMoveStop}>
+                 onStop={this.handleMoveStop}
+                 position={{x, y}}>
         <Resizable width={width} height={height}
                    minConstraints={[50, 50]}
                    handleSize={[20, 20]}

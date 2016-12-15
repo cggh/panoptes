@@ -10,6 +10,8 @@ import _isEqual from 'lodash/isEqual';
 const EMPTY_TAB = 'containers/EmptyTab';
 const START_TAB = 'containers/StartTab';
 
+const INITIAL_POPUP_WIDTH_PIXELS = 700;
+const INITIAL_POPUP_HEIGHT_PIXELS = 500;
 const MIN_POPUP_WIDTH_PIXELS = 200;
 const MIN_POPUP_HEIGHT_PIXELS = 150;
 const CASCADE_OFFSET_PIXELS = 20;
@@ -91,6 +93,14 @@ let SessionStore = Fluxxor.createStore({
   popupClose({compId}) {
     let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
     this.state = this.state.setIn(['popups', 'components'], list);
+
+    for (let i = 0, len = this.state.get('popupSlots').size; i < len; i++) {
+      if (this.state.getIn(['popupSlots', i]) === compId) {
+        this.state = this.state.setIn(['popupSlots', i], null);
+        break;
+      }
+    }
+
   },
 
   popupFocus({compId}) {
@@ -103,6 +113,7 @@ let SessionStore = Fluxxor.createStore({
   },
 
   popupOpen({component, compId, switchTo}) {
+
     if (compId) {
       this.state = this.state.updateIn(['popups', 'components'],
         (list) => list.filter((popupId) => popupId !== compId).push(compId));
@@ -114,21 +125,55 @@ let SessionStore = Fluxxor.createStore({
         this.popupFocus({compId: compId});
       }
     }
-    //Set an initial position to prevent opening over an existing popup
+
+
     if (!this.state.getIn(['popups', 'state', compId])) {
-      let numPopups = this.state.get('numPopupsOpened') || 0;
-      //150 accommodates header and allows some part of popup to be shown
-      let maxPopupsDown = Math.floor((window.innerHeight  - 200) / CASCADE_OFFSET_PIXELS);
-      let maxPopupsAcross = Math.floor((window.innerWidth  - 200) / CASCADE_OFFSET_PIXELS);
-      this.state = this.state.set('numPopupsOpened', numPopups + 1);
-      this.state = this.state.setIn(['popups', 'state', compId, 'position'], Immutable.Map(
+
+      // Set an initial size for the popup.
+      this.state = this.state.setIn(['popups', 'state', compId, 'size'], Immutable.Map(
         {
-          x: 50 + (numPopups % maxPopupsDown * CASCADE_OFFSET_PIXELS) + ((Math.floor(numPopups / maxPopupsDown) % maxPopupsAcross) * CASCADE_OFFSET_PIXELS),
-          y: 50 + (numPopups % maxPopupsDown * CASCADE_OFFSET_PIXELS)
+          width: INITIAL_POPUP_WIDTH_PIXELS,
+          height: INITIAL_POPUP_HEIGHT_PIXELS
         }
       ));
-    }
 
+      // Set an initial position that avoids obscuring existing popups.
+      // NB: This currently only avoids obscurring the inital positions (not modified positions) of existing popups.
+
+      let nextPopupSlotIndex = this.state.get('popupSlots').size;
+
+      for (let i = 0, len = this.state.get('popupSlots').size; i < len; i++) {
+        if (this.state.getIn(['popupSlots', i]) === null) {
+          nextPopupSlotIndex = i;
+          break;
+        }
+      }
+
+      if (nextPopupSlotIndex > this.state.get('popupSlots').size) {
+        console.error('nextPopupSlotIndex > this.state.get(\'popupSlots\').size');
+        console.info('nextPopupSlotIndex: %o', nextPopupSlotIndex);
+        console.info('this.state.get(\'popupSlots\').size: %o', this.state.get('popupSlots').size);
+        return null;
+      }
+
+      if (nextPopupSlotIndex === this.state.get('popupSlots').size) {
+        this.state = this.state.set('popupSlots', this.state.get('popupSlots').push(compId));
+      } else {
+        this.state = this.state.setIn(['popupSlots', nextPopupSlotIndex], compId);
+      }
+
+      const headerAllowancePixels = 200; // Accommodate header and show at least part of popup
+      let maxPopupsDown = Math.floor((window.innerHeight - headerAllowancePixels) / CASCADE_OFFSET_PIXELS);
+      let maxPopupsAcross = Math.floor((window.innerWidth - headerAllowancePixels) / CASCADE_OFFSET_PIXELS);
+
+      this.state = this.state.setIn(['popups', 'state', compId, 'position'], Immutable.Map(
+        {
+          x: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS) + ((Math.floor(nextPopupSlotIndex / maxPopupsDown) % maxPopupsAcross) * CASCADE_OFFSET_PIXELS),
+          y: 50 + (nextPopupSlotIndex % maxPopupsDown * CASCADE_OFFSET_PIXELS)
+        }
+      ));
+
+    }
   },
 
   popupResize({compId, size}) {
@@ -212,40 +257,54 @@ let SessionStore = Fluxxor.createStore({
 
   appResize() {
 
-    // Trim popups
+    // Resize or move popups so their bounds fall within the new window size.
     let popups = this.state.getIn(['popups', 'components']);
-
     popups.map((compId) => {
 
       let position = this.state.getIn(['popups', 'state', compId, 'position']);
       let size = this.state.getIn(['popups', 'state', compId, 'size']);
 
-      if (position !== undefined && size !== undefined) {
-        let positionX = position.get('x');
-        let positionY = position.get('y');
-        let sizeWidth = size.get('width');
-        let sizeHeight = size.get('height');
+      if (position === undefined || size === undefined) {
+        console.error('position === undefined || size === undefined');
+        console.info('position: %o', position);
+        console.info('size: %o', size);
+        return null;
+      }
 
-        // Trim window size to fit viewport.
-        if ((positionX + sizeWidth) >= window.innerWidth) {
-          sizeWidth = window.innerWidth - positionX - 1;
-          if (sizeWidth < MIN_POPUP_WIDTH_PIXELS) {
-            sizeWidth = MIN_POPUP_WIDTH_PIXELS;
-          }
-        }
-        if ((positionY + sizeHeight) >= window.innerHeight) {
-          sizeHeight = window.innerHeight - positionY - 1;
-          if (sizeHeight < MIN_POPUP_HEIGHT_PIXELS) {
-            sizeHeight = MIN_POPUP_HEIGHT_PIXELS;
-          }
-        }
+      let positionX = position.get('x');
+      let positionY = position.get('y');
+      let sizeWidth = size.get('width');
+      let sizeHeight = size.get('height');
 
-        let newSize = Immutable.Map({width: sizeWidth, height: sizeHeight});
-
-        if (!_isEqual(size, newSize)) {
-          this.state = this.state.mergeIn(['popups', 'state', compId, 'size'], newSize);
+      if ((positionX + sizeWidth) >= window.innerWidth) {
+        sizeWidth = window.innerWidth - positionX - 1;
+        if (sizeWidth < MIN_POPUP_WIDTH_PIXELS) {
+          positionX -= (MIN_POPUP_WIDTH_PIXELS - sizeWidth);
+          sizeWidth = MIN_POPUP_WIDTH_PIXELS;
+          positionX = positionX < 0 ? 0 : positionX;
         }
       }
+
+      if ((positionY + sizeHeight) >= window.innerHeight) {
+        sizeHeight = window.innerHeight - positionY - 1;
+        if (sizeHeight < MIN_POPUP_HEIGHT_PIXELS) {
+          positionY -= (MIN_POPUP_HEIGHT_PIXELS - sizeHeight);
+          sizeHeight = MIN_POPUP_HEIGHT_PIXELS;
+          positionY = positionY < 0 ? 0 : positionY;
+        }
+      }
+
+      let newSize = {width: sizeWidth, height: sizeHeight};
+      let newPosition = {x: positionX, y: positionY};
+
+      if (!_isEqual(size, newSize)) {
+        this.popupResize({compId, size: newSize});
+      }
+
+      if (!_isEqual(position, newPosition)) {
+        this.popupMove({compId, pos: newPosition});
+      }
+
     });
 
   }

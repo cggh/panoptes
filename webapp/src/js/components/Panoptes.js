@@ -119,10 +119,10 @@ let Panoptes = React.createClass({
                 let {width, height} = state.get('size', Map()).toJS();
                 return (
                   <Popup
-                    x={x}
-                    y={y}
-                    width={width}
-                    height={height}
+                    initialX={x}
+                    initialY={y}
+                    initialWidth={width}
+                    initialHeight={height}
                     compId={compId}
                     key={compId}
                     onMoveStop={actions.popupMove.bind(this, compId)}

@@ -107,7 +107,8 @@ if (dataset) {
             state: {}
           },
           foundGenes: [],
-          usedTableQueries: []
+          usedTableQueries: [],
+          popupSlots: []
         }
       };
       appState = appState ? appState : (
