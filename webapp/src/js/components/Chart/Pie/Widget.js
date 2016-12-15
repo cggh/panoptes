@@ -23,11 +23,13 @@ let PieChart = React.createClass({
     name: React.PropTypes.string,
     originalLat: React.PropTypes.number,
     originalLng: React.PropTypes.number,
-    radius: React.PropTypes.number
+    radius: React.PropTypes.number,
+    hideValues: React.PropTypes.bool
   },
 
   getDefaultProps() {
     return {
+      hideValues: false,
       name: '',
       residualFractionName: 'Other',
       radius: 5
@@ -35,13 +37,19 @@ let PieChart = React.createClass({
   },
 
   render() {
-    let {chartData, lat, lng, name, originalLat, originalLng, radius} = this.props;
+    let {chartData, hideValues, name, radius} = this.props;
 
     let sectorsData = [];
     let pieData = [];
 
     for (let i = 0, len = chartData.length; i < len; i++) {
-      sectorsData.push({color: chartData[i].color, title: (name === '' ? '' : name + '\n') + chartData[i].name + ': ' + chartData[i].value});
+
+      let title = (name === '' ? '' : name + '\n') + chartData[i].name + ': ' + chartData[i].value;
+      if (hideValues) {
+        title = (name === '' ? '' : name + '\n') + chartData[i].name;
+      }
+
+      sectorsData.push({color: chartData[i].color, title});
       if (chartData[i].value !== undefined && chartData[i].value !== null && chartData[i].value !== '' && !isNaN(chartData[i].value)) {
         pieData.push(chartData[i].value);
       } else {
@@ -80,10 +88,9 @@ let PieChart = React.createClass({
 
     return (
       <svg style={{overflow: 'visible'}} width="1" height="1">
-        <g transform={'translate(5, 5)'}>
+        <g>
           {sectors}
         </g>
-/        {false ? line: null}
       </svg>
     );
 

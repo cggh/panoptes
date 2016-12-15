@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 import jsxToString from 'jsx-to-string';
 import scrollbarSize from 'scrollbar-size';
@@ -34,6 +35,8 @@ import SQL from 'panoptes/SQL';
 import TableMap from 'Map/Table/Widget';
 import TableMarkersLayer from 'Map/TableMarkersLayer/Widget';
 import TileLayer from 'Map/TileLayer/Widget';
+import PropertySelector from 'panoptes/PropertySelector';
+import PropertyLegend from 'panoptes/PropertyLegend';
 
 import 'map.scss';
 
@@ -57,6 +60,7 @@ let MapActions = React.createClass({
     sidebar: React.PropTypes.bool,
     baseTileLayer: React.PropTypes.string,
     baseTileLayerProps: React.PropTypes.object,
+    markerColourProperty: React.PropTypes.string,
     overlayLayer: React.PropTypes.string,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
@@ -251,6 +255,9 @@ let MapActions = React.createClass({
     }
 
   },
+  handleChangeMarkerColourProperty(markerColourProperty) {
+    this.props.setProps({markerColourProperty});
+  },
 
   // Other functions
   icon() {
@@ -287,7 +294,17 @@ let MapActions = React.createClass({
   },
 
   render() {
-    let {center, setProps, baseTileLayer, baseTileLayerProps, overlayLayer, sidebar, table, zoom} = this.props;
+    let {
+      center,
+      setProps,
+      baseTileLayer,
+      baseTileLayerProps,
+      markerColourProperty,
+      overlayLayer,
+      sidebar,
+      table,
+      zoom
+    } = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -302,21 +319,35 @@ let MapActions = React.createClass({
     // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
     tableOptions = [{value: NULL_MARKER_LAYER, leftIcon: undefined, label: NULL_MARKER_LAYER}].concat(tableOptions);
 
-
     // If no table has been selected, just show a map with the other selected layers (if any).
 
     let markersLayerComponent = null;
     let baseLayerComponent = null;
     let overlayLayerComponent = null;
 
-
-    let adaptedMarkersLayerProps = {};
+    let customMapControls = undefined;
+    let query = undefined;
 
     if (table !== undefined && table !== NULL_MARKER_LAYER) {
 
       if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
-        adaptedMarkersLayerProps.query = this.getDefinedQuery();
+        query = this.getDefinedQuery();
       }
+
+      let legend = ReactDOMServer.renderToStaticMarkup(
+          <PropertyLegend
+            flux={this.flux}
+            property={markerColourProperty}
+            table={table}
+          />
+      );
+      let position = 'bottomleft';
+      let className = 'legend';
+
+      if (customMapControls === undefined) {
+        customMapControls = [];
+      }
+      customMapControls.push({component: legend, position, className});
 
       // NB: This might not be used, if/when only a table has been selected.
       markersLayerComponent = (
@@ -324,7 +355,11 @@ let MapActions = React.createClass({
           checked={true}
           name={this.config.tablesById[table].capNamePlural}
         >
-          <TableMarkersLayer table={table} {...adaptedMarkersLayerProps} />
+          <TableMarkersLayer
+            table={table}
+            query={query}
+            markerColourProperty={markerColourProperty}
+          />
         </Overlay>
       );
     }
@@ -401,6 +436,7 @@ let MapActions = React.createClass({
     let map = (
       <Map
         center={center}
+        customControls={customMapControls}
         setProps={setProps}
         onChange={this.handleChangeMap}
         zoom={zoom}
@@ -411,8 +447,10 @@ let MapActions = React.createClass({
 
       map = (
         <TableMap
-          {...adaptedMarkersLayerProps}
+          query={query}
+          markerColourProperty={markerColourProperty}
           center={center}
+          customControls={customMapControls}
           setProps={setProps}
           table={table}
           onChange={this.handleChangeMap}
@@ -430,7 +468,7 @@ let MapActions = React.createClass({
           <BaseLayer
             checked={true}
           >
-            <TileLayer zIndex="1" />
+            <TileLayer zIndex={1} />
           </BaseLayer>
         );
       }
@@ -438,6 +476,7 @@ let MapActions = React.createClass({
       map = (
         <Map
           center={center}
+          customControls={customMapControls}
           setProps={setProps}
           onChange={this.handleChangeMap}
           zoom={zoom}
@@ -459,7 +498,6 @@ let MapActions = React.createClass({
     // Wrap the map template code in a container with dimensions.
     let templateCode = '<div style="width:300px;height:300px">' + jsxToString(map, {ignoreProps: ['setProps', 'onChange']}) + '</div>';
 
-
     let sidebarContent = (
       <div className="sidebar map-sidebar">
         <SidebarHeader icon={this.icon()} description="View data geographically"/>
@@ -472,7 +510,7 @@ let MapActions = React.createClass({
             value={table}
           />
           {
-            table ?
+            table !== undefined && table !== NULL_MARKER_LAYER ?
               <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null
           }
@@ -492,6 +530,15 @@ let MapActions = React.createClass({
           >
             {this.overlayLayersMenu}
           </SelectField>
+          {table !== undefined && table !== NULL_MARKER_LAYER ?
+            <PropertySelector
+              table={table}
+              value={markerColourProperty}
+              label="Marker colour"
+              onSelect={this.handleChangeMarkerColourProperty}
+              allowNull={true}
+            />
+          : null }
           {
             this.config.user.isManager ?
               <TextField
