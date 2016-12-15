@@ -4,6 +4,7 @@
   width: 280px;
 }
 
+// NB: .map-controls is on the sidebar
 .map-controls {
   align-items: flex-start;
   .dropdown-option {
@@ -13,6 +14,19 @@
     .icon {
       color: $light-text-colour;
       padding-right: 7px;
+    }
+  }
+  .legend {
+    // NB: copied from genomebrowser.scss (and tree.scss)
+    .legend-element {
+      min-height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 16px;
+      .label {
+        padding-left: 8px;
+      }
     }
   }
 }
@@ -26,5 +40,25 @@
   .icon {
     color: $light-text-colour;
     padding-right: 7px;
+  }
+}
+
+// Custom controls (e.g. legend) on the map itself
+.map-custom-control {
+  background-color: white;
+  opacity: 0.7;
+  border-radius: 10px;
+  .legend {
+    padding: 5px 10px 5px 10px;
+    // NB: copied from genomebrowser.scss (and tree.scss)
+    .legend-element {
+      min-height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      .label {
+        padding-left: 8px;
+      }
+    }
   }
 }

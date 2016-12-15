@@ -42,7 +42,7 @@ const PropertySelector = React.createClass({
   render() {
     const {table, value, label, filter, allowNull} = this.props;
 
-    let propertyMenu = allowNull ? [<MenuItem value="__NULL__" primaryText="None"/>] : [];
+    let propertyMenu = allowNull ? [<MenuItem value="__NULL__" key="__NULL__" primaryText="None"/>] : [];
     let i = 0;
     if (table) {
       const propertyGroups = this.config.tablesById[table].propertyGroups;
@@ -53,10 +53,11 @@ const PropertySelector = React.createClass({
           propertyMenu.push(<Divider key={i++}/>);
         }
         let {id, name} = group;
-        propertyMenu.push(<MenuItem disabled value={id} key={`group_${id}`} primaryText={name}/>);
+        let groupId = id;
+        propertyMenu.push(<MenuItem disabled value={id} key={`group_${groupId}`} primaryText={name}/>);
         _each(filteredProps, (property) => {
           let {id, name} = property;
-          propertyMenu.push(<MenuItem value={id} key={id} primaryText={name}/>);
+          propertyMenu.push(<MenuItem value={id} key={`group_${groupId}_item_${id}`} primaryText={name}/>);
         });
       });
     }
