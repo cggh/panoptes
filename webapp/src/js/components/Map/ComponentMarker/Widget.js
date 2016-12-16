@@ -41,7 +41,7 @@ let ComponentMarker = React.createClass({
 
   getDefaultProps() {
     return {
-      fillColour: '#3D8BD5',
+      fillColour: '#ff4081',
       iconColour: 'white'
     };
   },
