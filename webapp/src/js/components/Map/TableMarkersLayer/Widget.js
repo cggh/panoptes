@@ -316,7 +316,8 @@ let TableMarkersLayer = React.createClass({
 
         if (marker.isHighlighted || (locationsCount === 1 && markersAtLocationCount === 1 && markerColourProperty === undefined)) {
 
-          // FIXME: apply colour to the single pin style markers.
+          // NB: Don't give highlighted markers the default colour,
+          // because it might lose its highlighted-ness amongst other (non-highlighted) default-coloured markers.
 
           singleMarkerWidgets.push(
             <ComponentMarker
@@ -325,7 +326,7 @@ let TableMarkersLayer = React.createClass({
               title={marker.title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
               zIndexOffset={markersCount + 2}
-              fillColour={marker.valueAsColour}
+              fillColour={marker.valueAsColour !== DEFAULT_MARKER_FILL_COLOUR ? marker.valueAsColour : undefined}
             />
           );
 
