@@ -261,11 +261,6 @@ let DataTableWithActions = React.createClass({
     let {table, columns, columnWidths, order, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
 
-    if (!columns) {
-      columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
-      columns = _map(columns, (prop) => prop.id);
-    }
-
     let {description} = this.tableConfig();
     let quickFindFieldsList = '';
     for (let i = 0, len = this.tableConfig().quickFindFields.length; i < len; i++) {
@@ -277,7 +272,7 @@ let DataTableWithActions = React.createClass({
     }
     let searchGUI = (
       <FlatButton label="Find text"
-                  disabled={columns.size === 0}
+                  disabled={columns === undefined || columns.length === 0}
                   primary={true}
                   onClick={this.handleSearchOpen}
                   icon={<Icon fixedWidth={true} name="search" />}
@@ -287,7 +282,7 @@ let DataTableWithActions = React.createClass({
       searchGUI = (
         <div>
           <RaisedButton label="Find text"
-                      disabled={columns.size === 0}
+                      disabled={columns === undefined || columns.length === 0}
                       primary={true}
                       icon={<Icon fixedWidth={true} name="search" inverse={true} />}
           />
@@ -309,9 +304,9 @@ let DataTableWithActions = React.createClass({
 
     // TODO: Or simply label "Pick Columns" ?
     let columnPickerLabel = 'Add/Remove Columns';
-    if (columns.length === this.tableConfig().properties.length) {
+    if (columns !== undefined && columns.length === this.tableConfig().properties.length) {
       columnPickerLabel = 'Remove Columns';
-    } else if (columns.length === 0) {
+    } else if (columns !== undefined && columns.length === 0) {
       columnPickerLabel = 'Add Columns';
     }
     let sidebarContent = (
@@ -331,7 +326,7 @@ let DataTableWithActions = React.createClass({
         {searchGUI}
         <Divider />
         <FlatButton label="Download data"
-                    disabled={columns.size === 0}
+                    disabled={columns === undefined || columns.length === 0}
                     primary={true}
                     onClick={() => this.handleDownload()}
                     icon={<Icon fixedWidth={true} name="download" />}
@@ -449,7 +444,7 @@ let DataTableWithActions = React.createClass({
             <span className="block text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
-            <span className="block text">{columns.length} of {this.tableConfig().properties.length} columns shown</span>
+            <span className="block text">{columns !== undefined ? columns.length : 0} of {this.tableConfig().properties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
           </div>
           <div className="grow">

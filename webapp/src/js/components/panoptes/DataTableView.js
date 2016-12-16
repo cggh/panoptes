@@ -8,7 +8,6 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _some from 'lodash/some';
 import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
-import _map from 'lodash/map';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -100,11 +99,18 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, columns, order, startRowIndex, query} = props;
+    let {table, columns, order, startRowIndex, query, onShowableRowsCountChange} = props;
     let {showableRowsCount} = this.state;
-    if (columns.length > 0 && showableRowsCount > 0) {
+
+    if (columns.length > 0 && (onShowableRowsCountChange === undefined || showableRowsCount > 0)) {
       this.setState({loadStatus: 'loading'});
+
       let stopRowIndex = startRowIndex + showableRowsCount - 1;
+
+      if (onShowableRowsCountChange === undefined) {
+        stopRowIndex = undefined;
+      }
+
       let queryAPIargs = {
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
@@ -256,14 +262,10 @@ let DataTableView = React.createClass({
   render() {
     let {className, columns, order} = this.props;
     let {loadStatus, rows, width, height} = this.state;
+
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
-    }
-
-    if (!columns) {
-      columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
-      columns = _map(columns, (prop) => prop.id);
     }
 
     if (columns.length > 0) {
