@@ -108,7 +108,6 @@ let TableMarkersLayer = React.createClass({
 
       if (showableColumns instanceof Array && showableColumns.length > 0) {
 
-        // FIXME: <> should be =
         let whereClause = SQL.WhereClause.AND([
           SQL.WhereClause.CompareFixed(latProperty, '=', lat),
           SQL.WhereClause.CompareFixed(lngProperty, '=', lng)
