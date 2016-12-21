@@ -10,7 +10,6 @@ let PieChartSector = React.createClass({
     arcDescriptor: React.PropTypes.object,
     title: React.PropTypes.string,
     onClick: React.PropTypes.func,
-    transform: React.PropTypes.string,
     className: React.PropTypes.string
   },
 
@@ -18,19 +17,18 @@ let PieChartSector = React.createClass({
     return {
       outerRadius: 20,
       innerRadius: 0,
-      transform: 'rotate(90)',
       className: 'pie-chart-sector'
     };
   },
 
   render: function() {
 
-    let {outerRadius, innerRadius, fillColor, arcDescriptor, title, onClick, transform, className} = this.props;
+    let {outerRadius, innerRadius, fillColor, arcDescriptor, title, onClick, className} = this.props;
 
     let arc = d3.svg.arc().outerRadius(outerRadius).innerRadius(innerRadius);
 
     return (
-      <g className={className} style={{fill: fillColor}} transform={transform} onClick={onClick}>
+      <g className={className} style={{fill: fillColor}} onClick={onClick}>
         <title>{title}</title>
         <path d={arc(arcDescriptor)}></path>
       </g>

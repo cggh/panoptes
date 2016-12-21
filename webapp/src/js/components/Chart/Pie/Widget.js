@@ -88,7 +88,7 @@ let PieChart = React.createClass({
 
     return (
       <svg style={{overflow: 'visible'}} width="1" height="1">
-        <g>
+        <g transform={'rotate(90)'}>
           {sectors}
         </g>
       </svg>
