@@ -32,6 +32,7 @@ let Histogram = React.createClass({
     let values = chartData.map((obj) => obj.value);
     let xScaleFunction = d3.scale.linear().domain(d3.extent(values)).range([0, width]);
     //let histogramData = d3.layout.histogram().bins(xScaleFunction.ticks(20))(itemValues);
+
     let histogramData = d3.layout.histogram()(values);
     let valueWidth = d3.min(values) < 0 ? -d3.min(values) + d3.max(values) : d3.min(values) + d3.max(values);
     let dxScaleFunction = d3.scale.linear().domain([0, valueWidth]).range([0, width]);
@@ -45,6 +46,12 @@ let Histogram = React.createClass({
           {
             histogramData.map(
               (d, i) => {
+
+                // FIXME: chartData is sometimes initially out-of-date,
+                // e.g. Marker colour: Category ID, Marker colour: Numerical 1
+                if (isNaN(d.x) || isNaN(d.y) || isNaN(d.dx)) {
+                  return null;
+                }
 
                 let scaledX = xScaleFunction(d.x);
                 let scaledY = yScaleFunction(d.y);
