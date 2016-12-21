@@ -32,15 +32,16 @@ let HistogramBin = React.createClass({
 
   render() {
     let {
-      x, y, dx, maxHeight,
+      x, y, dx,
       scaledX, scaledY, scaledDx,
+      maxHeight,
       unitNameSingle, unitNamePlural,
       valueName, values,
       fillColour
     } = this.props;
 
     return (
-      <g transform={'translate(' + scaledX + ',' + scaledY + ')'}>
+      <g transform={`translate(${scaledX}, ${scaledY})`}>
         <rect width={scaledDx} height={maxHeight - scaledY} fill={fillColour}>
           <title>{y} {y > 1 ? unitNamePlural : unitNameSingle} with {valueName} between {x} and {x + dx} <br /> {JSON.stringify(values)}</title>
         </rect>
