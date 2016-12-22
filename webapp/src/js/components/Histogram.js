@@ -73,7 +73,6 @@ let Histogram = React.createClass({
                   unitNamePlural={unitNamePlural}
                   valueName={valueName}
                   fillColour={fillColour}
-                  values={d}
                 />;
               }
             )
