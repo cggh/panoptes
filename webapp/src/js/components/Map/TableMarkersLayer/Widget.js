@@ -401,8 +401,7 @@ let TableMarkersLayer = React.createClass({
             }
 
             // NB: The originalRadius is for the GeoLayouter collision detection.
-            // If the width of the histogram box is HISTOGRAM_WIDTH_PIXELS,
-            // then the radius circumscribing that box will be Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2))
+            const histogramRadius = Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2));
 
             // NB: The colours associated with the individual values
             // can not be applied to the histogram,
@@ -415,7 +414,7 @@ let TableMarkersLayer = React.createClass({
               key: location,
               lat: markersGroupedByLocation[location][0].lat,
               lng: markersGroupedByLocation[location][0].lng,
-              originalRadius: Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2)),
+              originalRadius: histogramRadius,
               chartData: markerChartData,
               table,
               primKey: markersGroupedByLocation[location][0].primKey,
@@ -556,20 +555,6 @@ let TableMarkersLayer = React.createClass({
                           );
 
                         } else if (marker.clusterType === 'histogram') {
-
-                          // To convert square width to encircling radius: Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2))
-                          // let a = (100 / 2);
-                          // let b = Math.pow(a, 2);
-                          // let c = 2 * b;
-                          // let d = Math.sqrt(c);
-                          // console.log('A width of 100 becomes a radius of ' + d); // 70.71067811865476
-
-                          // To convert encircling radius to square width:
-                          // let undoD = Math.pow(70.71067811865476, 2);
-                          // let undoC = undoD / 2;
-                          // let undoB = Math.sqrt(undoC);
-                          // let undoA = undoB * 2;
-                          // console.log('A radius of 70.71067811865476 becomes a width of ' + undoA); // 100
 
                           const histogramWidth = Math.sqrt(Math.pow(marker.radius, 2) / 2) * 2;
 
