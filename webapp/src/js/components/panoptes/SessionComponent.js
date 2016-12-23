@@ -12,7 +12,8 @@ let SessionComponent = React.createClass({
 
   propTypes: {
     compId: React.PropTypes.string,
-    updateTitleIcon: React.PropTypes.func
+    updateTitleIcon: React.PropTypes.func,
+    replaceable: React.PropTypes.bool
   },
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -49,19 +50,20 @@ let SessionComponent = React.createClass({
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.updateTitleIcon && (prevState.component.get('type') !== this.state.component.get('type'))) {
-      this.props.updateTitleIcon()
+      this.props.updateTitleIcon();
     }
   },
 
   render() {
-    const {compId} = this.props;
+    const {compId, replaceable} = this.props;
     const {component} = this.state;
     let actions = this.getFlux().actions.session;
+
     return React.cloneElement(deserialiseComponent(component, [compId], {
       setProps: actions.componentSetProps,
       replaceSelf: actions.componentReplace,
       updateTitleIcon: this.updateTitleIcon
-    }), {ref: 'child'});
+    }), {ref: 'child', replaceable});
   }
 });
 

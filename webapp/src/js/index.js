@@ -100,7 +100,8 @@ if (dataset) {
           tabs: {
             components: ['FirstTab'],
             selectedTab: 'FirstTab',
-            unclosableTab: 'FirstTab'
+            unclosableTabs: ['FirstTab'],
+            unreplaceableTabs: ['FirstTab']
           },
           popups: {
             components: [],

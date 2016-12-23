@@ -9,6 +9,7 @@ let TabPane = React.createClass({
   propTypes: {
     title: React.PropTypes.string,
     active: React.PropTypes.bool, //Usually set by TabbedArea
+    replaceable: React.PropTypes.bool, //Usually set by TabbedArea
     children: React.PropTypes.element,
     className: React.PropTypes.string,
     updateTitleIcon: React.PropTypes.func
@@ -40,6 +41,7 @@ let TabPane = React.createClass({
     delete divProps.active;
     delete divProps.compId;
     delete divProps.updateTitleIcon;
+    delete divProps.replaceable;
 
     let classes = {
       'tab-pane': true,
@@ -48,8 +50,11 @@ let TabPane = React.createClass({
     };
 
     let child = React.Children.only(this.props.children);
-    let extraProps = (child && child.type.propTypes && child.type.propTypes.updateTitleIcon) ?
-    {updateTitleIcon: this.props.updateTitleIcon} : {};
+    let extraProps = {replaceable: this.props.replaceable};
+    if (child && child.type.propTypes && child.type.propTypes.updateTitleIcon) {
+      Object.assign(extraProps, {updateTitleIcon: this.props.updateTitleIcon});
+    }
+
     return (
       <div {...divProps} className={classNames(this.props.className, classes)}>
         {React.cloneElement(child, {
