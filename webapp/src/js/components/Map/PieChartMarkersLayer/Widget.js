@@ -202,7 +202,7 @@ let PieChartMarkersLayer = React.createClass({
 
           markers.push({
             chartDataTable: chartDataTable,
-            key: locationData[i][locationPrimKeyProperty],
+            key: locationDataPrimKey,
             lat: locationData[i][locationTableConfig.latitude],
             lng: locationData[i][locationTableConfig.longitude],
             name: locationData[i][locationNameProperty],
@@ -270,6 +270,7 @@ let PieChartMarkersLayer = React.createClass({
                         key={i}
                         position={{lat: marker.lat, lng: marker.lng}}
                         onClick={(e) => this.handleClickMarker(e, marker)}
+                        opacity={0.9}
                       >
                         <PieChart
                           chartData={marker.chartData}
@@ -287,6 +288,7 @@ let PieChartMarkersLayer = React.createClass({
                   renderNodes.map(
                     (marker, i) =>
                       <Polyline
+                        className="panoptes-pie-chart-markers-layer-polyline"
                         positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
                       />
                   )

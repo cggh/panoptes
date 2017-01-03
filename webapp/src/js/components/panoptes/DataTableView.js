@@ -99,11 +99,18 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, columns, order, startRowIndex, query} = props;
+    let {table, columns, order, startRowIndex, query, onShowableRowsCountChange} = props;
     let {showableRowsCount} = this.state;
-    if (columns.length > 0 && showableRowsCount > 0) {
+
+    if (columns.length > 0 && (onShowableRowsCountChange === undefined || showableRowsCount > 0)) {
       this.setState({loadStatus: 'loading'});
+
       let stopRowIndex = startRowIndex + showableRowsCount - 1;
+
+      if (onShowableRowsCountChange === undefined) {
+        stopRowIndex = undefined;
+      }
+
       let queryAPIargs = {
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
@@ -219,7 +226,7 @@ let DataTableView = React.createClass({
     }
 
     if (MEASURED_COLUMN_WIDTHS[this.props.table] && MEASURED_COLUMN_WIDTHS[this.props.table][column]) {
-      return MEASURED_COLUMN_WIDTHS[this.props.table][column]
+      return MEASURED_COLUMN_WIDTHS[this.props.table][column];
     }
     // NB: Columns need to be initialized with at least a non-null.
     let columnWidthPx = 0;
@@ -245,7 +252,7 @@ let DataTableView = React.createClass({
       canvas2dContext.font = propertyHeaderTextElementStyles['fontStyle'] + ' ' + propertyHeaderTextElementStyles['fontWeight'] + ' ' + propertyHeaderTextElementStyles['fontSize'] + ' "' + propertyHeaderTextElementStyles['fontFamily'] + '"';
       columnWidthPx = Math.ceil(canvas2dContext.measureText(columnData.name).width) + paddingWidthPx;
       MEASURED_COLUMN_WIDTHS[this.props.table] = MEASURED_COLUMN_WIDTHS[this.props.table] || {};
-      MEASURED_COLUMN_WIDTHS[this.props.table][column] = columnWidthPx
+      MEASURED_COLUMN_WIDTHS[this.props.table][column] = columnWidthPx;
     }
 
     return columnWidthPx;
@@ -255,11 +262,13 @@ let DataTableView = React.createClass({
   render() {
     let {className, columns, order} = this.props;
     let {loadStatus, rows, width, height} = this.state;
+
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    if (columns.length > 0)
+
+    if (columns.length > 0) {
       return (
         <DetectResize onResize={this.handleResize}>
           <div className={classNames('load-container', className)}>
@@ -355,12 +364,13 @@ let DataTableView = React.createClass({
           </div>
         </DetectResize>
       );
-    else
+    } else {
       return (
         <div className={classNames('load-container', className)}>
           <Loading status="custom">No columns selected</Loading>
         </div>
       );
+    }
   }
 
 });
