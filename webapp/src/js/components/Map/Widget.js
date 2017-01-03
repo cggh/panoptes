@@ -1,6 +1,7 @@
 import {Map as LeafletMap} from 'react-leaflet';
 import React from 'react';
 import displayName from 'react-display-name';
+import 'leaflet-loading/src/Control.Loading.js';
 
 //Panoptes
 import filterChildren from 'util/filterChildren';
@@ -20,6 +21,7 @@ import _min from 'lodash/min';
 
 // CSS
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-loading/src/Control.Loading.css';
 
 const ALLOWED_CHILDREN = [
   'LayersControl',
@@ -108,6 +110,7 @@ let Map = React.createClass({
       loadStatus: 'loaded'
     };
   },
+
 
   // Event handlers
   handleChangeLayerStatus(payload) {
@@ -227,6 +230,7 @@ let Map = React.createClass({
     let commonMapProps = {
       bounds: center && (zoom !== undefined) ? undefined : bounds,
       center: center,
+      loadingControl: true,
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: widgetStyle,
       ref: (ref) => this.map = ref,
