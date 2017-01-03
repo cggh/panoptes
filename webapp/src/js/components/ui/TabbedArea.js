@@ -14,7 +14,8 @@ let TabbedArea = React.createClass({
 
   propTypes: {
     activeTab: React.PropTypes.string,
-    unclosableTab: React.PropTypes.string,
+    unclosableTabs: React.PropTypes.object,
+    unreplaceableTabs: React.PropTypes.object,
     onSwitch: React.PropTypes.func,
     onClose: React.PropTypes.func,
     onDragAway: React.PropTypes.func,
@@ -112,13 +113,13 @@ let TabbedArea = React.createClass({
           <div className={classNames(classes)} onClick={this.handleClick.bind(this, id)}>
             {icons[id] ? <Icon name={icons[id]}/> : null}
             <div className="title">{titles[id]}</div>
-            {this.props.unclosableTab !== id ?
+            {this.props.unclosableTabs.indexOf(id) === -1 ?
               closeIcon
             : null}
           </div>
     );
 
-    if (this.props.onDragAway && this.props.unclosableTab !== id) {
+    if (this.props.onDragAway && this.props.unclosableTabs.indexOf(id) === -1) {
       // Wrap tabMarkup in Draggable
       tabMarkup = (
         <Draggable
@@ -138,19 +139,22 @@ let TabbedArea = React.createClass({
   },
 
   renderPane(tab) {
+
     return React.cloneElement(
       tab,
       {
         active: (tab.props.compId === this.props.activeTab),
         key: tab.props.compId,
         ref: tab.props.compId,
-        updateTitleIcon: () => this.forceUpdate()
+        updateTitleIcon: () => this.forceUpdate(),
+        replaceable: (this.props.unreplaceableTabs.indexOf(tab.props.compId) === -1 ? true : false)
       });
   },
 
   render() {
     const divProps = _assign({}, this.props);
-    delete divProps.unclosableTab;
+    delete divProps.unclosableTabs;
+    delete divProps.unreplaceableTabs;
     delete divProps.activeTab;
     delete divProps.onSwitch;
     delete divProps.onClose;

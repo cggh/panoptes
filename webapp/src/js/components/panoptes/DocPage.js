@@ -30,7 +30,8 @@ let DocPage = React.createClass({
   propTypes: {
     path: React.PropTypes.string,
     replaceSelf: React.PropTypes.func,
-    updateTitleIcon: React.PropTypes.func
+    updateTitleIcon: React.PropTypes.func,
+    replaceable: React.PropTypes.bool
   },
 
   componentWillMount() {
@@ -107,7 +108,8 @@ let DocPage = React.createClass({
 
   render() {
     const {content, loadStatus} = this.state;
-    const {replaceSelf} = this.props;
+    const replaceSelf = this.props.replaceable ? this.props.replaceSelf : undefined;
+
     return <div className="load-container">
       <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       <Loading status={loadStatus}/>
