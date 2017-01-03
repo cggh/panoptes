@@ -1,11 +1,11 @@
 @import "./variables";
 
 .genome-browser {
-  height: calc(100% - 41px);
+  height: 100%;
   width: 100%;
   .control-bar {
     //height: 40px;
-    line-height: 40px;
+    line-height: 30px;
     .loading-canvas {
       //opacity: 0;
       transition: opacity .5s ease-in-out;
@@ -25,6 +25,10 @@
         .wide {
           width: 200px
         }
+      }
+      span.block {
+        display: inline-block;
+        white-space: nowrap;
       }
     }
     .controls > * {

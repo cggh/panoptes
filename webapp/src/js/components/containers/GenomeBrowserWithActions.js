@@ -81,9 +81,11 @@ let GenomeBrowserWithActions = React.createClass({
               title={sidebar ? 'Expand' : 'Sidebar'}
             />
           </div>
-          <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} >
-            {children}
-          </GenomeBrowser>
+          <div className="grow">
+            <GenomeBrowser setProps={setProps} sideWidth={150} {...subProps} >
+              {children}
+            </GenomeBrowser>
+          </div>
         </div>
       </Sidebar>
     );

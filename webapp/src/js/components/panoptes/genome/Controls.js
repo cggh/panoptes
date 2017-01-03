@@ -93,47 +93,54 @@ let Controls = React.createClass({
     let max = this.config.chromosomes[chromosome] || FALLBACK_MAXIMUM;
     return (
       <span className="controls">
-        <span> Chromosome: </span>
-        <span>
-          <select ref="chromosome" value={chromosome} onChange={this.handleChromChange}>
-            {_map(this.config.chromosomes, (length, name) =>
-                <option key={name}
-                        value={name}>
-                  {name}
-                </option>
-            )}
-          </select>
+        <span className="block">
+          <span> Chromosome: </span>
+          <span>
+            <select ref="chromosome" value={chromosome} onChange={this.handleChromChange}>
+              {_map(this.config.chromosomes, (length, name) =>
+                  <option key={name}
+                          value={name}>
+                    {name}
+                  </option>
+              )}
+            </select>
+          </span>
         </span>
-        <span> Region: </span>
-        <span>
-          <input className={classnames({wide: true, invalid: !regionValid})}
-                 ref="region"
-                 type="text"
-                 spellCheck="false"
-                 value={regionText}
-                 min={minWidth}
-                 max={max}
-                 onChange={this.handleRegionChange}/>
+        <span className="block">
+          <span> Region: </span>
+          <span>
+            <input className={classnames({wide: true, invalid: !regionValid})}
+                   ref="region"
+                   type="text"
+                   spellCheck="false"
+                   value={regionText}
+                   min={minWidth}
+                   max={max}
+                   onChange={this.handleRegionChange}/>
+          </span>
         </span>
-        <span> Midpoint: </span>
-<span>
-<input ref="midpoint"
-        type="number"
-        min={0}
-        max={max}
-        value={parseInt(midpoint)}
-        onChange={this.handleRangeChange}/>
+        <span className="block">
+          <span> Midpoint: </span>
+          <span>
+            <input ref="midpoint"
+                    type="number"
+                    min={0}
+                    max={max}
+                    value={parseInt(midpoint)}
+                    onChange={this.handleRangeChange}/>
+          </span>
         </span>
-        <span> Width: </span>
-        <span>
-                 <input ref="width"
-                        type="number"
-                        value={parseInt(width)}
-                        min={minWidth}
-                        max={max}
-                        onChange={this.handleRangeChange}/>
-         </span>
-
+        <span className="block">
+          <span> Width: </span>
+          <span>
+             <input ref="width"
+                    type="number"
+                    value={parseInt(width)}
+                    min={minWidth}
+                    max={max}
+                    onChange={this.handleRangeChange}/>
+           </span>
+        </span>
 
       </span>
     );
@@ -141,4 +148,3 @@ let Controls = React.createClass({
 });
 
 export default Controls;
-
