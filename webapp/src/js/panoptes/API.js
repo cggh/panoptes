@@ -370,19 +370,6 @@ function importDataset(dataset) {
   }).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
-
-function importDatasetConfig(dataset) {
-  return requestJSON({
-    params: {
-      datatype: 'fileload_dataset',
-      ScopeStr: 'none',
-      SkipTableTracks: 'false',
-      datasetid: dataset
-    }
-
-  }).then((resp) => JSON.parse(Base64.decode(resp.content)));
-}
-
 function rowsCount(options) {
   assertRequired(options, ['database', 'table']);
 
@@ -574,7 +561,6 @@ module.exports = {
   findGene,
   findGenesInRegion,
   importDataset,
-  importDatasetConfig,
   modifyConfig,
   nullValues,
   query,

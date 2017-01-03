@@ -44,11 +44,6 @@ let DatasetManagerActions = React.createClass({
     return this.props.title || 'Dataset Manager';
   },
 
-  handleReloadConfig() {
-    API.importDatasetConfig(this.config.dataset);
-    // The import status logs should refresh every refreshMilliseconds.
-  },
-
   handleReimport() {
     API.importDataset(this.config.dataset);
     // The import status logs should refresh every refreshMilliseconds.
@@ -65,12 +60,6 @@ let DatasetManagerActions = React.createClass({
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={`Import and configure the ${name} (${dataset}) dataset`} />
-        <ConfirmButton label="Reload config only"
-                       primary={true}
-                       icon={<Icon fixedWidth={true} name={'cogs'} />}
-                       message={`Are you sure you want to reload the configuration for the ${name} (${dataset}) dataset?`}
-                       onConfirm={() => this.handleReloadConfig()}
-        />
         <ConfirmButton label="Reimport everything"
                        primary={true}
                        icon={<Icon fixedWidth={true} name={'refresh'} />}
