@@ -261,6 +261,11 @@ let DataTableWithActions = React.createClass({
     let {table, columns, columnWidths, order, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
 
+    if (!columns) {
+      columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
+      columns = _map(columns, (prop) => prop.id);
+    }
+
     let {description} = this.tableConfig();
     let quickFindFieldsList = '';
     for (let i = 0, len = this.tableConfig().quickFindFields.length; i < len; i++) {
