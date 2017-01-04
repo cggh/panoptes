@@ -8,6 +8,7 @@ import Icon from 'ui/Icon';
 import Draggable from 'react-draggable';
 import filterChildren from 'util/filterChildren';
 import _assign from 'lodash/assign';
+import Immutable from 'immutable';
 
 let TabbedArea = React.createClass({
   mixins: [PureRenderMixin],
@@ -32,6 +33,12 @@ let TabbedArea = React.createClass({
     };
   },
 
+  getDefaultProps() {
+    return {
+      unclosableTabs: Immutable.List(),
+      unreplaceableTabs: Immutable.List()
+    };
+  },
 
   componentDidMount() {
     this.componentDidUpdate();
