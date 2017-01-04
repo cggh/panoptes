@@ -333,10 +333,9 @@ let TableMarkersLayer = React.createClass({
 
           let title = marker.title;
           if (markerColourProperty !== undefined && markerColourProperty !== null) {
+            title = `${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
             if (markerColourProperty !== this.config.tablesById[table].primKey) {
-              title = `${this.config.tablesById[table].propertiesById[this.config.tablesById[table].primKey].name}: ${marker.primKey}\n${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
-            } else {
-              title = `${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
+              title = `${this.config.tablesById[table].propertiesById[this.config.tablesById[table].primKey].name}: ${marker.primKey}\n` + title;
             }
           }
 
