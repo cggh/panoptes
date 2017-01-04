@@ -294,7 +294,7 @@ let TableMarkersLayer = React.createClass({
     let markerColourPropertyIsNumerical = false;
     let markerColourPropertyIsCategorical = false;
 
-    if (markerColourProperty !== undefined) {
+    if (markerColourProperty !== undefined && markerColourProperty !== null) {
       markerColourPropertyIsNumerical = this.config.tablesById[table].propertiesById[markerColourProperty].isNumerical;
       markerColourPropertyIsCategorical = this.config.tablesById[table].propertiesById[markerColourProperty].isCategorical;
     }
@@ -332,7 +332,7 @@ let TableMarkersLayer = React.createClass({
         } else {
 
           let title = marker.title;
-          if (markerColourProperty !== undefined) {
+          if (markerColourProperty !== undefined && markerColourProperty !== null) {
             title = `${this.config.tablesById[table].propertiesById[this.config.tablesById[table].primKey].name}: ${marker.primKey}\n${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
           }
 
