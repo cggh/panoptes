@@ -108,9 +108,11 @@ let QueryPicker = React.createClass({
       return null;
     }
     if (this.state.storedFilterName === '') {
-      // TODO: error message to user
       return null;
     }
+
+    // TODO: Only store if there isn't already one with the same name and query.
+
     // Store the current query in the db and update the state.
     this.getFlux().actions.api.modifyConfig(
       {
@@ -119,11 +121,13 @@ let QueryPicker = React.createClass({
         action: 'merge',
         content: [{
           query: this.state.query,
-          name: this.state.storedFilterName,
+          name: this.state.storedFilterName
         }],
       }
     );
-    this.setState({storedFilterNameOpen: false});
+
+    // Hide the input field and clear its value.
+    this.setState({storedFilterNameOpen: false, storedFilterName: ''});
   },
 
   handleToggleSidebar() {

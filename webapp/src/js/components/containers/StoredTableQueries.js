@@ -50,9 +50,9 @@ let StoredTableQueries = React.createClass({
       return null;
     }
 
-    // TODO: Use Confirm, but we are already in a modal!
+    // TODO: Use Confirm, which will require a second-level modal.
 
-    // Overwrite the default query in the db with the specified stored query and then update the state.
+    // Overwrite the default query in the config with the specified stored query and then update the state.
     this.getFlux().actions.api.modifyConfig(
       {
         dataset: this.config.dataset,
@@ -71,9 +71,9 @@ let StoredTableQueries = React.createClass({
       return null;
     }
 
-    // TODO: Use Confirm, but we are already in a modal!
+    // TODO: Use Confirm, which will require a second-level modal.
 
-    // Delete the specified query in the db and then update the state.
+    // Delete the specified query in the config and update the state.
     this.getFlux().actions.api.modifyConfig(
       {
         dataset: this.config.dataset,
@@ -116,7 +116,7 @@ let StoredTableQueries = React.createClass({
       }
 
       return <ListItem
-               key={index}
+               key={JSON.stringify({name, query})}
                primaryText={name}
                secondaryText={<p className="list-string"><QueryString className="text" table={table} query={query} /></p>}
                secondaryTextLines={2}
