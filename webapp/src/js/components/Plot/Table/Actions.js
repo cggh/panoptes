@@ -32,6 +32,8 @@ import FilterButton from 'panoptes/FilterButton';
 
 import 'plot.scss';
 
+const NULL_RANDOM_SAMPLES_CARDINALITY = '— None —';
+
 let TablePlotActions = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -46,7 +48,8 @@ let TablePlotActions = React.createClass({
     plotType: React.PropTypes.string,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
+    randomSamplesCardinality: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -56,7 +59,8 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true
+      sidebar: true,
+      randomSamplesCardinality: NULL_RANDOM_SAMPLES_CARDINALITY
     };
   },
 
@@ -80,6 +84,14 @@ let TablePlotActions = React.createClass({
     this.props.setProps({plotType});
   },
 
+  handleChangeRandomSamplesCardinality(randomSamplesCardinality) {
+    if (randomSamplesCardinality === NULL_RANDOM_SAMPLES_CARDINALITY) {
+      this.props.setProps({randomSamplesCardinality: undefined});
+    } else {
+      this.props.setProps({randomSamplesCardinality});
+    }
+  },
+
   // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
   getDefinedQuery() {
     return this.props.query
@@ -88,7 +100,7 @@ let TablePlotActions = React.createClass({
   },
 
   render() {
-    let {sidebar, table, plotType, setProps} = this.props;
+    let {sidebar, table, plotType, setProps, randomSamplesCardinality} = this.props;
 
     let dimensionProperties = _pickBy(this.props, (value, name) => allDimensions.indexOf(name) !== -1);
 
@@ -97,6 +109,29 @@ let TablePlotActions = React.createClass({
       leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
       label: table.capNamePlural
     }));
+
+
+    let randomSamplesCardinalityOptions = [
+      <MenuItem key={20} primaryText={'20'} value={20} />,
+      <MenuItem key={50} primaryText={'50'} value={50} />,
+      <MenuItem key={100} primaryText={'100'} value={100} />,
+      <MenuItem key={200} primaryText={'200'} value={200} />,
+      <MenuItem key={500} primaryText={'500'} value={500} />,
+      <MenuItem key={1000} primaryText={'1K'} value={1000} />,
+      <MenuItem key={2000} primaryText={'2K'} value={2000} />,
+      <MenuItem key={5000} primaryText={'5K'} value={5000} />,
+      <MenuItem key={10000} primaryText={'10K'} value={10000} />,
+      <MenuItem key={20000} primaryText={'20K'} value={20000} />,
+      <MenuItem key={50000} primaryText={'50K'} value={50000} />,
+      <MenuItem key={100000} primaryText={'100K'} value={100000} />,
+      <MenuItem key={200000} primaryText={'200K'} value={200000} />,
+      <MenuItem key={500000} primaryText={'500K'} value={500000} />,
+    ];
+
+    // Add a "no random samples" option
+    // NB: The value cannot be undefined or null or '',
+    // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
+    randomSamplesCardinalityOptions = [<MenuItem key={NULL_RANDOM_SAMPLES_CARDINALITY} primaryText={NULL_RANDOM_SAMPLES_CARDINALITY} value={NULL_RANDOM_SAMPLES_CARDINALITY} />].concat(randomSamplesCardinalityOptions);
 
     let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
 
@@ -114,9 +149,17 @@ let TablePlotActions = React.createClass({
           {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
           <SelectField
+            value={randomSamplesCardinality}
+            autoWidth={true}
+            floatingLabelText="Random sample set"
+            onChange={(e, i, v) => this.handleChangeRandomSamplesCardinality(v)}
+          >
+            {randomSamplesCardinalityOptions}
+          </SelectField>
+          <SelectField
             value={plotType}
             autoWidth={true}
-            floatingLabelText="Plot Type:"
+            floatingLabelText="Plot type"
             onChange={(e, i, v) => this.handleChangePlotType(v)}
           >
             {plotTypeOptions}
@@ -156,7 +199,15 @@ let TablePlotActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            {table && plotType && dimensionProperties ? <TablePlot table={table} plotType={plotType} query={this.getDefinedQuery()} {...dimensionProperties} /> : null}
+            {table && plotType && dimensionProperties ?
+              <TablePlot
+                table={table}
+                plotType={plotType}
+                query={this.getDefinedQuery()}
+                {...dimensionProperties}
+                randomSamplesCardinality={randomSamplesCardinality !== NULL_RANDOM_SAMPLES_CARDINALITY ? randomSamplesCardinality : undefined}
+              /> : null
+            }
           </div>
         </div>
       </Sidebar>

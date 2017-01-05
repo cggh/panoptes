@@ -28,7 +28,7 @@ let TablePlot = React.createClass({
     PureRenderMixin,
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin.apply(this, ['table', 'query'].concat(allDimensions))
+    DataFetcherMixin.apply(this, ['table', 'query', 'randomSamplesCardinality'].concat(allDimensions))
   ],
 
   // ['table', 'query'].concat(_map(allDimensions, (dim) => 'dimensionProperties.' + dim))
@@ -40,7 +40,8 @@ let TablePlot = React.createClass({
     setProps: React.PropTypes.func,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
+    randomSamplesCardinality: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -68,10 +69,10 @@ let TablePlot = React.createClass({
 
   fetchData(props, requestContext) {
 
-    const {table, query} = props;
+    const {table, query, randomSamplesCardinality} = props;
     const dimensionProperties = _pickBy(props, (value, name) => allDimensions.indexOf(name) !== -1);
     const tableConfig = this.config.tablesById[table];
-
+console.log('fetchData randomSamplesCardinality %o', randomSamplesCardinality);
     // Get a list of all the recognised dimension names, e.g. horizontal, that:
     // - have been provided as props; and
     // - have a value, e.g. "Chromosome", that is a recognised property of the table.
@@ -90,9 +91,12 @@ let TablePlot = React.createClass({
         table: tableConfig.id,
         columns: columns,
         query: this.getDefinedQuery(query, table),
-        transpose: false,
-        randomSample: 20000
+        transpose: false
       };
+
+      if (randomSamplesCardinality !== undefined) {
+        APIargs.randomSample = randomSamplesCardinality;
+      }
 
       requestContext.request((componentCancellation) =>
           LRUCache.get(
