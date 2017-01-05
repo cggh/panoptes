@@ -17,7 +17,7 @@ let ConfigMixin = {
 
   componentWillUnmount: function() {
     let flux = this.props.flux || (this.context && this.context.flux);
-    flux.store('ConfigStore').removeListener('change', this._setStateFromFlux);
+    flux.store('ConfigStore').removeListener('change', this._setConfigFromFlux);
   },
 
   _setConfigFromFlux: function() {
