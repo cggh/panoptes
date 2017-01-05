@@ -160,7 +160,7 @@ let TableMarkersLayer = React.createClass({
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
-    // If no highlight has been specified, but a primKey has beem then convert primKey to a highlight.
+    // If no highlight has been specified, but a primKey has been then convert primKey to a highlight.
     if (highlight === undefined && primKey !== undefined) {
       highlight =  locationPrimKeyProperty + ':' + primKey;
     }
@@ -333,7 +333,10 @@ let TableMarkersLayer = React.createClass({
 
           let title = marker.title;
           if (markerColourProperty !== undefined && markerColourProperty !== null) {
-            title = `${this.config.tablesById[table].propertiesById[this.config.tablesById[table].primKey].name}: ${marker.primKey}\n${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
+            title = `${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
+            if (markerColourProperty !== this.config.tablesById[table].primKey) {
+              title = `${this.config.tablesById[table].propertiesById[this.config.tablesById[table].primKey].name}: ${marker.primKey}\n` + title;
+            }
           }
 
           singleMarkerWidgets.push(
