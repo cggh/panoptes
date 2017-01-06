@@ -80,7 +80,7 @@ let ListWithActions = React.createClass({
   },
 
   handleDownload() {
-    DataDownloader.downloadTableData(
+    DataDownloader(
       {
         dataset: this.config.dataset,
         table: this.props.table,
