@@ -55,7 +55,7 @@ class Sidebar extends React.Component {
   constructor(props) {
     super(props);
 
-    this.sidebar_width = (this.props.width || 248)+9+9+scrollbarSize(); //From css, sadly. We need to fix it as display:none is interfering with measurement
+    this.sidebar_width = (this.props.width || 248)+scrollbarSize(); //From css, sadly. We need to fix it as display:none is interfering with measurement
 
     this.state = {
 
