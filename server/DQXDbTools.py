@@ -490,6 +490,7 @@ def desciptionToDType(col_type):
         'tinyint': 'i1',
         'smallint': 'i2',
         'int': 'i4',
+        'bigint': 'i4', # FIXME: truncating because 64-bit is not supported in JS
         'double': 'f8',
         'float': 'f8',
         'real': 'f4',
