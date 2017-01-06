@@ -29,10 +29,9 @@ import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import FilterButton from 'panoptes/FilterButton';
+import RandomSamplesCardinalitySelector from 'panoptes/RandomSamplesCardinalitySelector';
 
 import 'plot.scss';
-
-const NULL_RANDOM_SAMPLES_CARDINALITY = '— None —';
 
 let TablePlotActions = React.createClass({
   mixins: [
@@ -59,8 +58,7 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true,
-      randomSamplesCardinality: NULL_RANDOM_SAMPLES_CARDINALITY
+      sidebar: true
     };
   },
 
@@ -85,11 +83,7 @@ let TablePlotActions = React.createClass({
   },
 
   handleChangeRandomSamplesCardinality(randomSamplesCardinality) {
-    if (randomSamplesCardinality === NULL_RANDOM_SAMPLES_CARDINALITY) {
-      this.props.setProps({randomSamplesCardinality: undefined});
-    } else {
-      this.props.setProps({randomSamplesCardinality});
-    }
+    this.props.setProps({randomSamplesCardinality});
   },
 
   // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
@@ -110,29 +104,6 @@ let TablePlotActions = React.createClass({
       label: table.capNamePlural
     }));
 
-
-    let randomSamplesCardinalityOptions = [
-      <MenuItem key={20} primaryText={'20'} value={20} />,
-      <MenuItem key={50} primaryText={'50'} value={50} />,
-      <MenuItem key={100} primaryText={'100'} value={100} />,
-      <MenuItem key={200} primaryText={'200'} value={200} />,
-      <MenuItem key={500} primaryText={'500'} value={500} />,
-      <MenuItem key={1000} primaryText={'1K'} value={1000} />,
-      <MenuItem key={2000} primaryText={'2K'} value={2000} />,
-      <MenuItem key={5000} primaryText={'5K'} value={5000} />,
-      <MenuItem key={10000} primaryText={'10K'} value={10000} />,
-      <MenuItem key={20000} primaryText={'20K'} value={20000} />,
-      <MenuItem key={50000} primaryText={'50K'} value={50000} />,
-      <MenuItem key={100000} primaryText={'100K'} value={100000} />,
-      <MenuItem key={200000} primaryText={'200K'} value={200000} />,
-      <MenuItem key={500000} primaryText={'500K'} value={500000} />,
-    ];
-
-    // Add a "no random samples" option
-    // NB: The value cannot be undefined or null or '',
-    // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
-    randomSamplesCardinalityOptions = [<MenuItem key={NULL_RANDOM_SAMPLES_CARDINALITY} primaryText={NULL_RANDOM_SAMPLES_CARDINALITY} value={NULL_RANDOM_SAMPLES_CARDINALITY} />].concat(randomSamplesCardinalityOptions);
-
     let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
 
     let sidebarContent = (
@@ -148,14 +119,10 @@ let TablePlotActions = React.createClass({
           />
           {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
-          <SelectField
+          <RandomSamplesCardinalitySelector
             value={randomSamplesCardinality}
-            autoWidth={true}
-            floatingLabelText="Random sample set"
-            onChange={(e, i, v) => this.handleChangeRandomSamplesCardinality(v)}
-          >
-            {randomSamplesCardinalityOptions}
-          </SelectField>
+            onChange={(v) => this.handleChangeRandomSamplesCardinality(v)}
+          />
           <SelectField
             value={plotType}
             autoWidth={true}
@@ -205,7 +172,7 @@ let TablePlotActions = React.createClass({
                 plotType={plotType}
                 query={this.getDefinedQuery()}
                 {...dimensionProperties}
-                randomSamplesCardinality={randomSamplesCardinality !== NULL_RANDOM_SAMPLES_CARDINALITY ? randomSamplesCardinality : undefined}
+                randomSamplesCardinality={randomSamplesCardinality}
               /> : null
             }
           </div>

@@ -72,7 +72,7 @@ let TablePlot = React.createClass({
     const {table, query, randomSamplesCardinality} = props;
     const dimensionProperties = _pickBy(props, (value, name) => allDimensions.indexOf(name) !== -1);
     const tableConfig = this.config.tablesById[table];
-console.log('fetchData randomSamplesCardinality %o', randomSamplesCardinality);
+
     // Get a list of all the recognised dimension names, e.g. horizontal, that:
     // - have been provided as props; and
     // - have a value, e.g. "Chromosome", that is a recognised property of the table.
