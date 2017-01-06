@@ -28,7 +28,7 @@ let TablePlot = React.createClass({
     PureRenderMixin,
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin.apply(this, ['table', 'query', 'randomSamplesCardinality'].concat(allDimensions))
+    DataFetcherMixin.apply(this, ['table', 'query', 'randomSubsetSize'].concat(allDimensions))
   ],
 
   // ['table', 'query'].concat(_map(allDimensions, (dim) => 'dimensionProperties.' + dim))
@@ -41,7 +41,7 @@ let TablePlot = React.createClass({
     table: React.PropTypes.string,
     query: React.PropTypes.string,
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
-    randomSamplesCardinality: React.PropTypes.number
+    randomSubsetSize: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -69,7 +69,7 @@ let TablePlot = React.createClass({
 
   fetchData(props, requestContext) {
 
-    const {table, query, randomSamplesCardinality} = props;
+    const {table, query, randomSubsetSize} = props;
     const dimensionProperties = _pickBy(props, (value, name) => allDimensions.indexOf(name) !== -1);
     const tableConfig = this.config.tablesById[table];
 
@@ -94,8 +94,8 @@ let TablePlot = React.createClass({
         transpose: false
       };
 
-      if (randomSamplesCardinality !== undefined) {
-        APIargs.randomSample = randomSamplesCardinality;
+      if (randomSubsetSize !== undefined) {
+        APIargs.randomSample = randomSubsetSize;
       }
 
       requestContext.request((componentCancellation) =>

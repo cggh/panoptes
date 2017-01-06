@@ -428,11 +428,12 @@ function twoDPageQuery(options) {
     rowOffset: null,
     rowLimit: null,
     colFailLimit: null,
+    rowRandomSubsetSize: null
   };
   const {
     dataset, table, colQry, rowQry, colOrder, rowOrder, colProperties,
     rowProperties, sortMode, rowSortProperty, rowSortCols, colKey,
-    rowOffset, rowLimit, colFailLimit
+    rowOffset, rowLimit, colFailLimit, rowRandomSubsetSize
   } = {...defaults, ...options};
   const twoDProperties = {...defaults, ...options}['2DProperties'];
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
@@ -456,6 +457,7 @@ function twoDPageQuery(options) {
       rowOffset,
       rowLimit,
       colFailLimit,
+      rowRandomSubsetSize
     }
   });
 }

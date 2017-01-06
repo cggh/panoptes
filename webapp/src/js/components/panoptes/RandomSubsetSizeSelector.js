@@ -7,7 +7,7 @@ import MenuItem from 'material-ui/MenuItem';
 // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
 const NULL_VALUE = '— None —';
 
-let RandomSamplesCardinalitySelector = React.createClass({
+let RandomSubsetSizeSelector = React.createClass({
   mixins: [
     PureRenderMixin
   ],
@@ -20,7 +20,7 @@ let RandomSamplesCardinalitySelector = React.createClass({
 
   getDefaultProps() {
     return {
-      label: 'Random sample set',
+      label: 'Random subset size',
       value: NULL_VALUE
     };
   },
@@ -68,4 +68,4 @@ let RandomSamplesCardinalitySelector = React.createClass({
 
 });
 
-export default RandomSamplesCardinalitySelector;
+export default RandomSubsetSizeSelector;

@@ -145,6 +145,7 @@ def handler(start_response, request_data):
     row_qry = request_data['rowQry']
     row_order = request_data.get('rowOrder', None)
     row_order_columns = []
+    row_random_subset_size = request_data['rowRandomSubsetSize']
     if row_order == 'columns':
         try:
             row_order_columns = request_data['rowSortCols'].split('~')
@@ -159,6 +160,10 @@ def handler(start_response, request_data):
         row_limit = int(request_data['rowLimit'])
     except KeyError:
         row_limit = None
+    try:
+        row_random_subset_size = int(request_data['rowRandomSubsetSize'])
+    except KeyError:
+        row_random_subset_size = None
     try:
         col_offset = int(request_data['colOffset'])
     except KeyError:

@@ -37,7 +37,7 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import NumericInput from 'ui/NumericInput';
 import Icon from 'ui/Icon';
 import queryToString from 'util/queryToString';
-import RandomSamplesCardinalitySelector from 'panoptes/RandomSamplesCardinalitySelector';
+import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
 
 const FAN_HEIGHT = 60;
 
@@ -65,7 +65,7 @@ let GenotypesChannel = React.createClass({
         'rowHeight',
         'pageSize',
         'page',
-        'randomSamplesCardinality'
+        'rowRandomSubsetSize'
       ]
     }),
     ConfigMixin,
@@ -87,7 +87,7 @@ let GenotypesChannel = React.createClass({
       'rowHeight',
       'pageSize',
       'page',
-      'randomSamplesCardinality'
+      'rowRandomSubsetSize'
     ),
   ],
 
@@ -113,7 +113,7 @@ let GenotypesChannel = React.createClass({
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
     onChangeLoadStatus: React.PropTypes.func,
-    randomSamplesCardinality: React.PropTypes.number
+    rowRandomSubsetSize: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -200,12 +200,12 @@ let GenotypesChannel = React.createClass({
     let {
       chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery,
       rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort,
-      randomSamplesCardinality
+      rowRandomSubsetSize
     } = props;
     let config = this.config.twoDTablesById[table];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
-
+console.log('rowRandomSubsetSize: %o', rowRandomSubsetSize);
     const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight', 'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, null);
@@ -275,8 +275,10 @@ let GenotypesChannel = React.createClass({
         colOnlyOnLimit: true
       };
 
-      if (randomSamplesCardinality !== undefined) {
-        APIargs.randomSample = randomSamplesCardinality;
+      if (rowRandomSubsetSize !== undefined) {
+        APIargs.rowRandomSubsetSize = rowRandomSubsetSize;
+console.log('colQry: %o', APIargs.colQry);
+console.log('rowQry: %o', APIargs.rowQry);
       }
 
       let cacheArgs = {
@@ -507,7 +509,7 @@ const GenotypesControls = React.createClass({
         'rowSort',
         'pageSize',
         'page',
-        'randomSamplesCardinality'
+        'rowRandomSubsetSize'
       ],
       redirect: ['setProps']
     }),
@@ -529,7 +531,7 @@ const GenotypesControls = React.createClass({
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
     getDataBlocks: React.PropTypes.func,
-    randomSamplesCardinality: React.PropTypes.number
+    rowRandomSubsetSize: React.PropTypes.number
   },
 
   handleDownload() {
@@ -606,14 +608,14 @@ const GenotypesControls = React.createClass({
       Math.floor(start) + '-' + Math.ceil(end) + '.txt');
   },
 
-  handleChangeRandomSamplesCardinality(randomSamplesCardinality) {
-    this.redirectedProps.setProps({randomSamplesCardinality})
+  handleChangeRandomSubsetSize(rowRandomSubsetSize) {
+    this.redirectedProps.setProps({rowRandomSubsetSize});
   },
 
   render() {
     let {
       table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha,
-      cellHeight, layoutGaps, rowSort, pageSize, page, randomSamplesCardinality
+      cellHeight, layoutGaps, rowSort, pageSize, page, rowRandomSubsetSize
     } = this.props;
     const config = this.config.twoDTablesById[table];
 
@@ -660,6 +662,13 @@ const GenotypesControls = React.createClass({
                               onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
           </div>
           <div className="control">
+            <RandomSubsetSizeSelector
+              value={rowRandomSubsetSize}
+              onChange={(v) => this.handleChangeRandomSubsetSize(v)}
+              label="Row random subset size"
+            />
+          </div>
+          <div className="control">
             <NumericInput debounce width={3} label="Row height" value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
           </div>
         </div>
@@ -700,12 +709,6 @@ const GenotypesControls = React.createClass({
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
                                                                                   primaryText={config.propertiesById[prop].name}/>)}
             </SelectField>
-          </div>
-          <div className="control">
-            <RandomSamplesCardinalitySelector
-              value={randomSamplesCardinality}
-              onChange={(v) => this.handleChangeRandomSamplesCardinality(v)}
-            />
           </div>
         </div>
         <div className="control-group">
