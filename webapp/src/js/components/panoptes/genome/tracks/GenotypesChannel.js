@@ -64,7 +64,8 @@ let GenotypesChannel = React.createClass({
         'cellHeight',
         'rowHeight',
         'pageSize',
-        'page'
+        'page',
+        'randomSamplesCardinality'
       ]
     }),
     ConfigMixin,
@@ -85,7 +86,8 @@ let GenotypesChannel = React.createClass({
       'layoutGaps',
       'rowHeight',
       'pageSize',
-      'page'
+      'page',
+      'randomSamplesCardinality'
     ),
   ],
 
@@ -110,7 +112,8 @@ let GenotypesChannel = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
-    onChangeLoadStatus: React.PropTypes.func
+    onChangeLoadStatus: React.PropTypes.func,
+    randomSamplesCardinality: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -194,7 +197,11 @@ let GenotypesChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort} = props;
+    let {
+      chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery,
+      rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort,
+      randomSamplesCardinality
+    } = props;
     let config = this.config.twoDTablesById[table];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
@@ -267,6 +274,11 @@ let GenotypesChannel = React.createClass({
         '2DProperties': twoDProperties.join('~'),
         colOnlyOnLimit: true
       };
+
+      if (randomSamplesCardinality !== undefined) {
+        APIargs.randomSample = randomSamplesCardinality;
+      }
+
       let cacheArgs = {
         method: 'twoDPageQuery',
         regionField: columnTableConfig.position,
@@ -494,7 +506,8 @@ const GenotypesControls = React.createClass({
         'layoutGaps',
         'rowSort',
         'pageSize',
-        'page'
+        'page',
+        'randomSamplesCardinality'
       ],
       redirect: ['setProps']
     }),
@@ -516,8 +529,7 @@ const GenotypesControls = React.createClass({
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
     getDataBlocks: React.PropTypes.func,
-    randomSamplesCardinality: React.PropTypes.number,
-    setProps: React.PropTypes.func
+    randomSamplesCardinality: React.PropTypes.number
   },
 
   handleDownload() {
@@ -595,7 +607,7 @@ const GenotypesControls = React.createClass({
   },
 
   handleChangeRandomSamplesCardinality(randomSamplesCardinality) {
-    this.props.setProps({randomSamplesCardinality});
+    this.redirectedProps.setProps({randomSamplesCardinality})
   },
 
   render() {
