@@ -20,7 +20,7 @@ CHUNK_SIZE = 400
 
 
 
-def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit, index_field):
+def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit, index_field, sample):
     if limit and fail_limit:
         raise Exception("Only one type of limit can be specified")
     where = DQXDbTools.WhereClause()
@@ -47,6 +47,8 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     if offset:
         sqlquery += ' OFFSET %s'
         params.append(int(offset))
+    if sample is not None:
+        sqlquery += ' SAMPLE {0}'.format(sample)
     
     print sqlquery, params
     cur.execute(sqlquery, params)
@@ -145,7 +147,7 @@ def handler(start_response, request_data):
     row_qry = request_data['rowQry']
     row_order = request_data.get('rowOrder', None)
     row_order_columns = []
-    row_random_subset_size = request_data['rowRandomSubsetSize']
+    row_random_sample = request_data.get('rowRandomSample', None)
     if row_order == 'columns':
         try:
             row_order_columns = request_data['rowSortCols'].split('~')
@@ -161,9 +163,9 @@ def handler(start_response, request_data):
     except KeyError:
         row_limit = None
     try:
-        row_random_subset_size = int(request_data['rowRandomSubsetSize'])
+        row_random_sample = int(request_data['rowRandomSample'])
     except KeyError:
-        row_random_subset_size = None
+        row_random_sample = None
     try:
         col_offset = int(request_data['colOffset'])
     except KeyError:
@@ -208,7 +210,8 @@ def handler(start_response, request_data):
                                        col_limit,
                                        col_offset,
                                        col_fail_limit,
-                                       col_index_field)
+                                       col_index_field,
+                                       None)
 
         if len(row_order_columns) > 0:
             #If we are sorting by 2d data then we need to grab all the rows as the limit applies post sort.
@@ -220,7 +223,8 @@ def handler(start_response, request_data):
                                            None,
                                            None,
                                            None,
-                                           row_index_field)
+                                           row_index_field,
+                                           row_random_sample)
 
         else:
             row_result = index_table_query(cur,
@@ -231,7 +235,8 @@ def handler(start_response, request_data):
                                            row_limit,
                                            row_offset,
                                            None,
-                                           row_index_field)
+                                           row_index_field,
+                                           None)
 
         col_idx = col_result[col_index_field]
         row_idx = row_result[row_index_field]

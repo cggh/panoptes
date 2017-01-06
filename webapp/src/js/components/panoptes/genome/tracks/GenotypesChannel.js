@@ -205,7 +205,6 @@ let GenotypesChannel = React.createClass({
     let config = this.config.twoDTablesById[table];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
-console.log('rowRandomSubsetSize: %o', rowRandomSubsetSize);
     const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight', 'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, null);
@@ -276,9 +275,7 @@ console.log('rowRandomSubsetSize: %o', rowRandomSubsetSize);
       };
 
       if (rowRandomSubsetSize !== undefined) {
-        APIargs.rowRandomSubsetSize = rowRandomSubsetSize;
-console.log('colQry: %o', APIargs.colQry);
-console.log('rowQry: %o', APIargs.rowQry);
+        APIargs.rowRandomSample = rowRandomSubsetSize;
       }
 
       let cacheArgs = {
