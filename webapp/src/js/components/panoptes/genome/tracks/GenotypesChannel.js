@@ -1,5 +1,6 @@
 import React from 'react';
 import FileSaver from 'file-saver';
+import {Motion, spring} from 'react-motion';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -36,7 +37,7 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import NumericInput from 'ui/NumericInput';
 import Icon from 'ui/Icon';
 import queryToString from 'util/queryToString';
-import {Motion, spring} from 'react-motion';
+import RandomSamplesCardinalitySelector from 'panoptes/RandomSamplesCardinalitySelector';
 
 const FAN_HEIGHT = 60;
 
@@ -514,7 +515,9 @@ const GenotypesControls = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
-    getDataBlocks: React.PropTypes.func
+    getDataBlocks: React.PropTypes.func,
+    randomSamplesCardinality: React.PropTypes.number,
+    setProps: React.PropTypes.func
   },
 
   handleDownload() {
@@ -591,9 +594,17 @@ const GenotypesControls = React.createClass({
       Math.floor(start) + '-' + Math.ceil(end) + '.txt');
   },
 
+  handleChangeRandomSamplesCardinality(randomSamplesCardinality) {
+    this.props.setProps({randomSamplesCardinality});
+  },
+
   render() {
-    let {table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;
+    let {
+      table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha,
+      cellHeight, layoutGaps, rowSort, pageSize, page, randomSamplesCardinality
+    } = this.props;
     const config = this.config.twoDTablesById[table];
+
     return (
       <div className="channel-controls">
         <div className="control-group">
@@ -623,7 +634,7 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <PropertySelector table={config.rowDataTable}
                               value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
-                              label="Row Label"
+                              label="Row label"
                               onSelect={(rowLabel) => this.redirectedProps.setProps({
                               rowLabel,
                               rowSort: rowSort || rowLabel
@@ -632,17 +643,17 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <PropertySelector table={config.rowDataTable}
                               value={rowSort}
-                              label="Row Sort"
+                              label="Row sort"
                               allowNull={true}
                               onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
           </div>
           <div className="control">
-            <NumericInput debounce width={3} label="Row Height" value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
+            <NumericInput debounce width={3} label="Row height" value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
           </div>
         </div>
         <div className="control-group">
           <div className="control">
-            <NumericInput debounce width={5} label="Page Size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
+            <NumericInput debounce width={5} label="Page size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
           </div>
           <div className="control">
             <NumericInput debounce width={3} label="Page" value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
@@ -652,7 +663,7 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <SelectField value={cellColour}
                          autoWidth={true}
-                         floatingLabelText="Cell Colour"
+                         floatingLabelText="Cell colour"
                          onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
               <MenuItem value="call" primaryText="Call"/>
               <MenuItem value="fraction" primaryText="Ref fraction"/>
@@ -661,7 +672,7 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <SelectField value={cellAlpha}
                          autoWidth={true}
-                         floatingLabelText="Cell Opacity"
+                         floatingLabelText="Cell opacity"
                          onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
@@ -671,12 +682,18 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <SelectField value={cellHeight}
                          autoWidth={true}
-                         floatingLabelText="Cell Height"
+                         floatingLabelText="Cell height"
                          onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
                                                                                   primaryText={config.propertiesById[prop].name}/>)}
             </SelectField>
+          </div>
+          <div className="control">
+            <RandomSamplesCardinalitySelector
+              value={randomSamplesCardinality}
+              onChange={(v) => this.handleChangeRandomSamplesCardinality(v)}
+            />
           </div>
         </div>
         <div className="control-group">
