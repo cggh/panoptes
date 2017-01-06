@@ -17,9 +17,16 @@ const defaultStyles = {
     position: 'absolute',
     top: 0,
     bottom: 0,
+    height: '100%',
     transition: 'transform .3s ease-out',
     WebkitTransition: '-webkit-transform .3s ease-out',
     willChange: 'transform',
+  },
+  sidebarContainer: {
+    zIndex: 2,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
     overflowY: 'auto',
   },
   content: {
@@ -197,6 +204,7 @@ class Sidebar extends React.Component {
 
   render() {
     const sidebarStyle = {...defaultStyles.sidebar, ...this.props.styles.sidebar};
+    const sidebarContainerStyle = {...defaultStyles.sidebarContainer, ...this.props.styles.sidebarContainer};
     const contentStyle = {...defaultStyles.content, ...this.props.styles.content};
     const overlayStyle = {...defaultStyles.overlay, ...this.props.styles.overlay};
     const useTouch = this.state.dragSupported && this.props.touch;
@@ -296,8 +304,10 @@ class Sidebar extends React.Component {
 
     return (
       <div {...rootProps}>
-        <div className={this.props.sidebarClassName} style={sidebarStyle} ref="sidebar">
-          {this.props.sidebar}
+        <div className={this.props.sidebarClassName} style={{width: `${this.sidebar_width}px`, ...sidebarStyle}} ref="sidebar">
+          <div style={sidebarContainerStyle}>
+            {this.props.sidebar}
+          </div>
         </div>
         <div className={this.props.overlayClassName}
              style={overlayStyle}
