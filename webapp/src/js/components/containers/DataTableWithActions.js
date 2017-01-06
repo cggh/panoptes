@@ -306,12 +306,11 @@ let DataTableWithActions = React.createClass({
 
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
-    // TODO: Or simply label "Pick Columns" ?
-    let columnPickerLabel = 'Add/Remove Columns';
+    let columnPickerLabel = 'Pick columns';
     if (columns !== undefined && columns.length === this.tableConfig().properties.length) {
-      columnPickerLabel = 'Remove Columns';
+      columnPickerLabel = 'Hide columns';
     } else if (columns !== undefined && columns.length === 0) {
-      columnPickerLabel = 'Add Columns';
+      columnPickerLabel = 'Show columns';
     }
     let sidebarContent = (
       <div className="sidebar">
