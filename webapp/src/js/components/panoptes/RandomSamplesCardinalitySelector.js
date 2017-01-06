@@ -3,7 +3,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
-// NB: The value cannot be undefined or null or '',
+// NB: The null value cannot be undefined or null or '',
 // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
 const NULL_VALUE = '— None —';
 
@@ -37,6 +37,7 @@ let RandomSamplesCardinalitySelector = React.createClass({
     let {label, value} = this.props;
 
     let options = [
+      <MenuItem key={NULL_VALUE} primaryText={NULL_VALUE} value={NULL_VALUE} />,
       <MenuItem key={20} primaryText={'20'} value={20} />,
       <MenuItem key={50} primaryText={'50'} value={50} />,
       <MenuItem key={100} primaryText={'100'} value={100} />,
@@ -52,11 +53,6 @@ let RandomSamplesCardinalitySelector = React.createClass({
       <MenuItem key={200000} primaryText={'200K'} value={200000} />,
       <MenuItem key={500000} primaryText={'500K'} value={500000} />,
     ];
-
-    // Add a "no value" option
-    // NB: The value cannot be undefined or null or '',
-    // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
-    options = [<MenuItem key={NULL_VALUE} primaryText={NULL_VALUE} value={NULL_VALUE} />].concat(options);
 
     return (
       <SelectField
