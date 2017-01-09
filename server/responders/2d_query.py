@@ -163,10 +163,6 @@ def handler(start_response, request_data):
     except KeyError:
         row_limit = None
     try:
-        row_random_sample = int(request_data['rowRandomSample'])
-    except KeyError:
-        row_random_sample = None
-    try:
         col_offset = int(request_data['colOffset'])
     except KeyError:
         col_offset = None
@@ -191,8 +187,10 @@ def handler(start_response, request_data):
         sort_mode = request_data['sortMode']
     except KeyError:
         sort_mode = None
-
-
+    try:
+        row_random_sample = int(request_data['rowRandomSample'])
+    except KeyError:
+        row_random_sample = None
 
     col_index_field = datatable + '_column_index'
     row_index_field = datatable + '_row_index'
@@ -236,7 +234,7 @@ def handler(start_response, request_data):
                                            row_offset,
                                            None,
                                            row_index_field,
-                                           None)
+                                           row_random_sample)
 
         col_idx = col_result[col_index_field]
         row_idx = row_result[row_index_field]
