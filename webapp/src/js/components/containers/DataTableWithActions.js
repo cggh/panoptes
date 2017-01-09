@@ -260,7 +260,6 @@ let DataTableWithActions = React.createClass({
     let actions = this.getFlux().actions;
     let {table, columns, columnWidths, order, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
-
     if (!columns) {
       columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
       columns = _map(columns, (prop) => prop.id);

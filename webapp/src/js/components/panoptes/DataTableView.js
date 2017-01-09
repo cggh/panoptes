@@ -111,21 +111,23 @@ let DataTableView = React.createClass({
         stopRowIndex = undefined;
       }
 
+      let fetchStartRowIndex = Math.floor(startRowIndex/100)*100;
+      let fetchStopRowIndex = (Math.floor(stopRowIndex/100)+1)*100;
       let queryAPIargs = {
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
         columns: columns,
         orderBy: order,
         query: this.getDefinedQuery(query, table),
-        start: startRowIndex,
-        stop: stopRowIndex,
+        start: fetchStartRowIndex,
+        stop: fetchStopRowIndex,
         transpose: true //We want rows, not columns
       };
 
       let rowsCountAPIargs = {
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
-        query: this.getDefinedQuery(query, table),
+        query: this.getDefinedQuery(query, table)
       };
 
       requestContext.request((componentCancellation) =>
@@ -147,7 +149,7 @@ let DataTableView = React.createClass({
       .then(([rows, rowsCount]) => {
         this.setState({
           loadStatus: 'loaded',
-          rows: rows,
+          rows: rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1),
           totalRowsCount: rowsCount
         });
       })
