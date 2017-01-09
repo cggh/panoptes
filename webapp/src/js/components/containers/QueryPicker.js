@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 import {HotKeys} from 'react-hotkeys'; // 0.9.0 needs {...}
 import scrollbarSize from 'scrollbar-size';
 
@@ -148,12 +148,13 @@ let QueryPicker = React.createClass({
     return (
       <div className="large-modal query-picker">
         <Sidebar
+          width={348}
           styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
           docked={hasSidebar}
           transitions={false}
           touch={false}
           sidebar={(
-          <div className="sidebar" style={{width: '35vw'}}>
+          <div className="sidebar" style={{width: '348px'}}>
             <SidebarHeader icon={this.icon()} description={'Filters can be used to show only the rows that meet specific criteria.'}/>
             <StoredTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
             <Divider/>

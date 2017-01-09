@@ -2,7 +2,7 @@ import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import {treeTypes} from 'phylocanvas';
 import titleCase from 'title-case';
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 
 import _map from 'lodash/map';
 import _has from 'lodash/has';

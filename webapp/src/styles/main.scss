@@ -11,12 +11,11 @@
 }
 
 * {
-  //Material ui uses a transition on "all" meaning that visibility becomes animated. We don't want that, so we white-list properties that we are ok with being animated
-  transition-property: background-color, background-position, border-bottom-color, border-bottom-width, border-left-color, border-left-width, border-right-color, border-right-width, border-spacing, border-top-color, border-top-width, bottom, clip, color, font-size, font-weight, height, left, letter-spacing, line-height, margin-bottom, margin-left, margin-right, margin-top, max-height, max-width, min-height, min-width, opacity, outline-color, outline-width, padding-bottom, padding-left, padding-right, padding-top, right, text-indent, text-shadow, top, transform, vertical-align, width, word-spacing, z-index !important;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+
 *:before,
 *:after {
   -webkit-box-sizing: border-box;

@@ -6,7 +6,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 
 // UI components
 import SidebarHeader from 'ui/SidebarHeader';

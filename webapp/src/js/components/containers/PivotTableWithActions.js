@@ -1,6 +1,6 @@
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
-import Sidebar from 'react-sidebar';
+import Sidebar from 'ui/Sidebar';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
