@@ -6,7 +6,7 @@ import SQL from 'panoptes/SQL';
 const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
 // TODO: migrate to API.js ???
-export function downloadTableData(payload) {
+export default function downloadTableData(payload) {
 
   let defaults = {
     query: SQL.nullQuery
