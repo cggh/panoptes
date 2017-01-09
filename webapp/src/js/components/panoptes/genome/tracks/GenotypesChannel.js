@@ -205,8 +205,12 @@ let GenotypesChannel = React.createClass({
     let config = this.config.twoDTablesById[table];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
-    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight', 'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
-    if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
+    const dataInvalidatingProps = [
+      'chromosome', 'cellColour', 'cellAlpha', 'cellHeight', 'rowQuery',
+      'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize',
+      'rowRandomSubsetSize'
+    ];
+    if (dataInvalidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, null);
     }
     if (width - sideWidth < 1) {
@@ -234,7 +238,7 @@ let GenotypesChannel = React.createClass({
     }
     const {blockLevel, blockIndex, needNext} = findBlock({start, end});
     //If we already at this block then don't change it!
-    if (dataInvlidatingProps.some((name) => this.props[name] !== props[name]) || !(this.blockLevel === blockLevel
+    if (dataInvalidatingProps.some((name) => this.props[name] !== props[name]) || !(this.blockLevel === blockLevel
       && this.blockIndex === blockIndex
       && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
