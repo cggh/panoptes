@@ -9,6 +9,7 @@ webapp/node_modules/
 webapp/dist/panoptes/Maps
 webapp/dist/panoptes/Docs
 webapp/dist/panoptes/images
+webapp/npm-debug.log
 
 settings.gen
 chef-install
