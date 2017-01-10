@@ -1,6 +1,7 @@
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
+import json
 
 import DQXDbTools
 from operator import itemgetter
@@ -16,11 +17,13 @@ from gzipstream import gzip
 from importer.SettingsDataTable import SettingsDataTable
 from importer.Settings2Dtable import Settings2Dtable
 from DQXDbTools import desciptionToDType
+from cache import getCache
+
 CHUNK_SIZE = 400
 
 
 
-def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit, index_field, sample):
+def index_table_query(dataset, cur, table, fields, query, order, limit, offset, fail_limit, index_field, sample):
     if limit and fail_limit:
         raise Exception("Only one type of limit can be specified")
     where = DQXDbTools.WhereClause()
@@ -49,15 +52,28 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
         params.append(int(offset))
     if sample is not None:
         sqlquery += ' SAMPLE {0}'.format(sample)
-    
-    print sqlquery, params
-    cur.execute(sqlquery, params)
-    rows = cur.fetchall()
-    result = {}
-    for i, (field, desc) in enumerate(zip(fields, cur.description)):
+
+    cache = getCache()
+    cacheKey = json.dumps([sqlquery, params])
+    rows, description = None, None
+    try:
+        rows, description = cache[cacheKey]
+    except KeyError:
+        print '2D', sqlquery, params
+        pass
+
+    if rows is None:
+        cur.execute(sqlquery, params)
+        rows = cur.fetchall()
+        description = cur.description
+        #We cache even if random sample is requested such that requests at different points on the col axis pick the same rows and vice-versa - ie we always want the same random sample.
+        cache[cacheKey] = [rows, description]
+
+    data = {}
+    for i, (field, desc) in enumerate(zip(fields, description)):
         dtype = desciptionToDType(desc[1])
-        result[field] = np.array([row[i] for row in rows], dtype=dtype)
-    return result
+        data[field] = np.array([row[i] for row in rows], dtype=dtype)
+    return data
 
 
 def select_by_list(properties, row_idx, col_idx):
@@ -147,7 +163,6 @@ def handler(start_response, request_data):
     row_qry = request_data['rowQry']
     row_order = request_data.get('rowOrder', None)
     row_order_columns = []
-    row_random_sample = request_data.get('rowRandomSample', None)
     if row_order == 'columns':
         try:
             row_order_columns = request_data['rowSortCols'].split('~')
@@ -197,103 +212,116 @@ def handler(start_response, request_data):
     col_properties.append(col_index_field)
     row_properties.append(row_index_field)
 
-    with DQXDbTools.DBCursor(request_data, dataset, read_timeout=config.TIMEOUT) as cur:
-        col_tablename, row_tablename = get_table_ids(cur, dataset, datatable)
+    cache = getCache()
+    cache_key = json.dumps([datatable, dataset, two_d_properties, col_properties, row_properties, col_qry, col_order,
+                           row_qry, row_order, row_order_columns, row_random_sample, col_limit, row_limit, col_offset,
+                           row_offset, col_fail_limit, row_sort_property, col_key, sort_mode])
+    data = None
+    try:
+        data = cache[cache_key]
+    except KeyError:
+        print '2D Cache miss'
+        pass
 
-        col_result = index_table_query(cur,
-                                       col_tablename,
-                                       col_properties,
-                                       col_qry,
-                                       col_order,
-                                       col_limit,
-                                       col_offset,
-                                       col_fail_limit,
-                                       col_index_field,
-                                       None)
+    if data is None:
+        with DQXDbTools.DBCursor(request_data, dataset, read_timeout=config.TIMEOUT) as cur:
+            col_tablename, row_tablename = get_table_ids(cur, dataset, datatable)
+            col_result = index_table_query(dataset,
+                                           cur,
+                                           col_tablename,
+                                           col_properties,
+                                           col_qry,
+                                           col_order,
+                                           col_limit,
+                                           col_offset,
+                                           col_fail_limit,
+                                           col_index_field,
+                                           None)
 
-        if len(row_order_columns) > 0:
-            #If we are sorting by 2d data then we need to grab all the rows as the limit applies post sort.
-            row_result = index_table_query(cur,
-                                           row_tablename,
-                                           row_properties,
-                                           row_qry,
-                                           row_order,
-                                           None,
-                                           None,
-                                           None,
-                                           row_index_field,
-                                           row_random_sample)
+            if len(row_order_columns) > 0:
+                #If we are sorting by 2d data then we need to grab all the rows as the limit applies post sort.
+                row_result = index_table_query(dataset,
+                                               cur,
+                                               row_tablename,
+                                               row_properties,
+                                               row_qry,
+                                               row_order,
+                                               None,
+                                               None,
+                                               None,
+                                               row_index_field,
+                                               row_random_sample)
 
-        else:
-            row_result = index_table_query(cur,
-                                           row_tablename,
-                                           row_properties,
-                                           row_qry,
-                                           row_order,
-                                           row_limit,
-                                           row_offset,
-                                           None,
-                                           row_index_field,
-                                           row_random_sample)
+            else:
+                row_result = index_table_query(dataset,
+                                               cur,
+                                               row_tablename,
+                                               row_properties,
+                                               row_qry,
+                                               row_order,
+                                               row_limit,
+                                               row_offset,
+                                               None,
+                                               row_index_field,
+                                               row_random_sample)
 
-        col_idx = col_result[col_index_field]
-        row_idx = row_result[row_index_field]
-        del col_result[col_index_field]
-        del row_result[row_index_field]
-        if len(col_idx) == col_fail_limit:
-            result_set = [('_over_col_limit', np.array([0], dtype='i1'))]
-            for name, array in row_result.items():
-                result_set.append((('row_'+name), array))
-        else:
-            if len(row_order_columns) > 0 and len(row_idx) > 0:
-                #Translate primkeys to idx
-                sqlquery = 'SELECT "{col_field}", "{idx_field}" FROM "{table}" WHERE "{col_field}" IN ({params})'.format(
-                    idx_field=DQXDbTools.ToSafeIdentifier(col_index_field),
-                    table=DQXDbTools.ToSafeIdentifier(col_tablename),
-                    params="'"+"','".join(map(DQXDbTools.ToSafeIdentifier, row_order_columns))+"'",
-                    col_field=DQXDbTools.ToSafeIdentifier(col_key))
-                print sqlquery
-                cur.execute(sqlquery)
-                idx_for_col = dict((k, v) for k,v in cur.fetchall())
-                #Sort by the order specified - reverse so last clicked is major sort
-                sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
-                #grab the data needed to sort
-                sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, [row_sort_property])
-                rows = zip(row_idx, sort_data[row_sort_property])
-                if sort_mode == 'call':
-                    polyploid_key_func = lambda row: ''.join(summarise_call(calls) for calls in row[1])
-                    haploid_key_func = lambda row: ''.join(map(lambda c: str(c).zfill(2), row[1]))
-                    if len(rows[0][1].shape) == 1:
-                        rows.sort(key=haploid_key_func, reverse=True)
-                    else:
-                        rows.sort(key=polyploid_key_func, reverse=True)
-                elif sort_mode == 'fraction':
-                    for i in range(len(sort_col_idx)):
-                        #TODO Shuld be some fancy bayesian shizzle
-                        def key_func(row):
-                            if sum(row[1][i]) == 0:
-                                return '-1'
-                            return str(1-float(row[1][i][0])/sum(row[1][i]))+str(sum(row[1][i])).zfill(4)
-                        rows.sort(key=key_func, reverse=True)
-                else:
-                    print "Unimplemented sort_mode"
-                row_pos_for_idx = dict(zip(row_idx, range(len(row_idx))))
-                #Now just get the row_idx to pass to 2d extract for the slice we need
-                row_idx = np.array(map(itemgetter(0), rows)[row_offset: row_offset+row_limit])
-                #Use this row idx to retieve the row data from the initial query
+            col_idx = col_result[col_index_field]
+            row_idx = row_result[row_index_field]
+            del col_result[col_index_field]
+            del row_result[row_index_field]
+            if len(col_idx) == col_fail_limit:
+                result_set = [('_over_col_limit', np.array([0], dtype='i1'))]
                 for name, array in row_result.items():
-                    row_result[name] = array[[row_pos_for_idx[idx] for idx in row_idx]]
+                    result_set.append((('row_'+name), array))
+            else:
+                if len(row_order_columns) > 0 and len(row_idx) > 0:
+                    #Translate primkeys to idx
+                    sqlquery = 'SELECT "{col_field}", "{idx_field}" FROM "{table}" WHERE "{col_field}" IN ({params})'.format(
+                        idx_field=DQXDbTools.ToSafeIdentifier(col_index_field),
+                        table=DQXDbTools.ToSafeIdentifier(col_tablename),
+                        params="'"+"','".join(map(DQXDbTools.ToSafeIdentifier, row_order_columns))+"'",
+                        col_field=DQXDbTools.ToSafeIdentifier(col_key))
+                    idx_for_col = dict((k, v) for k,v in cur.fetchall())
+                    #Sort by the order specified - reverse so last clicked is major sort
+                    sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
+                    #grab the data needed to sort
+                    sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, [row_sort_property])
+                    rows = zip(row_idx, sort_data[row_sort_property])
+                    if sort_mode == 'call':
+                        polyploid_key_func = lambda row: ''.join(summarise_call(calls) for calls in row[1])
+                        haploid_key_func = lambda row: ''.join(map(lambda c: str(c).zfill(2), row[1]))
+                        if len(rows[0][1].shape) == 1:
+                            rows.sort(key=haploid_key_func, reverse=True)
+                        else:
+                            rows.sort(key=polyploid_key_func, reverse=True)
+                    elif sort_mode == 'fraction':
+                        for i in range(len(sort_col_idx)):
+                            #TODO Shuld be some fancy bayesian shizzle
+                            def key_func(row):
+                                if sum(row[1][i]) == 0:
+                                    return '-1'
+                                return str(1-float(row[1][i][0])/sum(row[1][i]))+str(sum(row[1][i])).zfill(4)
+                            rows.sort(key=key_func, reverse=True)
+                    else:
+                        print "Unimplemented sort_mode"
+                    row_pos_for_idx = dict(zip(row_idx, range(len(row_idx))))
+                    #Now just get the row_idx to pass to 2d extract for the slice we need
+                    row_idx = np.array(map(itemgetter(0), rows)[row_offset: row_offset+row_limit])
+                    #Use this row idx to retieve the row data from the initial query
+                    for name, array in row_result.items():
+                        row_result[name] = array[[row_pos_for_idx[idx] for idx in row_idx]]
 
-            two_d_result = extract2D(dataset, datatable, row_idx, col_idx, two_d_properties)
+                two_d_result = extract2D(dataset, datatable, row_idx, col_idx, two_d_properties)
 
-            result_set = []
-            for name, array in col_result.items():
-                result_set.append((('col_'+name), array))
-            for name, array in row_result.items():
-                result_set.append((('row_'+name), array))
-            for name, array in two_d_result.items():
-                result_set.append((('2D_'+name), array))
-    data = gzip(data=''.join(arraybuffer.encode_array_set(result_set)))
+                result_set = []
+                for name, array in col_result.items():
+                    result_set.append((('col_'+name), array))
+                for name, array in row_result.items():
+                    result_set.append((('row_'+name), array))
+                for name, array in two_d_result.items():
+                    result_set.append((('2D_'+name), array))
+        data = gzip(data=''.join(arraybuffer.encode_array_set(result_set)))
+        cache[cache_key] = data
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),
