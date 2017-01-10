@@ -1,5 +1,8 @@
 ![logo](https://raw.github.com/cggh/panoptes/master/logo.png)
 
+#### This branch contains a beta version of Panoptes 2.0 which is not production ready
+#### [Version 1.6.2](https://github.com/cggh/panoptes/releases/tag/Pn1.6.2) is the most recent stable release
+
 Panoptes
 ========
 
