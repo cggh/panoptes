@@ -25,6 +25,7 @@ let GenotypesFan = React.createClass({
 
   componentDidMount() {
     this.paint(this.refs.canvas, this.props);
+    this.tooBigBlocks = [];
   },
 
   componentWillReceiveProps(nextProps) {
@@ -39,10 +40,7 @@ let GenotypesFan = React.createClass({
           merged.push(block);
         }
       });
-    } else {
-      this.tooBigBlocks = [];
     }
-
   },
 
   componentDidUpdate() {
