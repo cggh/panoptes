@@ -49,7 +49,8 @@ let TablePlot = React.createClass({
   // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: undefined
+      query: undefined,
+      randomSubsetSize: 20000 //To avoid fetching all by default
     };
   },
 

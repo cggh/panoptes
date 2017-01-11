@@ -58,7 +58,8 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true
+      sidebar: true,
+      randomSubsetSize: 20000 //To avoid fetching all by default
     };
   },
 
