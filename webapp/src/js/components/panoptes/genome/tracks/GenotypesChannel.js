@@ -418,7 +418,7 @@ let GenotypesChannel = React.createClass({
     const numRows = rowData ? rowData.id.shape[0] : 0;
 
     let initColWidthSpring = {
-      colWidth: _isFinite(colWidth) ? colWidth : null,
+      colWidth: _isFinite(colWidth) ? colWidth : 0,
     };
     let colWidthSpring = {
       colWidth: spring(initColWidthSpring.colWidth),
