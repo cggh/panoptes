@@ -5,7 +5,7 @@ import MenuItem from 'material-ui/MenuItem';
 
 // NB: The null value cannot be undefined or null or '',
 // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
-const NULL_VALUE = '— None —';
+const NULL_VALUE = '__NULL__';
 
 let RandomSubsetSizeSelector = React.createClass({
   mixins: [
@@ -37,7 +37,7 @@ let RandomSubsetSizeSelector = React.createClass({
     let {label, value} = this.props;
 
     let options = [
-      <MenuItem key={NULL_VALUE} primaryText={NULL_VALUE} value={NULL_VALUE} />,
+      <MenuItem key={NULL_VALUE} primaryText="No Subsampling" value={NULL_VALUE} />,
       <MenuItem key={20} primaryText={'20'} value={20} />,
       <MenuItem key={50} primaryText={'50'} value={50} />,
       <MenuItem key={100} primaryText={'100'} value={100} />,
@@ -56,7 +56,7 @@ let RandomSubsetSizeSelector = React.createClass({
 
     return (
       <SelectField
-        value={value}
+        value={value === NULL_VALUE ? undefined : value}
         autoWidth={true}
         floatingLabelText={label}
         onChange={(e, i, v) => this.handleChangeValue(v)}
