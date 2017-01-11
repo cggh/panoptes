@@ -1,5 +1,6 @@
 import React from 'react';
 import FileSaver from 'file-saver';
+import {Motion, spring} from 'react-motion';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -36,7 +37,7 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import NumericInput from 'ui/NumericInput';
 import Icon from 'ui/Icon';
 import queryToString from 'util/queryToString';
-import {Motion, spring} from 'react-motion';
+import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
 
 const FAN_HEIGHT = 60;
 
@@ -63,7 +64,8 @@ let GenotypesChannel = React.createClass({
         'cellHeight',
         'rowHeight',
         'pageSize',
-        'page'
+        'page',
+        'rowRandomSubsetSize'
       ]
     }),
     ConfigMixin,
@@ -84,7 +86,8 @@ let GenotypesChannel = React.createClass({
       'layoutGaps',
       'rowHeight',
       'pageSize',
-      'page'
+      'page',
+      'rowRandomSubsetSize'
     ),
   ],
 
@@ -109,7 +112,8 @@ let GenotypesChannel = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
-    onChangeLoadStatus: React.PropTypes.func
+    onChangeLoadStatus: React.PropTypes.func,
+    rowRandomSubsetSize: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -193,13 +197,20 @@ let GenotypesChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort} = props;
+    let {
+      chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery,
+      rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort,
+      rowRandomSubsetSize
+    } = props;
     let config = this.config.twoDTablesById[table];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
     rowQuery = this.getDefinedQuery(rowQuery, config.rowDataTable);
-
-    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight', 'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
-    if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
+    const dataInvalidatingProps = [
+      'chromosome', 'cellColour', 'cellAlpha', 'cellHeight', 'rowQuery',
+      'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize',
+      'rowRandomSubsetSize'
+    ];
+    if (dataInvalidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, null);
     }
     if (width - sideWidth < 1) {
@@ -227,7 +238,7 @@ let GenotypesChannel = React.createClass({
     }
     const {blockLevel, blockIndex, needNext} = findBlock({start, end});
     //If we already at this block then don't change it!
-    if (dataInvlidatingProps.some((name) => this.props[name] !== props[name]) || !(this.blockLevel === blockLevel
+    if (dataInvalidatingProps.some((name) => this.props[name] !== props[name]) || !(this.blockLevel === blockLevel
       && this.blockIndex === blockIndex
       && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
@@ -266,6 +277,11 @@ let GenotypesChannel = React.createClass({
         '2DProperties': twoDProperties.join('~'),
         colOnlyOnLimit: true
       };
+
+      if (rowRandomSubsetSize !== undefined) {
+        APIargs.rowRandomSample = rowRandomSubsetSize;
+      }
+
       let cacheArgs = {
         method: 'twoDPageQuery',
         regionField: columnTableConfig.position,
@@ -493,7 +509,8 @@ const GenotypesControls = React.createClass({
         'layoutGaps',
         'rowSort',
         'pageSize',
-        'page'
+        'page',
+        'rowRandomSubsetSize'
       ],
       redirect: ['setProps']
     }),
@@ -514,7 +531,8 @@ const GenotypesControls = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
-    getDataBlocks: React.PropTypes.func
+    getDataBlocks: React.PropTypes.func,
+    rowRandomSubsetSize: React.PropTypes.number
   },
 
   handleDownload() {
@@ -591,9 +609,17 @@ const GenotypesControls = React.createClass({
       Math.floor(start) + '-' + Math.ceil(end) + '.txt');
   },
 
+  handleChangeRandomSubsetSize(rowRandomSubsetSize) {
+    this.redirectedProps.setProps({rowRandomSubsetSize});
+  },
+
   render() {
-    let {table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;
+    let {
+      table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha,
+      cellHeight, layoutGaps, rowSort, pageSize, page, rowRandomSubsetSize
+    } = this.props;
     const config = this.config.twoDTablesById[table];
+
     return (
       <div className="channel-controls">
         <div className="control-group">
@@ -623,7 +649,7 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <PropertySelector table={config.rowDataTable}
                               value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
-                              label="Row Label"
+                              label="Row label"
                               onSelect={(rowLabel) => this.redirectedProps.setProps({
                               rowLabel,
                               rowSort: rowSort || rowLabel
@@ -632,17 +658,24 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <PropertySelector table={config.rowDataTable}
                               value={rowSort}
-                              label="Row Sort"
+                              label="Row sort"
                               allowNull={true}
                               onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
           </div>
           <div className="control">
-            <NumericInput debounce width={3} label="Row Height" value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
+            <RandomSubsetSizeSelector
+              value={rowRandomSubsetSize}
+              onChange={(v) => this.handleChangeRandomSubsetSize(v)}
+              label="Row random subset size"
+            />
+          </div>
+          <div className="control">
+            <NumericInput debounce width={3} label="Row height" value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
           </div>
         </div>
         <div className="control-group">
           <div className="control">
-            <NumericInput debounce width={5} label="Page Size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
+            <NumericInput debounce width={5} label="Page size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
           </div>
           <div className="control">
             <NumericInput debounce width={3} label="Page" value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
@@ -652,7 +685,7 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <SelectField value={cellColour}
                          autoWidth={true}
-                         floatingLabelText="Cell Colour"
+                         floatingLabelText="Cell colour"
                          onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
               <MenuItem value="call" primaryText="Call"/>
               <MenuItem value="fraction" primaryText="Ref fraction"/>
@@ -661,7 +694,7 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <SelectField value={cellAlpha}
                          autoWidth={true}
-                         floatingLabelText="Cell Opacity"
+                         floatingLabelText="Cell opacity"
                          onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
@@ -671,7 +704,7 @@ const GenotypesControls = React.createClass({
           <div className="control">
             <SelectField value={cellHeight}
                          autoWidth={true}
-                         floatingLabelText="Cell Height"
+                         floatingLabelText="Cell height"
                          onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}

@@ -29,6 +29,7 @@ import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import FilterButton from 'panoptes/FilterButton';
+import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
 
 import 'plot.scss';
 
@@ -46,7 +47,8 @@ let TablePlotActions = React.createClass({
     plotType: React.PropTypes.string,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
+    randomSubsetSize: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -56,7 +58,8 @@ let TablePlotActions = React.createClass({
     return {
       query: undefined,
       setProps: null,
-      sidebar: true
+      sidebar: true,
+      randomSubsetSize: 20000 //To avoid fetching all by default
     };
   },
 
@@ -80,6 +83,10 @@ let TablePlotActions = React.createClass({
     this.props.setProps({plotType});
   },
 
+  handleChangeRandomSubsetSize(randomSubsetSize) {
+    this.props.setProps({randomSubsetSize});
+  },
+
   // NB: the behaviour depends on whether this.props.table is not NULL_TABLE.
   getDefinedQuery() {
     return this.props.query
@@ -88,7 +95,7 @@ let TablePlotActions = React.createClass({
   },
 
   render() {
-    let {sidebar, table, plotType, setProps} = this.props;
+    let {sidebar, table, plotType, setProps, randomSubsetSize} = this.props;
 
     let dimensionProperties = _pickBy(this.props, (value, name) => allDimensions.indexOf(name) !== -1);
 
@@ -113,10 +120,14 @@ let TablePlotActions = React.createClass({
           />
           {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
+          <RandomSubsetSizeSelector
+            value={randomSubsetSize}
+            onChange={(v) => this.handleChangeRandomSubsetSize(v)}
+          />
           <SelectField
             value={plotType}
             autoWidth={true}
-            floatingLabelText="Plot Type:"
+            floatingLabelText="Plot type"
             onChange={(e, i, v) => this.handleChangePlotType(v)}
           >
             {plotTypeOptions}
@@ -156,7 +167,15 @@ let TablePlotActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            {table && plotType && dimensionProperties ? <TablePlot table={table} plotType={plotType} query={this.getDefinedQuery()} {...dimensionProperties} /> : null}
+            {table && plotType && dimensionProperties ?
+              <TablePlot
+                table={table}
+                plotType={plotType}
+                query={this.getDefinedQuery()}
+                {...dimensionProperties}
+                randomSubsetSize={randomSubsetSize}
+              /> : null
+            }
           </div>
         </div>
       </Sidebar>
