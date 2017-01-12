@@ -381,7 +381,7 @@ let TableMarkersLayer = React.createClass({
           //   if the markerColourPropertyIsNumerical, then use a histogram.
 
           if (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical) {
-            console.error('markerColourPropertyIsNumerical && markerColourPropertyIsCategical');
+            console.error('markerColourPropertyIsNumerical && markerColourPropertyIsCategorical');
             console.info('markerColourPropertyIsNumerical: %o', markerColourPropertyIsNumerical);
             console.info('markerColourPropertyIsCategorical: %o', markerColourPropertyIsCategorical);
             return null;
@@ -443,7 +443,7 @@ let TableMarkersLayer = React.createClass({
             let markerChartData = [];
             for (let value in markersGroupedByValue) {
               markerChartData.push({
-                name: markersGroupedByValue[value].map((obj) => obj.title).join(', '),
+                name: markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByValue[value].map((obj) => obj.title).join(', '),
                 value: markersGroupedByValue[value].length,
                 color: markersGroupedByValue[value][0].valueAsColour
               });
@@ -478,7 +478,7 @@ let TableMarkersLayer = React.createClass({
             primKey: markersGroupedByLocation[location][0].primKey,
             valueAsColour: markersGroupedByLocation[location][0].valueAsColour,
             count: markersGroupedByLocation[location].length,
-            title: markersGroupedByLocation[location].map((obj) => obj.title).join(', '),
+            title: markersGroupedByLocation[location].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByLocation[location].map((obj) => obj.title).join(', '),
             latProperty: markersGroupedByLocation[location][0].latProperty,
             lngProperty: markersGroupedByLocation[location][0].lngProperty
           });
