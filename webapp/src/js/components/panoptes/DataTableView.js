@@ -91,6 +91,14 @@ let DataTableView = React.createClass({
     this.setShowableRows = _throttle(this.setShowableRows, 500);
   },
 
+  icon() {
+    return this.tableConfig().icon;
+  },
+
+  title() {
+    return this.props.query !== undefined ? `${this.tableConfig().capNamePlural} subset` : this.tableConfig().capNamePlural;
+  },
+
   getDefinedQuery(query, table) {
     return (query || this.props.query) ||
       ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
