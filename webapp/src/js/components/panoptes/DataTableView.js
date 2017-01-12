@@ -91,6 +91,14 @@ let DataTableView = React.createClass({
     this.setShowableRows = _throttle(this.setShowableRows, 500);
   },
 
+  icon() {
+    return this.tableConfig().icon;
+  },
+
+  title() {
+    return this.props.query !== undefined ? `${this.tableConfig().capNamePlural} subset` : this.tableConfig().capNamePlural;
+  },
+
   getDefinedQuery(query, table) {
     return (query || this.props.query) ||
       ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
@@ -111,8 +119,9 @@ let DataTableView = React.createClass({
         stopRowIndex = undefined;
       }
 
-      let fetchStartRowIndex = Math.floor(startRowIndex/100)*100;
-      let fetchStopRowIndex = (Math.floor(stopRowIndex/100)+1)*100;
+      let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
+      let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
+
       let queryAPIargs = {
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
@@ -147,9 +156,14 @@ let DataTableView = React.createClass({
         ])
       )
       .then(([rows, rowsCount]) => {
+
+        if (fetchStartRowIndex !== undefined && startRowIndex !== undefined && stopRowIndex !== undefined) {
+          rows = rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1);
+        }
+
         this.setState({
           loadStatus: 'loaded',
-          rows: rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1),
+          rows,
           totalRowsCount: rowsCount
         });
       })

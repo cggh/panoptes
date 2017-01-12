@@ -34,6 +34,7 @@ import {scaleColour} from 'util/Colours';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
+const MINIMUM_BUBBLE_RADIUS = 10;
 
 let TableMarkersLayer = React.createClass({
 
@@ -92,13 +93,12 @@ let TableMarkersLayer = React.createClass({
   },
   handleClickClusterMarker(e, payload) {
     let {table, lat, lng, latProperty, lngProperty} = payload;
-
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
     let switchTo = !middleClick;
-
+console.log('handleClickClusterMarker payload %o', payload);
     if (this.config.tablesById[table].listView) {
       this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
     } else {
@@ -324,7 +324,7 @@ let TableMarkersLayer = React.createClass({
               position={{lat: marker.lat, lng: marker.lng}}
               title={marker.title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
-              zIndexOffset={markersCount + 2}
+              zIndexOffset={2 * markersCount}
               fillColour={marker.valueAsColour !== DEFAULT_MARKER_FILL_COLOUR ? marker.valueAsColour : undefined}
             />
           );
@@ -333,7 +333,9 @@ let TableMarkersLayer = React.createClass({
 
           let title = marker.title;
           if (markerColourProperty !== undefined && markerColourProperty !== null) {
-            title = `${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
+            if (marker.value !== undefined) {
+              title = `${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
+            }
             if (markerColourProperty !== this.config.tablesById[table].primKey) {
               title = `${this.config.tablesById[table].propertiesById[this.config.tablesById[table].primKey].name}: ${marker.primKey}\n` + title;
             }
@@ -346,7 +348,7 @@ let TableMarkersLayer = React.createClass({
               title={title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
               opacity={0.8}
-              zIndexOffset={1}
+              zIndexOffset={markersCount}
             >
               <svg height="12" width="12">
                 <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill={marker.valueAsColour} />
@@ -376,15 +378,10 @@ let TableMarkersLayer = React.createClass({
         if (Object.keys(markersGroupedByValue).length > 1) {
 
           // If there is more than one unique marker value at this location, then:
-          //   if the markerColourPropertyIsCategorical, then use a pie chart;
-          //   if the markerColourPropertyIsNumerical, then use a histogram.
+          //   if the markerColourPropertyIsNumerical or both numerical && categorical, then use a histogram.
+          //   otherwise if the markerColourPropertyIsCategorical or neither, then use a pie chart;
 
-          if (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical) {
-            console.error('markerColourPropertyIsNumerical && markerColourPropertyIsCategical');
-            console.info('markerColourPropertyIsNumerical: %o', markerColourPropertyIsNumerical);
-            console.info('markerColourPropertyIsCategorical: %o', markerColourPropertyIsCategorical);
-            return null;
-          } else if (markerColourPropertyIsNumerical) {
+          if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
 
             //// Prepare a histogram
 
@@ -442,7 +439,7 @@ let TableMarkersLayer = React.createClass({
             let markerChartData = [];
             for (let value in markersGroupedByValue) {
               markerChartData.push({
-                name: markersGroupedByValue[value].map((obj) => obj.title).join(', '),
+                name: markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByValue[value].map((obj) => obj.title).join(', '),
                 value: markersGroupedByValue[value].length,
                 color: markersGroupedByValue[value][0].valueAsColour
               });
@@ -468,7 +465,7 @@ let TableMarkersLayer = React.createClass({
 
           // If there is only one colour, then use a cluster bubble.
           clusterMarkers.push({
-            clusterType: 'bubble', // This is necessary due to object merging, although unused, to overwrite 'pieChart'.
+            clusterType: 'bubble', // This is necessary due to object merging, although unused, to overwrite 'pieChart' or 'histogram', etc.
             key: location,
             lat: markersGroupedByLocation[location][0].lat,
             lng: markersGroupedByLocation[location][0].lng,
@@ -477,7 +474,9 @@ let TableMarkersLayer = React.createClass({
             primKey: markersGroupedByLocation[location][0].primKey,
             valueAsColour: markersGroupedByLocation[location][0].valueAsColour,
             count: markersGroupedByLocation[location].length,
-            title: markersGroupedByLocation[location].map((obj) => obj.title).join(', ')
+            title: markersGroupedByLocation[location].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByLocation[location].map((obj) => obj.title).join(', '),
+            latProperty: markersGroupedByLocation[location][0].latProperty,
+            lngProperty: markersGroupedByLocation[location][0].lngProperty
           });
 
         } else {
@@ -505,7 +504,7 @@ let TableMarkersLayer = React.createClass({
       );
       let lengthRatio = this.lastLengthRatio || 1;
       if (pieAreaSum > 0) {
-        lengthRatio = Math.sqrt(0.005 / (pieAreaSum / pixelArea));
+        lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(clusterMarkers, (marker) => marker.radius = marker.originalRadius * lengthRatio);
@@ -527,9 +526,10 @@ let TableMarkersLayer = React.createClass({
                       (marker, i) => {
 
                         // NB: Code copied from PieChart and PieChartSector widgets
+                        let bubbleRadius = marker.radius > MINIMUM_BUBBLE_RADIUS ? marker.radius : MINIMUM_BUBBLE_RADIUS;
                         let pie = d3.layout.pie().sort(null);
                         let arcDescriptors = pie([1]);
-                        let arc = d3.svg.arc().outerRadius(marker.radius).innerRadius(0);
+                        let arc = d3.svg.arc().outerRadius(bubbleRadius).innerRadius(0);
 
                         // Default to using a bubble (or "balloon"?) cluster marker.valueAsColour
                         let clusterComponent = (
@@ -537,7 +537,7 @@ let TableMarkersLayer = React.createClass({
                             <g className="panoptes-cluster-bubble" style={{fill: marker.valueAsColour}}>
                               <title>{marker.title}</title>
                               <path d={arc(arcDescriptors[0])}></path>
-                              <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle">{marker.count}</text>
+                              <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{marker.count}</text>
                             </g>
                           </svg>
                         );
