@@ -111,8 +111,8 @@ let DataTableView = React.createClass({
         stopRowIndex = undefined;
       }
 
-      let fetchStartRowIndex = Math.floor(startRowIndex/100)*100;
-      let fetchStopRowIndex = (Math.floor(stopRowIndex/100)+1)*100;
+      let fetchStartRowIndex = Math.floor(startRowIndex / 100) * 100;
+      let fetchStopRowIndex = (Math.floor(stopRowIndex / 100) + 1) * 100;
       let queryAPIargs = {
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
