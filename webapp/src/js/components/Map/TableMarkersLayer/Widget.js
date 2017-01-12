@@ -469,7 +469,7 @@ let TableMarkersLayer = React.createClass({
 
           // If there is only one colour, then use a cluster bubble.
           clusterMarkers.push({
-            clusterType: 'bubble', // This is necessary due to object merging, although unused, to overwrite 'pieChart'.
+            clusterType: 'bubble', // This is necessary due to object merging, although unused, to overwrite 'pieChart' or 'histogram', etc.
             key: location,
             lat: markersGroupedByLocation[location][0].lat,
             lng: markersGroupedByLocation[location][0].lng,
@@ -508,7 +508,7 @@ let TableMarkersLayer = React.createClass({
       );
       let lengthRatio = this.lastLengthRatio || 1;
       if (pieAreaSum > 0) {
-        lengthRatio = Math.sqrt(0.005 / (pieAreaSum / pixelArea));
+        lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(clusterMarkers, (marker) => marker.radius = marker.originalRadius * lengthRatio);
