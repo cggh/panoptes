@@ -34,6 +34,7 @@ import {scaleColour} from 'util/Colours';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
+const MINIMUM_BUBBLE_RADIUS = 10;
 
 let TableMarkersLayer = React.createClass({
 
@@ -97,7 +98,6 @@ let TableMarkersLayer = React.createClass({
       e.originalEvent.stopPropagation();
     }
     let switchTo = !middleClick;
-
     if (this.config.tablesById[table].listView) {
       this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
     } else {
@@ -525,9 +525,10 @@ let TableMarkersLayer = React.createClass({
                       (marker, i) => {
 
                         // NB: Code copied from PieChart and PieChartSector widgets
+                        let bubbleRadius = marker.radius > MINIMUM_BUBBLE_RADIUS ? marker.radius : MINIMUM_BUBBLE_RADIUS;
                         let pie = d3.layout.pie().sort(null);
                         let arcDescriptors = pie([1]);
-                        let arc = d3.svg.arc().outerRadius(marker.radius).innerRadius(0);
+                        let arc = d3.svg.arc().outerRadius(bubbleRadius).innerRadius(0);
 
                         // Default to using a bubble (or "balloon"?) cluster marker.valueAsColour
                         let clusterComponent = (
@@ -535,7 +536,7 @@ let TableMarkersLayer = React.createClass({
                             <g className="panoptes-cluster-bubble" style={{fill: marker.valueAsColour}}>
                               <title>{marker.title}</title>
                               <path d={arc(arcDescriptors[0])}></path>
-                              <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle">{marker.count}</text>
+                              <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{marker.count}</text>
                             </g>
                           </svg>
                         );
