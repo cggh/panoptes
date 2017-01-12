@@ -51,7 +51,7 @@ let TileLayer = React.createClass({
       ext: 'png',
       maxZoom: 17,
       minZoom: 0,
-      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+      url: location.protocol + '//{s}.tile.osm.org/{z}/{x}/{y}.png'
     };
   },
 
