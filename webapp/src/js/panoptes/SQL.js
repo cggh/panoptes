@@ -382,8 +382,11 @@ SQL.WhereClause.whcClassGenerator['ispresent'] = function(args) {
   whc.ColName = args.ColName;
   return whc;
 };
-SQL.WhereClause.IsPresent = function() {
+SQL.WhereClause.IsPresent = function(colName) {
   let that = {};
+  if (colName) {
+    that.ColName = colName
+  }
   that.whcClass = 'ispresent';
   that.isCompound = false;
   that.type = 'ISPRESENT';
