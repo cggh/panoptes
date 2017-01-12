@@ -98,6 +98,7 @@ let TableMarkersLayer = React.createClass({
       e.originalEvent.stopPropagation();
     }
     let switchTo = !middleClick;
+console.log('handleClickClusterMarker payload %o', payload);
     if (this.config.tablesById[table].listView) {
       this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
     } else {
@@ -347,7 +348,7 @@ let TableMarkersLayer = React.createClass({
               title={title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
               opacity={0.8}
-              zIndexOffset={1}
+              zIndexOffset={markersCount}
             >
               <svg height="12" width="12">
                 <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill={marker.valueAsColour} />
