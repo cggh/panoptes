@@ -324,7 +324,7 @@ console.log('handleClickClusterMarker payload %o', payload);
               position={{lat: marker.lat, lng: marker.lng}}
               title={marker.title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
-              zIndexOffset={markersCount + 2}
+              zIndexOffset={2 * markersCount}
               fillColour={marker.valueAsColour !== DEFAULT_MARKER_FILL_COLOUR ? marker.valueAsColour : undefined}
             />
           );
