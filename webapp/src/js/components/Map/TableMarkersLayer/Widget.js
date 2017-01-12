@@ -377,15 +377,10 @@ let TableMarkersLayer = React.createClass({
         if (Object.keys(markersGroupedByValue).length > 1) {
 
           // If there is more than one unique marker value at this location, then:
-          //   if the markerColourPropertyIsCategorical, then use a pie chart;
-          //   if the markerColourPropertyIsNumerical, then use a histogram.
+          //   if the markerColourPropertyIsNumerical or both numerical && categorical, then use a histogram.
+          //   otherwise if the markerColourPropertyIsCategorical or neither, then use a pie chart;
 
-          if (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical) {
-            console.error('markerColourPropertyIsNumerical && markerColourPropertyIsCategorical');
-            console.info('markerColourPropertyIsNumerical: %o', markerColourPropertyIsNumerical);
-            console.info('markerColourPropertyIsCategorical: %o', markerColourPropertyIsCategorical);
-            return null;
-          } else if (markerColourPropertyIsNumerical) {
+          if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
 
             //// Prepare a histogram
 
