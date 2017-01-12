@@ -226,7 +226,7 @@ let MapActions = React.createClass({
     if (table === NULL_MARKER_LAYER) {
       this.props.setProps({table: undefined});
     } else {
-      this.props.setProps({table});
+      this.props.setProps({table, markerColourProperty: undefined});
     }
 
   },
