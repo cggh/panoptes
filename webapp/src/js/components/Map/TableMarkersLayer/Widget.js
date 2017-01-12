@@ -92,7 +92,7 @@ let TableMarkersLayer = React.createClass({
   },
   handleClickClusterMarker(e, payload) {
     let {table, lat, lng, latProperty, lngProperty} = payload;
-
+console.log('handleClickClusterMarker payload %o', payload);
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
@@ -477,7 +477,9 @@ let TableMarkersLayer = React.createClass({
             primKey: markersGroupedByLocation[location][0].primKey,
             valueAsColour: markersGroupedByLocation[location][0].valueAsColour,
             count: markersGroupedByLocation[location].length,
-            title: markersGroupedByLocation[location].map((obj) => obj.title).join(', ')
+            title: markersGroupedByLocation[location].map((obj) => obj.title).join(', '),
+            latProperty: markersGroupedByLocation[location][0].latProperty,
+            lngProperty: markersGroupedByLocation[location][0].lngProperty
           });
 
         } else {
