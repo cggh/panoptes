@@ -21,7 +21,7 @@ import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
-const DRAW_POINTS_THRESHOLD = 1000;
+const DRAW_POINTS_THRESHOLD = 2000;
 
 let NumericalSummaryTrack = React.createClass({
   mixins: [
@@ -119,7 +119,9 @@ let NumericalSummaryTrack = React.createClass({
         {expr: ['min', [track]], as: 'min'},
         {expr: ['max', [track]], as: 'max'}
       ];
-      query = SQL.WhereClause.AND([query ? SQL.WhereClause.decode(query) : SQL.WhereClause.Trivial(), SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome)]);
+      query = SQL.WhereClause.AND([query ? SQL.WhereClause.decode(query) : SQL.WhereClause.Trivial(),
+        SQL.WhereClause.IsPresent(track),
+        SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome)]);
       let APIargs = {
         database: this.config.dataset,
         table,
