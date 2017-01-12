@@ -117,12 +117,25 @@ let MapActions = React.createClass({
         if (providerName === 'HERE' || providerName === 'MapBox') {
           continue;
         }
+        // Thunderforest requires apikey
+        if (providerName === 'Thunderforest') {
+          continue;
+        }
 
         // FIXME: Providers not supported here yet
         // NASAGIBS requires {time}, {tilematrixset}
         if (providerName === 'NASAGIBS') {
           continue;
         }
+        // JusticeMap requires {size}
+        if (providerName === 'JusticeMap') {
+          continue;
+        }
+        // OpenWeatherMap takes too long to load
+        if (providerName === 'OpenWeatherMap') {
+          continue;
+        }
+
 
         let attribution = providerObj.options !== undefined ? providerObj.options.attribution : undefined;
         this.attributions[providerName] = attribution;
