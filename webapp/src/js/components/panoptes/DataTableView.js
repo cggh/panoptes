@@ -156,9 +156,14 @@ let DataTableView = React.createClass({
         ])
       )
       .then(([rows, rowsCount]) => {
+
+        if (fetchStartRowIndex !== undefined && startRowIndex !== undefined && stopRowIndex !== undefined) {
+          rows = rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1);
+        }
+
         this.setState({
           loadStatus: 'loaded',
-          rows: rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1),
+          rows,
           totalRowsCount: rowsCount
         });
       })
