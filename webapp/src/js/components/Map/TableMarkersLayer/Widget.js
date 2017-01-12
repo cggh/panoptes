@@ -92,7 +92,6 @@ let TableMarkersLayer = React.createClass({
   },
   handleClickClusterMarker(e, payload) {
     let {table, lat, lng, latProperty, lngProperty} = payload;
-console.log('handleClickClusterMarker payload %o', payload);
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
