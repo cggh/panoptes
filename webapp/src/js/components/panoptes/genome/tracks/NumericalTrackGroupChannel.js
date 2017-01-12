@@ -3,6 +3,8 @@ import Immutable from 'immutable';
 
 import _isFinite from 'lodash/isFinite';
 import _forEach from 'lodash/forEach';
+import _min from 'lodash/min';
+import _max from 'lodash/max';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -58,7 +60,7 @@ let NumericalTrackGroupChannel = React.createClass({
 
   getDefaultProps() {
     return {
-      autoYScale: true,
+      autoYScale: false,
     };
   },
 
@@ -103,9 +105,17 @@ let NumericalTrackGroupChannel = React.createClass({
   },
 
   render() {
-    let {width, sideWidth, children, table, query, childrenHash} = this.props;
+    let {width, sideWidth, children, table, query, childrenHash, autoYScale, yMin, yMax} = this.props;
     if (table) {
       query = this.getDefinedQuery(query, table);
+    }
+    let childrenArray = React.Children.toArray(children);
+    let propConfig = this.tableConfig().propertiesById;
+    if (!autoYScale && yMin === undefined) {
+      yMin = _min(ValidComponentChildren.map(childrenArray, (child, i) => propConfig[child.props.track].minVal));
+    }
+    if (!autoYScale && yMax === undefined) {
+      yMax = _max(ValidComponentChildren.map(childrenArray, (child, i) => propConfig[child.props.track].maxVal));
     }
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     children = React.Children.map(children,
@@ -116,12 +126,17 @@ let NumericalTrackGroupChannel = React.createClass({
             query: table ? query : undefined
           }));
     return (
-      <CanvasGroupChannel onTap={this.handleTap} {...this.props}
+      <CanvasGroupChannel onTap={this.handleTap}
+                          {...this.props}
+                          yMin={yMin}
+                          yMax={yMax}
                           side={<Side {...this.props} setProps={this.redirectedProps.setProps} query={query}>
                             {children}
                             </Side>}
                           onClose={this.redirectedProps.onClose}
                           controls={<NumericalTrackGroupControls {...this.props}
+                                                                 yMin={yMin}
+                                                                 yMax={yMax}
                                                                  setProps={this.redirectedProps.setProps}
                                                                  query={query} />}
                           legend={<Legend childrenHash={childrenHash} setProps={this.redirectedProps.setProps}>
@@ -291,7 +306,6 @@ let NumericalTrackGroupControls = React.createClass({
 
   render() {
     let {autoYScale, yMin, yMax, children, table, query} = this.props;
-
     let actions = this.getFlux().actions;
 
     return (
