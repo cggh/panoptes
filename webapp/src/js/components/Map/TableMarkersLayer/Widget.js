@@ -98,7 +98,7 @@ let TableMarkersLayer = React.createClass({
       e.originalEvent.stopPropagation();
     }
     let switchTo = !middleClick;
-console.log('handleClickClusterMarker payload %o', payload);
+
     if (this.config.tablesById[table].listView) {
       this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
     } else {
