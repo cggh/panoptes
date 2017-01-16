@@ -24,9 +24,9 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 import _isNumber from 'lodash/isNumber';
 
-const DEFAULT_SPRING = [160, 30];
-const FLING_SPRING = [60, 15];
-const NO_SPRING = [2000, 80];
+const DEFAULT_SPRING = {stiffness: 160, damping: 30};
+const FLING_SPRING = {stiffness: 60, damping: 15};
+const NO_SPRING = {stiffness: 2000, damping: 80};
 const MIN_WIDTH = 5;
 const FALLBACK_MAXIMUM = 1000000000;
 const CONTROLS_HEIGHT = 33;
@@ -196,16 +196,12 @@ let GenomeBrowser = React.createClass({
       [start, end] = this.scaleClamp(start, end, 0.5);
       this.panStartPixel = null;
     } else {
-      let endValue = {
-        mid: {val: (end + start) / 2, config: NO_SPRING},
-        halfWidth: {val: (end - start) / 2, config: NO_SPRING}
-      };
-      this.refs.spring.setState({
-        currValue: endValue,
-        currVelocity: {mid: {val: 0}, halfWidth: {val: 0}}
-      });
+      //Commented out as gives unwanted jumps
+      // this.refs.spring.setState({
+      //   currentStyle: {mid: (end + start) / 2, halfWidth: (end - start) / 2},
+      //   currentVelocity: {mid: 0, halfWidth: 0}
+      // });
       this.nextSpringConfig = NO_SPRING;
-
     }
     this.props.setProps({start: start, end: end});
   },

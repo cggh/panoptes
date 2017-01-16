@@ -10,6 +10,8 @@ import YScale from 'panoptes/genome/tracks/YScale';
 
 
 import {Motion, spring} from 'react-motion';
+const DEFAULT_SPRING = {stiffness:160, damping: 30};
+const NO_SPRING = {stiffness: 2000, damping: 80};
 
 let CanvasGroupChannel = React.createClass({
   mixins: [
@@ -58,7 +60,8 @@ let CanvasGroupChannel = React.createClass({
       this.redirectedProps.onClose();
   },
 
-  handleYLimitChange(index, dataLimits) {
+  handleYLimitChange(index, dataLimits, noAnimation) {
+    noAnimation = true;
     this.yLimits[index] = dataLimits;
     let allDataYMin = null;
     let allDataYMax = null;
@@ -71,14 +74,31 @@ let CanvasGroupChannel = React.createClass({
       }
     });
     if (_isFinite(allDataYMin) && _isFinite(allDataYMax)) {
-      this.setState({dataYMin: allDataYMin, dataYMax: allDataYMax});
+      this.setState({
+        dataYMin: allDataYMin,
+        dataYMax: allDataYMax
+        // springConfig: noAnimation ? NO_SPRING : DEFAULT_SPRING
+      });
+      if (this.props.autoYScale && noAnimation) {
+        let endValue = {
+          yMin: {val: allDataYMin, config: NO_SPRING},
+          yMax: {val: allDataYMax, config: NO_SPRING},
+          springConfig: NO_SPRING
+        };
+        this.refs.spring.setState({
+          currentStyle: {yMin: allDataYMin, yMax: allDataYMax},
+          currentVelocity: {yMin: 0, yMax: 0}
+        });
+        this.nextSpringConfig = NO_SPRING;
+      }
     }
   },
 
   render() {
     let {width, height, sideWidth, yMin, yMax, autoYScale, side, controls, legend} = this.props;
     let {dataYMin, dataYMax} = this.state;
-
+    let springConfig = (autoYScale && this.nextSpringConfig) || DEFAULT_SPRING;
+    this.nextSpringConfig = null;
     if (autoYScale) {
       if (_isFinite(dataYMin) && _isFinite(dataYMax)) {
         yMin = dataYMin;
@@ -101,8 +121,8 @@ let CanvasGroupChannel = React.createClass({
       yMax: _isFinite(yMax) ? yMax : null
     };
     let yAxisSpring = {
-      yMin: spring(initYAxisSpring.yMin),
-      yMax: spring(initYAxisSpring.yMax)
+      yMin: spring(initYAxisSpring.yMin, springConfig),
+      yMax: spring(initYAxisSpring.yMax, springConfig)
     };
 
     return (
@@ -116,7 +136,7 @@ let CanvasGroupChannel = React.createClass({
         legendComponent={legend}
         onClose={this.handleClose}
       >
-          <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
+          <Motion ref="spring" style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
               return <Hammer onTap={this.props.onTap}>
