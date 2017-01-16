@@ -537,10 +537,10 @@ let TableMarkersLayer = React.createClass({
 
                         // Default to using a bubble cluster marker.valueAsColour
                         let clusterComponent = (
-                          <svg style={{overflow: 'visible'}} width="1" height="1">
+                          <svg style={{overflow: 'visible'}} width={bubbleRadius} height={bubbleRadius}>
                             <g className="panoptes-cluster-bubble" style={{fill: marker.valueAsColour}}>
                               <title>{marker.title}</title>
-                              <circle cx="1" cy="1" r={bubbleRadius} />
+                              <circle cx={bubbleRadius / 2} cy={bubbleRadius / 2} r={bubbleRadius} />
                               <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{marker.count}</text>
                             </g>
                           </svg>
