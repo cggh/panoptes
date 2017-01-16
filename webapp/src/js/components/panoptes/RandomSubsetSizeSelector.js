@@ -27,7 +27,7 @@ let RandomSubsetSizeSelector = React.createClass({
 
   handleChangeValue(value) {
     if (value === NULL_VALUE) {
-      this.props.onChange(undefined);
+      this.props.onChange(null);
     } else {
       this.props.onChange(value);
     }
@@ -37,7 +37,7 @@ let RandomSubsetSizeSelector = React.createClass({
     let {label, value} = this.props;
 
     let options = [
-      <MenuItem key={NULL_VALUE} primaryText="No Subsampling" value={NULL_VALUE} />,
+      <MenuItem key={NULL_VALUE} primaryText="No subsampling" value={NULL_VALUE} />,
       <MenuItem key={20} primaryText={'20'} value={20} />,
       <MenuItem key={50} primaryText={'50'} value={50} />,
       <MenuItem key={100} primaryText={'100'} value={100} />,
