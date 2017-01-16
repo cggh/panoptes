@@ -533,18 +533,14 @@ let TableMarkersLayer = React.createClass({
                     renderNodes.map(
                       (marker, i) => {
 
-                        // NB: Code copied from PieChart and PieChartSector widgets
                         let bubbleRadius = marker.radius > MINIMUM_BUBBLE_RADIUS ? marker.radius : MINIMUM_BUBBLE_RADIUS;
-                        let pie = d3.layout.pie().sort(null);
-                        let arcDescriptors = pie([1]);
-                        let arc = d3.svg.arc().outerRadius(bubbleRadius).innerRadius(0);
 
-                        // Default to using a bubble (or "balloon"?) cluster marker.valueAsColour
+                        // Default to using a bubble cluster marker.valueAsColour
                         let clusterComponent = (
                           <svg style={{overflow: 'visible'}} width="1" height="1">
                             <g className="panoptes-cluster-bubble" style={{fill: marker.valueAsColour}}>
                               <title>{marker.title}</title>
-                              <path d={arc(arcDescriptors[0])}></path>
+                              <circle cx="1" cy="1" r={bubbleRadius} />
                               <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{marker.count}</text>
                             </g>
                           </svg>
