@@ -55,11 +55,6 @@ Compatibility
     - [x] Mozilla Firefox v25 (latest v49)
 
 ###Compatible-pending client web browsers (minimum versions):
-- desktop and laptop
-  - Microsoft Windows 8.1, 10
-    - [ ] Microsoft Internet Explorer v11 (released 2013-10-17) (known to fail, `'Uint8ClampedArray' is undefined`)
-  - Microsoft Windows 7, 8
-    - [ ] Microsoft Internet Explorer v10 (released 2012-10-26) (known to fail, `'Uint8ClampedArray' is undefined`)
 - tablet and mobile
   - Apple iOS v10
     - [ ] Google Chrome v29 (latest v54) (preliminary tests suggest OK)
