@@ -92,7 +92,7 @@ let TableMarkersLayer = React.createClass({
     this.getFlux().actions.panoptes.dataItemPopup({table, primKey, switchTo: !middleClick});
   },
   handleClickClusterMarker(e, payload) {
-    let {table, lat, lng, latProperty, lngProperty} = payload;
+    let {table, originalLat, originalLng, latProperty, lngProperty} = payload;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
@@ -109,8 +109,8 @@ let TableMarkersLayer = React.createClass({
       if (showableColumns instanceof Array && showableColumns.length > 0) {
 
         let whereClause = SQL.WhereClause.AND([
-          SQL.WhereClause.CompareFixed(latProperty, '=', lat),
-          SQL.WhereClause.CompareFixed(lngProperty, '=', lng)
+          SQL.WhereClause.CompareFixed(latProperty, '=', originalLat),
+          SQL.WhereClause.CompareFixed(lngProperty, '=', originalLng)
         ]);
         whereClause.isRoot = true;
         let query = SQL.WhereClause.encode(whereClause);
@@ -257,7 +257,9 @@ let TableMarkersLayer = React.createClass({
             valueAsColour,
             value,
             latProperty: locationTableConfig.latitude,
-            lngProperty: locationTableConfig.longitude
+            lngProperty: locationTableConfig.longitude,
+            originalLat: lat,
+            originalLng: lng
           };
 
           markers.push({lat, lng}); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
@@ -420,7 +422,9 @@ let TableMarkersLayer = React.createClass({
               primKey: markersGroupedByLocation[location][0].primKey,
               colourScaleFunction: scaleColour([minValue, maxValue]),
               latProperty: markersGroupedByLocation[location][0].latProperty,
-              lngProperty: markersGroupedByLocation[location][0].lngProperty
+              lngProperty: markersGroupedByLocation[location][0].lngProperty,
+              originalLat: markersGroupedByLocation[location][0].originalLat,
+              originalLng: markersGroupedByLocation[location][0].originalLng
             });
 
           } else {
@@ -456,7 +460,9 @@ let TableMarkersLayer = React.createClass({
               table,
               primKey: markersGroupedByLocation[location][0].primKey,
               latProperty: markersGroupedByLocation[location][0].latProperty,
-              lngProperty: markersGroupedByLocation[location][0].lngProperty
+              lngProperty: markersGroupedByLocation[location][0].lngProperty,
+              originalLat: markersGroupedByLocation[location][0].originalLat,
+              originalLng: markersGroupedByLocation[location][0].originalLng
             });
 
           }
@@ -476,7 +482,9 @@ let TableMarkersLayer = React.createClass({
             count: markersGroupedByLocation[location].length,
             title: markersGroupedByLocation[location].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByLocation[location].map((obj) => obj.title).join(', '),
             latProperty: markersGroupedByLocation[location][0].latProperty,
-            lngProperty: markersGroupedByLocation[location][0].lngProperty
+            lngProperty: markersGroupedByLocation[location][0].lngProperty,
+            originalLat: markersGroupedByLocation[location][0].originalLat,
+            originalLng: markersGroupedByLocation[location][0].originalLng
           });
 
         } else {
@@ -551,8 +559,8 @@ let TableMarkersLayer = React.createClass({
                                 hideValues={true}
                                 lat={marker.lat}
                                 lng={marker.lng}
-                                originalLat={marker.lat}
-                                originalLng={marker.lng}
+                                originalLat={marker.originalLat}
+                                originalLng={marker.originalLng}
                                 radius={marker.radius}
                               />
                           );
@@ -569,8 +577,8 @@ let TableMarkersLayer = React.createClass({
                                 radius={marker.radius}
                                 lat={marker.lat}
                                 lng={marker.lng}
-                                originalLat={marker.lat}
-                                originalLng={marker.lng}
+                                originalLat={marker.originalLat}
+                                originalLng={marker.originalLng}
                                 unitNameSingle={this.config.tablesById[table].nameSingle}
                                 unitNamePlural={this.config.tablesById[table].namePlural}
                                 valueName={this.config.tablesById[table].propertiesById[markerColourProperty].name}
@@ -582,8 +590,8 @@ let TableMarkersLayer = React.createClass({
 
                         let onClickPayload = {
                           table: marker.table,
-                          lat: marker.lat,
-                          lng: marker.lng,
+                          originalLat: marker.originalLat,
+                          originalLng: marker.originalLng,
                           latProperty: marker.latProperty,
                           lngProperty: marker.lngProperty
                         };
