@@ -92,13 +92,13 @@ let TableMarkersLayer = React.createClass({
     this.getFlux().actions.panoptes.dataItemPopup({table, primKey, switchTo: !middleClick});
   },
   handleClickClusterMarker(e, payload) {
-    let {table, lat, lng, latProperty, lngProperty} = payload;
+    let {table, originalLat, originalLng, latProperty, lngProperty} = payload;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
     let switchTo = !middleClick;
-console.log('handleClickClusterMarker payload %o', payload);
+
     if (this.config.tablesById[table].listView) {
       this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
     } else {
@@ -109,8 +109,8 @@ console.log('handleClickClusterMarker payload %o', payload);
       if (showableColumns instanceof Array && showableColumns.length > 0) {
 
         let whereClause = SQL.WhereClause.AND([
-          SQL.WhereClause.CompareFixed(latProperty, '=', lat),
-          SQL.WhereClause.CompareFixed(lngProperty, '=', lng)
+          SQL.WhereClause.CompareFixed(latProperty, '=', originalLat),
+          SQL.WhereClause.CompareFixed(lngProperty, '=', originalLng)
         ]);
         whereClause.isRoot = true;
         let query = SQL.WhereClause.encode(whereClause);
@@ -257,7 +257,9 @@ console.log('handleClickClusterMarker payload %o', payload);
             valueAsColour,
             value,
             latProperty: locationTableConfig.latitude,
-            lngProperty: locationTableConfig.longitude
+            lngProperty: locationTableConfig.longitude,
+            originalLat: lat,
+            originalLng: lng
           };
 
           markers.push({lat, lng}); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
@@ -420,7 +422,9 @@ console.log('handleClickClusterMarker payload %o', payload);
               primKey: markersGroupedByLocation[location][0].primKey,
               colourScaleFunction: scaleColour([minValue, maxValue]),
               latProperty: markersGroupedByLocation[location][0].latProperty,
-              lngProperty: markersGroupedByLocation[location][0].lngProperty
+              lngProperty: markersGroupedByLocation[location][0].lngProperty,
+              originalLat: markersGroupedByLocation[location][0].originalLat,
+              originalLng: markersGroupedByLocation[location][0].originalLng
             });
 
           } else {
@@ -456,7 +460,9 @@ console.log('handleClickClusterMarker payload %o', payload);
               table,
               primKey: markersGroupedByLocation[location][0].primKey,
               latProperty: markersGroupedByLocation[location][0].latProperty,
-              lngProperty: markersGroupedByLocation[location][0].lngProperty
+              lngProperty: markersGroupedByLocation[location][0].lngProperty,
+              originalLat: markersGroupedByLocation[location][0].originalLat,
+              originalLng: markersGroupedByLocation[location][0].originalLng
             });
 
           }
@@ -476,7 +482,9 @@ console.log('handleClickClusterMarker payload %o', payload);
             count: markersGroupedByLocation[location].length,
             title: markersGroupedByLocation[location].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByLocation[location].map((obj) => obj.title).join(', '),
             latProperty: markersGroupedByLocation[location][0].latProperty,
-            lngProperty: markersGroupedByLocation[location][0].lngProperty
+            lngProperty: markersGroupedByLocation[location][0].lngProperty,
+            originalLat: markersGroupedByLocation[location][0].originalLat,
+            originalLng: markersGroupedByLocation[location][0].originalLng
           });
 
         } else {
@@ -525,19 +533,15 @@ console.log('handleClickClusterMarker payload %o', payload);
                     renderNodes.map(
                       (marker, i) => {
 
-                        // NB: Code copied from PieChart and PieChartSector widgets
                         let bubbleRadius = marker.radius > MINIMUM_BUBBLE_RADIUS ? marker.radius : MINIMUM_BUBBLE_RADIUS;
-                        let pie = d3.layout.pie().sort(null);
-                        let arcDescriptors = pie([1]);
-                        let arc = d3.svg.arc().outerRadius(bubbleRadius).innerRadius(0);
 
-                        // Default to using a bubble (or "balloon"?) cluster marker.valueAsColour
+                        // Default to using a bubble cluster marker.valueAsColour
                         let clusterComponent = (
-                          <svg style={{overflow: 'visible'}} width="1" height="1">
+                          <svg style={{overflow: 'visible'}} width={bubbleRadius} height={bubbleRadius}>
                             <g className="panoptes-cluster-bubble" style={{fill: marker.valueAsColour}}>
                               <title>{marker.title}</title>
-                              <path d={arc(arcDescriptors[0])}></path>
-                              <text x="50%" y="50%" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{marker.count}</text>
+                              <circle cx="0" cy="0" r={bubbleRadius} />
+                              <text x="0" y="0" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{marker.count}</text>
                             </g>
                           </svg>
                         );
@@ -551,8 +555,8 @@ console.log('handleClickClusterMarker payload %o', payload);
                                 hideValues={true}
                                 lat={marker.lat}
                                 lng={marker.lng}
-                                originalLat={marker.lat}
-                                originalLng={marker.lng}
+                                originalLat={marker.originalLat}
+                                originalLng={marker.originalLng}
                                 radius={marker.radius}
                               />
                           );
@@ -569,8 +573,8 @@ console.log('handleClickClusterMarker payload %o', payload);
                                 radius={marker.radius}
                                 lat={marker.lat}
                                 lng={marker.lng}
-                                originalLat={marker.lat}
-                                originalLng={marker.lng}
+                                originalLat={marker.originalLat}
+                                originalLng={marker.originalLng}
                                 unitNameSingle={this.config.tablesById[table].nameSingle}
                                 unitNamePlural={this.config.tablesById[table].namePlural}
                                 valueName={this.config.tablesById[table].propertiesById[markerColourProperty].name}
@@ -582,8 +586,8 @@ console.log('handleClickClusterMarker payload %o', payload);
 
                         let onClickPayload = {
                           table: marker.table,
-                          lat: marker.lat,
-                          lng: marker.lng,
+                          originalLat: marker.originalLat,
+                          originalLng: marker.originalLng,
                           latProperty: marker.latProperty,
                           lngProperty: marker.lngProperty
                         };
