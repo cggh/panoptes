@@ -45,6 +45,7 @@ let GenomeBrowserWithActions = React.createClass({
     chromosome: React.PropTypes.string,
     start: React.PropTypes.number,
     end: React.PropTypes.number,
+    childrenHash: React.PropTypes.number
   },
 
   getDefaultProps() {
