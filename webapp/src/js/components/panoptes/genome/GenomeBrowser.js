@@ -4,6 +4,7 @@ import offset from 'bloody-offset';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
+import _forEach from 'lodash/forEach';
 import _head from 'lodash/head';
 import _keys from 'lodash/keys';
 import d3 from 'd3';
@@ -44,7 +45,8 @@ let GenomeBrowser = React.createClass({
     start: React.PropTypes.number,
     end: React.PropTypes.number,
     sideWidth: React.PropTypes.number.isRequired,
-    children: React.PropTypes.node
+    children: React.PropTypes.node,
+    childrenHash: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -67,9 +69,23 @@ let GenomeBrowser = React.createClass({
   },
 
   componentWillMount() {
+    this.scrollListeners = [];
     this.loading = 0;
     this.panStartPixel = null;
     this.defaultChrom = _head(_keys(this.config.chromosomes)); //Would be done as defaultProp, but config not avaliable then
+  },
+
+  componentDidMount() {
+    this.scrollTracks.onscroll = () => {
+      this.handleTrackScroll();
+    };
+    this.componentDidUpdate({});
+  },
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.childrenHash != this.props.childrenHash) {
+      this.handleTrackScroll();
+    }
   },
 
   componentWillReceiveProps(nextProps) {
@@ -214,6 +230,15 @@ let GenomeBrowser = React.createClass({
     this.setState({loading: this.loading});
   },
 
+  handleTrackScroll() {
+    let numTracks = React.Children.count(this.props.children);
+    _forEach(this.scrollListeners, (listener, i) => {
+      if (i < numTracks && listener && listener.handleScroll) {
+        listener.handleScroll(this.scrollTracks);
+      }
+    });
+  },
+
   render() {
     let {start, end, sideWidth, chromosome, children} = this.props;
     children = filterChildren(this, children); //Remove whitespace children from template padding
@@ -290,11 +315,12 @@ let GenomeBrowser = React.createClass({
                               ...trackProps
                             }) : null)}
                       </div>
-                      <div className="scrolling grow scroll-within">
+                      <div ref={(node) => this.scrollTracks = node} className="scrolling grow scroll-within">
                         {ValidComponentChildren.map(children,
                           (child, i) => !child.props.fixed ?
                             React.cloneElement(child, {
                               onClose: () => this.redirectedProps.setProps((props) => props.deleteIn(['children', i])),
+                              ref: (component) => this.scrollListeners[i] = component,
                               ...trackProps
                             }) : null)}
                       </div>

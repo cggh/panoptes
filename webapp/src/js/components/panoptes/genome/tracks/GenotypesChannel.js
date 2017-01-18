@@ -17,7 +17,6 @@ import _some from 'lodash/some';
 import _takeRight from 'lodash/takeRight';
 import _unique from 'lodash/uniq';
 import _isFinite from 'lodash/isFinite';
-
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
@@ -38,7 +37,7 @@ import NumericInput from 'ui/NumericInput';
 import Icon from 'ui/Icon';
 import queryToString from 'util/queryToString';
 import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
-
+import "genotypes.scss"
 const FAN_HEIGHT = 60;
 
 let GenotypesChannel = React.createClass({
@@ -135,7 +134,8 @@ let GenotypesChannel = React.createClass({
       colPositions: new Float64Array(0),
       genomicPositions: new Float64Array(0),
       visibleGenomicPositions: new Float64Array(0),
-      colWidth: 1
+      colWidth: 1,
+      visibleTop: 0
     };
   },
 
@@ -424,9 +424,14 @@ let GenotypesChannel = React.createClass({
     return this.state.dataBlocks;
   },
 
+  handleScroll(scrollDiv) {
+    this.setState({visibleTop:
+      -(this.container.getBoundingClientRect().top - scrollDiv.getBoundingClientRect().top)})
+  },
+
   render() {
     let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
-    const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
+    const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth, visibleTop} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
@@ -465,16 +470,8 @@ let GenotypesChannel = React.createClass({
         <Motion style={colWidthSpring} defaultStyle={initColWidthSpring}>
           {(interpolated) => {
             let {colWidth} = interpolated;
-            return <div>
-              <GenotypesFan
-              genomicPositions={genomicPositions}
-              layoutBlocks={layoutBlocks}
-              dataBlocks={dataBlocks}
-              width={width - sideWidth}
-              height={FAN_HEIGHT}
-              start={start}
-              end={end}
-              colWidth={colWidth}/>
+            return <div ref={(node) => this.container = node} className="genotypes-channel">
+              <div style={{height: FAN_HEIGHT+'px'}} />
               <GenotypesTable
                 table={table}
                 rowData={rowData}
@@ -489,6 +486,18 @@ let GenotypesChannel = React.createClass({
                 cellAlpha={cellAlpha}
                 cellHeight={cellHeight}
                 rowHeight={rowHeight}/>
+              <GenotypesFan
+                top={Math.min(rowHeight * numRows,
+                  Math.max(0, visibleTop))}
+                genomicPositions={genomicPositions}
+                layoutBlocks={layoutBlocks}
+                dataBlocks={dataBlocks}
+                width={width - sideWidth}
+                height={FAN_HEIGHT}
+                start={start}
+                end={end}
+                colWidth={colWidth}/>
+
             </div>;
             }}</Motion>
       </ChannelWithConfigDrawer>);

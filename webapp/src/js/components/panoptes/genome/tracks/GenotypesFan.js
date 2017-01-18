@@ -13,6 +13,7 @@ let GenotypesFan = React.createClass({
   ],
 
   propTypes: {
+    top: React.PropTypes.number,
     genomicPositions: React.PropTypes.any,
     colWidth: React.PropTypes.number,
     start: React.PropTypes.number,
@@ -52,6 +53,8 @@ let GenotypesFan = React.createClass({
     const ctx = canvas.getContext('2d');
     const scale =  width / (end - start);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
     if (!layoutBlocks || !genomicPositions) {
@@ -158,8 +161,10 @@ let GenotypesFan = React.createClass({
 
 
   render() {
-    let {width, height} = this.props;
+    let {width, height, top} = this.props;
     return <canvas ref="canvas"
+                   className="genotypes-header"
+                   style={{top: top+'px'}}
                    width={width}
                    height={height}/>;
   }
