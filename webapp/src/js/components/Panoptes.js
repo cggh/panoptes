@@ -132,7 +132,7 @@ let Panoptes = createReactClass({
             <div className="page">
               <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
               <div className="body scroll-within">
-                <SessionComponent compId={tabs.get('selectedTab')} />
+                  <SessionComponent compId={tabs.get('selectedTab')} />
               </div>
             </div>
             <Modal visible={modal ? true : false}
