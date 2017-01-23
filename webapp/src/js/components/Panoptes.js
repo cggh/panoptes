@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import React from  'react';
 import createReactClass from 'create-react-class';
 import NotificationSystem from 'react-notification-system';
-import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
-import {Map} from 'immutable';
 import _assign from 'lodash.assign';
 
 // Mixins
@@ -13,32 +11,23 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Panoptes
-import TabbedArea from 'ui/TabbedArea';
-import TabPane from 'ui/TabPane';
-import Popups from 'ui/Popups';
-import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
-import Finder from 'containers/Finder';
 import Copy from 'ui/Copy';
 import Confirm from 'ui/Confirm';
 import SessionComponent from 'panoptes/SessionComponent';
-import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 // Material UI
-import IconButton from 'material-ui/IconButton';
-// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-// import createMuiTheme from 'material-ui/styles/createMuiTheme';
 import createPalette from 'material-ui/styles/createPalette';
 import createTypography from 'material-ui/styles/createTypography';
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {withTheme} from 'material-ui/styles';
-import Tooltip from 'rc-tooltip';
-import 'rc-tooltip/assets/bootstrap.css';
-
-//https://github.com/facebook/flow/issues/380
 import {blue, pink} from 'material-ui/colors';
 import {A200 as pinkA200} from 'material-ui/colors/pink';
-//import red from 'material-ui/colors/red';
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import IconButton from 'material-ui/IconButton';
+import MenuIcon from 'material-ui-icons/Menu';
 
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
@@ -135,48 +124,10 @@ let Panoptes = createReactClass({
             </div>
             <div className="page">
               <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
-              <div className="body">
-                <TabbedArea activeTab={tabs.get('selectedTab')}
-                  unclosableTabs={tabs.get('unclosableTabs')}
-                  unreplaceableTabs={tabs.get('unreplaceableTabs')}
-                  onSwitch={actions.tabSwitch}
-                  onClose={actions.tabClose}
-                  onAddTab={actions.tabOpen}
-                  onDragAway={actions.tabPopOut}
-                >
-                  {tabs.get('components').map((compId) =>
-                    <TabPane
-                      compId={compId}
-                      key={compId}>
-                      <SessionComponent compId={compId} />
-                    </TabPane>
-                  ).toArray()}
-                </TabbedArea>
+              <div className="body scroll-within">
+                <SessionComponent compId={tabs.get('selectedTab')} />
               </div>
             </div>
-            <Popups>
-              {popups.get('components').map((compId) => {
-                let state = popups.getIn(['state', compId]);
-                let {x, y} = state.get('position', Map()).toJS();
-                let {width, height} = state.get('size', Map()).toJS();
-                return (
-                  <Popup
-                    initialX={x}
-                    initialY={y}
-                    initialWidth={width}
-                    initialHeight={height}
-                    compId={compId}
-                    key={compId}
-                    onMoveStop={actions.popupMove.bind(this, compId)}
-                    onResizeStop={actions.popupResize.bind(this, compId)}
-                    onClose={actions.popupClose.bind(this, compId)}
-                    onMaximise={actions.popupToTab.bind(this, compId)}
-                    onClick={actions.popupFocus.bind(this, compId)}>
-                    <SessionComponent compId={compId} />
-                  </Popup>
-                );
-              }).toArray()}
-            </Popups>
             <Modal visible={modal ? true : false}
               onClose={actions.modalClose}>
               {modal ?
@@ -231,51 +182,17 @@ let Header = createReactClass({
   render() {
     let {dataset, name, logo} = this.props;
     let actions = this.getFlux().actions;
-    const userId = this.config.user.id;
     return (
-      <div className="header">
-        <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
-        <div className="username">
-          { this.config.cas.service ? (userId == 'anonymous' ?
-            <a href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
-            : <span>
-              {userId}
-              <a className="logout" href={this.config.cas.logout}>logout</a>
-            </span>) : null
-          }
-        </div>
-        <img className="logo" src={logo}/>
-        {this.config.user.isManager ?
-          <Tooltip
-            overlay="Set current state as initial view for all users"
-            placement="bottom"
-          >
-            <IconButton
-              className="fa fa-floppy-o"
-              onClick={this.handleSaveInitialSession}
-            />
-          </Tooltip>
-          : null
-        }
-        <Tooltip
-          overlay="Find"
-          placement="bottom"
-        >
-          <IconButton
-            className="fa fa-search"
-            onClick={() => actions.session.modalOpen(<Finder />)}
-          />
-        </Tooltip>
-        <Tooltip
-          overlay="Link"
-          placement="bottom"
-        >
-          <IconButton
-            className="fa fa-link"
-            onClick={this.handlePageLinkClick}
-          />
-        </Tooltip>
-      </div>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton className={classes.menuButton} color="contrast" aria-label="Menu">
+            <MenuIcon />
+          </IconButton>
+          <Typography type="title" color="inherit">
+            {name}
+          </Typography>
+        </Toolbar>
+      </AppBar>
     );
   },
 });
