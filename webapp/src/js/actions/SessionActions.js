@@ -38,10 +38,17 @@ let SessionActions = {
     this.dispatch(SESSION.POPUP_CLOSE, {compId});
   },
   popupOpen(component, switchTo = true) {
-    this.dispatch(SESSION.POPUP_OPEN, {
+    if (!component) {
+      component = <EmptyTab />;
+    }
+    this.dispatch(SESSION.TAB_OPEN, {
       component: serialiseComponent(component),
       switchTo
     });
+    // this.dispatch(SESSION.POPUP_OPEN, {
+    //   component: serialiseComponent(component),
+    //   switchTo
+    // });
   },
   popupFocus(compId) {
     this.dispatch(SESSION.POPUP_FOCUS, {compId});
