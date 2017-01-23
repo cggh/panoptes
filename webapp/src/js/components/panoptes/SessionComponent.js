@@ -21,6 +21,12 @@ let SessionComponent = React.createClass({
       (nextState.component !== this.state.component);
   },
 
+  getDefaultProps() {
+    return {
+      updateTitleIcon: () => null
+    }
+  },
+
   componentWillMount() {
     //Store this so that we can access changes without render.
     this.updateTitleIcon =

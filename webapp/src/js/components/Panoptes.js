@@ -30,6 +30,8 @@ import {
   blue500, blue700,
   pinkA200,
 } from 'material-ui/styles/colors';
+import AppBar from 'material-ui/AppBar';
+
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
 
@@ -105,48 +107,10 @@ let Panoptes = React.createClass({
             </div>
             <div className="page">
               <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
-              <div className="body">
-                <TabbedArea activeTab={tabs.get('selectedTab')}
-                            unclosableTabs={tabs.get('unclosableTabs')}
-                            unreplaceableTabs={tabs.get('unreplaceableTabs')}
-                            onSwitch={actions.tabSwitch}
-                            onClose={actions.tabClose}
-                            onAddTab={actions.tabOpen}
-                            onDragAway={actions.tabPopOut}
-                >
-                  {tabs.get('components').map((compId) =>
-                      <TabPane
-                        compId={compId}
-                        key={compId}>
-                        <SessionComponent compId={compId} />
-                      </TabPane>
-                  ).toArray()}
-                </TabbedArea>
+              <div className="body scroll-within">
+                  <SessionComponent compId={tabs.get('selectedTab')} />
               </div>
             </div>
-            <Popups>
-              {popups.get('components').map((compId) => {
-                let state = popups.getIn(['state', compId]);
-                let {x, y} = state.get('position', Map()).toJS();
-                let {width, height} = state.get('size', Map()).toJS();
-                return (
-                  <Popup
-                    initialX={x}
-                    initialY={y}
-                    initialWidth={width}
-                    initialHeight={height}
-                    compId={compId}
-                    key={compId}
-                    onMoveStop={actions.popupMove.bind(this, compId)}
-                    onResizeStop={actions.popupResize.bind(this, compId)}
-                    onClose={actions.popupClose.bind(this, compId)}
-                    onMaximise={actions.popupToTab.bind(this, compId)}
-                    onClick={actions.popupFocus.bind(this, compId)}>
-                    <SessionComponent compId={compId} />
-                  </Popup>
-                );
-              }).toArray()}
-            </Popups>
             <Modal visible={modal ? true : false}
                    onClose={actions.modalClose}>
               {modal ?
@@ -199,38 +163,66 @@ let Header = React.createClass({
   render() {
     let {dataset, name, logo} = this.props;
     let actions = this.getFlux().actions;
-    const userId = this.config.user.id;
-    // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
+    // const userId = this.config.user.id;
+    // // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
+    // return (
+    //   <div className="header">
+    //     <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
+    //     <div className="username">
+    //       { this.config.cas.service ? (userId == 'anonymous' ?
+    //         <a href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
+    //         : <span>
+    //            {userId}
+    //            <a className="logout" href={this.config.cas.logout}>logout</a>
+    //          </span>) : null
+    //       }
+    //     </div>
+    //     <img className="logo" src={logo}/>
+    //     {this.config.user.isManager ?
+    //       <IconButton tooltip="Set current state as initial view for all users"
+    //                   iconClassName="fa fa-floppy-o"
+    //                   onClick={this.handleSaveInitialSession}
+    //       /> : null}
+    //
+    //     <IconButton tooltip="Find"
+    //                 iconClassName="fa fa-search"
+    //                 onClick={() => actions.session.modalOpen(<Finder />)}
+    //     />
+    //     <IconButton
+    //       tooltip="Link"
+    //       iconClassName="fa fa-link"
+    //       onClick={this.handlePageLinkClick}
+    //     />
+    //   </div>
     return (
-      <div className="header">
-        <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
-        <div className="username">
-          { this.config.cas.service ? (userId == 'anonymous' ?
-            <a href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
-            : <span>
-               {userId}
-               <a className="logout" href={this.config.cas.logout}>logout</a>
-             </span>) : null
-          }
-        </div>
-        <img className="logo" src={logo}/>
-        {this.config.user.isManager ?
-          <IconButton tooltip="Set current state as initial view for all users"
-                      iconClassName="fa fa-floppy-o"
-                      onClick={this.handleSaveInitialSession}
-          /> : null}
-
-        <IconButton tooltip="Find"
-                    iconClassName="fa fa-search"
-                    onClick={() => actions.session.modalOpen(<Finder />)}
-        />
-        <IconButton
-          tooltip="Link"
-          iconClassName="fa fa-link"
-          onClick={this.handlePageLinkClick}
-        />
-      </div>
+      <AppBar
+        title={name}
+        iconClassNameRight="muidocs-icon-navigation-expand-more"
+      />
     );
+    // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
+    // return (
+    //   <div className="header">
+    //     <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
+    //     <div className="username">{userID}</div>
+    //     <img className="logo" src={logo}/>
+    //     {this.config.user.isManager ?
+    //       <IconButton tooltip="Set current state as initial view for all users"
+    //                   iconClassName="fa fa-floppy-o"
+    //                   onClick={this.handleSaveInitialSession}
+    //       /> : null}
+    //
+    //     <IconButton tooltip="Find"
+    //                 iconClassName="fa fa-search"
+    //                 onClick={() => actions.session.modalOpen(<Finder />)}
+    //     />
+    //     <IconButton
+    //       tooltip="Link"
+    //       iconClassName="fa fa-link"
+    //       onClick={this.handlePageLinkClick}
+    //     />
+    //   </div>
+    // );
   }
 });
 
