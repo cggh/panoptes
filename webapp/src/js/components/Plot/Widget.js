@@ -1,6 +1,7 @@
 import React from 'react';
-import Plotly from 'react-plotlyjs';
-
+import createPlotlyComponent from 'react-plotlyjs';
+import Plotly from 'plotly.js/dist/plotly-cartesian';
+const PlotlyComponent = createPlotlyComponent(Plotly);
 import _reduce from 'lodash/reduce';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -73,7 +74,7 @@ let Plot = React.createClass({
           this.setState(size);
         }}
       >
-        <Plotly
+        <PlotlyComponent
           className="plot"
           data={plotData}
           layout={layout}
