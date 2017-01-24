@@ -153,9 +153,11 @@ if (dataset) {
       storeState = _debounce(storeState, 250);
       stores.SessionStore.on('change', storeState);
 
+      //Replace our current navigation point with one with a state.
+      history.replace(history.location.pathname, appState);
       history.listen((location, action) => {
         if (action === 'POP') {
-          let newState = Immutable.fromJS((location.state ? location.state.session : null) || getDatasetAndStateUID(location.pathname).session);
+          let newState = Immutable.fromJS((location.state ? location.state.session : {}));
           if (!newState.equals(stores.SessionStore.state)) {
             stores.SessionStore.state = newState;
             backbutton = true;

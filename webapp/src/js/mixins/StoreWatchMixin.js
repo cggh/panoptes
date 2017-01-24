@@ -1,4 +1,4 @@
-import _bind from 'lodash/bind';
+import _each from 'lodash/forEach';
 
 let StoreWatchMixin = function() {
   let storeNames = Array.prototype.slice.call(arguments);
@@ -8,21 +8,28 @@ let StoreWatchMixin = function() {
         let namePart = this.constructor.displayName ? ' of ' + this.constructor.displayName : '';
         throw new Error('Could not find flux on this.props or this.context' + namePart);
       }
-      let flux = this.props.flux || (this.context && this.context.flux);
-      storeNames.forEach(_bind(function(store) {
-        flux.store(store).on('change', this._setStateFromFlux);
-      }, this));
+
+      let flux = this.props.flux || this.context.flux;
+      this.mounted = true;
+
+      // No autobinding in ES6 classes
+      this._setStateFromFlux = function() {
+        if(this.mounted) {
+          this.setState(this.getStateFromFlux());
+        }
+      }.bind(this);
+
+      _each(storeNames, function(store) {
+        flux.store(store).on("change", this._setStateFromFlux);
+      }.bind(this));
     },
 
     componentWillUnmount: function() {
-      let flux = this.props.flux || (this.context && this.context.flux);
-      storeNames.forEach(_bind(function(store) {
-        flux.store(store).removeListener('change', this._setStateFromFlux);
-      }, this));
-    },
-
-    _setStateFromFlux: function() {
-      this.setState(this.getStateFromFlux());
+      let flux = this.props.flux || this.context.flux;
+      this.mounted = false;
+      _each(storeNames, function(store) {
+        flux.store(store).removeListener("change", this._setStateFromFlux);
+      }.bind(this));
     },
 
     getInitialState: function() {
