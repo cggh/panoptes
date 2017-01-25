@@ -1,4 +1,4 @@
-import d3 from 'd3';
+import {pie} from 'd3-shape';
 import React from 'react';
 
 // Mixins
@@ -57,8 +57,8 @@ let PieChart = React.createClass({
       }
     }
 
-    let pie = d3.layout.pie().sort(null);
-    let arcDescriptors = pie(pieData);
+    let pieChart = pie().sort(null);
+    let arcDescriptors = pieChart(pieData);
 
     let sectors = sectorsData.map((sectorData, i) =>
         <PieChartSector

@@ -2,7 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import tickWidth from 'panoptes/TickWidth';
 
-import d3 from 'd3';
+import {scaleLinear} from 'd3-scale';
 
 const HEIGHT = 40;
 
@@ -43,7 +43,7 @@ let GenomeScale = React.createClass({
     let {start, end, width, sideWidth} = this.props;
     const canvas = this.refs.canvas;
 
-    let scale = d3.scale.linear().domain([start, end]).range([0, width - sideWidth]);
+    let scale = scaleLinear().domain([start, end]).range([0, width - sideWidth]);
 
     //Make a small tick be close to this many pixels:
     let SMALL_TICK = 50;

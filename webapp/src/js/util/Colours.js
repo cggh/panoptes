@@ -1,5 +1,6 @@
 
-import d3 from 'd3';
+import {scaleOrdinal, scaleLinear} from 'd3-scale';
+import {interpolateHcl} from 'd3-interpolate';
 
 let exisitingScales = {};
 
@@ -33,15 +34,15 @@ export const scaleColours = [
 
 export function categoryColours(identifier) {
   if (!exisitingScales[identifier])
-    exisitingScales[identifier] = d3.scale.ordinal().range(colours);
+    exisitingScales[identifier] = scaleOrdinal().range(colours);
   return exisitingScales[identifier];
 }
 
 export function scaleColour(domain) {
-  return d3.scale.linear()
+  return scaleLinear()
     .domain(domain)  // min/max of data
     .range(scaleColours)
-    .interpolate(d3.interpolateHcl);
+    .interpolate(interpolateHcl);
 }
 
 export function booleanColours() {

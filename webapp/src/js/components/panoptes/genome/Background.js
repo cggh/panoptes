@@ -2,7 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import tickWidth from 'panoptes/TickWidth.js';
 
-import d3 from 'd3';
+import {scaleLinear} from 'd3-scale';
 
 
 let Background = React.createClass({
@@ -35,7 +35,7 @@ let Background = React.createClass({
     let {start, end, width, height, sideWidth} = this.props;
     const canvas = this.refs.canvas;
 
-    let scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
+    let scale = scaleLinear().domain([start, end]).range([sideWidth, width]);
 
     //Make a small tick be close to this many pixels:
     let SMALL_TICK = 50;

@@ -310,7 +310,7 @@ let PivotTableView = React.createClass({
                 if (valueColours && rowHeading !== '_all_') {
                   let col = valueColours[rowHeading] || valueColours['_other_'];
                   if (col) {
-                    background = Color(col).lighten(0.3).rgbString();
+                    background = Color(col).lighten(0.3).string();
                   }
                 }
 
@@ -344,7 +344,7 @@ let PivotTableView = React.createClass({
               if (valueColours && columnHeading !== '_all_') {
                 let col = valueColours[columnHeading] || valueColours['_other_'];
                 if (col) {
-                  background = Color(col).lighten(0.3).rgbString();
+                  background = Color(col).lighten(0.3).string();
                 }
               }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import d3 from 'd3';
+
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -512,7 +512,7 @@ let TableMarkersLayer = React.createClass({
       );
       let lengthRatio = this.lastLengthRatio || 1;
       if (pieAreaSum > 0) {
-        lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
+        lengthRatio = Math.sqrt(0.3 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(clusterMarkers, (marker) => marker.radius = marker.originalRadius * lengthRatio);

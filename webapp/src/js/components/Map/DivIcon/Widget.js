@@ -14,27 +14,27 @@ export default class DivIcon extends MapLayer {
     zIndexOffset: PropTypes.number,
   }
 
-  componentWillMount() {
-    super.componentWillMount();
-    const {position, ...props} = this.props;
-    this.icon = new LeafletDivIcon(props);
-    this.leafletElement = marker(position, {icon: this.icon,  ...props});
-    this.leafletElement.on('add', this.renderContent.bind(this));
-    this.leafletElement.on('remove', this.removeContent.bind(this));
+  createLeafletElement(props) {
+    const {position, ...otherProps} = props;
+    this.icon = new LeafletDivIcon(otherProps);
+    let leafletElement = marker(position, {icon: this.icon,  ...otherProps});
+    leafletElement.on('add', this.renderContent.bind(this));
+    leafletElement.on('remove', this.removeContent.bind(this));
+    return leafletElement;
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.position !== prevProps.position) {
-      this.leafletElement.setLatLng(this.props.position);
+  updateLeafletElement(prevProps, props) {
+    if (props.position !== prevProps.position) {
+      this.leafletElement.setLatLng(props.position);
     }
-    if (this.props.zIndexOffset !== prevProps.zIndexOffset) {
-      this.leafletElement.setZIndexOffset(this.props.zIndexOffset);
+    if (props.zIndexOffset !== prevProps.zIndexOffset) {
+      this.leafletElement.setZIndexOffset(props.zIndexOffset);
     }
-    if (this.props.opacity !== prevProps.opacity) {
-      this.leafletElement.setOpacity(this.props.opacity);
+    if (props.opacity !== prevProps.opacity) {
+      this.leafletElement.setOpacity(props.opacity);
     }
-    if (this.props.draggable !== prevProps.draggable) {
-      if (this.props.draggable) {
+    if (props.draggable !== prevProps.draggable) {
+      if (props.draggable) {
         this.leafletElement.dragging.enable();
       } else {
         this.leafletElement.dragging.disable();

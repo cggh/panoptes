@@ -7,7 +7,7 @@ import _has from 'lodash/has';
 import _forEach from 'lodash/forEach';
 import _head from 'lodash/head';
 import _keys from 'lodash/keys';
-import d3 from 'd3';
+import {scaleLinear} from 'd3-scale';
 import scrollbarSize from 'scrollbar-size';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import normalizeWheel from 'normalize-wheel';
@@ -254,7 +254,7 @@ let GenomeBrowser = React.createClass({
 
     let {width, height, springConfig} = this.state;
     width = Math.max(0, width - scrollbarSize());
-    this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
+    this.scale = scaleLinear().domain([start, end]).range([sideWidth, width]);
     let pixelWidth = (end - start) / (width - sideWidth);
     //Animate by middle and width for better experience
     let initTargetPos = {
