@@ -338,7 +338,6 @@ let TableMarkersLayer = React.createClass({
               position={{lat: marker.lat, lng: marker.lng}}
               title={title}
               onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
-              opacity={0.8}
               zIndexOffset={markersCount}
             >
               <svg height="12" width="12">
@@ -501,7 +500,7 @@ let TableMarkersLayer = React.createClass({
       );
       let lengthRatio = this.lastLengthRatio || 1;
       if (pieAreaSum > 0) {
-        lengthRatio = Math.sqrt(0.3 / (pieAreaSum / pixelArea));
+        lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(clusterMarkers, (marker) => marker.radius = marker.originalRadius * lengthRatio);
@@ -586,7 +585,6 @@ let TableMarkersLayer = React.createClass({
                             key={'ComponentMarker_' + i}
                             position={{lat: marker.lat, lng: marker.lng}}
                             onClick={(e) => this.handleClickClusterMarker(e, onClickPayload)}
-                            opacity={0.8}
                             zIndexOffset={0}
                           >
                             {clusterComponent}

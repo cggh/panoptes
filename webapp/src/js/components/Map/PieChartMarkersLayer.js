@@ -270,7 +270,6 @@ let PieChartMarkersLayer = React.createClass({
                         key={i}
                         position={{lat: marker.lat, lng: marker.lng}}
                         onClick={(e) => this.handleClickMarker(e, marker)}
-                        opacity={0.9}
                       >
                         <PieChart
                           chartData={marker.chartData}
