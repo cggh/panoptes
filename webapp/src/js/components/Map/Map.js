@@ -9,7 +9,7 @@ import filterChildren from 'util/filterChildren';
 // Panoptes components
 import DetectResize from 'utils/DetectResize';
 import Loading from 'ui/Loading';
-import TileLayer from 'Map/TileLayer/Widget';
+import TileLayer from 'Map/TileLayer';
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
@@ -80,7 +80,7 @@ let Map = React.createClass({
     center: React.PropTypes.object,
     children: React.PropTypes.node,
     customControls: React.PropTypes.array,
-    setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
+    setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when component is in templates
     onChange: React.PropTypes.func,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number
@@ -230,8 +230,8 @@ let Map = React.createClass({
           });
         }
 
-        // NB: this.props.setProps is not available when the widget is mounted via a template (when it's not session-bound)
-        // Also, this.props.setProps is not available when the widget is mounted through DataItem/Actions
+        // NB: this.props.setProps is not available when the component is mounted via a template (when it's not session-bound)
+        // Also, this.props.setProps is not available when the component is mounted through DataItemActions
 
         if (this.props.setProps !== undefined) {
           this.props.setProps({center: newCenter, zoom: newZoom});
@@ -260,10 +260,6 @@ let Map = React.createClass({
       zoom = 0;
     }
 
-    // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
-    // TODO: Turn this into a class for all widgets.
-    let widgetStyle = {height: '100%'};
-
     // NB: JSX children will overwrite the passed prop, if any.
     // https://github.com/facebook/flow/issues/1355
 
@@ -277,7 +273,7 @@ let Map = React.createClass({
       center: center,
       loadingControl: true,
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
-      style: widgetStyle,
+      style: {height: '100%'},
       ref: (ref) => this.map = ref,
       zoom: zoom,
       zoomAnimation: false
@@ -404,8 +400,8 @@ let Map = React.createClass({
 
     return (
       <DetectResize onResize={this.handleDetectResize}>
-        <div style={widgetStyle}>
-          <div style={widgetStyle}>
+        <div style={{height: '100%'}}>
+          <div style={{height: '100%'}}>
             {mapComponent}
           </div>
           <Loading status={loadStatus}/>

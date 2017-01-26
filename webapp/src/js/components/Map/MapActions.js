@@ -21,20 +21,20 @@ import SelectField from 'material-ui/SelectField';
 import TextField from 'material-ui/TextField';
 
 // Panoptes
-import BaseLayer from 'Map/BaseLayer/Widget';
+import BaseLayer from 'Map/BaseLayer';
 import FilterButton from 'panoptes/FilterButton';
 import Icon from 'ui/Icon';
-import ImageOverlay from 'Map/ImageOverlay/Widget';
-import LayersControl from 'Map/LayersControl/Widget';
-import Map from 'Map/Widget';
-import Overlay from 'Map/Overlay/Widget';
+import ImageOverlay from 'Map/ImageOverlay';
+import LayersControl from 'Map/LayersControl';
+import Map from 'Map/Map';
+import Overlay from 'Map/Overlay';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import SidebarHeader from 'ui/SidebarHeader';
 import SQL from 'panoptes/SQL';
-import TableMap from 'Map/Table/Widget';
-import TableMarkersLayer from 'Map/TableMarkersLayer/Widget';
-import TileLayer from 'Map/TileLayer/Widget';
+import TableMap from 'Map/Table';
+import TableMarkersLayer from 'Map/TableMarkersLayer';
+import TileLayer from 'Map/TileLayer';
 import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
 

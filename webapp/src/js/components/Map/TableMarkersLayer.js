@@ -18,15 +18,15 @@ import _size from 'lodash/size';
 // Panoptes
 import API from 'panoptes/API';
 import CalcMapBounds from 'util/CalcMapBounds';
-import ComponentMarker from 'Map/ComponentMarker/Widget';
+import ComponentMarker from 'Map/ComponentMarker';
 import ErrorReport from 'panoptes/ErrorReporter';
-import FeatureGroup from 'Map/FeatureGroup/Widget';
+import FeatureGroup from 'Map/FeatureGroup';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';
 import GeoLayouter from 'utils/GeoLayouter';
 import Polyline from 'Map/Polyline';
-import PieChart from 'Chart/Pie/Widget';
+import PieChart from 'PieChart';
 import DataTableView from 'panoptes/DataTableView';
 import ListWithActions from 'containers/ListWithActions';
 import Histogram from 'Histogram';
@@ -301,7 +301,7 @@ let TableMarkersLayer = React.createClass({
       markerColourPropertyIsCategorical = this.config.tablesById[table].propertiesById[markerColourProperty].isCategorical;
     }
 
-    let singleMarkerWidgets = [];
+    let singleMarkerComponents = [];
     let clusterMarkers = [];
 
     const locationsCount = Object.keys(markersGroupedByLocation).length;
@@ -320,7 +320,7 @@ let TableMarkersLayer = React.createClass({
           // NB: Don't give highlighted markers the default colour,
           // because it might lose its highlighted-ness amongst other (non-highlighted) default-coloured markers.
 
-          singleMarkerWidgets.push(
+          singleMarkerComponents.push(
             <ComponentMarker
               key={location}
               position={{lat: marker.lat, lng: marker.lng}}
@@ -343,7 +343,7 @@ let TableMarkersLayer = React.createClass({
             }
           }
 
-          singleMarkerWidgets.push(
+          singleMarkerComponents.push(
             <ComponentMarker
               key={title}
               position={{lat: marker.lat, lng: marker.lng}}
@@ -621,7 +621,7 @@ let TableMarkersLayer = React.createClass({
             }
           </GeoLayouter>
           <FeatureGroup
-            children={singleMarkerWidgets}
+            children={singleMarkerComponents}
             layerContainer={layerContainer}
             map={map}
           />
@@ -630,7 +630,7 @@ let TableMarkersLayer = React.createClass({
     } else {
       return (
         <FeatureGroup
-          children={singleMarkerWidgets}
+          children={singleMarkerComponents}
           layerContainer={layerContainer}
           map={map}
         />

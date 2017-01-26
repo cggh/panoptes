@@ -1,7 +1,7 @@
 import React from 'react';
 import Constants from '../constants/Constants';
 import DataItemViews from 'panoptes/DataItemViews';
-import DataItem from 'components/DataItem/Widget';
+import DataItem from 'components/DataItem';
 import serialiseComponent from 'util/serialiseComponent';
 const SESSION = Constants.SESSION;
 

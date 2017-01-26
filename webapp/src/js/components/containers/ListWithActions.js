@@ -19,7 +19,7 @@ import Alert from 'ui/Alert';
 // Panoptes
 import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
-import DataItem from 'DataItem/Widget';
+import DataItem from 'DataItem';
 import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import DataItemViews from 'panoptes/DataItemViews';

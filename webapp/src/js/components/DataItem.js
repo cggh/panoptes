@@ -10,7 +10,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 // UI components
 import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
-import DataItemActions from 'DataItem/Actions';
+import DataItemActions from 'DataItemActions';
 
 let DataItem = React.createClass({
 

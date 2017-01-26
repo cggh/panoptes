@@ -1,5 +1,5 @@
 import React from 'react';
-import DivIcon from 'Map/DivIcon/Widget';
+import DivIcon from 'Map/DivIcon';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';

@@ -5,10 +5,10 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import Map from 'Map/Widget';
+import Map from 'Map/Map';
 import SQL from 'panoptes/SQL';
-import TileLayer from 'Map/TileLayer/Widget';
-import TableMarkersLayer from 'Map/TableMarkersLayer/Widget';
+import TileLayer from 'Map/TileLayer';
+import TableMarkersLayer from 'Map/TableMarkersLayer';
 
 // NB: This is a void component; no children allowed.
 // Although, the components returned by this component may have children.
@@ -83,17 +83,13 @@ let TableMap = React.createClass({
       return null;
     }
 
-    // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
-    // TODO: Turn this into a class for all widgets.
-    let widgetStyle = {height: '100%'};
-
     return (
       <Map
         center={center}
         customControls={customControls}
         setProps={setProps}
         onChange={onChange}
-        style={widgetStyle}
+        style={{height: '100%'}}
         zoom={zoom}
       >
         <TileLayer />

@@ -34,7 +34,7 @@ import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import FilterButton from 'panoptes/FilterButton';
 import PivotTableWithActions from 'containers/PivotTableWithActions';
-import PlotTableWithActions from 'components/Plot/Table/Actions';
+import TablePlotActions from 'components/TablePlotActions';
 
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -341,7 +341,7 @@ let DataTableWithActions = React.createClass({
         />
         <FlatButton label="Plot Table"
                     primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen(<PlotTableWithActions table={table} query={dataTableQuery}/>, true)}
+                    onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
                     icon={<Icon fixedWidth={true} name="bar-chart" />}
         />
       </div>
