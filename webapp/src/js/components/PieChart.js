@@ -6,7 +6,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import PieChartSector from 'Chart/Pie/Sector/Widget';
+import PieChartSector from 'PieChartSector';
 
 let PieChart = React.createClass({
 

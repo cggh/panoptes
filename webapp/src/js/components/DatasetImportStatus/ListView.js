@@ -8,7 +8,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 // Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-import DatasetImportStatusItemView from 'Dataset/ImportStatus/ItemView';
+import DatasetImportStatusItemView from 'DatasetImportStatus/ItemView';
 
 // UI components
 import Loading from 'ui/Loading';

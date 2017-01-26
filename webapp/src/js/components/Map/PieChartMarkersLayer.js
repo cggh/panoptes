@@ -8,13 +8,13 @@ import FluxMixin from 'mixins/FluxMixin';
 // Panoptes
 import API from 'panoptes/API';
 import CalcMapBounds from 'util/CalcMapBounds';
-import ComponentMarker from 'Map/ComponentMarker/Widget';
+import ComponentMarker from 'Map/ComponentMarker';
 import ErrorReport from 'panoptes/ErrorReporter';
-import FeatureGroup from 'Map/FeatureGroup/Widget';
+import FeatureGroup from 'Map/FeatureGroup';
 import Polyline from 'Map/Polyline';
 import GeoLayouter from 'utils/GeoLayouter';
 import LRUCache from 'util/LRUCache';
-import PieChart from 'Chart/Pie/Widget';
+import PieChart from 'PieChart';
 
 // Lodash
 import _sumBy from 'lodash/sumBy';

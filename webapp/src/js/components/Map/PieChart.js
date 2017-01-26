@@ -4,10 +4,10 @@ import React from 'react';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import Map from 'Map/Widget';
-import FeatureGroup from 'Map/FeatureGroup/Widget';
-import TileLayer from 'Map/TileLayer/Widget';
-import PieChartMarkersLayer from 'Map/PieChartMarkersLayer/Widget';
+import Map from 'Map/Map';
+import FeatureGroup from 'Map/FeatureGroup';
+import TileLayer from 'Map/TileLayer';
+import PieChartMarkersLayer from 'Map/PieChartMarkersLayer';
 
 let PieChartMap = React.createClass({
 
@@ -48,7 +48,7 @@ let PieChartMap = React.createClass({
       zoom,
     } = this.props;
 
-    // NB: The table prop is passed by Panoptes, e.g. DataItem/Widget
+    // NB: The table prop is passed by Panoptes, e.g. DataItem
     // The chartDataTable prop is named to distinguish it from the locationDataTable.
     // Either "table" or "chartDataTable" can be used in templates,
     // with chartDataTable taking preference when both are specfied.
@@ -56,15 +56,11 @@ let PieChartMap = React.createClass({
       chartDataTable = table;
     }
 
-    // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
-    // TODO: Turn this into a class for all widgets.
-    let widgetStyle = {height: '100%'};
-
     return (
       <Map
         center={center}
         setProps={setProps}
-        style={widgetStyle}
+        style={{height: '100%'}}
         zoom={zoom}
       >
         <FeatureGroup>

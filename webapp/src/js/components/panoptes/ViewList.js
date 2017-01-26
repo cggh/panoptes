@@ -13,9 +13,9 @@ import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
 import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
 import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 
-import DatasetManagerActions from 'Dataset/Manager/Actions';
-import PlotWithActions from 'Plot/Table/Actions';
-import MapActions from 'Map/Actions';
+import DatasetManagerActions from 'DatasetManagerActions';
+import TablePlotActions from 'TablePlotActions';
+import MapActions from 'Map/MapActions';
 import TreeWithActions from 'containers/TreeWithActions';
 
 let ViewList = React.createClass({
@@ -72,7 +72,7 @@ let ViewList = React.createClass({
                     innerDivStyle={{opacity: hasShowableTables ? 'inherit' : 0.5}}
                     secondaryText={hasShowableTables ? 'View table data graphically' : 'No table data to plot'}
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
-                    onClick={hasShowableTables ? (e) => this.handleOpen(e, <PlotWithActions />) : () => null}/>
+                    onClick={hasShowableTables ? (e) => this.handleOpen(e, <TablePlotActions />) : () => null}/>
           <ListItem primaryText="Map Composer"
                     disabled={!(hasShowableGeoCoordTables || hasMapLayers)}
                     innerDivStyle={{opacity: (hasShowableGeoCoordTables || hasMapLayers) ? 'inherit' : 0.5}}

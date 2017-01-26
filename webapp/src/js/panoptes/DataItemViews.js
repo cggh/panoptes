@@ -1,10 +1,10 @@
 import React from 'react';
-import Overview from 'Overview/Widget';
-import TableMap from 'Map/Table/Widget';
-import PieChartMap from 'Map/Chart/Pie/Widget';
-import FieldList from 'FieldList/Widget';
-import PropertyGroup from 'PropertyGroup/Widget';
-import Template from 'Template/Widget';
+import Overview from 'Overview';
+import TableMap from 'Map/Table';
+import PieChartMap from 'Map/PieChart';
+import FieldList from 'FieldList';
+import PropertyGroup from 'PropertyGroup';
+import Template from 'Template';
 
 function getViews(dataItemViews, hasGeoCoord) {
   /*eslint-disable react/display-name */

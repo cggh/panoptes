@@ -24,7 +24,7 @@ import PropertySelector from 'panoptes/PropertySelector';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
-import TablePlot from 'Plot/Table/Widget';
+import TablePlot from 'TablePlot';
 import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';

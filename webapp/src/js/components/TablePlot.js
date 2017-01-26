@@ -5,7 +5,7 @@ import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
 import _pickBy from 'lodash/pickBy';
 
-import Plot from 'Plot/Widget';
+import Plot from 'Plot';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
