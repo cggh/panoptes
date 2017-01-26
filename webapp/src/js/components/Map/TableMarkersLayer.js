@@ -27,7 +27,7 @@ import {propertyColour} from 'util/Colours';
 import GeoLayouter from 'utils/GeoLayouter';
 import Polyline from 'Map/Polyline';
 import PieChart from 'PieChart';
-import DataTableView from 'panoptes/DataTableView';
+import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';
 import Histogram from 'Histogram';
 import {scaleColour} from 'util/Colours';
@@ -102,25 +102,14 @@ let TableMarkersLayer = React.createClass({
     if (this.config.tablesById[table].listView) {
       this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
     } else {
-
-      // Don't show a table that has no showable columns.
-      let showableColumns = _map(_filter(this.config.tablesById[table].properties, (prop) => prop.showByDefault && prop.showInTable), (prop) => prop.id);
-
-      if (showableColumns instanceof Array && showableColumns.length > 0) {
-
         let whereClause = SQL.WhereClause.AND([
           SQL.WhereClause.CompareFixed(latProperty, '=', originalLat),
           SQL.WhereClause.CompareFixed(lngProperty, '=', originalLng)
         ]);
         whereClause.isRoot = true;
         let query = SQL.WhereClause.encode(whereClause);
-
-        this.getFlux().actions.session.popupOpen(<DataTableView key={table + '_' + query} table={table} query={query} columns={showableColumns} />, switchTo);
-      }
-
-
+        this.getFlux().actions.session.popupOpen(<DataTableWithActions key={table + '_' + query} table={table} query={query}/>, switchTo);
     }
-
   },
 
   getDefinedQuery(query, table) {
