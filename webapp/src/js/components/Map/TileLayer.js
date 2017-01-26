@@ -47,11 +47,11 @@ let TileLayer = React.createClass({
   },
   getDefaultProps() {
     return {
-      attribution: '&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      attribution: '&copy <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       ext: 'png',
       maxZoom: 17,
       minZoom: 0,
-      url: location.protocol + '//{s}.tile.osm.org/{z}/{x}/{y}.png'
+      url: location.protocol + '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     };
   },
 
