@@ -93,6 +93,7 @@ let ComponentMarker = React.createClass({
         opacity={opacity}
         position={position}
         title={title}
+        iconSize={0}
         zIndexOffset={zIndexOffset}
       >
         {React.Children.only(children)}
