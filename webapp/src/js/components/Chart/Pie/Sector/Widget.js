@@ -1,5 +1,5 @@
 import React from 'react';
-import d3 from 'd3';
+import {arc} from 'd3-shape';
 
 let PieChartSector = React.createClass({
 
@@ -25,12 +25,12 @@ let PieChartSector = React.createClass({
 
     let {outerRadius, innerRadius, fillColor, arcDescriptor, title, onClick, className} = this.props;
 
-    let arc = d3.svg.arc().outerRadius(outerRadius).innerRadius(innerRadius);
+    let arcPath = arc().outerRadius(outerRadius).innerRadius(innerRadius);
 
     return (
       <g className={className} style={{fill: fillColor}} onClick={onClick}>
         <title>{title}</title>
-        <path d={arc(arcDescriptor)}></path>
+        <path d={arcPath(arcDescriptor)}></path>
       </g>
     );
   }

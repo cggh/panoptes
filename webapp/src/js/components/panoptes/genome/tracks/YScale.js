@@ -1,6 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import d3 from 'd3';
+import {scaleLinear} from 'd3-scale';
 
 let YScale = React.createClass({
   mixins: [PureRenderMixin],
@@ -30,7 +30,7 @@ let YScale = React.createClass({
   paint() {
     const {min, max, width, height} = this.props;
     const canvas = this.refs.canvas;
-    const scale = d3.scale.linear().domain([min, max]).range([height, 0]);
+    const scale = scaleLinear().domain([min, max]).range([height, 0]);
     const n = 4;
     const format = scale.tickFormat(n);
 

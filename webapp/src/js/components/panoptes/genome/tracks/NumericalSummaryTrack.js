@@ -251,7 +251,7 @@ let NumericalSummaryTrack = React.createClass({
           lastWindow = window[i];
         }
       });
-      ctx.fillStyle = Color(colour).clearer(0.9).rgbString();
+      ctx.fillStyle = Color(colour).clearer(0.9).string();
       ctx.fill();
     }
     let lastPointNull = true;
@@ -290,9 +290,9 @@ let NumericalSummaryTrack = React.createClass({
         ctx.arc(xPixel, yPixel, 2, 0, 2 * Math.PI, false);
       }
     });
-    ctx.fillStyle = Color(colour).clearer(0.8).rgbString();
+    ctx.fillStyle = Color(colour).clearer(0.8).string();
     ctx.fill();
-    ctx.strokeStyle = Color(colour).clearer(0.5).rgbString();
+    ctx.strokeStyle = Color(colour).clearer(0.5).string();
     ctx.stroke();
   },
 

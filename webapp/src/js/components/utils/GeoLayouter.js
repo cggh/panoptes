@@ -1,4 +1,4 @@
-import d3 from 'd3';
+import {forceSimulation, forceLink, forceManyBody, forceCollide} from 'd3-force';
 import React from 'react';
 
 // Lodash
@@ -33,63 +33,69 @@ let GeoLayouter = React.createClass({
     let updatedRenderNodesByKey = {};
     let updatedFixedNodesByKey = {};
     let updateLinks = [];
-    _forEach(_cloneDeep(nodes), (node) => {
+    let fixedRadius = map.project(map.unproject({y: 0, x: 10}), 0).x
+    let radiusScale = map.project(map.unproject({y: 0, x: 1}), 0).x;
+
+    _forEach(nodes, (node) => {
       let {x, y} = map.project(node, 0);
-      node.x = x;
-      node.y = y;
+      let {lat, lng} = node;
       let key = node.key;
       if (this.fixedNodesByKey[key] && this.renderNodesByKey[key]) {
-        //We've seen this node so just copy across and update it's properties
+        //We've seen this node copy across
         updatedFixedNodesByKey[key] = this.fixedNodesByKey[key];
         updatedRenderNodesByKey[key] = this.renderNodesByKey[key];
-        let {x, y, px, py, index, weight, ...others} = node;
-        _assign(updatedFixedNodesByKey[key], {x, y}); //For the fixed node just move it so the linked node gets dragged towards it
-        _assign(updatedRenderNodesByKey[key], others); //For the render node change everything but force-related quantities
+        //It's position might have changed so update the fixed node
+        _assign(updatedFixedNodesByKey[key], {x, y, fx:x, fy:y, lat, lng}); //For the fixed node just move it so the linked node gets dragged towards it
+        let clone = Object.assign({}, node);
+        delete clone.x;
+        delete clone.y;
+        delete clone.lat;
+        delete clone.lng;
+        delete clone.vx;
+        delete clone.vy;
+        delete clone.index;
+        //Don't modify the position or velocity of the render node, just copy across all other properties
+        _assign(updatedRenderNodesByKey[key], clone); //For the render node change everything but force-related quantities
       } else {
         //This node is new
-        let {x, y, lat, lng} = node;
-        updatedFixedNodesByKey[key] = {x, y, lat, lng, fixed: true};
-        node.fixed = false;
-        node.fixedNode = updatedFixedNodesByKey[key];
-        updatedRenderNodesByKey[key] = node;
+        updatedFixedNodesByKey[key] = {x, y, fx:x, fy:y, lat, lng, fixed: true};
+        updatedRenderNodesByKey[key] = Object.assign(node, {x, y, fixed: false, fixedNode: updatedFixedNodesByKey[key]})
       }
-      updateLinks.push({source: updatedFixedNodesByKey[key], target: updatedRenderNodesByKey[key]});
+      updatedFixedNodesByKey[key].collisionRadius = fixedRadius;
+      updatedRenderNodesByKey[key].collisionRadius = updatedRenderNodesByKey[key].radius * radiusScale
+      updateLinks.push({
+        source: updatedFixedNodesByKey[key],
+        target: updatedRenderNodesByKey[key],
+        distance: updatedRenderNodesByKey[key].collisionRadius + updatedFixedNodesByKey[key].collisionRadius
+      });
     });
     this.fixedNodesByKey = updatedFixedNodesByKey;
     this.renderNodesByKey = updatedRenderNodesByKey;
     this.renderNodes = _values(updatedRenderNodesByKey);
-    //Update the collision radius
-    let radiusScale = map.project(map.unproject({y: 0, x: 1}), 0).x;
-    _forEach(this.renderNodes, (node) => node.collisionRadius = node.radius * radiusScale);
-    this.force.nodes(_values(updatedFixedNodesByKey).concat(this.renderNodes));
-    this.force.links(updateLinks);
-    this.force.start();
+    let allNodes = _values(_values(updatedFixedNodesByKey)).concat(this.renderNodes);
+    this.sim.nodes(allNodes);
+    this.sim.force('link').links(updateLinks);
+    this.sim.alpha(1);
+    this.sim.restart();
   },
   // Lifecycle methods
   componentWillMount() {
     this.renderNodesByKey = {}; //Moving nodes that get rendered
-    this.fixedNodesByKey = {}; //Fixed nodes that aren't rendered but provide a restoring force to the moving nodes actual position
-    this.force = d3.layout.force();
+    this.fixedNodesByKey = {}; //Fixed nodes that aren't rendered but provide collision points to prevent nodes covering their geopositions
+    this.sim = forceSimulation()
+    // Set up force options.
+      .force("collide", forceCollide((node) => node.collisionRadius).strength(1))
+      .force("link", forceLink().distance((link) => link.distance))
+      .force("repel", forceManyBody().distanceMin(0.1).strength((node) => node.fixed ? 0 : -.30))
+    ;
+    this.updateNodes(this.props.nodes);
     // On every tick event triggered by d3's layout force, this.handleTick will be called.
     // The (x, y) of every force-applied node will be updated (potentially) on every tick.
-    this.force.on('tick', this.handleTick);
-
-    // Set up force options.
-    this.force.gravity(0); // 0 is gravityless
-    this.force.friction(0.1); // 1 is frictionless
-    this.force.linkStrength(0.9); // 1 is rigid
-    this.force.linkDistance(0); // Ideally renderNodes should be on top of fixedNodes
-    this.force.charge(0); // negative is repulsive
-
-    // TODO: .size([width, height]) according to box size
-    //let width = 1500, height = 1400;
-    //this.force.size([width, height]); // Affects the gravitational center, i.e. [ x/2, y/2 ]
-
-    this.updateNodes(this.props.nodes);
+    this.sim.on('tick', this.handleTick);
   },
 
   componentWillUnmount() {
-    this.force.stop();
+    this.sim.stop();
   },
 
   componentWillReceiveProps(nextProps) {
@@ -98,37 +104,12 @@ let GeoLayouter = React.createClass({
 
   // Event handlers
   handleTick() {
-    let q = d3.geom.quadtree(this.renderNodes);
-    _forEach(this.renderNodes, (node) => {
-      let r = node.collisionRadius + 16;
-      let nx1 = node.x - r;
-      let nx2 = node.x + r;
-      let ny1 = node.y - r;
-      let ny2 = node.y + r;
-      q.visit((quad, x1, y1, x2, y2) => {
-        if (quad.point && (quad.point !== node)) {
-          let x = node.x - quad.point.x,
-            y = node.y - quad.point.y,
-            l = Math.sqrt(x * x + y * y),
-            r = node.collisionRadius + quad.point.collisionRadius;
-          if (l < r) {
-            l = (l - r) / l * .5;
-            node.x -= x *= l * 0.15;
-            node.y -= y *= l * 0.15;
-            quad.point.x += x;
-            quad.point.y += y;
-          }
-        }
-        return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-      });
-    }
-    );
     this.forceUpdate();
   },
 
   render() {
     // NB: this.forceUpdate(), which is called by this.handleTick(), causes a re-render,
-    // in case the (x, y) of this.renderNodes has been updated by this.force() and this.detectCollisions()
+    // in case the (x, y) of this.renderNodes has been updated by this.sim() and this.detectCollisions()
 
     // Update the (lng, lat) of each renderNode using its (x, y)
     _forEach(this.renderNodes, (node) => {

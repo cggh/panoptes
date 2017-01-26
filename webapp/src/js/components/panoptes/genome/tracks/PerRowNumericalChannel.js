@@ -1,5 +1,5 @@
 import React from 'react';
-import d3 from 'd3';
+import {line, area} from 'd3-shape';
 import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
 import _debounce from 'lodash/debounce';
@@ -279,7 +279,7 @@ let PerRowNumericalTrack = React.createClass({
     let colours = {};
     primKeys.forEach((primKey, i) => {
       if (columns[primKey]) {
-        lines[primKey] = d3.svg.line()
+        lines[primKey] = line()
           .interpolate(interpolation)
           .tension(tension)
           .defined(_isFinite)
@@ -289,7 +289,7 @@ let PerRowNumericalTrack = React.createClass({
       }
     });
     //Area is turned of for now as this channel often has many tracks on top of each other.
-    //let area = d3.svg.area()
+    //let area = area()
     //  .interpolate(interpolation)
     //  .tension(tension)
     //  .defined(_isFinite)

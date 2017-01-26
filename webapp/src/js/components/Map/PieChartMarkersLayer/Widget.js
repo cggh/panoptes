@@ -248,7 +248,7 @@ let PieChartMarkersLayer = React.createClass({
     );
     let lengthRatio = this.lastLengthRatio || 1;
     if (pieAreaSum > 0) {
-      lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
+      lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea)); //Make charts cover about 15% of the map
     }
     this.lastLengthRatio = lengthRatio;
     _forEach(markers, (marker) => marker.radius = marker.originalRadius * lengthRatio);

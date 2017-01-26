@@ -1,5 +1,5 @@
 import React from 'react';
-import d3 from 'd3';
+import {scale} from 'd3-scale';
 import _isFinite from 'lodash/isFinite';
 
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -73,7 +73,7 @@ let ScaledSVGChannel = React.createClass({
       return null;
 
     let effWidth = width - sideWidth;
-    let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
+    let scale = scaleLinear().domain([start, end]).range([0, effWidth]);
     let stepWidth = (scale(end) - scale(start)) / (end - start);
     let offset = scale(0) - scale(start + 0.5);
 
