@@ -1,9 +1,7 @@
 import React from 'react';
 import {scaleLinear} from 'd3-scale';
-import {histogram, extent} from 'd3-array';
+import {histogram} from 'd3-array';
 
-import _min from 'lodash/min';
-import _max from 'lodash/max';
 import _maxBy from 'lodash/maxBy';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -28,26 +26,30 @@ let Histogram = React.createClass({
     unitNameSingle: React.PropTypes.string.isRequired,
     unitNamePlural: React.PropTypes.string.isRequired,
     valueName: React.PropTypes.string.isRequired,
-    colourScaleFunction: React.PropTypes.func
+    colourScaleFunction: React.PropTypes.func,
+    minValue: React.PropTypes.number,
+    maxValue: React.PropTypes.number
   },
 
   render() {
-    let {chartData, width, height, unitNameSingle, unitNamePlural, valueName, colourScaleFunction} = this.props;
+    let {chartData, width, height, unitNameSingle, unitNamePlural, valueName, colourScaleFunction, minValue, maxValue} = this.props;
 
     let values = chartData.map((obj) => obj.value);
-    let xScaleFunction = scaleLinear().domain(extent(values)).range([0, width]);
-    //let histogramData = histogram().bins(xScaleFunction.ticks(20))(itemValues);
+    let histogramData = histogram().domain([minValue, maxValue]).thresholds(4)(values);
 
-    let histogramData = histogram()(values);
-    let valueWidth = _min(values) < 0 ? -_min(values) + _max(values) : _min(values) + _max(values);
-    let dxScaleFunction = scaleLinear().domain([0, valueWidth]).range([0, width]);
+    let valueExpanse = minValue < 0 ? -minValue + maxValue : minValue + maxValue;
+    let dxScaleFunction = scaleLinear().domain([0, valueExpanse]).range([0, width]);
 
+    let xScaleFunction = scaleLinear().domain([minValue, maxValue]).range([0, width]);
     // NB: This is upside-down, so that highest bins will have the least height deducted.
     let yScaleFunction = scaleLinear().domain([0, _maxBy(histogramData, (d) => d.length).length]).range([height, 0]);
 
+    const transform = 'translate(-' + (width / 2) + ', -' + (height / 2) + ')';
+
     return (
-      <svg style={{background: 'white'}} width={width} height={height}>
-        <g>
+      <svg style={{overflow: 'visible'}} width={width} height={height}>
+        <g transform={transform}>
+          <rect style={{fill: 'white'}} width={width} height={height} />
           {
             histogramData.map(
               (d, i) => {
