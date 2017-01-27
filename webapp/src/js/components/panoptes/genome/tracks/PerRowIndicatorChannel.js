@@ -190,8 +190,8 @@ let PerRowIndicatorChannel = React.createClass({
       this.colourData = combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
         propertyColour(this.config.tablesById[table].propertiesById[colourProperty]));
-      this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.1).string());
-      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.3).string());
+      this.colourVals = _map(this.colourVals, (colour) => Color(colour).fade(0.1).string());
+      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).fade(0.3).string());
     } else {
       this.colourVals = null;
       this.colourData = null;
