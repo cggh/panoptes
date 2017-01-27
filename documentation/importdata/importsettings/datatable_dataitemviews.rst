@@ -67,9 +67,6 @@ This is achieved by combining information from two data tables:
 A set of properties of the current table is used to define pie sizes on all pie charts.
 For each pie and location combination there should be a property in the data table,
 containing the relative size of that specific pie
-pieChartSize
-  *Value (required).* Displayed size of the largest pie chart(only applies if *type* is PieChartMap).
-
 mapCenter
   *Block (required).* Specifies the map center in the start view(only applies if *type* is PieChartMap).
   The block can contain the following keys:
@@ -85,10 +82,6 @@ dataType
   Possible values:
 
   - ``Fraction``: .
-
-positionOffsetFraction
-  *Value (required).* An offset between the pie chart location and the actual chart,
-  used to achieve a nice (ideally non-overlapping) view(only applies if *type* is PieChartMap).
 
 locationDataTable
   *Text (required).* ID of the data table containing the locations

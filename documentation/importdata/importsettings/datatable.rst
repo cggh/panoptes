@@ -61,21 +61,14 @@ storedQueries
       *Text (required).* a display name for this query.
 
 
-maxCountQueryRecords
-  *Value.*  Default:200000.  Defines the maximum number of records that will be downloaded to the client.
-  This limit influences views that display individual data items, such as scatter plots and geographical map views.
-  If not specified, this defaults to 200,000.
-
-maxCountQueryAggregated
-  *Value.*  Default:1000000.  Defines the maximum number of records that will be queried on the server for views that present
-  data items in an aggregated way, such as histograms and bar graphs.
-  If not specified, this defaults to 1,000,000.
-
 fetchRecordCount
   *Boolean.*  Default:False.  .
 
 quickFindFields
   *PropertyIDs.* The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s).
+
+previewProperties
+  *PropertyIDs.* The list of properties that will be shown (along with the primary key) when the item is previewed such as in genome browser .
 
 disableSubsets
   *Boolean.* If set, there will be no subsets options for this data table.

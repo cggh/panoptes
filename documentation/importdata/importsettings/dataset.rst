@@ -38,4 +38,17 @@ googleAnalyticsId
 initialSessionState
   *Block.* The default tabs, popups and recently used genes and queries for a new session. Most easily set by using the save button on the header (only shown to managers).
 
+genomeBrowserChannelSets
+  *List.*  Default:[].  A list of exmaple channel configurations that will be shown on the genome browser sidebar.
+  The block can contain the following keys:
+    channels
+      *List (required).* List of serialised channels.
+
+    name
+      *Text (required).* Channel set name.
+
+    description
+      *Text (required).* Channel set description.
+
+
 

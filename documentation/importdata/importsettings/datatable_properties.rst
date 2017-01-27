@@ -114,9 +114,9 @@ browserShowOnTop
   *Boolean.* Indicates that the track will be shown in the top (non-scrolling) area of the genome browser.
   In this case, it will always be visible (only applies if *showInBrowser* is True).
 
-channelColor
-  *Text.*  Default:rgb(0,0,0).  Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``
-  (only applies if *showInBrowser* is True).
+colour
+  *Text.* Colour used to display this property. Formatted as ``"rgb(r,g,b)"`` or ``"#HHHHHH"``
+  .
 
 defaultVisible
   *Boolean.*  Default:True.  .
