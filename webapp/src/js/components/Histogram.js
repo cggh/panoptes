@@ -54,8 +54,6 @@ let Histogram = React.createClass({
             histogramData.map(
               (d, i) => {
 
-                // FIXME: chartData is sometimes initially out-of-date,
-                // e.g. Marker colour: Category ID, Marker colour: Numerical 1
                 if (isNaN(d.x0) || isNaN(d.length) || isNaN(d.x1)) {
                   return null;
                 }

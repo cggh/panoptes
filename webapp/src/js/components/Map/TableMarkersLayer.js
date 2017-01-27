@@ -123,6 +123,10 @@ let TableMarkersLayer = React.createClass({
     let {highlight, primKey, table, query, markerColourProperty} = props;
     let {changeLayerStatus} = this.context;
 
+    if (table !== this.props.table ||
+      markerColourProperty !== this.props.markerColourProperty) {
+      this.setState({markersGroupedByLocation: {}});
+    }
     changeLayerStatus({loadStatus: 'loading'});
 
     let tableConfig = this.config.tablesById[table];
