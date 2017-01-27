@@ -365,12 +365,6 @@ let TableMarkersLayer = React.createClass({
         }
 
 
-        if (Object.keys(markersGroupedByValue).length > 1) {
-
-          // If there is more than one unique marker value at this location, then:
-          //   if the markerColourPropertyIsNumerical or both numerical && categorical, then use a histogram.
-          //   otherwise if the markerColourPropertyIsCategorical or neither, then use a pie chart;
-
           if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
 
             //// Prepare a histogram
@@ -436,7 +430,6 @@ let TableMarkersLayer = React.createClass({
                 color: markersGroupedByValue[value][0].valueAsColour
               });
             }
-
             clusterMarkers.push({
               clusterType: 'pieChart',
               chartDataTable: table,
@@ -447,6 +440,7 @@ let TableMarkersLayer = React.createClass({
               chartData: markerChartData,
               table,
               primKey: markersGroupedByLocation[location][0].primKey,
+              count: markersGroupedByLocation[location].length,
               latProperty: markersGroupedByLocation[location][0].latProperty,
               lngProperty: markersGroupedByLocation[location][0].lngProperty,
               originalLat: markersGroupedByLocation[location][0].originalLat,
@@ -454,35 +448,7 @@ let TableMarkersLayer = React.createClass({
             });
 
           }
-
-        } else if (Object.keys(markersGroupedByValue).length === 1) {
-
-          // If there is only one colour, then use a cluster bubble.
-          clusterMarkers.push({
-            clusterType: 'bubble', // This is necessary due to object merging, although unused, to overwrite 'pieChart' or 'histogram', etc.
-            key: location,
-            lat: markersGroupedByLocation[location][0].lat,
-            lng: markersGroupedByLocation[location][0].lng,
-            originalRadius: Math.sqrt(markersGroupedByLocation[location].length),
-            table,
-            primKey: markersGroupedByLocation[location][0].primKey,
-            valueAsColour: markersGroupedByLocation[location][0].valueAsColour,
-            count: markersGroupedByLocation[location].length,
-            title: markersGroupedByLocation[location].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByLocation[location].map((obj) => obj.title).join(', '),
-            latProperty: markersGroupedByLocation[location][0].latProperty,
-            lngProperty: markersGroupedByLocation[location][0].lngProperty,
-            originalLat: markersGroupedByLocation[location][0].originalLat,
-            originalLng: markersGroupedByLocation[location][0].originalLng
-          });
-
-        } else {
-          console.error('Unhandled number of Object.keys(markersGroupedByValue): ' + Object.keys(markersGroupedByValue).length);
-          console.info('markersGroupedByValue: %o', markersGroupedByValue);
-          return null;
-        }
-
       }
-
     }
 
     if (clusterMarkers.length > 0) {
@@ -546,6 +512,7 @@ let TableMarkersLayer = React.createClass({
                                 originalLat={marker.originalLat}
                                 originalLng={marker.originalLng}
                                 radius={marker.radius}
+                                faceText={marker.count}
                               />
                           );
 

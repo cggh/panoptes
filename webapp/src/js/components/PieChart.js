@@ -32,12 +32,13 @@ let PieChart = React.createClass({
       hideValues: false,
       name: '',
       residualFractionName: 'Other',
-      radius: 5
+      radius: 5,
+      faceText: ''
     };
   },
 
   render() {
-    let {chartData, hideValues, name, radius} = this.props;
+    let {chartData, hideValues, name, radius, faceText} = this.props;
 
     let sectorsData = [];
     let pieData = [];
@@ -91,6 +92,7 @@ let PieChart = React.createClass({
         <g transform={'rotate(90)'}>
           {sectors}
         </g>
+        <text x="0" y="0" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{faceText}</text>
       </svg>
     );
 
