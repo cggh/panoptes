@@ -4,8 +4,8 @@ import React from 'react';
 // Lodash
 import _forEach from 'lodash/forEach';
 import _values from 'lodash/values';
-import _cloneDeep from 'lodash/cloneDeep';
 import _assign from 'lodash/assign';
+import _min from 'lodash/min';
 
 let GeoLayouter = React.createClass({
   propTypes: {
@@ -33,7 +33,7 @@ let GeoLayouter = React.createClass({
     let updatedRenderNodesByKey = {};
     let updatedFixedNodesByKey = {};
     let updateLinks = [];
-    let fixedRadius = map.project(map.unproject({y: 0, x: 10}), 0).x
+    let fixedRadius = map.project(map.unproject({y: 0, x: _min([map.getSize().x,map.getSize().y])/100}), 0).x;
     let radiusScale = map.project(map.unproject({y: 0, x: 1}), 0).x;
 
     _forEach(nodes, (node) => {
@@ -62,7 +62,7 @@ let GeoLayouter = React.createClass({
         updatedRenderNodesByKey[key] = Object.assign(node, {x, y, fixed: false, fixedNode: updatedFixedNodesByKey[key]})
       }
       updatedFixedNodesByKey[key].collisionRadius = fixedRadius;
-      updatedRenderNodesByKey[key].collisionRadius = updatedRenderNodesByKey[key].radius * radiusScale
+      updatedRenderNodesByKey[key].collisionRadius = updatedRenderNodesByKey[key].radius * radiusScale;
       updateLinks.push({
         source: updatedFixedNodesByKey[key],
         target: updatedRenderNodesByKey[key],
