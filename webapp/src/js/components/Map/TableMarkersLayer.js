@@ -424,10 +424,11 @@ let TableMarkersLayer = React.createClass({
 
           // Create a chart item (pie chart sector) for each unique marker value.
           // NB: all markers that have the same value also have the same colour.
+          // NB: the key for undefined values is the string "undefined"
           let markerChartData = [];
           for (let value in markersGroupedByValue) {
             markerChartData.push({
-              name: value + ': ' + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByValue[value].map((obj) => obj.title).join(', '),
+              name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByValue[value].map((obj) => obj.title).join(', '),
               value: markersGroupedByValue[value].length,
               color: markersGroupedByValue[value][0].valueAsColour
             });
