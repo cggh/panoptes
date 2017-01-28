@@ -24,7 +24,8 @@ let PieChart = React.createClass({
     originalLat: React.PropTypes.number,
     originalLng: React.PropTypes.number,
     radius: React.PropTypes.number,
-    hideValues: React.PropTypes.bool
+    hideValues: React.PropTypes.bool,
+    faceText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
   },
 
   getDefaultProps() {
@@ -87,12 +88,23 @@ let PieChart = React.createClass({
     //   );
     // }
 
+    const faceTextStyle = {
+      fontSize: '10px',
+      paintOrder: 'stroke',
+      stroke: 'white',
+      strokeWidth: '2px',
+      strokeOpacity: '0.4',
+      strokeLinecap: 'butt',
+      strokeLinejoin: 'miter',
+      fontWeight: 'bold'
+    };
+
     return (
       <svg style={{overflow: 'visible'}} width={radius} height={radius}>
         <g transform={'rotate(90)'}>
           {sectors}
         </g>
-        <text x="0" y="0" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{faceText}</text>
+        <text style={faceTextStyle} x="0" y="0" textAnchor="middle" alignmentBaseline="middle">{faceText}</text>
       </svg>
     );
 
