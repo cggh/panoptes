@@ -34,55 +34,51 @@ let Histogram = React.createClass({
   render() {
     let {chartData, width, height, unitNameSingle, unitNamePlural, valueName, colourScaleFunction, minValue, maxValue} = this.props;
 
-    let values = chartData.map((obj) => obj.value);
-    let histogramData = histogram().domain([minValue, maxValue]).thresholds(4)(values);
-
-    let valueExpanse = minValue < 0 ? -minValue + maxValue : minValue + maxValue;
-    let dxScaleFunction = scaleLinear().domain([0, valueExpanse]).range([0, width]);
-
-    let xScaleFunction = scaleLinear().domain([minValue, maxValue]).range([0, width]);
-    // NB: This is upside-down, so that highest bins will have the least height deducted.
-    let yScaleFunction = scaleLinear().domain([0, _maxBy(histogramData, (d) => d.length).length]).range([height, 0]);
-
-    const transform = 'translate(-' + (width / 2) + ', -' + (height / 2) + ')';
+    let histogramData = histogram()
+      .value((obj) => obj.value)
+      .domain([minValue, maxValue])
+      (chartData);
+    //D3 gives non-regular size bins at start and end so fix that here
+    if (histogramData.length > 2) {
+      let size = histogramData[1].x1 - histogramData[1].x0;
+      histogramData[0].x0 = histogramData[0].x1 - size;
+      histogramData[histogramData.length-1].x1 = histogramData[histogramData.length-1].x0 + size;
+    }
+    let xScale = scaleLinear().domain([histogramData[0].x0, histogramData[histogramData.length-1].x1]).range([0, width]);
+    let yScale = scaleLinear().domain([0, _maxBy(histogramData, (d) => d.length).length]).range([0, height]);
 
     return (
-      <svg style={{overflow: 'visible'}} width={width} height={height}>
-        <g transform={transform}>
-          <rect style={{fill: 'white'}} width={width} height={height} />
+      <svg style={{top:`${-height/2}px`, left:`${-width/2}px`}}
+           className="panoptes-histogram">
+          <rect className="panoptes-histogram-bg"
+                x={xScale.range()[0]-1} y={-1} width={1+xScale.range()[1]-xScale.range()[0]} height={height+1} />
           {
             histogramData.map(
               (d, i) => {
-
-                if (isNaN(d.x0) || isNaN(d.length) || isNaN(d.x1)) {
+                let x = d.x0;
+                let y = d.length;
+                let dx = d.x1 - d.x0;
+                if (isNaN(x) || isNaN(dx) || isNaN(y)) {
                   return null;
                 }
-
-                let scaledX = xScaleFunction(d.x0);
-                let scaledY = yScaleFunction(d.length);
-                let scaledDx = dxScaleFunction(d.x1 - d.x0);
-
                 // Use the colour from the middle of the bin range.
                 let fillColour = colourScaleFunction((d.x0 + d.x1) / 2);
-
-                return <HistogramBin
-                  x={d.x0}
-                  y={d.length}
-                  dx={d.x1 - d.x0}
-                  scaledX={scaledX}
-                  scaledY={scaledY}
-                  scaledDx={scaledDx}
-                  maxHeight={height}
-                  key={i}
-                  unitNameSingle={unitNameSingle}
-                  unitNamePlural={unitNamePlural}
-                  valueName={valueName}
-                  fillColour={fillColour}
-                />;
-              }
-            )
+                return (
+                  <HistogramBin x={xScale(x)} y={height-yScale(y)} key={i}
+                                width={xScale(dx)-xScale(0)} height={yScale(y)}
+                                fill={fillColour}
+                                title={`${y} ${y > 1 ? unitNamePlural : unitNameSingle} with ${valueName} between ${x.toFixed(2)} and ${(x + dx).toFixed(2)}`}
+                  />
+                );
+              })
           }
-        </g>
+        <line className="panoptes-histogram-axes"
+              x1={xScale.range()[0]+1} x2={xScale.range()[0]+1}
+              y1={height} y2={0} />
+        <line className="panoptes-histogram-axes"
+              x1={xScale.range()[0]} x2={xScale.range()[1]}
+              y1={height} y2={height} />
+
       </svg>
     );
 
