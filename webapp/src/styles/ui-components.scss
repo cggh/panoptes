@@ -545,6 +545,27 @@ input.invalid {
   }
 }
 
+.edit-doc-page {
+  .editor {
+    position: relative;
+    padding: 20px;
+    pre {
+      margin: 0;
+    }
+    .DraftEditor-root {
+      font-family: monospace;
+      border: 1px solid #ccc;
+      cursor: text;
+    }
+  }
+}
+
+.docpage-edit {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .table-row-cell {
   text-overflow: ellipsis;
   overflow: hidden;

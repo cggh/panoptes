@@ -23,6 +23,7 @@ let ConfigMixin = {
   _setConfigFromFlux: function() {
     let flux = this.props.flux || (this.context && this.context.flux);
     this.config = flux.store('ConfigStore').getState();
+    if (this.onConfigChange) this.onConfigChange();
     this.forceUpdate();
   }
 };

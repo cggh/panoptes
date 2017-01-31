@@ -3,8 +3,10 @@ import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
+import EditDocPage from 'panoptes/EditDocPage';
 import htmlparser from 'htmlparser2';
 import Loading from 'ui/Loading';
+import IconButton from 'material-ui/IconButton';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -36,6 +38,13 @@ let DocPage = React.createClass({
 
   componentWillMount() {
     this.titleFromHTML = 'Loading...';
+  },
+
+  onConfigChange() {
+    const {path} = this.props;
+    if (this.config.docs[path]) {
+      this.setState({loadStatus: 'loaded', content: this.config.docs[path]}, () => this.componentWillUpdate(this.props, this.state));
+    }
   },
 
   fetchData(props, requestContext) {
@@ -107,10 +116,20 @@ let DocPage = React.createClass({
   },
 
   render() {
+    const {path} = this.props;
     const {content, loadStatus} = this.state;
     const replaceSelf = this.props.replaceable ? this.props.replaceSelf : undefined;
+    const actions = this.getFlux().actions;
 
     return <div className="load-container">
+      {this.config.user.isManager ?
+        <div className="docpage-edit">
+          <IconButton tooltip="Edit"
+                    iconClassName="fa fa-edit"
+                    onClick={() => actions.session.modalOpen(<EditDocPage path={path}/>)}
+          />
+        </div>
+        : null}
       <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       <Loading status={loadStatus}/>
     </div>;

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import uuid
+
 import os
 
 import yaml
@@ -656,11 +658,12 @@ class ImportSettings:
         with portalocker.Lock(self.fileName, mode="r", timeout=5) as configfile:
             config = ruamel.yaml.load(configfile.read(), ruamel.yaml.RoundTripLoader)
             config = updateConfig(config)
-            with open(self.fileName+'_tmp', 'w') as tempfile:
+            tempFileName = self.fileName + '_tmp' + str(uuid.uuid4())
+            with open(tempFileName, 'w') as tempfile:
                 tempfile.write(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
                 tempfile.flush()
                 os.fsync(tempfile.fileno())
-            os.rename(self.fileName+'_tmp', self.fileName)
+            os.rename(tempFileName, self.fileName)
 
 
     def __getitem__(self, key):
