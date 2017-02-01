@@ -122,6 +122,7 @@ let DocPage = React.createClass({
     const actions = this.getFlux().actions;
 
     return <div className="load-container">
+      <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       {this.config.user.isManager ?
         <div className="docpage-edit">
           <IconButton tooltip="Edit"
@@ -130,7 +131,6 @@ let DocPage = React.createClass({
           />
         </div>
         : null}
-      <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       <Loading status={loadStatus}/>
     </div>;
   }

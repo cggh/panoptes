@@ -13,6 +13,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Icon from 'ui/Icon';
 
 import 'prismjs/themes/prism.css'
+import 'draft-js/dist/Draft.css'
 
 const decorator = new PrismDecorator({defaultSyntax: 'markup'});
 
