@@ -56,7 +56,7 @@ let EditDocPage = React.createClass({
 
     this.setState({
       content,
-      editorState: EditorState.createWithContent(contentState)//, decorator) Fix needed in prism
+      editorState: EditorState.createWithContent(contentState, decorator)
     });
   },
 
