@@ -1,3 +1,5 @@
+import os
+import uuid
 from os import path, listdir
 from os.path import join
 
@@ -14,7 +16,6 @@ from readChromLengths import readChromLengths
 config = PanoptesConfig(None)
 sourceDir = join(config.getSourceDataDir(), 'datasets')
 baseDir = config.getBaseDir()
-
 
 def readSetOfSettings(dirPath, loader, wanted_names=None):
     if not path.isdir(dirPath):
@@ -85,6 +86,23 @@ class ReadOnlyErrorWriter:
     def updateAndWriteBack(self, action, updatePath, newConfig, validate=True):
         raise Exception("The config at:"+'.'.join([self.name]+updatePath)+" is read-only")
 
+class DocsWriter:
+    def __init__(self, datasetId):
+        self.datasetId = datasetId
+    def updateAndWriteBack(self, action, path, content, validate=True):
+        path = '.'.join(path)
+        if action is not 'replace':
+            Exception("Method:" + action + " is not implemented for docs")
+        filename = join(baseDir, 'Docs', self.datasetId, path)
+        tempFileName = filename + '_tmp' + str(uuid.uuid4())
+        with open(tempFileName, 'w') as tempfile:
+            tempfile.write(content)
+            tempfile.flush()
+            os.fsync(tempfile.fileno())
+            os.rename(tempFileName, filename)
+        return {path: content}
+
+
 def writeJSONConfig(datasetId, action, path, newConfig):
     dataset_folder = join(sourceDir, datasetId)
     settings_file = join(dataset_folder, 'settings')
@@ -92,11 +110,12 @@ def writeJSONConfig(datasetId, action, path, newConfig):
     writers = {
         'settings': lambda path: (path, SettingsDataset(settings_file, validate=True)),
         'chromosomes': lambda path: (path, ReadOnlyErrorWriter('chromosomes')),
-        'genome': lambda path: (path, ReadOnlyErrorWriter('genome')), #For now as this will likely get a refactor
-        'mapLayers': lambda path: (path, ReadOnlyErrorWriter('mapLayers')),  # For now as this will likely get a refactor
         'tablesById': lambda path: (path[1:], SettingsDataTable(join(dataset_folder, 'datatables', path[0], 'settings'), validate=True)),
         'twoDTablesById': lambda path: (path[1:], SettingsDataTable(join(dataset_folder, '2D_datatables', path[0], 'settings'), validate=True)),
+        'genome': lambda path: (path, ReadOnlyErrorWriter('genome')), #For now as this will likely get a refactor
+        'mapLayers': lambda path: (path, ReadOnlyErrorWriter('mapLayers')),  # For now as this will likely get a refactor
+        'docs': lambda path: (path, DocsWriter(datasetId))
     }
     path = path.split('.')
     (path, writer) = writers[path[0]](path[1:])
-    writer.updateAndWriteBack(action, path, newConfig, validate=True)
+    return writer.updateAndWriteBack(action, path, newConfig, validate=True)
