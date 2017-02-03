@@ -8,6 +8,7 @@ nameBanner: Samples and Variants       # Name as it appears in the top banner of
 # This can be used to provide an explicit ordering of the data tables in the UI
 dataTables:
 - variants
+- variants_hdf5
 - samples
 - contributors
 - samplingsites

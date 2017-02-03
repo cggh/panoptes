@@ -1,7 +1,7 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-nameSingle: variant     # Display name referring to a table item (single, no capital)
-namePlural: variants    # Display name referring to a table item (plural, no capital)
+nameSingle: variant-hdf5     # Display name referring to a table item (single, no capital)
+namePlural: variants-hdf5    # Display name referring to a table item (plural, no capital)
 description: A table containing a number of genomic variants     # A description of this data table
 
 icon: fa-bookmark

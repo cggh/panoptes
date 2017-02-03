@@ -36,8 +36,6 @@ class LoadTable(threading.Thread):
         self._tableId = tableId
         self._separator = '\t'
         self._lineSeparator = '\n'
-        #Whether to use a temporary file and INSERT or LOAD FILE
-        self._bulkLoad = True
         self._createSubsets = createSubsets
         
         self._loadSettings = loadSettings
@@ -213,9 +211,8 @@ class LoadTable(threading.Thread):
                     self._parseHeader(header)
             
             #If importing x lines then we need to create a temporary file
-                    #If not bulkLoading the need to create a file with SQL INSERT statements
                     #If column lengths are not set then we need to calculate them
-                    if self._bulkLoad and self._maxLineCount <= 0 and skipParse:
+                    if self._maxLineCount <= 0 and skipParse:
                         self._log("Skipping parse of input file")
                     else:                
                         lineCount = 0
@@ -228,11 +225,7 @@ class LoadTable(threading.Thread):
                                 if len(line) > 0:
                                     #Still parse because of calculating column size
                                     writeCells = self._parseLine(line)
-                        
-                                    if self._bulkLoad == False:            
-                                        self._writeInsertLine(ofp, tableid, writeCells)
-                                    
-                                    
+
                                     lineCount += 1
                                     if lineCount % 1000000 == 0:
                                         self._log('Line '+str(lineCount))
@@ -256,12 +249,10 @@ class LoadTable(threading.Thread):
         
             if (self._maxLineCount > 0):
                 hfp.close()
-                            
-            if self._bulkLoad:
-                #Bulk load
-                if (self._maxLineCount > 0):
-                    sourceFileName = headFileName
-                    
+
+            if (self._maxLineCount > 0):
+                sourceFileName = headFileName
+
             return sourceFileName
 
                 
@@ -285,18 +276,11 @@ class LoadTable(threading.Thread):
             self._dao._execSql(self._createTable(tableid))
             
             self._log('Importing data')
-            
-            if self._bulkLoad:
-                #Bulk load
-                if (self._maxLineCount > 0):
-                    self._loadTable(sourceFileName)
-                    os.remove(sourceFileName)
-                else:
-                    self._loadTable(sourceFileName)
-            else:
-                #Import from script
-                ImpUtils.ExecuteSQLScript(self._responder, self._destFileName, databaseid)
-                os.remove(self._destFileName)           
+
+            self._loadTable(sourceFileName)
+            if (self._maxLineCount > 0):
+                os.remove(sourceFileName)
+
             
             self._addIndexes()
             

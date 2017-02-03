@@ -1,7 +1,10 @@
 import logging
 import linecache
+import os
+
 from BaseImport import BaseImport
 from LoadTable import LoadTable
+import ImpUtils
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -12,8 +15,9 @@ class ProcessDatabase(BaseImport):
         if not self._importSettings['ConfigOnly']:
             #Wait for the database loader thread to return
             self._dbloader.join()
-    
-    
+            if self._toDelete:
+                os.remove(self._toDelete)
+
             self._dbloader.printLog()
     
             if self._dbloader.status is not None:
@@ -27,8 +31,7 @@ class ProcessDatabase(BaseImport):
                 raise Exception("Database loading failed {} {} {} {}".format(filename, lineno, line.strip(), exc_obj))
 
     def importData(self, tableid, inputFile = None, createSubsets = False, loadSettings = None):
-        
-        
+
         if loadSettings is None:
             loadSettings = self._fetchSettings(tableid)
             
@@ -36,14 +39,15 @@ class ProcessDatabase(BaseImport):
             settings, data = self._getDataFiles(tableid)
         else:
             data = inputFile
-            
-                   
+
+        hdf = (data[-4:] == 'hdf5')
+        self._toDelete = None
+        if hdf:
+            data = ImpUtils.tabFileFromHDF5(loadSettings, data)
+            self._toDelete = data
         self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, loadSettings, self._importSettings, createSubsets)
-        
         if not self._importSettings['ConfigOnly']:
             self._log(("Preparing to load {} to {}.{}").format(data, self._datasetId, tableid))
             self._dbloader.start()
-            
-                
-           
+
     
