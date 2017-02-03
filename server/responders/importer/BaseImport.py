@@ -166,13 +166,19 @@ class BaseImport(object):
             self._log("Missing settings file {} from {} {} ".format(settings, self._datatablesFolder, datatable))
 #            raise Exception("Missing settings {}".format(settings))
         data = os.path.join(folder, self._dataFile)
-        if not os.path.isfile(data):
-            data1 = data + '.gz'
-            if os.path.isfile(data1):
-                self._dataFile = self._dataFile + '.gz'
+        data_gz = data + '.gz'
+        data_hdf = data + '.hdf5'
+        if not os.path.isfile(data) and os.path.isfile(data_gz):
+            self._dataFile = self._dataFile + '.gz'
+            data = data_gz
+        else:
+            if not os.path.isfile(data) and os.path.isfile(data_hdf):
+                self._dataFile = self._dataFile + '.hdf5'
+                data = data_hdf
             else:
-                self._log("Missing data file {} from {} {} ".format(data, self._datatablesFolder, datatable))
-#                raise Exception("Missing data {}".format(data))
+                if not os.path.isfile(data):
+                    self._log("Missing data file {} from {} {} ".format(data, self._datatablesFolder, datatable))
+    #                raise Exception("Missing data {}".format(data))
         
         return settings, data
     

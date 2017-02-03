@@ -1,0 +1,184 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
+nameSingle: variant-hdf5     # Display name referring to a table item (single, no capital)
+namePlural: variants-hdf5    # Display name referring to a table item (plural, no capital)
+description: A table containing a number of genomic variants     # A description of this data table
+
+icon: fa-bookmark
+
+# The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
+# Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
+primKey: SnpName
+
+sortDefault: Value1               # Specify this property as the default sort field
+
+
+# The following set of tags is used to define the items in this data table as positions on the genome
+isPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
+chromosome: chromosome            # Speficies the table column ID that contains the chromosome
+position: position                # Specifies the table column ID that contains the position on the chromosome
+
+#If the source data is in HDF5 an optional path to the group where the arrays are found can be specified
+hdfPath: variants
+
+# The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
+quickFindFields: SnpName
+previewProperties: Value1, Extra_1
+
+propertyGroups:
+- id: Info
+  name: Variant Info
+- id: AlleleFreq
+  name: Allele freqs.
+
+# The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
+# NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
+# Both mechanisms can be combined: further settings can still be specified for individual properties
+properties:
+- id: chromosome                 # Identifier of the property, corresponding to the column header in the [data] file
+  name: Chromosome               # Display name of the property
+  groupId: Info
+  description: Chromosome name   # Description of the property
+  dataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLatitude, Date
+
+- id: position
+  name: Position
+  groupId: Info
+  description: Genomic position of the variant on the chromosome (1-based)
+  dataType: Int32
+
+- id: SnpName
+  name: Variant name
+  groupId: Info
+  description: Unique name of the variant
+  dataType: Text
+  search: StartPattern          # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
+
+- id: HighQuality
+  name: High Quality
+  groupId: Info
+  description: Variant Quality filter
+  dataType: Boolean
+  tableDefaultVisible: false
+  showInBrowser: true
+  #BrowserDefaultVisible: true   # Indicates that the channel will activated by default in the genome browser
+  browserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
+
+- id: Value1, Value2, Value_three  # Common settings for groups of properties can be defined simultaneously
+  isCategorical: false
+  groupId: Info
+  index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  showInBrowser: true           # If true, this property will be displayed in the genome browser
+  decimDigits: 2                # Optional: For Value types, specifies the number of decmimal digits that should be used to display the value
+
+- id: Value1
+  name: Value 1
+  dataType: Float
+  description: The first numerical value
+  showBar: true                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
+  minVal: 0                       # Optional: For Value types, specifies the minimum value that can be reached.
+  maxVal: 1                       # Optional: For Value types, specifies the maximum value that can be reached.
+  colour: rgb(0,80,200)     # Colour used to display this property
+  browserDefaultVisible: true
+
+- id: Value2
+  name: Value 2
+  dataType: Float
+  description: The second numerical value
+  colour: rgb(200,80,0)
+
+- id: Value_three                   # NOTE: datatable file column headers can contain whitespaces, but these will be replaced by underscores during import. The identifiers in the settings files should also replace the whitespaces by underscores.
+  name: Value 3
+  dataType: Float
+  description: The third numerical value
+  browserDefaultVisible: true
+
+- id: Extra_1
+  name: Extra 1
+  groupId: Info
+  description: An example categorical property
+  dataType: Text
+  showInBrowser: true
+  valueColours:                   # Specifies display colours for the values of this property
+    A: rgb(255,128,60)
+    B: rgb(0,180,0)
+    _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
+  valueDescriptions:                # Specifies descriptions for this property
+    A: <b>OMG</b> This value is <i>A</i>. It is the first letter of the alphabet
+    B: B is boring and has only a line<br/>break
+  valueDisplays:                # Specifies descriptions for this property, not applied if externalURL is specified for this property.
+    B: :)<em>B</em>:P
+  browserDefaultVisible: true
+
+- id: NRAF_WAF, NRAF_EAF, NRAF_SAF
+  isCategorical: false
+  dataType: Float
+  groupId: AlleleFreq
+  minVal: 0
+  maxVal: 1
+
+- id: NRAF_WAF
+  description: Non-reference allele frequency in West Africa
+
+- id: NRAF_EAF
+  description: Non-reference allele frequency in East Africa
+
+- id: NRAF_SAF
+  description: Non-reference allele frequency in South Africa
+
+- id: int8
+  dataType: Int8
+  isCategorical: false
+
+- id: int16
+  dataType: Int16
+
+- id: int32
+  dataType: Int32
+
+- id: boolean
+  dataType: Boolean
+
+
+
+externalLinks:
+- url: https://www.google.co.uk/search?q={SnpName}
+  name: Google search
+
+- url: http://en.wikipedia.org/wiki/{SnpName}
+  name: Wikipedia
+
+dataItemViews:
+               # Lists the custom views that should appear in the popup for an individual datatable item
+
+- type: FieldList                                      # Specifies a list of properties to be shown
+  name: Variant properties                             # Name of the view
+  fields:
+  - chromosome                                         # List of the fields to be included
+  - position
+  - SnpName
+  - HighQuality
+  - Value1
+  - Value2
+  - Value_three
+  - Extra_1
+
+- type: PropertyGroup
+  name: Allele Frequencies
+  groupId: AlleleFreq
+
+- type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
+  name: Map                                            # Name of the view
+  mapCenter: {longitude: 10, latitude: 0}             # Start location of the map
+  dataType: Fraction                                   # Type of values used to create the pie chart
+  locationDataTable: populations                       # Datatable containing the locations (should have a Longitude & Latitude property)
+  locationSizeProperty: SampleCount                    # Property of the locations datatable containing the size of the pie chart
+  locationNameProperty: Name                           # Property of the locations datatable containing the name of the pie chart
+  componentColumns:                                    # Enumerates all the components of the pie charts, and binds them to columns (one for each component x location)
+  - pattern: NRAF_{locid}                              # Column name providing the data ({locid} will be replaced by the location primary key values)
+    name: Non-reference allele frequency               # Name of the pie
+    color: rgb(128,28,0)                               # Color of the pie
+  residualFractionName: Reference allele frequency     # Name of the residual fraction (if any)
+
+- type: Overview                                       # Specifies the default view of all fields
+  name: Overview

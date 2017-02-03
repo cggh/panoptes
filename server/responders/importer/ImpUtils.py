@@ -1,8 +1,13 @@
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-
+import numbers
 import os
+from itertools import izip, imap
+from math import isnan
+
+import h5py
+
 import config
 import uuid
 import DQXDbTools
@@ -58,8 +63,34 @@ def mkdir(name):
         if exception.errno != errno.EEXIST:
             raise
 
-
 def IsDatasetPresentInServer(credInfo, datasetId):
     control = monetdb.control.Control(passphrase='monetdb')
     datasets = [db['name'] for db in control.status()]
     return datasetId in datasets
+
+def valueToString(value):
+    if isinstance(value, numbers.Number) and isnan(value):
+        return ''
+    return str(value)
+
+
+def tabFileFromHDF5(settings, file):
+    arrays = {}
+    with h5py.File(file, 'r') as h5:
+        path = settings['hdfPath']
+        props = settings['properties']
+        for prop in props:
+            arrays[prop['id']] = h5[path][prop['id']]
+        array_length = arrays[props[0]['id']].shape[0]
+        if any(array.shape[0] is not array_length for array in arrays.values()):
+            raise Exception('HDF5 arrays are not all same size')
+        outFileName = GetTempFileName()
+        with open(outFileName, 'w') as outFile:
+            outFile.write('\t'.join(arrays))
+            outFile.write('\n')
+            step_size = 1000
+            for start in range(0, array_length, step_size):
+                end = min(start + step_size, array_length)
+                for line in izip(*[array[start:end] for array in arrays.values()]):
+                    outFile.writelines('\t'.join(imap(valueToString, line))+'\n')
+    return outFileName

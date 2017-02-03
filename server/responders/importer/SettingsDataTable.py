@@ -29,6 +29,11 @@ class SettingsDataTable(ImportSettings):
                                    'required': False,
                                    'description': 'Specifies an icon that will be associated with the data table.\n  The icon name can be chosen from the list specified in http://fortawesome.github.io/Font-Awesome/icons/'
                                 }),
+                         ('hdfPath', {
+                                   'type': 'Text',
+                                   'required': False,
+                                   'description': 'If the data source is HDF5 then this can be used to specify the path within the HDF5 file to the arrays'
+                                }),
                          ('isHidden', {
                                    'type': 'Boolean',
                                    'required': False,
