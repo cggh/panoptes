@@ -125,7 +125,7 @@ class SettingsDAO(object):
                 if sql_part.strip() ==  '':
                     continue 
                 if i < 5:
-                    self._log('SQL:' + self._datasetId+';'+sql_part)
+                    self._log('SQL:' + self._datasetId+';'+sql_part[:1000])
                 if i == 5:
                     self._log('SQL:' + self._datasetId+'; Commands truncated...')
                 i = i + 1

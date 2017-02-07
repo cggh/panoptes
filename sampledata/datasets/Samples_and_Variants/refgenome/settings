@@ -4,10 +4,10 @@
 annotation:                                # Directives for parsing the annotation file (annotation.gff)
   format: GFF                              # Format: GFF = Version 3 GFF file ; GTF = Version 2 GTF file
   geneFeature: [gene, pseudogene]          # Feature id(s) used to identify genes
-  exonFeature: exon                        # Feature id(s) used to identify exons
+  exonFeature: [CDS, pseudogenic_exon]     # Feature id(s) used to identify exons
   geneNameAttribute: Name                  # Attribute id used to identify gene names
-  geneNameSetAttribute: [Name, Alias]      # Attribute id(s) used to identify gene name sets
-  geneDescriptionAttribute: description    # Attribute id(s) used to identify gene descriptions
+  geneNameSetAttribute: [Name, synonym]      # Attribute id(s) used to identify gene name sets
+  geneDescriptionAttribute: [comment, literature]    # Attribute id(s) used to identify gene descriptions
 
 externalGeneLinks:
 -                                              # Links to external web page that will show up for each gene
