@@ -102,7 +102,7 @@ def ImportRefGenome(calculationObject, datasetId, sourceFolder, importSettings):
                     if 'geneFeature' in annotationsettings:
                         geneidlist = flattenarglist(annotationsettings['geneFeature'])
                     if 'exonFeature' in annotationsettings:
-                        exonid = annotationsettings['exonFeature']
+                        exonid = flattenarglist(annotationsettings['exonFeature'])
                     if 'geneNameAttribute' in annotationsettings:
                         attrib_genename = flattenarglist(annotationsettings['geneNameAttribute'])
                     if 'geneNameSetAttribute' in annotationsettings:
