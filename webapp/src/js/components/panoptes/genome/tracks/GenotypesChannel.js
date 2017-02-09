@@ -270,17 +270,14 @@ let GenotypesChannel = React.createClass({
         colOrder: columnTableConfig.position,
         rowQry: rowQuery,
         rowOrder: rowSort,
-        rowOffset: page * pageSize,
-        rowLimit: (page + 1) * pageSize,
+        rowRandomSample: rowRandomSubsetSize,
+        rowOffset: rowRandomSubsetSize ? undefined : page * pageSize,
+        rowLimit: rowRandomSubsetSize ? undefined : (page + 1) * pageSize,
         colProperties: colProperties.join('~'),
         rowProperties: rowProperties.join('~'),
         '2DProperties': twoDProperties.join('~'),
         colOnlyOnLimit: true
       };
-
-      if (rowRandomSubsetSize !== undefined) {
-        APIargs.rowRandomSample = rowRandomSubsetSize;
-      }
 
       let cacheArgs = {
         method: 'twoDPageQuery',
@@ -684,10 +681,10 @@ const GenotypesControls = React.createClass({
         </div>
         <div className="control-group">
           <div className="control">
-            <NumericInput debounce width={5} label="Page size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
+            <NumericInput debounce disabled={!!rowRandomSubsetSize} width={5} label="Page size" value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
           </div>
           <div className="control">
-            <NumericInput debounce width={3} label="Page" value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
+            <NumericInput debounce disabled={!!rowRandomSubsetSize} width={3} label="Page" value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
           </div>
         </div>
         <div className="control-group">

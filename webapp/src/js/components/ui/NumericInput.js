@@ -14,13 +14,15 @@ let NumericInput = React.createClass({
     label: React.PropTypes.string,
     value: React.PropTypes.number,
     debounce: React.PropTypes.bool,
+    disabled: React.PropTypes.bool,
     onChange: React.PropTypes.func.isRequired
   },
 
   getDefaultProps() {
     return {
       width: 6,
-      debounce: false
+      debounce: false,
+      disabled: false
     }
   },
 
@@ -63,10 +65,11 @@ let NumericInput = React.createClass({
   },
 
   render() {
-    let {label, width} = this.props;
+    let {label, width, disabled} = this.props;
     let {error, value} = this.state;
     return (
         <TextField
+          disabled={disabled}
           type="number"
           style={{width: `${width * 30}px`}}
           ref={(node) => this.textField = node}
