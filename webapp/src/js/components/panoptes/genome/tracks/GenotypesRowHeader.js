@@ -17,7 +17,7 @@ let GenotypesRowHeader = React.createClass({
     width: React.PropTypes.number,
     rowLabel: React.PropTypes.string,
     rowHeight: React.PropTypes.number,
-    rowData: React.PropTypes.array
+    rowData: React.PropTypes.object
   },
 
   componentDidMount() {

@@ -144,7 +144,6 @@ let GenotypesChannel = React.createClass({
     const startIndex = _sortedIndex(genomicPositions, start);
     const endIndex = _sortedLastIndex(genomicPositions, end);
     const visibleGenomicPositions = genomicPositions.subarray ? genomicPositions.subarray(startIndex, endIndex) : genomicPositions.slice(startIndex, endIndex);
-
     const maxGapCount = layoutGaps ? 20 : 0;
 
     //Get an array of all the gaps
@@ -317,12 +316,11 @@ let GenotypesChannel = React.createClass({
       let callMatrixArray = callMatrix.array;
       let ploidy = callMatrix.shape[2] || 1;
       let callSummaryMatrix = new Int8Array(callMatrixArray.length / ploidy);
-      for (let row = 0, lrows = callMatrix.shape[0]; row < lrows; row++) {
-        for (let col = 0, lcols = callMatrix.shape[1]; col < lcols; col++) {
+      for (let col = 0, numCols = callMatrix.shape[0]; col < numCols; col++) {
+        for (let row = 0, numRows = callMatrix.shape[1]; row < numRows; row++) {
           let call = -2; //init
           for (let allele = 0; allele < ploidy; allele++) {
-            let c = callMatrixArray[row * lcols * ploidy + col * ploidy + allele];
-
+            let c = callMatrixArray[(col * numRows * ploidy) + (row * ploidy) + allele];
             c = c > 0 ? 1 : c;
             if (c == -1) { //Missing
               call = -1;
@@ -338,7 +336,7 @@ let GenotypesChannel = React.createClass({
             }
             call = c;
           }
-          callSummaryMatrix[row * lcols + col] = call;
+          callSummaryMatrix[col * numRows + row] = call;
         }
       }
       callSummaryMatrix = {
@@ -352,17 +350,17 @@ let GenotypesChannel = React.createClass({
       let depthMatrixArray = depthMatrix.array;
       let arity = depthMatrix.shape[2] || 1;
       let fractionalMatrix = new Uint8ClampedArray(depthMatrixArray.length / arity);
-      for (let row = 0, lrows = depthMatrix.shape[0]; row < lrows; row++) {
-        for (let col = 0, lcols = depthMatrix.shape[1]; col < lcols; col++) {
-          let refCount = depthMatrixArray[row * lcols * arity + col * arity];
+      for (let col = 0, lcols = depthMatrix.shape[0]; col < lcols; col++) {
+        for (let row = 0, lrows = depthMatrix.shape[1]; row < lrows; row++) {
+          let refCount = depthMatrixArray[col * lrows * arity + row * arity];
           let altCount = 0;
           for (let allele = 1; allele < arity; allele++) {
-            altCount += depthMatrixArray[row * lcols * arity + col * arity + allele];
+            altCount += depthMatrixArray[col * lrows * arity + row * arity + allele];
           }
           let fraction = altCount / (refCount + altCount);
           fraction = Math.max(0, fraction);
           fraction = Math.min(1, fraction);
-          fractionalMatrix[row * lcols + col] = altCount + refCount > 0 ? 1 + 255 * fraction : 0;
+          fractionalMatrix[col * lrows + row] = altCount + refCount > 0 ? 1 + 255 * fraction : 0;
         }
       }
       fractionalMatrix = {
@@ -557,7 +555,6 @@ const GenotypesControls = React.createClass({
 
     let data = '';
     data += '#Dataset: ' + this.config.dataset + '\r\n';
-    // NB: tableCapNamePlural (Cap) is not available
     data += `#Table: ${tableConfig.namePlural}${(cellColour == 'call' ? ' Calls' : ' Allele Depths')}\r\n`;
     data += `#${columnTableConfig.capNamePlural} filter: ${columnQueryAsString}\r\n`;
     data += `#${rowTableConfig.capNamePlural} filter: ${rowQueryAsString}\r\n`;
@@ -587,7 +584,7 @@ const GenotypesControls = React.createClass({
       let propArray = block[`2D_${tableConfig.showInGenomeBrowser[cellColour == 'call' ? 'call' : 'alleleDepth']}`];
       let shape = propArray.shape;
       propArray = propArray.array;
-      let lcols = shape[1];
+      let numRows = shape[1];
       let ploidy = shape[2] || 1;
       let positions = block[`col_${columnTableConfig.position}`].array;
       for (i = 0; i < positions.length; i++) {
@@ -595,7 +592,7 @@ const GenotypesControls = React.createClass({
           data += positions[i] + '\t';
           for (var j = 0; j < rowPrimaryKey.length; j++) {
             for (var k = 0; k < ploidy; k++) {
-              data += propArray[j * lcols * ploidy + i * ploidy + k];
+              data += propArray[(i * numRows * ploidy) + (j * ploidy) + k];
               if (k < ploidy - 1)
                 data += ','
             }

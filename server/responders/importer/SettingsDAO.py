@@ -207,7 +207,7 @@ class SettingsDAO(object):
         self._execSql('create ' + modifier + ' index {} ON {}({})'.format(DBCOLESC(indexName), DBTBESC(tableid), ",".join(map(DBCOLESC, cols))))
             
 
-    def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, primKey, max_line_count):
+    def insert2DIndexes(self, zarr_file, dimension, tableid, table_settings, primKey, max_line_count):
         
         DQXUtils.CheckValidTableIdentifier(tableid)
 
@@ -225,11 +225,11 @@ class SettingsDAO(object):
             #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
             #Firstly create a temporary table with the index array
             try:
-                index = remote_hdf5[table_settings[indexArray]]
+                index = zarr_file[table_settings[indexArray]]
             except KeyError:
-                raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings[indexArray]))
+                raise Exception("zarr doesn't contain {0} at the root".format(table_settings[indexArray]))
             for prop in table_settings['properties']:
-                if len(index) != remote_hdf5[prop['id']].shape[0 if dimension =='column' else 1]:
+                if len(index) != zarr_file[prop['id']].shape[0 if dimension == 'column' else 1]:
                     raise Exception("Property {0} has a different row length to the row index".format(property))
                 
             self.dropTable(tempTable)
@@ -290,7 +290,7 @@ class SettingsDAO(object):
                 dimension)
             self._execSql(sql)
 
-            #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
+            #We don't have an array of keys into a column so we are being told the data in zarr is in the same order as sorted "ColumnIndexField" so we index by that column in order
             sql = 'create table "index" as select "{5}", row_number() over (order by "{1}")-1 as "rowNum" from "{0}" with data;' \
                   'update "{0}" set {2}_{3}_index=(select "rowNum" from "index" where "index"."{5}"="{0}"."{5}");' \
                   'drop table "index";'

@@ -6,8 +6,8 @@ import json
 import DQXDbTools
 from operator import itemgetter
 import os
-import h5py
-import itertools
+import zarr
+import dask.array as da
 import numpy as np
 import config
 import arraybuffer
@@ -18,10 +18,6 @@ from importer.SettingsDataTable import SettingsDataTable
 from importer.Settings2Dtable import Settings2Dtable
 from DQXDbTools import desciptionToDType
 from cache import getCache
-
-CHUNK_SIZE = 400
-
-
 
 def index_table_query(dataset, cur, table, fields, query, order, limit, offset, fail_limit, index_field, sample):
     if limit and fail_limit:
@@ -77,45 +73,15 @@ def index_table_query(dataset, cur, table, fields, query, order, limit, offset, 
 
 
 def select_by_list(properties, row_idx, col_idx):
-    num_cells = len(col_idx) * len(row_idx)
-    arities = {}
-    for prop, array in properties.items():
-        if len(array.shape) == 2:
-            arities[prop] = 1
-        else:
-            arities[prop] = array.shape[2]
-    coords = {}
-    for arity in arities.values():
-        if arity == 1:
-            coords[arity] = [(col, row) for row in row_idx for col in col_idx]
-        else:
-            coords[arity] = [(col, row, i) for row in row_idx for col in col_idx for i in xrange(arity)]
-
     result = {}
     for prop, array in properties.items():
-        arity = arities[prop]
-        result[prop] = np.empty((num_cells * arity,), dtype=array.id.dtype)
-        num_chunks = num_cells*arity / CHUNK_SIZE
-        num_chunks = num_chunks + 1 if (num_cells*arity) % CHUNK_SIZE else num_chunks
-        i_coords = iter(coords[arity])
-        for i in xrange(num_chunks):
-            slice = list(itertools.islice(i_coords, CHUNK_SIZE))
-            selection = np.asarray(slice)
-            sel = h5py._hl.selections.PointSelection(array.shape)
-            sel.set(selection)
-            out = np.ndarray(sel.mshape, array.id.dtype)
-            array.id.read(h5py.h5s.create_simple(sel.mshape),
-                          sel._id,
-                          out,
-                          h5py.h5t.py_create(array.id.dtype))
-            result[prop][i * CHUNK_SIZE: (i * CHUNK_SIZE) + len(selection)] = out[:]
-        result[prop].shape = (len(row_idx), len(col_idx)) if arities[prop] == 1 else (len(row_idx), len(col_idx), arity)
+        dask_task = array[col_idx][:, row_idx]
+        result[prop] = dask_task.compute()
     return result
 
 def get_table_ids(cur, dataset, datatable):
     tableSettings = Settings2Dtable()
     tableSettings.loadFile(os.path.join(config.SOURCEDATADIR, 'datasets', dataset, '2D_datatables', datatable, 'settings'))
-
     return tableSettings['columnDataTable'], tableSettings['rowDataTable']
 
 
@@ -124,14 +90,13 @@ def response(request_data):
 
 
 def extract2D(dataset, datatable, row_idx, col_idx, two_d_properties):
-    hdf5_file = h5py.File(os.path.join(config.BASEDIR, '2D_data', dataset + '_' + datatable + '.hdf5'), 'r')
-    two_d_properties = dict((prop, None) for prop in two_d_properties)
-    for prop in two_d_properties.keys():
-        two_d_properties[prop] = hdf5_file[prop]
+    zarr_file = zarr.DirectoryStore(os.path.join(config.BASEDIR, '2D_data', dataset + '_' + datatable + '.zarr'))
+    root_group = zarr.open_group(zarr_file)
+    two_d_properties = dict((prop, da.from_array(root_group[prop], chunks=root_group[prop].chunks, fancy=False)) for prop in two_d_properties)
     if len(col_idx) == 0 or len(row_idx) == 0:
         two_d_result = {}
         for prop in two_d_properties.keys():
-            two_d_result[prop] = np.array([], dtype=two_d_properties[prop].id.dtype)
+            two_d_result[prop] = np.array([], dtype=two_d_properties[prop].dtype)
     else:
         two_d_result = select_by_list(two_d_properties, row_idx, col_idx)
     return two_d_result

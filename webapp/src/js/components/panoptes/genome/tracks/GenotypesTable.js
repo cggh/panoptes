@@ -60,7 +60,6 @@ let GenotypesTable = React.createClass({
       block.len = 0;
       return;
     }
-
     const colArray = block[`2D__${cellColour}`].array;
     const colShape = block[`2D__${cellColour}`].shape;
     let alphaArray, alphaShape, alphaOffset, alphaScale;
@@ -93,14 +92,15 @@ let GenotypesTable = React.createClass({
     });
     if (block.cacheKey !== cacheKey) {
       let offscreenCanvas = document.createElement('canvas');
-      const rowLen = colShape[1];
-      offscreenCanvas.width = rowLen;
-      offscreenCanvas.height = colShape[0] * rowHeight;
+      const numRows = colShape[1];
+      const numCols = colShape[0];
+      offscreenCanvas.width = numCols;
+      offscreenCanvas.height = colShape[1] * rowHeight;
       let ctx = offscreenCanvas.getContext('2d');
 
       function draw(x) {
-        for (let y = 0, iEnd = colShape[0]; y < iEnd; y++) {
-          const index = y * rowLen + x;
+        for (let y = 0, iEnd = numRows; y < iEnd; y++) {
+          const index = x * numRows + y;
           let alpha = alphaArray ?
             Math.max(0, Math.min(1, (alphaArray[index] - alphaOffset) / alphaScale)) : 1;
           let height = heightArray ?
@@ -136,8 +136,8 @@ let GenotypesTable = React.createClass({
         this.paint(this.refs.gridCanvas, this.refs.overlayCanvas);
       }
 
-      chunkedMap([0, rowLen], draw, update, 100, 50, this);
-      block.len = rowLen || 0;
+      chunkedMap([0, numCols], draw, update, 100, 50, this);
+      block.len = numCols || 0;
       block.cache = offscreenCanvas;
       block.cacheKey = cacheKey;
     }
@@ -224,8 +224,8 @@ let GenotypesTable = React.createClass({
     if (!textArray) return;
 
     const arity = textArray.shape[2] || 1;
-    const colLen = textArray.shape[0] || 0;
-    const rowLen = textArray.shape[1] || 0;
+    const numRows = textArray.shape[1] || 0;
+    const numCols = textArray.shape[0] || 0;
     textArray = textArray.array;
     ctx.save();
     ctx.font = '' + rowHeight + 'px Roboto';
@@ -237,12 +237,12 @@ let GenotypesTable = React.createClass({
     if (pixColWidth > textWidth + 15 && rowHeight >= 6) {
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       for (let i = 0; i < sourceWidth; ++i) {
-        ctx.fillRect(((colStart + i + 0.5) * pixColWidth) - textWidth / 2, 0, textWidth, colLen * rowHeight);
+        ctx.fillRect(((colStart + i + 0.5) * pixColWidth) - textWidth / 2, 0, textWidth, numRows * rowHeight);
       }
       ctx.fillStyle = 'rgb(40,40,40)';
       for (let i = 0; i < sourceWidth; ++i) {
-        for (let j = 0; j < colLen; ++j) {
-          const sourceIndex = (j * rowLen) + i + sourceStart;
+        for (let j = 0; j < numRows; ++j) {
+          const sourceIndex = ((i+sourceStart) * numRows) + j;
           let text = '';
           for (let k = sourceIndex * arity, kEnd = (sourceIndex * arity) + arity; k < kEnd; ++k) {
             text += textArray[k];

@@ -6,7 +6,6 @@ requests==2.11.1
 python-monetdb==11.19.3.2
 Cython==0.25.1
 xlrd==1.0.0
-h5py==2.6.0
 stuf==0.9.16
 PyYAML==3.12
 python-dateutil==2.5.3
@@ -18,3 +17,9 @@ biopython==1.68
 ruamel.yaml==0.12.15
 portalocker==1.0.0
 diskcache==2.0.2
+zarr==2.1.4
+toolz==0.8.2
+dask==0.13.0
+
+
+
