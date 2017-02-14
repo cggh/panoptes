@@ -41,7 +41,7 @@ def _encode_numpy_array(array):
     if dtype == 'S':
         data = pack_string_array(array)
     else:
-        data = array.data
+        data = array.tobytes('C')
     yield struct.pack('<L', reduce(mul,array.shape))
     for byte in data:
         yield byte

@@ -6,46 +6,13 @@
 import os
 import DQXDbTools
 import DQXUtils
-import h5py
+import zarr
 import ImpUtils
-import arraybuffer
 from BaseImport import BaseImport
 from SettingsDataTable import SettingsDataTable
 
 class Import2DDataTable(BaseImport):
 
-    def _hdf5_copy(self, src, dest, func = None, limit=None):
-            #Process in chunk sized (at least on the primary dimension) pieces
-            try:
-                step_size = src.chunks[0]
-                print 'oldchunk:', src.chunks
-                print 'newchunk:', dest.chunks
-            except TypeError:
-                step_size = 10000
-            shape = src.shape
-            if func:
-                for start in xrange(0, limit[0] or len(src), step_size):
-                    end = min(start + step_size, limit[0] or len(src))
-                    if len(shape) == 3:
-                        dest[start:end, :limit[1], :] = func(src[start:end, :limit[1], :])
-                    elif len(shape) == 2:
-                        dest[start:end, :limit[1]] = func(src[start:end, :limit[1]])
-                    elif len(shape) == 1:
-                        dest[start:end] = func(src[start:end])
-                    else:
-                        raise ValueError("shape", shape, "not of dimension 1, 2 or 3")
-            else:
-                for start in xrange(0, limit[0] or len(src), step_size):
-                    end = min(start + step_size, limit[0] or len(src))
-                    if len(shape) == 3:
-                        dest[start:end, :limit[1], :] = src[start:end, :limit[1], :]
-                    elif len(shape) == 2:
-                        dest[start:end, :] = src[start:end, :]
-                    elif len(shape) == 1:
-                        dest[start:end] = src[start:end]
-                    else:
-                        raise ValueError("shape", shape, "not of dimension 1, 2 or 3")
-                        
     #Retrieve and validate settings
     def getSettings(self, tableid):
         tableSettings = self._fetchSettings(tableid)
@@ -72,8 +39,9 @@ class Import2DDataTable(BaseImport):
             table_settings = self.getSettings(tableid)
 
 
-            settingsFile, dataFile = self._getDataFiles(tableid)
-            remote_hdf5 = h5py.File(dataFile, 'r')
+            settingsFile, data_file = self._getDataFiles(tableid)
+            zarr_file = zarr.DirectoryStore(data_file)
+            zarr_file = zarr.group(zarr_file)
             #Check that the referenced tables exist and have the primary key specified.
 
             if table_settings['columnDataTable']:
@@ -102,46 +70,24 @@ class Import2DDataTable(BaseImport):
                     # We could just run the command and ignore the error raised if it already exists
                     # sql = "ALTER TABLE `{0}` ADD `{1}_column_index` INT DEFAULT NULL;".format(table_settings['columnDataTable'], tableid)
                     # self._execSql(sql)
-                    self._dao.insert2DIndexes(remote_hdf5, "column", tableid, table_settings,
+                    self._dao.insert2DIndexes(zarr_file, "column", tableid, table_settings,
                                               columnTableSettings['primKey'],
                                               max_line_count)
 
                 if table_settings['rowDataTable']:
-                    self._dao.insert2DIndexes(remote_hdf5, "row", tableid, table_settings,
+                    self._dao.insert2DIndexes(zarr_file, "row", tableid, table_settings,
                                               rowTableSettings['primKey'],
                                               None)
 
-                #We have the indexes - now we need a local copy of the HDF5 data for each property
                 ImpUtils.mkdir(os.path.join(self._config.getBaseDir(), '2D_data'))
-                path_join = os.path.join(self._config.getBaseDir(), '2D_data', self._datasetId + '_' + tableid + '.hdf5')
+                path_join = os.path.join(self._config.getBaseDir(), '2D_data', self._datasetId + '_' + tableid + '.zarr')
                 try:
                     os.remove(path_join)
                 except OSError:
                     pass
-                if table_settings['symlinkData']:
-                    print "Symlinking datasets - will only work on unix"
-                    os.symlink(dataFile, path_join)
-                else:
-                    local_hdf5 = h5py.File(path_join, 'w', libver='latest')
-                    print "Copying HDF5 datasets"
-                    for prop in table_settings['properties']:
-                        print "..", prop
-                        prop_in = remote_hdf5[prop['id']]
-                        #Make some choices assuming data is variants/samples
-                        if prop_in.shape[0] > prop_in.shape[1]:
-                            chunks = [min(1000, prop_in.shape[0]), min(10, prop_in.shape[1])]
-                        else:
-                            chunks = [min(10, prop_in.shape[0]), min(1000, prop_in.shape[1])]
-                        arity = 1 if len(prop_in.shape) == 2 else prop_in.shape[2]
-                        if arity > 1:
-                            chunks.append(arity)
-                        prop_out = local_hdf5.create_dataset(prop['id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
-                        self._hdf5_copy(prop_in, prop_out, limit=(max_line_count, None))
-                        print "done"
-                    print "all copies complete"
-                    local_hdf5.close()
-                remote_hdf5.close()
-                
+                print "Symlinking 2D data"
+                os.symlink(data_file, path_join)
+
     def importAll2DTables(self):
        
         datatables_2D = self._getTables()

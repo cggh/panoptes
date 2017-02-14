@@ -31,12 +31,12 @@ class Settings2Dtable(ImportSettings):
                     ('columnIndexField', {
                          'type': 'Text',
                          'required': True,
-                         'description': 'The property ID in the ``columnDataTable`` data table that maps into the ``columnIndexArray``\n  array in the HDF5 source file. ``columnIndexField`` and ``columnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.\n  Alternatively ``columnIndexArray`` can be omitted implying that the columns in HDF5 are in the same order as ``columnIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
+                         'description': 'The property ID in the ``columnDataTable`` data table that maps into the ``columnIndexArray``\n  array in the zarr source dir. ``columnIndexField`` and ``columnIndexArray`` together establish the link between the column data table values, and the data present in the zarr source dir.\n  Alternatively ``columnIndexArray`` can be omitted implying that the columns in zarr are in the same order as ``columnIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                          }),
                     ('columnIndexArray', {
                          'type': 'Text',
                          'required': False,
-                         'description': '1D Array in the HDF5 source file that gives the value of ``columnIndexField`` for each column.\n  If this is omitted then it is assumed that the HDF5 columns are in the same\n  order as the ``columnDataTable`` data table, sorted by the ``columnIndexField`` property'
+                         'description': '1D Array in the zarr source dir that gives the value of ``columnIndexField`` for each column.\n  If this is omitted then it is assumed that the zarr columns are in the same\n  order as the ``columnDataTable`` data table, sorted by the ``columnIndexField`` property'
                          }),
                     ('rowDataTable', {
                          'type': 'Text',
@@ -46,18 +46,12 @@ class Settings2Dtable(ImportSettings):
                     ('rowIndexField', {
                          'type': 'Text',
                          'required': True,
-                         'description': 'The property ID in the ``rowDataTable`` data table that maps into ``rowIndexArray``\n  array in the HDF5 source file. ``rowIndexField`` and ``rowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.\n  Alternatively ``rowIndexArray`` can be omitted implying that the rows in HDF5 are in the same order as ``rowIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
+                         'description': 'The property ID in the ``rowDataTable`` data table that maps into ``rowIndexArray``\n  array in the zarr source dir. ``rowIndexField`` and ``rowIndexArray`` together establish the link between the row data table values, and the data present in the zarr source dir.\n  Alternatively ``rowIndexArray`` can be omitted implying that the rows in zarr are in the same order as ``rowIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                          }),
                     ('rowIndexArray', {
                          'type': 'Text',
                          'required': False,
-                         'description': '1D Array in the HDF5 source file that gives the value of ``rowIndexField`` for each row.\n  If this is omitted then it is assumed that the HDF5 columns are in the same\n  order as the ``rowDataTable`` data table, sorted by the ``rowIndexField property``'
-                         }),
-                    ('symlinkData', {
-                         'type': 'Boolean',
-                         'required': False,
-                         'default': False,
-                         'description': 'If true then the HDF5 source file will not be copied but only symlinked. Note that if your HDF5 doesn’t have small enough chunking (max few MB per chunk) then performance will suffer. The default of False copies and rechunks the HDF5'
+                         'description': '1D Array in the zarr source dir that gives the value of ``rowIndexField`` for each row.\n  If this is omitted then it is assumed that the zarr columns are in the same\n  order as the ``rowDataTable`` data table, sorted by the ``rowIndexField property``'
                          }),
                     ('showInGenomeBrowser', {
                          'type': 'Block',
@@ -89,7 +83,7 @@ class Settings2Dtable(ImportSettings):
                                       ('id', {
                                              'type': 'Text',
                                              'required': True,
-                                             'description': 'Identifier of the property, and name of the dataset in the HDF5 source file'
+                                             'description': 'Identifier of the property, and name of the dataset in the zarr source dir'
                                              }),
                                       ('name', {
                                                 'type': 'Text',

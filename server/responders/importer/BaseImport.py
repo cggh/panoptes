@@ -44,7 +44,7 @@ class BaseImport(object):
             datasetFolder = os.path.join(baseFolder, datasetId)
         
             self._datatablesFolder = os.path.join(datasetFolder, dataDir)
-            self._dataFile = 'data.hdf5'
+            self._dataFile = 'data.zarr'
 
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
@@ -168,14 +168,16 @@ class BaseImport(object):
         data = os.path.join(folder, self._dataFile)
         data_gz = data + '.gz'
         data_hdf = data + '.hdf5'
-        if not os.path.isfile(data) and os.path.isfile(data_gz):
+        data_zarr = data + '.zarr'
+        if os.path.isfile(data):
+            pass
+        elif os.path.isfile(data_gz):
             self._dataFile = self._dataFile + '.gz'
             data = data_gz
-        else:
-            if not os.path.isfile(data) and os.path.isfile(data_hdf):
+        elif os.path.isfile(data_hdf):
                 self._dataFile = self._dataFile + '.hdf5'
                 data = data_hdf
-            else:
+        else:
                 if not os.path.isfile(data):
                     self._log("Missing data file {} from {} {} ".format(data, self._datatablesFolder, datatable))
     #                raise Exception("Missing data {}".format(data))

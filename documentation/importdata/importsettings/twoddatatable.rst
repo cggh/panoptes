@@ -32,13 +32,13 @@ columnDataTable
 
 columnIndexField
   *Text (required).* The property ID in the ``columnDataTable`` data table that maps into the ``columnIndexArray``
-  array in the HDF5 source file. ``columnIndexField`` and ``columnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.
-  Alternatively ``columnIndexArray`` can be omitted implying that the columns in HDF5 are in the same order as ``columnIndexField`` sorted.
+  array in the zarr source file. ``columnIndexField`` and ``columnIndexArray`` together establish the link between the column data table values, and the data present in the zarr source file.
+  Alternatively ``columnIndexArray`` can be omitted implying that the columns in zarr are in the same order as ``columnIndexField`` sorted.
   Note that "AutoKey" can be used if your rows do not have Unique IDs.
 
 columnIndexArray
-  *Text.* 1D Array in the HDF5 source file that gives the value of ``columnIndexField`` for each column.
-  If this is omitted then it is assumed that the HDF5 columns are in the same
+  *Text.* 1D Array in the zarr source dir that gives the value of ``columnIndexField`` for each column.
+  If this is omitted then it is assumed that the zarr columns are in the same
   order as the ``columnDataTable`` data table, sorted by the ``columnIndexField`` property.
 
 rowDataTable
@@ -47,17 +47,14 @@ rowDataTable
 
 rowIndexField
   *Text (required).* The property ID in the ``rowDataTable`` data table that maps into ``rowIndexArray``
-  array in the HDF5 source file. ``rowIndexField`` and ``rowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.
-  Alternatively ``rowIndexArray`` can be omitted implying that the rows in HDF5 are in the same order as ``rowIndexField`` sorted.
+  array in the zarr source file. ``rowIndexField`` and ``rowIndexArray`` together establish the link between the row data table values, and the data present in the zarr source dir.
+  Alternatively ``rowIndexArray`` can be omitted implying that the rows in zarr are in the same order as ``rowIndexField`` sorted.
   Note that "AutoKey" can be used if your rows do not have Unique IDs.
 
 rowIndexArray
-  *Text.* 1D Array in the HDF5 source file that gives the value of ``rowIndexField`` for each row.
-  If this is omitted then it is assumed that the HDF5 columns are in the same
+  *Text.* 1D Array in the zarr source dir that gives the value of ``rowIndexField`` for each row.
+  If this is omitted then it is assumed that the zarr columns are in the same
   order as the ``rowDataTable`` data table, sorted by the ``rowIndexField property``.
-
-symlinkData
-  *Boolean.*  Default:False.  If true then the HDF5 source file will not be copied but only symlinked. Note that if your HDF5 doesn’t have small enough chunking (max few MB per chunk) then performance will suffer. The default of False copies and rechunks the HDF5.
 
 showInGenomeBrowser
   *Block.* If this key is present, the data will be visualised as a channel in the genome browser.
@@ -78,7 +75,7 @@ properties
   *List (required).* Contains a list of all properties defined for each cell of the 2D data table.
   The block can contain the following keys:
     id
-      *Text (required).* Identifier of the property, and name of the dataset in the HDF5 source file.
+      *Text (required).* Identifier of the property, and name of the dataset in the zarr source dir.
 
     name
       *Text.* Display name of the property.
