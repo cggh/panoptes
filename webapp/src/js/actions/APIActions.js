@@ -88,10 +88,38 @@ let APIActions = {
     })
     .catch((error) => {
       this.dispatch(APICONST.MODIFY_CONFIG_FAIL);
+      //This line here until all modify config components handle errors well
       ErrorReport(this.flux, error.message, () => this.flux.actions.api.modifyConfig(options));
     });
-  }
+  },
 
+  replaceYAMLConfig(options) {
+    assertRequired(options, ['dataset', 'path', 'content']);
+    let {dataset, path, content, onSuccess} = options;
+    this.dispatch(APICONST.MODIFY_CONFIG);
+    API.replaceYAMLConfig(
+      {
+        dataset,
+        path,
+        content
+      }
+    )
+    .then((resp) => {
+      this.dispatch(
+        APICONST.MODIFY_CONFIG_SUCCESS,
+        {
+          newConfig: resp
+        }
+      );
+      if (onSuccess) {
+        onSuccess();
+      }
+    }).catch((error) => {
+      const msg = error.message || error.responseText || error;
+      ErrorReport(this.flux, msg, null, 0);
+      this.dispatch(APICONST.MODIFY_CONFIG_FAIL, {msg});
+    });
+  }
 };
 
 export default APIActions;

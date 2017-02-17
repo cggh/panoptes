@@ -4,6 +4,7 @@ from os import path, listdir
 from os.path import join
 
 from os.path import exists
+from responders.importer import ImpUtils
 from simplejson import load, loads, dumps
 from PanoptesConfig import PanoptesConfig
 from SettingsDataset import SettingsDataset
@@ -20,10 +21,14 @@ baseDir = config.getBaseDir()
 def readSetOfSettings(dirPath, loader, wanted_names=None):
     if not path.isdir(dirPath):
         return {}
-    return {name: loads(loader(join(dirPath, name, 'settings'), validate=True).serialize())
-                 for name in listdir(dirPath)
-                  if path.isdir(join(dirPath, name)) and (not wanted_names or name in wanted_names)}
-
+    result = {}
+    for name in listdir(dirPath):
+        if path.isdir(join(dirPath, name)) and (not wanted_names or name in wanted_names):
+            settings_file = join(dirPath, name, 'settings')
+            result[name] = loads(loader(settings_file, validate=True).serialize())
+            with open(settings_file, 'r') as yaml:
+                result[name]['_yaml'] = yaml.read()
+    return result
 
 def readJSONConfig(datasetId):
     dataset_folder = join(sourceDir, datasetId)
@@ -32,7 +37,9 @@ def readJSONConfig(datasetId):
         raise Exception('Error: ' + datasetId + ' is not a known dataset in the source directory')
     settings_file = join(dataset_folder, 'settings')
     settings = loads(SettingsDataset(settings_file, validate=True).serialize())
-    
+    with open(settings_file, 'r') as yaml:
+        settings['_yaml'] = yaml.read()
+
     chromosomes = None
     try:
         with open(join(base_folder, 'chromosomes.json'), 'r') as f:
@@ -43,7 +50,7 @@ def readJSONConfig(datasetId):
             chromosomes = readChromLengths(join(dataset_folder, 'refgenome', 'refsequence.fa'))
         except IOError:
             print('refsequence.fa not found - skipping')
-    
+
     tables = readSetOfSettings(join(dataset_folder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     try:
         for tableId, table_config in tables.items():
@@ -65,14 +72,15 @@ def readJSONConfig(datasetId):
             with open(graph_file, 'r') as f:
                 tables[tableId]['trees'] = load(f)
 
+    twoDTables = readSetOfSettings(join(dataset_folder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
+    genome_settings_file = join(dataset_folder, 'refgenome', 'settings')
     genome = None
     try:
-        genome = loads(SettingsRefGenome(join(dataset_folder, 'refgenome', 'settings'), validate=True).serialize())
+        genome = loads(SettingsRefGenome(genome_settings_file, validate=True).serialize())
     except IOError:
         print('refgenome settings not found - skipping')
-        
-
-    twoDTables = readSetOfSettings(join(dataset_folder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
+    with open(genome_settings_file, 'r') as yaml:
+        genome['_yaml'] = yaml.read()
     mapLayers = readSetOfSettings(join(dataset_folder, 'maps'), SettingsMapLayer)
     #As an optimisation we send index.html if it exists to avoid the inevitable request.
     try:
@@ -116,13 +124,14 @@ class DocsWriter:
 
 def writeJSONConfig(datasetId, action, path, newConfig):
     dataset_folder = join(sourceDir, datasetId)
-    settings_file = join(dataset_folder, 'settings')
     #We have a path in the combined JSON object - we now follow the path until we hit a subset confined to one YAML handler
     writers = {
-        'settings': lambda path: (path, SettingsDataset(settings_file, validate=True)),
+        'settings': lambda path: (path, SettingsDataset(join(dataset_folder, 'settings'), validate=True)),
         'chromosomes': lambda path: (path, ReadOnlyErrorWriter('chromosomes')),
-        'tablesById': lambda path: (path[1:], SettingsDataTable(join(dataset_folder, 'datatables', path[0], 'settings'), validate=True)),
-        'twoDTablesById': lambda path: (path[1:], SettingsDataTable(join(dataset_folder, '2D_datatables', path[0], 'settings'), validate=True)),
+        'tablesById': lambda path: (path[1:],
+                                    SettingsDataTable(join(dataset_folder, 'datatables', path[0], 'settings'), validate=True)),
+        'twoDTablesById': lambda path: (path[1:],
+                                        SettingsDataTable(join(dataset_folder, '2D_datatables', path[0], 'settings'), validate=True)),
         'genome': lambda path: (path, ReadOnlyErrorWriter('genome')), #For now as this will likely get a refactor
         'mapLayers': lambda path: (path, ReadOnlyErrorWriter('mapLayers')),  # For now as this will likely get a refactor
         'docs': lambda path: (path, DocsWriter(datasetId))
@@ -130,3 +139,31 @@ def writeJSONConfig(datasetId, action, path, newConfig):
     path = path.split('.')
     (path, writer) = writers[path[0]](path[1:])
     return writer.updateAndWriteBack(action, path, newConfig, validate=True)
+
+def writeYAMLConfig(datasetId, path, newConfig):
+    dataset_folder = join(sourceDir, datasetId)
+    temp_settings_filename = ImpUtils.GetTempFileName()
+    with open(temp_settings_filename, 'w') as temp_settings_file:
+        temp_settings_file.write(newConfig)
+    validators = {
+        'settings': lambda path: (join(dataset_folder, 'settings'),
+                                  SettingsDataset(temp_settings_filename, validate=True)),
+        'genome': lambda path: (join(dataset_folder, 'refgenome', 'settings'),
+                                  SettingsRefGenome(temp_settings_filename, validate=True)),
+        'tablesById': lambda path: (join(dataset_folder, 'datatables', path[0], 'settings'),
+                                    SettingsDataTable(temp_settings_filename, validate=True)),
+        'twoDTablesById': lambda path: (join(dataset_folder, '2D_datatables', path[0], 'settings'),
+                                        SettingsDataTable(temp_settings_filename, validate=True)),
+    }
+    path = path.split('.')
+    try:
+        (settings_file, validator) = validators[path[0]](path[1:])
+        #Validation happens in the validator constructor that is called in the lambda
+        #So if we get here without exception thrown by validation then we can copy the new settings onto the old
+        os.system('mv %s %s' % (temp_settings_filename, settings_file))
+    finally:
+        try:
+            os.remove(temp_settings_filename)
+        except OSError:
+            pass
+

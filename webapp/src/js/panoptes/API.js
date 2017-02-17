@@ -409,6 +409,21 @@ function modifyConfig(options) {
   }).then((response) => response.config);
 }
 
+function replaceYAMLConfig(options) {
+  assertRequired(options, ['dataset', 'path', 'content']);
+  let {dataset, path, content} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    method: 'POST',
+    data: content,
+    params: {
+      dataset,
+      path,
+      datatype: 'replaceconfig'
+    }
+  }).then((response) => response.config);
+}
 
 
 function twoDPageQuery(options) {
@@ -564,6 +579,7 @@ module.exports = {
   findGenesInRegion,
   importDataset,
   modifyConfig,
+  replaceYAMLConfig,
   nullValues,
   query,
   requestJSON,
