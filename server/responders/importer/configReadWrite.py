@@ -32,13 +32,18 @@ def readJSONConfig(datasetId):
         raise Exception('Error: ' + datasetId + ' is not a known dataset in the source directory')
     settings_file = join(dataset_folder, 'settings')
     settings = loads(SettingsDataset(settings_file, validate=True).serialize())
+    
+    chromosomes = None
     try:
         with open(join(base_folder, 'chromosomes.json'), 'r') as f:
             chromosomes = load(f)
     except IOError:
         print('Cached chrom config not found - scanning')
-        chromosomes = readChromLengths(join(dataset_folder, 'refgenome', 'refsequence.fa'))
-
+        try:
+            chromosomes = readChromLengths(join(dataset_folder, 'refgenome', 'refsequence.fa'))
+        except IOError:
+            print('refsequence.fa not found - skipping')
+    
     tables = readSetOfSettings(join(dataset_folder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     try:
         for tableId, table_config in tables.items():
@@ -60,8 +65,14 @@ def readJSONConfig(datasetId):
             with open(graph_file, 'r') as f:
                 tables[tableId]['trees'] = load(f)
 
+    genome = None
+    try:
+        genome = loads(SettingsRefGenome(join(dataset_folder, 'refgenome', 'settings'), validate=True).serialize())
+    except IOError:
+        print('refgenome settings not found - skipping')
+        
+
     twoDTables = readSetOfSettings(join(dataset_folder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
-    genome = loads(SettingsRefGenome(join(dataset_folder, 'refgenome', 'settings'), validate=True).serialize())
     mapLayers = readSetOfSettings(join(dataset_folder, 'maps'), SettingsMapLayer)
     #As an optimisation we send index.html if it exists to avoid the inevitable request.
     try:

@@ -48,6 +48,7 @@ let ViewList = React.createClass({
     const hasTrees = _some(_filter(this.config.visibleTables, (table) => table.trees));
     const hasShowableGeoCoordTables = _some(_filter(this.config.visibleTables, (table) => table.hasGeoCoord));
     const hasMapLayers = _some(this.config.mapLayers);
+    const hasGenome = this.config.genome !== null ? true : false;
 
     return (
       <List style={this.props.style}>
@@ -58,15 +59,21 @@ let ViewList = React.createClass({
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
                     onClick={(e) => this.handleOpen(e, <DatasetManagerActions />)}/>
           : null}
-        <ListItem primaryText="Genome Browser"
-                  secondaryText="View table data and sequence data on the genome"
-                  leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                  onClick={(e) => this.handleOpen(e,
-                    <GenomeBrowserWithActions>
-                      <ReferenceSequence fixed/>
-                      <AnnotationChannel fixed/>
-                    </GenomeBrowserWithActions>
-                      )}/>
+          <ListItem primaryText="Genome Browser"
+                    disabled={!hasGenome}
+                    innerDivStyle={{opacity: hasGenome ? 'inherit' : 0.5}}
+                    secondaryText={hasGenome ? 'View table data and sequence data on the genome' : 'No genomic data to browse'}
+                    leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
+                    onClick={hasGenome ?
+                      (e) => this.handleOpen(e,
+                        <GenomeBrowserWithActions>
+                          <ReferenceSequence fixed/>
+                          <AnnotationChannel fixed/>
+                        </GenomeBrowserWithActions>
+                      )
+                      : () => null
+                    }
+                    />
           <ListItem primaryText="Table Plotter"
                     disabled={!hasShowableTables}
                     innerDivStyle={{opacity: hasShowableTables ? 'inherit' : 0.5}}
@@ -76,7 +83,7 @@ let ViewList = React.createClass({
           <ListItem primaryText="Map Composer"
                     disabled={!(hasShowableGeoCoordTables || hasMapLayers)}
                     innerDivStyle={{opacity: (hasShowableGeoCoordTables || hasMapLayers) ? 'inherit' : 0.5}}
-                    secondaryText={'View data geographically'}
+                    secondaryText={(hasShowableGeoCoordTables || hasMapLayers) ? 'View data geographically' : 'No geographic data to browse'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
                     onClick={(hasShowableGeoCoordTables || hasMapLayers) ? (e) => this.handleOpen(e, <MapActions />) : () => null}/>
           <ListItem primaryText="Tree Plotter"
