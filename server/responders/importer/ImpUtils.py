@@ -39,7 +39,7 @@ def GetSQLDataType(dataType):
     }[dataType]
 
 def GetTempFileName():
-    #Check the temp dir exists and then return a new file name in it
+    #Check tgethe temp dir exists and then return a new file name in it
     temp_dir = os.path.join(config.BASEDIR,'temp')
     try:
         os.makedirs(temp_dir)

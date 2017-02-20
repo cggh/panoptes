@@ -17,14 +17,28 @@ const ConfigStore = Fluxxor.createStore({
 
   initialize(initConfig) {
     this.state = this.addDerivedConfig(initConfig);
+    this.state.loadStatus = 'LOADED';
     this.bindActions(
-      APIConst.MODIFY_CONFIG_SUCCESS, this.modifyConfigSuccess
+      APIConst.MODIFY_CONFIG, this.modifyConfig,
+      APIConst.MODIFY_CONFIG_SUCCESS, this.modifyConfigSuccess,
+      APIConst.MODIFY_CONFIG_FAIL, this.modifyConfigFail
     );
   },
 
-  modifyConfigSuccess(payload) {
-    const {newConfig} = payload;
+  modifyConfig() {
+    this.state.loadStatus = 'LOADING';
+    this.emit('change');
+  },
+
+  modifyConfigSuccess({newConfig}) {
     this.state = {...this.state, ...this.addDerivedConfig(newConfig)};
+    this.state.loadStatus = 'LOADED';
+    this.emit('change');
+  },
+
+  modifyConfigFail({msg}) {
+    this.state.loadStatus = 'ERROR';
+    this.state.errorMsg = msg;
     this.emit('change');
   },
 

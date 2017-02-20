@@ -1,5 +1,9 @@
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
+import EditYAMLConfig from 'panoptes/EditYAMLConfig';
+import FlatButton from 'material-ui/FlatButton';
+import _map from 'lodash/map';
+import Divider from 'material-ui/Divider';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -66,6 +70,26 @@ let DatasetManagerActions = React.createClass({
                        message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
                        onConfirm={() => this.handleReimport()}
         />
+        <FlatButton label={"Edit dataset config"}
+                    primary={true}
+                    onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="settings"/>)}
+                    icon={<Icon fixedWidth={true} name={'edit'} />}
+        />
+        <Divider />
+        <FlatButton label={"Edit genome config"}
+                    primary={true}
+                    onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="genome"/>)}
+                    icon={<Icon fixedWidth={true} name={'edit'} />}
+        />
+        <Divider />
+        {_map(this.config.tables, (table) => (
+          <FlatButton label={`Edit ${table.id}`}
+                      primary={true}
+                      onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path={`tablesById.${table.id}`}/>)}
+                      icon={<Icon fixedWidth={true} name={'edit'} />}
+          />
+        ))}
+
       </div>
     );
     return (
@@ -82,7 +106,7 @@ let DatasetManagerActions = React.createClass({
             />
             <span className="block text">Status logs</span>
           </div>
-          <div className="grow">
+          <div className="grow scroll-within">
                 <DatasetImportStatusListView refreshMilliseconds={2000} />
           </div>
         </div>

@@ -246,11 +246,14 @@ class ImportSettings:
 
             with open(self.fileName, 'r') as configfile:
                 try:
-                    self._settings = yaml.load(configfile.read()) or {}
+                    text = configfile.read()
+                    self._settings = yaml.load(text) or {}
+                    if type(self._settings) != dict:
+                        raise Exception("YAML contains only a string - should be dict with keys and values")
 
                 except Exception as e:
                     print('ERROR: yaml parsing error: ' + str(e))
-                    raise ImportError.ImportException('Error while parsing yaml file {0}'.format(fileName))
+                    raise Exception('Error while parsing yaml file {0}'.format(fileName))
 
             self._load(validate)
 #            if self._logLevel:
@@ -306,10 +309,10 @@ class ImportSettings:
         siblingName = srdef['name']
         if testDict[siblingName] != siblingValue:
             if pkey in testDict:
-                message = "{} Wrong value for {} (expected {} got {}) for {}".format(pkey, siblingName, siblingValue, testDict[siblingName], str(testDict))
+                message = "{} Wrong value for {} (expected {} got {}) for {}\n".format(pkey, siblingName, siblingValue, testDict[siblingName], str(testDict)[:100])
         else:
             if testDict[siblingName] == siblingValue and not pkey in testDict:
-                message = "Missing required value {} for {} because {} == {}".format(pkey, str(testDict), siblingName, siblingValue)
+                message = "Missing required value {} for {} because {} == {}\n".format(pkey, str(testDict)[:100], siblingName, siblingValue)
 
         return message
 
@@ -319,7 +322,7 @@ class ImportSettings:
 
         if (settingName in self._settings and self[settingName] == settingValue):
             if not pkey in testDict:
-                self._errors.append("Missing required value {} for {}".format(pkey, str(testDict)))
+                self._errors.append("Missing required value {} for {}\n".format(pkey, str(testDict)[:100]))
 
 
     def _hasOptionalSibling(self, testDict, pkey, pdef):
@@ -333,10 +336,10 @@ class ImportSettings:
                 ret = True
                 if type(sibValue) == str and val != sibValue:
                     ret = False
-                    self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)))
+                    self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}\n".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)[:100]))
                 if type(sibValue) == list and val not in sibValue:
                     ret = False
-                    self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)))
+                    self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}\n".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)[:100]))
         return ret
 
     def _checkProperty(self, testDict, pkey, pdef, siblings = None):
@@ -352,7 +355,7 @@ class ImportSettings:
                 if pkey == 'name' and 'id' in testDict:
                     testDict['name'] = testDict['id']
                 else:
-                    self._errors.append("Missing required value {} for {}".format(pkey, str(testDict)))
+                    self._errors.append("Missing required value {} for {}\n".format(pkey, str(testDict)[:100]))
                 #print "Missing failed - Checking {} for {} using {}".format(str(testDict),pkey,str(pdef))
 
 
@@ -371,46 +374,46 @@ class ImportSettings:
             #Check enumerated values
             if 'values' in pdef:
                 if value not in pdef['values']:
-                    self._errors.append("Invalid value {} for key {}".format(value, pkey))
+                    self._errors.append("Invalid value {} for key {}\n".format(value, pkey))
 
         #Make sure Booleans are bool
             if pdef['type'] == 'Boolean':
                 if not type(value) is bool:
-                    self._errors.append("{} must be a boolean is {} ({})".format(pkey,type(value),value))
+                    self._errors.append("{} must be a boolean is {} ({})\n".format(pkey,type(value),value))
             elif pdef['type'] == 'Block':
                 if not type(value) is dict:
-                    self._errors.append("{} must be a block is {}".format(pkey, value))
+                    self._errors.append("{} must be a block is {}\n".format(pkey, value))
             elif pdef['type'] == 'List':
                 if not type(value) is list:
-                    self._errors.append("{} must be a List is {}".format(pkey, value))
+                    self._errors.append("{} must be a List is {}\n".format(pkey, value))
             elif pdef['type'] == 'Value':
                 if not (type(value) is int or type(value) is float):
-                    self._errors.append("{} must be a Value is {}".format(pkey, value))
+                    self._errors.append("{} must be a Value is {}\n".format(pkey, value))
             elif pdef['type'] == 'Text' or pdef['type'] == 'DatatableID':
                 if not (type(value) is str or type(value) is unicode):
-                    self._errors.append("{} must be a str is {}".format(pkey, value))
+                    self._errors.append("{} must be a str is {}\n".format(pkey, value))
             elif pdef['type'] == 'Text or List':
                 if not (type(value) is str or type(value) is list):
-                    self._errors.append("{} must be Text or List is {}".format(pkey, value))
+                    self._errors.append("{} must be Text or List is {}\n".format(pkey, value))
             elif pdef['type'] == 'PropertyID':
                 if not (value in self._propidMap or (pkey == 'primKey' and value == 'AutoKey') or value == 'None' or ('autoScanProperties' in self._settings and self._settings["autoScanProperties"])):
-                    self._errors.append("{} must be a valid PropertyId is {}".format(pkey, value))
+                    self._errors.append("{} must be a valid PropertyId is {}\n".format(pkey, value))
             elif pdef['type'] == 'PropertyIDs':
                 pass
                 for propid in value.split(','):
                     propid = propid.strip()
                     if not (propid in self._propidMap or '@' in propid):
-                        self._errors.append("{} must be a valid PropertyId is {}".format(pkey, propid))
+                        self._errors.append("{} must be a valid PropertyId is {}\n".format(pkey, propid))
             elif pdef['type'] == 'PropertyIDList':
                 pass
                 if not type(value) is list:
                     self._errors.append("{} must be a List is {}".format(pkey, value))
                 for propid in value:
                     if not (propid in self._propidMap or '@' in propid):
-                        self._errors.append("{} must be a valid PropertyId is {}".format(pkey, propid))
+                        self._errors.append("{} must be a valid PropertyId is {}\n".format(pkey, propid))
             else:
                 #Error in definition above
-                self._errors.append("Undefined type {} for {}".format(pdef['type'], pkey))
+                self._errors.append("Undefined type {} for {}\n".format(pdef['type'], pkey))
 
         if 'siblingOptional' in pdef:
             if siblings and pkey in testDict:
@@ -428,7 +431,7 @@ class ImportSettings:
                     else:
                         options.append(msg)
                 if not valid:
-                    self._errors.append("When " + pkey + " one of following must be set " + ",".join(map(lambda x: x['name'] + "=" + x['value'], pdef['siblingRequired'])) + " for " + str(testDict))
+                    self._errors.append("When " + pkey + " one of following must be set " + ",".join(map(lambda x: x['name'] + "=" + x['value'], pdef['siblingRequired'])) + " for " + str(testDict)[:100] + '\n')
 
             else:
                 msg = self._checkSiblingRequired(testDict, pkey, pdef['siblingRequired'], siblings)
@@ -453,7 +456,7 @@ class ImportSettings:
                 value = toValidate[key]
 
                 if key not in definition:
-                    self._errors.append("Unknown property key {} in {}".format(key, str(toValidate)))
+                    self._errors.append("Unknown property key {} in {}\n".format(key, str(toValidate)[:100]))
                     continue
 
                 defn = definition[key]
@@ -464,7 +467,7 @@ class ImportSettings:
                     if type(value) == dict:
                         self._checkProperty(value, key, defn)
                 else:
-                    self._errors.append("Unknown configuration item: {}".format(key))
+                    self._errors.append("Unknown configuration item: {}\n".format(key))
 
         if type(definition) == list:
             for item in definition:
