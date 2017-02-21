@@ -79,8 +79,9 @@ def readJSONConfig(datasetId):
         genome = loads(SettingsRefGenome(genome_settings_file, validate=True).serialize())
     except IOError:
         print('refgenome settings not found - skipping')
-    with open(genome_settings_file, 'r') as yaml:
-        genome['_yaml'] = yaml.read()
+    if genome is not None:
+        with open(genome_settings_file, 'r') as yaml:
+            genome['_yaml'] = yaml.read()
     mapLayers = readSetOfSettings(join(dataset_folder, 'maps'), SettingsMapLayer)
     #As an optimisation we send index.html if it exists to avoid the inevitable request.
     try:
