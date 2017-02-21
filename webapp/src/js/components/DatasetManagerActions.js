@@ -70,17 +70,21 @@ let DatasetManagerActions = React.createClass({
                        message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
                        onConfirm={() => this.handleReimport()}
         />
-        <FlatButton label={"Edit dataset config"}
+        <FlatButton label={'Edit dataset config'}
                     primary={true}
                     onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="settings"/>)}
                     icon={<Icon fixedWidth={true} name={'edit'} />}
         />
-        <Divider />
-        <FlatButton label={"Edit genome config"}
-                    primary={true}
-                    onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="genome"/>)}
-                    icon={<Icon fixedWidth={true} name={'edit'} />}
-        />
+        {this.config.genome !== null ?
+          <div>
+            <Divider />
+            <FlatButton label={'Edit genome config'}
+                        primary={true}
+                        onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="genome"/>)}
+                        icon={<Icon fixedWidth={true} name={'edit'} />}
+            />
+          </div>
+        : null}
         <Divider />
         {_map(this.config.tables, (table) => (
           <FlatButton label={`Edit ${table.id}`}
