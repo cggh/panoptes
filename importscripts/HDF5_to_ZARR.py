@@ -15,8 +15,13 @@ if __name__ == '__main__':
         def copy(name):
             hdf_array = input_file[name]
             if type(hdf_array) is h5py._hl.dataset.Dataset:
+                chunks = hdf_array.chunks
+                if chunks:
+                    chunks = list(chunks)
+                    chunks[0] = 20000
+                    chunks[1] = 500
                 print name
-                zarr_array = root_grp.empty_like(name, hdf_array)
+                zarr_array = root_grp.empty_like(name, hdf_array, chunks=chunks)                
                 zarr_array[:] = hdf_array
         input_file.visit(copy)
         

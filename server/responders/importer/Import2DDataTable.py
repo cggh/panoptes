@@ -49,8 +49,8 @@ class Import2DDataTable(BaseImport):
                 columnTableSettings.loadFile(
                     os.path.join(self._datasetFolder, 'datatables', table_settings['columnDataTable'], 'settings'))
                 columnProperties = [prop['id'] for prop in columnTableSettings['properties']]
-                if table_settings['columnIndexField'] not in columnProperties:
-                    raise Exception(table_settings['columnDataTable'] + ' does not have property ' + table_settings['columnIndexField'])
+#                if table_settings['columnIndexField'] not in columnProperties:
+ #                   raise Exception(table_settings['columnDataTable'] + ' does not have property ' + table_settings['columnIndexField'])
             if table_settings['rowDataTable']:
                 rowTableSettings = SettingsDataTable()
                 rowTableSettings.loadFile(
