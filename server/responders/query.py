@@ -102,7 +102,7 @@ def handler(start_response, requestData):
                 dtype = desciptionToDType(desc[1])
                 if dtype in ['i1', 'i2', 'i4', 'S']:
                     null_value = NULL_VALUES[dtype]
-                    result[desc[0]] = np.array([row[i] if row[i] is not None else null_value for row in rows], dtype=dtype)
+                    result[desc[0]] = np.array([(row[i].encode('ascii', 'replace') if dtype == 'S' else row[i]) if row[i] is not None else null_value for row in rows], dtype=dtype)
                 elif desc[1] == 'timestamp':
                     result[desc[0]] = np.array([datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
                 else:
