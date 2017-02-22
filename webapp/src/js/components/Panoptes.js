@@ -215,4 +215,4 @@ let Header = React.createClass({
   }
 });
 
-module.exports = Panoptes;
+export default Panoptes;

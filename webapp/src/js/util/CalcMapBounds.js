@@ -13,6 +13,6 @@ function calcMapBounds(markers) {
   return bounds;
 }
 
-module.exports = {
+export default {
   calcMapBounds
 };

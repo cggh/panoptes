@@ -10,6 +10,6 @@ function map(children, func, context) {
 }
 
 
-module.exports = {
+export default {
   map: map
 };

@@ -52,6 +52,6 @@ function getViews(dataItemViews, hasGeoCoord) {
   return views;
 }
 
-module.exports = {
+export default {
   getViews
 };
