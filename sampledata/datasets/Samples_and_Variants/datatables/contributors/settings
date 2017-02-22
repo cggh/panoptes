@@ -52,17 +52,19 @@ dataItemViews:
             <i>There is no description available for this entity</i>
     {{/if}}
     </h4>
-    <h3>Sites:</h3>
-    <ul>
-    {{#each samplingsites}}
-      <li>
-          {{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}
-          <ItemLink table='samplingsites' primKey='{{SiteID}}' />
-      </li>
-    {{else}}
-      No sites from this contributor
-    {{/each}}
-    </ul>
+    {{#if samplingsites}}
+        <h3>Sites:</h3>
+        <ul>
+        {{#each samplingsites}}
+          <li>
+              {{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}
+              <ItemLink table='samplingsites' primKey='{{SiteID}}' />
+          </li>
+        {{else}}
+          No sites from this contributor
+        {{/each}}
+        </ul>
+    {{/if}}
     <div style="width:300px;height:300px">
       <ItemMap table='samplingsites' highlight='Contributor_ID:{{ID}}' />
     </div>
