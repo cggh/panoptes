@@ -11,10 +11,10 @@ let ToggleBox = React.createClass({
     children: function(props, propName, componentName) {
       // Only accept a single child, of the appropriate type
       let children = filterChildren(this, React.Children.toArray(props[propName]));
-      if (!(children[0].type === "Title" && children[1].type === Content))
+      if (!(children[0].type === "Caption" && children[1].type === Content))
         return new Error(
           '`' + componentName + '` ' +
-          'should have two children: one Title followed by one Content'
+          'should have two children: one Caption followed by one Content'
         );
     }
   },
@@ -36,10 +36,10 @@ let ToggleBox = React.createClass({
   render() {
     let {children} = this.props;
     children = filterChildren(this, React.Children.toArray(children));
-    if (!((children[0].type === "Title" && children[1].type === Content) ||
-    (children[1].type === "Title" && children[0].type === Content)))
+    if (!((children[0].type === "Caption" && children[1].type === Content) ||
+    (children[1].type === "Caption" && children[0].type === Content)))
     throw Error(
-      'ToggleBox should have two children: one Title followed by one Content'
+      'ToggleBox should have two children: one Caption followed by one Content'
     );
 
     let [title, content] = children;
