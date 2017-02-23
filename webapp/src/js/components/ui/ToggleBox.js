@@ -10,21 +10,21 @@ let ToggleBox = React.createClass({
   	isHidden: React.PropTypes.bool,
     children: React.PropTypes.element // Needs to be two elements, which counts as 5 children in React?
   },
+  
+  getDefaultProps: function () {
+    return { isHidden:true } ;
+  } ,
 
   getInitialState: function() {
       return {
-          isHidden: true
+          isHidden: this.props.isHidden
       };
   },
-    
-  handleShow: function () {
-  	this.setState ( { isHidden: false } )
+
+  handleToggle: function () {
+  	this.setState ( { isHidden: !this.state.isHidden } )
   },
-  
-  handleHide: function () {
-  	this.setState ( { isHidden: true } )
-  },
-  
+
   render() {
 	let title = this.props.children[1] ; // First element; title that is always shown
 	let payload = this.props.children[3] ; // Second element; payload that can be toggled
@@ -33,9 +33,9 @@ let ToggleBox = React.createClass({
 	
   	return (
   		<div>
-  		<div style={{display:'inline-block','vertical-align':'top',margin:'2px',cursor:'pointer','border-radius':'5px',border:'1px solid black',padding:'1px'}}>
-  			<div style={{display:v1}} onClick={this.handleShow}>+</div>
-  			<div style={{display:v2}} onClick={this.handleHide}>-</div>
+  		<div style={{display:'inline-block','vertical-align':'top',margin:'2px','text-align':'center',width:'1em',cursor:'pointer','border-radius':'5px',border:'1px solid black',padding:'1px'}} onClick={this.handleToggle}>
+  			<div style={{display:v1}}>+</div>
+  			<div style={{display:v2}}>-</div>
   		</div>
   		<div style={{display:'inline-block','vertical-align':'top',margin:'2px'}}>
   			<div>{title}</div>
