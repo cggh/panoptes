@@ -565,7 +565,7 @@ const nullValues = {
   Int32: -2147483648,
 };
 
-module.exports = {
+export default {
   annotationData,
   encodeQuery,
   errorMessage,

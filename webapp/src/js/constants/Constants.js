@@ -42,7 +42,7 @@ let api = keyMirror({
 });
 
 
-module.exports = {
+export default {
   SESSION: nameSpace('SESSION', session),
   PANOPTES: nameSpace('PANOPTES', panoptes),
   API: nameSpace('API', api)
