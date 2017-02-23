@@ -3,7 +3,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import _isArray from 'lodash/isArray';
 import filterChildren from 'util/filterChildren';
 
-//Child of CustomButton
+//Child of CustomButton, ToggleBox
 
 let Content = React.createClass({
   mixins: [
