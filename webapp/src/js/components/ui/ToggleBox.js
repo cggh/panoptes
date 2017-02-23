@@ -33,11 +33,13 @@ let ToggleBox = React.createClass({
 	
   	return (
   		<div>
-  		<div style={{display:'inline-block','vertical-align':'top',margin:'2px','text-align':'center',width:'1em',cursor:'pointer','border-radius':'5px',border:'1px solid black',padding:'1px'}} onClick={this.handleToggle}>
+  		<div style={{display:'table-cell','vertical-align':'top',margin:'2px','text-align':'center',width:'1em',padding:'1px'}}>
+  		<div style={{cursor:'pointer','border-radius':'5px',border:'1px solid black'}} onClick={this.handleToggle}>
   			<div style={{display:v1}}>+</div>
   			<div style={{display:v2}}>-</div>
   		</div>
-  		<div style={{display:'inline-block','vertical-align':'top',margin:'2px'}}>
+  		</div>
+  		<div style={{display:'table-cell','vertical-align':'top',margin:'2px'}}>
   			<div>{title}</div>
   			<div style={{display:v2}}>{payload}</div>
   		</div>
