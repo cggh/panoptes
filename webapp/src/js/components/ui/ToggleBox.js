@@ -8,6 +8,7 @@ let ToggleBox = React.createClass({
 
   propTypes: {
   	isHidden: React.PropTypes.bool,
+  	visible: React.PropTypes.string,
     children: function(props, propName, componentName) {
       // Only accept a single child, of the appropriate type
       let children = filterChildren(this, React.Children.toArray(props[propName]));
@@ -26,7 +27,7 @@ let ToggleBox = React.createClass({
 
   getInitialState: function() {
       return {
-          isHidden: this.props.isHidden
+          isHidden: typeof this.props.visible === 'undefined' ? this.props.isHidden : ( this.props.visible != 'true' )
       };
   },
 

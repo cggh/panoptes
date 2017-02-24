@@ -30,7 +30,8 @@
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "NODE_ENV=production webpack --env.prod=true",
-    "serveprod": "NODE_ENV=production webpack-dev-server --env.prod=true"
+    "serveprod": "NODE_ENV=production webpack-dev-server --env.prod=true",
+    "remotedev": "webpack-dev-server --host 0.0.0.0"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
@@ -104,6 +105,7 @@
     "react-resizable": "^1.6.0",
     "react-sidebar": "^2.3.0",
     "react-tap-event-plugin": "^2.0.1",
+    "react-image-gallery": "^0.7.0",
     "repeat-string": "^1.6.1",
     "scrollbar-size": "^1.0.4",
     "shallow-equals": "1.0.0",
