@@ -6,7 +6,6 @@ import os
 from itertools import izip, imap
 from math import isnan
 
-import h5py
 
 import config
 import uuid
@@ -76,6 +75,10 @@ def valueToString(value):
 
 def tabFileFromHDF5(settings, file):
     arrays = {}
+    try:
+        import h5py
+    except:
+        raise Exception("h5py not installed - run 'source panoptes_virtualenv/bin/activate; pip install h5py")
     with h5py.File(file, 'r') as h5:
         path = settings['hdfPath']
         props = settings['properties']
