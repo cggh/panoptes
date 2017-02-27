@@ -384,7 +384,6 @@ let TableMarkersLayer = React.createClass({
           let markerChartData = [];
           for (let value in markersGroupedByValue) {
             markerChartData.push({
-              name: markersGroupedByValue[value].map((obj) => obj.title).join(', '),
               value: markersGroupedByValue[value][0].value,
               color: markersGroupedByValue[value][0].valueAsColour
             });
@@ -432,7 +431,7 @@ let TableMarkersLayer = React.createClass({
           let markerChartData = [];
           for (let value in markersGroupedByValue) {
             markerChartData.push({
-              name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural + '\n' + markersGroupedByValue[value].map((obj) => obj.title).join(', '),
+              name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural,
               value: markersGroupedByValue[value].length,
               color: markersGroupedByValue[value][0].valueAsColour
             });
