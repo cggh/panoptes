@@ -19,11 +19,7 @@ function _filterError(json) {
     throw Error('Invalid server response type');
   }
   if ('Error' in json) {
-    if (json.Error == 'NotAuthenticated') {
-      throw Error('Not Authenticated');
-    } else {
-      throw Error(`Error: ${json.Error}`);
-    }
+    throw Error(`Error: ${json.Error}`);
   }
   if ('issue' in json) {
     throw Error(json.issue);

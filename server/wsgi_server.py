@@ -7,20 +7,19 @@ import wsgi_general
 import os
 from werkzeug.wsgi import SharedDataMiddleware, DispatcherMiddleware
 import config
-from cas import CASMiddleware
+from cas.werkzeugcas import WerkzeugCAS
 import logging
 from werkzeug.contrib.sessions import FilesystemSessionStore
 from werkzeug.wrappers import Response
 
-#logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 #This function is called if:
 # Not authenticated
 # the ignore_redirect regex matches the (full) url pattern
 def ignored_callback(environ, start_response):
     response = Response('{"Error":"NotAuthenticated"}')
-#    response.status = '401 Unauthorized'
-    response.status = '200 OK'
+    response.status = '401 Unauthorized'
     response.headers['Content-Type'] = 'application/json'
 
     return response(environ, start_response)
@@ -43,17 +42,19 @@ except AttributeError:
     effective_url = None
 if cas_service != '':
     fs_session_store = FilesystemSessionStore()
-    application = CASMiddleware(application,
-                              cas_root_url = cas_service,
-                              logout_url = config.CAS_LOGOUT_PAGE,
-                              logout_dest = config.CAS_LOGOUT_DESTINATION,
-                              protocol_version = config.CAS_VERSION,
-                              casfailed_url = config.CAS_FAILURE_PAGE,
-                              effective_url = effective_url,
-                              entry_page = '/index.html',
-                              session_store = fs_session_store,
-                              ignore_redirect = '(.*)\\api?datatype=',
-                              ignored_callback = ignored_callback)
+    cas_application = WerkzeugCAS()
+    cas_application._application = application
+    cas_application._session_store = fs_session_store
+    cas_application.initialize(cas_root_url = cas_service,
+                               logout_url = config.CAS_LOGOUT_PAGE,
+                               logout_dest = config.CAS_LOGOUT_DESTINATION,
+                               protocol_version = config.CAS_VERSION,
+                               casfailed_url = config.CAS_FAILURE_PAGE,
+                               effective_url = effective_url,
+                               entry_page = '/index.html',
+                               ignore_redirect = '(.*)\\api?datatype=',
+                               ignored_callback = ignored_callback)
+    application = cas_application
 
 
 
