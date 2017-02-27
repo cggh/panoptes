@@ -59,7 +59,8 @@ let DataTableView = React.createClass({
     onShowableRowsCountChange: React.PropTypes.func,
     onFetchedRowsCountChange: React.PropTypes.func,
     onTotalRowsCountChange: React.PropTypes.func,
-    className: React.PropTypes.string
+    className: React.PropTypes.string,
+    maxRowsPerPage: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -72,7 +73,7 @@ let DataTableView = React.createClass({
       order: [],
       startRowIndex: 0,
       columns: [],
-      columnWidths: {},
+      columnWidths: {}
     };
   },
 
@@ -107,15 +108,19 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, columns, order, startRowIndex, query, onShowableRowsCountChange} = props;
+    let {table, columns, order, startRowIndex, query, maxRowsPerPage} = props;
     let {showableRowsCount} = this.state;
 
-    if (columns.length > 0 && (onShowableRowsCountChange === undefined || showableRowsCount > 0)) {
+    if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
 
-      let stopRowIndex = startRowIndex + showableRowsCount - 1;
+      let stopRowIndex = undefined;
 
-      if (onShowableRowsCountChange === undefined) {
+      if (maxRowsPerPage !== undefined && maxRowsPerPage > 0) {
+        stopRowIndex = startRowIndex + maxRowsPerPage - 1;
+      } else if (showableRowsCount !== undefined && showableRowsCount > 0) {
+        stopRowIndex = startRowIndex + showableRowsCount - 1;
+      } else {
         stopRowIndex = undefined;
       }
 
