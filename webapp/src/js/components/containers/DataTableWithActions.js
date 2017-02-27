@@ -50,7 +50,8 @@ let DataTableWithActions = React.createClass({
     initialStartRowIndex: React.PropTypes.number,
     sidebar: React.PropTypes.bool,
     initialSearchFocus: React.PropTypes.bool,
-    searchText: React.PropTypes.string
+    searchText: React.PropTypes.string,
+    maxRowsPerPage: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -65,7 +66,8 @@ let DataTableWithActions = React.createClass({
       initialStartRowIndex: 0,
       sidebar: true,
       initialSearchFocus: false,
-      searchText: ''
+      searchText: '',
+      maxRowsPerPage: 250
     };
   },
 
@@ -138,11 +140,23 @@ let DataTableWithActions = React.createClass({
   },
 
   handleNextPage() {
-    this.setState({startRowIndex: this.state.startRowIndex + this.state.showableRowsCount});
+    if (this.props.maxRowsPerPage !== undefined) {
+      this.setState({startRowIndex: this.state.startRowIndex + this.props.maxRowsPerPage});
+    } else {
+      this.setState({startRowIndex: this.state.startRowIndex + this.state.showableRowsCount});
+    }
   },
 
   handlePreviousPage() {
-    let rowIndex = this.state.startRowIndex - this.state.showableRowsCount;
+
+    let rowIndex = undefined;
+
+    if (this.props.maxRowsPerPage !== undefined) {
+      rowIndex = this.state.startRowIndex - this.props.maxRowsPerPage;
+    } else {
+      rowIndex = this.state.startRowIndex - this.state.showableRowsCount;
+    }
+
     if (rowIndex < 0) {
       rowIndex = 0;
     }
@@ -154,7 +168,13 @@ let DataTableWithActions = React.createClass({
   },
 
   handleLastPage() {
-    this.setState({startRowIndex: this.state.totalRowsCount - this.state.showableRowsCount});
+
+    if (this.props.maxRowsPerPage !== undefined) {
+      this.setState({startRowIndex: this.state.totalRowsCount - this.props.maxRowsPerPage});
+    } else {
+      this.setState({startRowIndex: this.state.totalRowsCount - this.state.showableRowsCount});
+    }
+
   },
 
   handleDownload() {
@@ -258,7 +278,7 @@ let DataTableWithActions = React.createClass({
   render() {
 
     let actions = this.getFlux().actions;
-    let {table, columns, columnWidths, order, sidebar, setProps, searchText} = this.props;
+    let {table, columns, columnWidths, order, sidebar, setProps, searchText, maxRowsPerPage} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
     if (!columns) {
       columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
@@ -347,6 +367,8 @@ let DataTableWithActions = React.createClass({
       </div>
     );
 
+    let pageSizeInRows = maxRowsPerPage !== undefined ? maxRowsPerPage : showableRowsCount;
+
     let pageBackwardNav = null;
     if (startRowIndex != 0) {
       // Unless we are showing the first row, provide nav to previous rows.
@@ -354,12 +376,12 @@ let DataTableWithActions = React.createClass({
         <span>
         <Icon className="pointer icon"
               name="fast-backward"
-              title={'First ' + showableRowsCount + ' rows'}
+              title={'First ' + pageSizeInRows + ' rows'}
               onClick={this.handleFirstPage}
         />
         <Icon className="pointer icon"
               name="step-backward"
-              title={'Previous ' + showableRowsCount + ' rows'}
+              title={'Previous ' + pageSizeInRows + ' rows'}
               onClick={this.handlePreviousPage}
         />
         </span>
@@ -387,10 +409,10 @@ let DataTableWithActions = React.createClass({
     } else if (fetchedRowsCount == 0 && startRowIndex != 0) {
       // If we're showing nothing, and we're not at the beginning, assume we've gone past the last row.
       shownRowsMessage = <span className="text">Gone past the last row</span>;
-    } else if (fetchedRowsCount != 0 && fetchedRowsCount < showableRowsCount) {
+    } else if (fetchedRowsCount != 0 && fetchedRowsCount < pageSizeInRows) {
       // If we're showing something and it's fewer than possible, assume we're showing the last rows.
       shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {startRowIndex + fetchedRowsCount}</span>;
-    } else if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
+    } else if (fetchedRowsCount != 0 && fetchedRowsCount == pageSizeInRows) {
       // If we're showing something and it's all we can show, then there could be more or we might be showing the last lot.
 
       // What we're showing is less than we could possibly show, so it's safe to assume that we're showing the last lot.
@@ -398,18 +420,18 @@ let DataTableWithActions = React.createClass({
     }
 
     let pageForwardNav = null;
-    if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount && (startRowIndex + showableRowsCount < totalRowsCount)) {
+    if (fetchedRowsCount != 0 && fetchedRowsCount == pageSizeInRows && (startRowIndex + pageSizeInRows < totalRowsCount)) {
       // If we are showing something and it's as many as possible, then provide nav to further rows.
       pageForwardNav = (
         <span>
         <Icon className="pointer icon"
               name="step-forward"
-              title={'Next ' + showableRowsCount + ' rows'}
+              title={'Next ' + pageSizeInRows + ' rows'}
               onClick={this.handleNextPage}
         />
         <Icon className="pointer icon"
               name="fast-forward"
-              title={'Last ' + showableRowsCount + ' rows'}
+              title={'Last ' + pageSizeInRows + ' rows'}
               onClick={this.handleLastPage}
         />
         </span>
@@ -424,7 +446,7 @@ let DataTableWithActions = React.createClass({
         />
         <Icon className="pointer icon disabled"
               name="fast-forward"
-              title={'Showing last ' + showableRowsCount + ' rows'}
+              title={'Showing last ' + pageSizeInRows + ' rows'}
         />
         </span>
       );
@@ -448,7 +470,7 @@ let DataTableWithActions = React.createClass({
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
             <span className="block text">{columns !== undefined ? columns.length : 0} of {this.tableConfig().properties.length} columns shown</span>
-            <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
+            <span className="block text">{pageBackwardNav}{pageForwardNav}{shownRowsMessage}</span>
           </div>
           <div className="grow">
             <DataTableView table={table}
@@ -459,9 +481,10 @@ let DataTableWithActions = React.createClass({
                            onColumnResize={this.handleColumnResize}
                            onOrderChange={this.handleOrderChange}
                            startRowIndex={startRowIndex}
-                           onShowableRowsCountChange={this.handleShowableRowsCountChange}
+                           onShowableRowsCountChange={maxRowsPerPage !== undefined ? undefined : this.handleShowableRowsCountChange}
                            onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
                            onTotalRowsCountChange={this.handleTotalRowsCountChange}
+                           maxRowsPerPage={maxRowsPerPage}
               />
             </div>
         </div>
