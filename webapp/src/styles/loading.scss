@@ -35,8 +35,10 @@
     padding-top: 15px;
   }
   .custom {
+    opacity: 0.8;
     text-align: center;
     font-style: italic;
+    pointer-events: auto;
   }
 }
 

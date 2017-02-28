@@ -80,6 +80,12 @@ class PanoptesConfig(object):
     def getPluginPath(self):
         return self._getGlobalVar('PLUGINPATH', True)
     
+    def getCasService(self):
+        return self._getGlobalVar('CAS_SERVICE', True)
+
+    def getCasLogout(self):
+        return self._getGlobalVar('CAS_LOGOUT_PAGE', True)
+
     def getMasterDbName(self):
         return 'datasets'
             

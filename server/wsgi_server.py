@@ -14,20 +14,10 @@ from werkzeug.wrappers import Response
 
 # logging.basicConfig(level=logging.DEBUG)
 
-#This function is called if:
-# Not authenticated
-# the ignore_redirect regex matches the (full) url pattern
-def ignored_callback(environ, start_response):
-    response = Response('{"Error":"NotAuthenticated"}')
-    response.status = '401 Unauthorized'
-    response.headers['Content-Type'] = 'application/json'
-
-    return response(environ, start_response)
-
 general_with_static = SharedDataMiddleware(wsgi_general.application, {
     '/': os.path.join(os.path.dirname(config.__file__), 'webapp/dist')
 }, cache_timeout=1)
-application = DispatcherMiddleware(general_with_static, {
+api_application = DispatcherMiddleware(general_with_static, {
     '/panoptes/api':        wsgi_api.application,
 })
 
@@ -40,10 +30,22 @@ try:
     effective_url = config.CAS_EFFECTIVE_URL
 except AttributeError:
     effective_url = None
+try:
+    ssl_service = config.CAS_SSL_SERVICE
+except AttributeError:
+    ssl_service = False
+
+
 if cas_service != '':
+    # This function is called if:
+    # Not authenticated
+    # the ignore_redirect regex matches the (full) url pattern
+    def ignored_callback(environ, start_response):
+        return api_application(environ, start_response)
+
     fs_session_store = FilesystemSessionStore()
     cas_application = WerkzeugCAS()
-    cas_application._application = application
+    cas_application._application = api_application
     cas_application._session_store = fs_session_store
     cas_application.initialize(cas_root_url = cas_service,
                                logout_url = config.CAS_LOGOUT_PAGE,
@@ -51,10 +53,12 @@ if cas_service != '':
                                protocol_version = config.CAS_VERSION,
                                casfailed_url = config.CAS_FAILURE_PAGE,
                                effective_url = effective_url,
+                               ssl_service = ssl_service,
                                entry_page = '/index.html',
-                               ignore_redirect = '(.*)\\api?datatype=',
+                               ignore_redirect = '(.*)',
                                ignored_callback = ignored_callback)
     application = cas_application
-
+else:
+    application = api_application
 
 

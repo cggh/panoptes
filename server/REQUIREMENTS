@@ -20,7 +20,7 @@ diskcache==2.0.2
 zarr==2.1.4
 toolz==0.8.2
 dask==0.13.0
-CASWSGIMiddleware==1.1.0
+git+git://github.com/benjeffery/cas_wsgi_middleware.git
 
 
 

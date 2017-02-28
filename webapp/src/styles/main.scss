@@ -69,6 +69,13 @@ a {
       .username {
         margin: 7px;
         font-weight: bold;
+        .logout {
+          padding-left: 5px;
+          font-family: sans-serif;
+          text-decoration: underline;
+          font-style: italic;
+          font-weight: 100;
+        }
       }
     }
 

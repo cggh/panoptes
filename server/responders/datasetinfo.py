@@ -18,12 +18,14 @@ def response(returndata):
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
 
     returndata['manager'] = authorization.IsDataSetManager(credInfo, databaseName)
+    returndata['userid'] = credInfo.GetUserId()
 
     needfullreload = False
     needconfigreload = False
     try:
         with DQXDbTools.DBCursor(returndata, databaseName) as cur:
             cur.execute('SELECT "content" FROM "settings" WHERE "id"=%s', ("DBSchemaVersion",))
+
             rs = cur.fetchone()
             if rs is None:
                 needfullreload = True

@@ -188,13 +188,27 @@ if (dataset) {
         , document.getElementById('main'));
     })
     .catch((err) => {
-      ReactDOM.render(
-        <div>
-          <Loading status="error">
+      let errJson = null;
+      try {
+        errJson = JSON.parse(err.responseText);
+      }
+      catch(err) {}
+      let render = <Loading status="error">
             {err.responseText || err.message || 'Error'}
+          </Loading>;
+      if (errJson && err.status == 403) {
+        render = <div>
+          <Loading status="custom">
+            You ({errJson.userid}) do not have permission to read this dataset<br/>
+            {errJson.userid == 'anonymous' && errJson.cas ?
+              <a href={`${errJson.cas}?service=${window.location.href}`}>Login</a>
+              : <a href={errJson.cas_logout}>Logout</a>}
           </Loading>
-        </div>
-        , document.getElementById('main'));
+        </div>;
+
+
+      }
+      ReactDOM.render(render, document.getElementById('main'));
       throw err;
     })
     .done();

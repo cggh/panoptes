@@ -2,6 +2,7 @@ import API from 'panoptes/API';
 
 let fetchInitialConfig = function(dataset) {
   let isManager = false;
+  let userId = "anonymous";
   return API.requestJSON({
     params: {
       datatype: 'datasetinfo',
@@ -14,6 +15,7 @@ let fetchInitialConfig = function(dataset) {
       if (resp.needconfigreload)
         console.log('Schema config reload');
       isManager = resp.manager; //eslint-disable-line no-undef
+      userId = resp.userid; //eslint-disable-line no-undef
     })
     .then(() => API.requestJSON({
       params: {
@@ -21,7 +23,7 @@ let fetchInitialConfig = function(dataset) {
         dataset
       }
     }))
-    .then((resp) => ({dataset, user: {isManager}, ...resp.config}));
+    .then((resp) => ({dataset, user: {isManager, id: userId}, ...resp.config}));
 };
 
 export default fetchInitialConfig;
