@@ -80,13 +80,13 @@ EOF
     else
         monetdbd create $BASEDIR/monetdb
     fi
+    monetdbd set passphrase=monetdb $BASEDIR/monetdb
+    monetdbd set control=True $BASEDIR/monetdb
     if [ -f $BASEDIR/monetdb/merovingian.pid ]; then
         echo -e "${green}  db server already running"
     else
         monetdbd start $BASEDIR/monetdb
     fi
-    monetdbd set control=True $BASEDIR/monetdb
-    monetdbd set passphrase=monetdb $BASEDIR/monetdb
     if monetdb create datasets ; then
         monetdb release datasets
         DOTMONETDBFILE=$PROJECT_ROOT/.monetdb mclient -d datasets < ${PROJECT_ROOT}/scripts/datasetindex.sql
