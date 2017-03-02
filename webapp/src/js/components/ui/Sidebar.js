@@ -324,6 +324,8 @@ class Sidebar extends React.Component {
   }
 }
 
+Sidebar.displayName = 'Sidebar';
+
 Sidebar.propTypes = {
   // main content to render
   children: React.PropTypes.node.isRequired,
