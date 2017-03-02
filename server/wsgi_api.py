@@ -44,9 +44,13 @@ def application(environ, start_response):
         except DQXDbTools.CredentialException as e:
             print('CREDENTIAL EXCEPTION: '+str(e))
             response['Error'] = 'Credential problem: ' + str(e)
-            #Really should be 403 - but I think the JS will break as it expects 200
-            #status = '403 Forbidden'
-            status = '200 OK'
+            #Pass down the cas details if there so the client can show al login link
+            try:
+                response['cas'] = config.CAS_SERVICE
+                response['cas_logout'] = config.CAS_LOGOUT_PAGE
+            except AttributeError:
+                pass
+            status = '403 Forbidden'
         except DQXDbTools.Timeout as e:
             status = '504 Gateway Timeout'
 

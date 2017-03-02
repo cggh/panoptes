@@ -14,9 +14,9 @@ from SettingsRefGenome import SettingsRefGenome
 from SettingsMapLayer import SettingsMapLayer
 from readChromLengths import readChromLengths
 
-config = PanoptesConfig(None)
-sourceDir = join(config.getSourceDataDir(), 'datasets')
-baseDir = config.getBaseDir()
+pnConfig = PanoptesConfig(None)
+sourceDir = join(pnConfig.getSourceDataDir(), 'datasets')
+baseDir = pnConfig.getBaseDir()
 
 def readSetOfSettings(dirPath, loader, wanted_names=None):
     if not path.isdir(dirPath):
@@ -91,6 +91,7 @@ def readJSONConfig(datasetId):
         introPage = None
 
     return {
+        'cas': {'service': pnConfig.getCasService(), 'logout': pnConfig.getCasLogout()},
         'settings': settings,
         'chromosomes': chromosomes,
         'tablesById': tables,

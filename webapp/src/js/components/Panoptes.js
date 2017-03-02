@@ -82,7 +82,6 @@ let Panoptes = React.createClass({
   render() {
     let actions = this.getFlux().actions.session;
     let {tabs, popups, modal} = this.state;
-    let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.config;
     // NB: initialConfig is actually defined (in index.html)
     return (
@@ -93,7 +92,7 @@ let Panoptes = React.createClass({
               <div className="spinner" />
             </div>
             <div className="page">
-              <Header dataset={config.dataset} name={config.settings.name} userID={userID} logo={initialConfig.logo}/>
+              <Header dataset={config.dataset} name={config.settings.name} logo={initialConfig.logo}/>
               <div className="body">
                 <TabbedArea activeTab={tabs.get('selectedTab')}
                             unclosableTabs={tabs.get('unclosableTabs')}
@@ -160,7 +159,6 @@ let Header = React.createClass({
   propTypes: {
     dataset: React.PropTypes.string,
     name: React.PropTypes.string,
-    userID: React.PropTypes.string,
     logo: React.PropTypes.string
   },
 
@@ -187,13 +185,22 @@ let Header = React.createClass({
   },
 
   render() {
-    let {dataset, name, userID, logo} = this.props;
+    let {dataset, name, logo} = this.props;
     let actions = this.getFlux().actions;
+    const userId = this.config.user.id;
     // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
     return (
       <div className="header">
         <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
-        <div className="username">{userID}</div>
+        <div className="username">
+          { this.config.cas.service ? (userId == 'anonymous' ?
+            <a href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
+            : <span>
+               {userId}
+               <a className="logout" href={this.config.cas.logout}>logout</a>
+             </span>) : null
+          }
+        </div>
         <img className="logo" src={logo}/>
         {this.config.user.isManager ?
           <IconButton tooltip="Set current state as initial view for all users"
