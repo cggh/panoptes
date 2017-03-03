@@ -41,7 +41,8 @@ let SessionStore = Fluxxor.createStore({
       SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch),
       SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound),
       SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed),
-      SESSION.APP_RESIZE, this.emitIfNeeded(this.appResize)
+      SESSION.APP_RESIZE, this.emitIfNeeded(this.appResize),
+      SESSION.REUSE_OR_POPUP, this.emitIfNeeded(this.reuseOrPopup)
     );
   },
 
@@ -65,7 +66,6 @@ let SessionStore = Fluxxor.createStore({
   componentReplace({componentPath, newComponent}) {
     this.state = this.state.setIn(['components', ...componentPath], newComponent);
   },
-
 
   modalClose() {
     this.modal = null;
@@ -100,12 +100,13 @@ let SessionStore = Fluxxor.createStore({
         break;
       }
     }
-
+    this.deleteComponent(compId);
   },
 
   popupFocus({compId}) {
     this.state = this.state.updateIn(['popups', 'components'],
       (list) => list.filter((popupId) => popupId !== compId).push(compId));
+    this.useComponent(compId)
   },
 
   popupMove({compId, pos}) {
@@ -113,7 +114,6 @@ let SessionStore = Fluxxor.createStore({
   },
 
   popupOpen({component, compId, switchTo, size, pos}) {
-
     if (!compId) {
       compId = uid(10);
       this.state = this.state.setIn(['components', compId], component);
@@ -183,7 +183,7 @@ let SessionStore = Fluxxor.createStore({
 
   tabClose({compId}, force) {
     //Closing the start tab is a no-op
-    if (!force && this.state.getIn(['components', compId, 'component']) === START_TAB)
+    if (!force && this.state.getIn(['components', compId, 'type']) === START_TAB)
       return;
     let pos = this.state.getIn(['tabs', 'components']).indexOf(compId);
     if (pos === -1)
@@ -202,6 +202,7 @@ let SessionStore = Fluxxor.createStore({
         else
           this.state = this.state.setIn(['tabs', 'selectedTab'], newTabs.last());
     }
+    this.deleteComponent(compId);
   },
 
   tabOpen({component, switchTo, compId}) {
@@ -215,6 +216,7 @@ let SessionStore = Fluxxor.createStore({
     }
     if (switchTo) {
       this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
+      this.useComponent(compId);
     }
   },
   tabPopOut({compId, pos, size}) {
@@ -223,6 +225,7 @@ let SessionStore = Fluxxor.createStore({
   },
   tabSwitch({compId}) {
     this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
+    this.useComponent(compId);
   },
 
   getState() {
@@ -300,8 +303,49 @@ let SessionStore = Fluxxor.createStore({
 
     });
 
-  }
+  },
 
+  useComponent(compId) {
+    this.state = this.state.update('mostRecentlyUsedComponents',
+      Immutable.List(),
+      (list) => list.filter((usedComp) => usedComp !== compId).unshift(compId));
+  },
+
+  deleteComponent(compId) {
+    this.state = this.state.update('components',
+      (components) => components.filter((comp) => comp !== compId));
+    this.state = this.state.update('mostRecentlyUsedComponents',
+      (components) => components.filter((comp) => comp !== compId));
+
+  },
+
+  reuseOrPopup({componentName, props}) {
+    let existingCompId = null;
+    this.state.get('mostRecentlyUsedComponents', Immutable.List())
+      .forEach((compId) => {
+        if (this.state.getIn(['components', compId, 'type']) === componentName) {
+          existingCompId = compId;
+          return false;
+        }
+        else {
+          return true;
+        }
+      });
+    if (existingCompId) {
+      this.componentSetProps({componentPath: [existingCompId], updater: props});
+      if (this.state.hasIn(['popups', 'components'], existingCompId)) {
+        this.popupFocus({compId: existingCompId});
+      }
+    } else {
+      this.popupOpen({
+        component: Immutable.fromJS({
+          type: componentName,
+          props
+        }),
+        switchTo: true
+      });
+    }
+  }
 });
 
 export default SessionStore;

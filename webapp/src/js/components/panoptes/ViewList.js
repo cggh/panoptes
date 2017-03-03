@@ -10,8 +10,6 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Icon from 'ui/Icon';
 import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
-import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
-import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 
 import DatasetManagerActions from 'DatasetManagerActions';
 import TablePlotActions from 'TablePlotActions';
@@ -66,10 +64,7 @@ let ViewList = React.createClass({
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
                     onClick={hasGenome ?
                       (e) => this.handleOpen(e,
-                        <GenomeBrowserWithActions>
-                          <ReferenceSequence fixed/>
-                          <AnnotationChannel fixed/>
-                        </GenomeBrowserWithActions>
+                        <GenomeBrowserWithActions/>
                       )
                       : () => null
                     }

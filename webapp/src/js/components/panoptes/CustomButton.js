@@ -31,6 +31,7 @@ let CustomButton = React.createClass({
   },
 
   handleClick(e) {
+    e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front
     let {children, target} = this.props;
     children = filterChildren(this, React.Children.toArray(children));
     let [anchor, content] = children;
