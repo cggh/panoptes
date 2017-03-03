@@ -485,10 +485,7 @@ let TableMarkersLayer = React.createClass({
           <GeoLayouter nodes={clusterMarkers}>
             {
               (renderNodes) =>
-                <FeatureGroup
-                  layerContainer={layerContainer}
-                  map={map}
-                >
+                <FeatureGroup>
                   {
                     renderNodes.map(
                       (marker, i) => {
@@ -584,8 +581,6 @@ let TableMarkersLayer = React.createClass({
           </GeoLayouter>
           <FeatureGroup
             children={singleMarkerComponents}
-            layerContainer={layerContainer}
-            map={map}
           />
         </FeatureGroup>
       );
