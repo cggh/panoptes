@@ -28,6 +28,7 @@ let PopupButton = React.createClass({
   },
 
   handleClick(e) {
+    e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front
     let {children, target} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (target === 'tab') {

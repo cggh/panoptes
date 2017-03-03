@@ -86,8 +86,11 @@ let SessionActions = {
   },
   appResize() {
     this.dispatch(SESSION.APP_RESIZE, {});
-  }
+  },
 
+  reuseComponentOrPopup(componentName, props) {
+    this.dispatch(SESSION.REUSE_OR_POPUP, {componentName, props})
+  }
 };
 
 export default SessionActions;

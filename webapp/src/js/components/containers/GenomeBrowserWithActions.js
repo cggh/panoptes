@@ -34,6 +34,8 @@ import scrollbarSize from 'scrollbar-size';
 import ListWithActions from 'containers/ListWithActions';
 import DataTableWithActions from 'containers/DataTableWithActions';
 import SQL from 'panoptes/SQL';
+import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
+import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 
 let GenomeBrowserWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -67,6 +69,9 @@ let GenomeBrowserWithActions = React.createClass({
     //Insert an extra child to hint to the user how to add tracks
     children = React.Children.toArray(children);
     children.push(<AddChannelMessage key="_ACM_" setProps={this.props.setProps}/>);
+    //Add fixed children to the top
+    children.unshift(<AnnotationChannel fixed/>);
+    children.unshift(<ReferenceSequence fixed/>);
 
     return (
       <Sidebar
