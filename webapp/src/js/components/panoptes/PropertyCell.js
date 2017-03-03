@@ -74,8 +74,9 @@ let PropertyCell = React.createClass({
     } else if (!noLinks && prop.isPrimKey) {
       return <ItemLink table={prop.tableId} primKey={value} />;
     }
-    return <span className="prop">
-      {Formatter(prop, value)}
+    const content = Formatter(prop, value);
+    return <span className="prop" title={content}>
+      {content}
       {descriptionIcon}
     </span>;
   }
