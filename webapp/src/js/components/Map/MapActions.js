@@ -486,6 +486,8 @@ let MapActions = React.createClass({
         );
       }
 
+      // NB: Setting the key to markerColourProperty avoids zombie layer options
+      // appearing in the layerControl whenever the markerColourProperty changes.
       map = (
         <Map
           center={center}
@@ -494,7 +496,7 @@ let MapActions = React.createClass({
           onChange={this.handleChangeMap}
           zoom={zoom}
         >
-          <LayersControl>
+          <LayersControl key={markerColourProperty}>
             {baseLayerComponent}
             {overlayLayerComponent}
             {markersLayerComponent}
