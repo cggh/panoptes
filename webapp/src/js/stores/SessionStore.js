@@ -106,6 +106,7 @@ let SessionStore = Fluxxor.createStore({
   popupFocus({compId}) {
     this.state = this.state.updateIn(['popups', 'components'],
       (list) => list.filter((popupId) => popupId !== compId).push(compId));
+    this.useComponent(compId)
   },
 
   popupMove({compId, pos}) {
@@ -215,6 +216,7 @@ let SessionStore = Fluxxor.createStore({
     }
     if (switchTo) {
       this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
+      this.useComponent(compId);
     }
   },
   tabPopOut({compId, pos, size}) {
@@ -223,6 +225,7 @@ let SessionStore = Fluxxor.createStore({
   },
   tabSwitch({compId}) {
     this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
+    this.useComponent(compId);
   },
 
   getState() {
@@ -300,6 +303,13 @@ let SessionStore = Fluxxor.createStore({
 
     });
 
+  },
+
+  //Mark a component as used so we update our most recent used lists
+  useComponent(compId) {
+    this.state = this.state.update('mostRecentlyUsedComponents',
+      Immutable.List(),
+      (list) => list.filter((usedComp) => usedComp !== compId).unshift(compId));
   }
 
 });
