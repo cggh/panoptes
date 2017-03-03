@@ -90,7 +90,7 @@ let SessionStore = Fluxxor.createStore({
     this.lastNotification = payload;
   },
 
-  popupClose({compId}) {
+  popupClose({compId, keep}) {
     let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
     this.state = this.state.setIn(['popups', 'components'], list);
 
@@ -100,7 +100,9 @@ let SessionStore = Fluxxor.createStore({
         break;
       }
     }
-    this.deleteComponent(compId);
+    if (!keep) {
+      this.deleteComponent(compId);
+    }
   },
 
   popupFocus({compId}) {
@@ -178,10 +180,10 @@ let SessionStore = Fluxxor.createStore({
 
   popupToTab(payload) {
     this.tabOpen({switchTo: true, ...payload});
-    this.popupClose(payload);
+    this.popupClose({keep: true, ...payload});
   },
 
-  tabClose({compId}, force) {
+  tabClose({compId, keep}, force) {
     //Closing the start tab is a no-op
     if (!force && this.state.getIn(['components', compId, 'type']) === START_TAB)
       return;
@@ -202,7 +204,9 @@ let SessionStore = Fluxxor.createStore({
         else
           this.state = this.state.setIn(['tabs', 'selectedTab'], newTabs.last());
     }
-    this.deleteComponent(compId);
+    if (!keep) {
+      this.deleteComponent(compId);
+    }
   },
 
   tabOpen({component, switchTo, compId}) {
@@ -221,7 +225,7 @@ let SessionStore = Fluxxor.createStore({
   },
   tabPopOut({compId, pos, size}) {
     this.popupOpen({compId, pos, size, switchTo: true});
-    this.tabClose({compId, pos}, true);
+    this.tabClose({compId, pos, keep: true}, true);
   },
   tabSwitch({compId}) {
     this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
@@ -313,10 +317,9 @@ let SessionStore = Fluxxor.createStore({
 
   deleteComponent(compId) {
     this.state = this.state.update('components',
-      (components) => components.filter((comp) => comp !== compId));
+      (components) => components.delete(compId));
     this.state = this.state.update('mostRecentlyUsedComponents',
       (components) => components.filter((comp) => comp !== compId));
-
   },
 
   reuseOrPopup({componentName, props}) {
