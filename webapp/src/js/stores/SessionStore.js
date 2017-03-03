@@ -333,7 +333,7 @@ let SessionStore = Fluxxor.createStore({
       });
     if (existingCompId) {
       this.componentSetProps({componentPath: [existingCompId], updater: props});
-      if (this.state.hasIn(['popups', 'components'], existingCompId)) {
+      if (this.state.getIn(['popups', 'components']).has(existingCompId)) {
         this.popupFocus({compId: existingCompId});
       }
     } else {
