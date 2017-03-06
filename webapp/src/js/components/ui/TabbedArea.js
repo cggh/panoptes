@@ -63,7 +63,6 @@ let TabbedArea = React.createClass({
 
   handleClick(tabId, e) {
     if (this.props.onSwitch) {
-      e.preventDefault();
       this.props.onSwitch(tabId);
     }
   },
