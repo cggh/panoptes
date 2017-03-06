@@ -6,8 +6,8 @@ annotation:                                # Directives for parsing the annotati
   geneFeature: [gene, pseudogene]          # Feature id(s) used to identify genes
   exonFeature: [CDS, pseudogenic_exon]     # Feature id(s) used to identify exons
   geneNameAttribute: Name                  # Attribute id used to identify gene names
-  geneNameSetAttribute: [Name, synonym]      # Attribute id(s) used to identify gene name sets
-  geneDescriptionAttribute: [comment, literature]    # Attribute id(s) used to identify gene descriptions
+  geneNameSetAttribute: [synonym, previous_systematic_id]      # Attribute id(s) used to identify gene name sets
+  geneDescriptionAttribute: [product]    # Attribute id(s) used to identify gene descriptions
 
 externalGeneLinks:
 -                                              # Links to external web page that will show up for each gene

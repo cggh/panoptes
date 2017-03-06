@@ -251,8 +251,8 @@ class GFFParser:
                 f.write(''+'\t')
                 f.write('gene'+'\t')
                 f.write(feat['name']+'\t')
-                f.write(';'.join(unicode(key)+unicode(': ')+urllib.unquote(val) for key, val in feat['names'].items())+'\t')
-                f.write(';'.join(unicode(key)+unicode(': ')+urllib.unquote(val) for key, val in feat['descr'].items()))
+                f.write('; '.join(unicode(key)+unicode(': ')+urllib.unquote(val) for key, val in feat['names'].items())+'\t')
+                f.write('; '.join(unicode(key)+unicode(': ')+urllib.unquote(val) for key, val in feat['descr'].items()))
                 f.write('\n')
                 for child in feat['children']:
                     if child['type'] in self.exonid:
