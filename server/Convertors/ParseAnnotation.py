@@ -24,7 +24,7 @@ class GFFParser:
         self.attriblist_name = []
         self.attriblist_names = []
         self.attriblist_descr = []
-
+        self.attriblist_top_level_descr = []
 
     def GetParentFeature(self,feat):
         parentid=feat['parentid']
@@ -94,7 +94,7 @@ class GFFParser:
                                     appendfeatproperty(feat, 'name', value)
                                 if key in self.attriblist_names:
                                     feat['names'][key] = value
-                                if key in self.attriblist_descr:
+                                if key in self.attriblist_top_level_descr:
                                     feat['descr'][key] = value
                             else:
                                 if key == 'gene_id':
@@ -152,7 +152,7 @@ class GFFParser:
                                 appendfeatproperty(feat, 'name', value)
                             if key in self.attriblist_names:
                                 feat['names'][key] = value
-                            if key in self.attriblist_descr:
+                            if key in self.attriblist_top_level_descr:
                                 feat['descr'][key] = value
                             if key == 'Derives_from':
                                 feat['derives_from'] = value
@@ -226,7 +226,7 @@ class GFFParser:
         print('add info from children')
         for feat in self.features:
             for child in feat['children'] + (feat['derived'] if 'derived' in feat else []):
-                for key in self.attriblist_descr:
+                for key in self.attriblist_top_level_descr:
                     if key not in feat['descr'] and key in child['descr']:
                         feat['descr'][key] = child['descr'][key]
                 for key in self.attriblist_names:
@@ -251,8 +251,30 @@ class GFFParser:
                 f.write(''+'\t')
                 f.write('gene'+'\t')
                 f.write(feat['name']+'\t')
-                f.write('; '.join(unicode(key)+unicode(': ')+urllib.unquote(val) for key, val in feat['names'].items())+'\t')
-                f.write('; '.join(unicode(key)+unicode(': ')+urllib.unquote(val) for key, val in feat['descr'].items()))
+                names = []
+                for key, val in feat['names'].items():
+                    for altname in val.split(','):
+                        altname = urllib.unquote(altname)
+                        names.append(altname.split(';')[0]) #Just grab the name, not data associated to it
+                f.write(', '.join(sorted(names))+'\t')
+                desc = []
+                for key in self.attriblist_descr:
+                    if key in feat['descr']:
+                        desc.append(unicode(key) + unicode(': ') + urllib.unquote(feat['descr'][key]))
+                    else:
+                        if '.' in key:
+                            first, second = key.split('.')
+                            try:
+                                decoded = urllib.unquote(feat['descr'][first])
+                                for data in decoded.split(';'):
+                                    if ('=') in data:
+                                        key_2, val = data.split('=')[:2]  #Often = appears in value
+                                        if key_2 == second:
+                                            desc.append(unicode(first) + unicode(': ') + urllib.unquote(val))
+                            except KeyError:
+                                pass
+
+                f.write('; '.join(desc))
                 f.write('\n')
                 for child in feat['children']:
                     if child['type'] in self.exonid:
@@ -333,6 +355,7 @@ parser.exonid = arg_exonid.split(',')
 parser.attriblist_name = arg_attrib_genename.split(',')
 parser.attriblist_names = arg_attriblist_genenames.split(',')
 parser.attriblist_descr = arg_attrib_descr.split(',')
+parser.attriblist_top_level_descr = set(map(lambda descr: descr.split('.')[0], parser.attriblist_descr))
 
 if arg_format == 'GTF':
     parser.parseGTF(filelist)
