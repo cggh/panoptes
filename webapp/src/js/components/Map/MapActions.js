@@ -555,7 +555,7 @@ let MapActions = React.createClass({
             />
           : null }
           {
-            this.config.user.isManager ?
+            this.config.user.isManager  && false ?  //Disabling this for now till we have a generic system for all components
               <TextField
                 floatingLabelText="Template code:"
                 multiLine={true}
