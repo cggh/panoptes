@@ -26,6 +26,9 @@ let TableList = React.createClass({
 
   handleOpen(e, component) {
     const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
+    if (!middleClick) {
+      e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front
+    }
     (this.props.onClick || this.handleClick)({component, middleClick});
   },
 
