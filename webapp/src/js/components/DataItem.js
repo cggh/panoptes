@@ -28,7 +28,7 @@ let DataItem = React.createClass({
     children: React.PropTypes.node
   },
 
-  getDefaultProps: function() {
+  getDefaultProps: function () {
     return {
       activeTab: 'view_0'
     };
@@ -45,28 +45,30 @@ let DataItem = React.createClass({
   render() {
     let {table, primKey, setProps, activeTab, children} = this.props;
     children = filterChildren(this, children); //Remove whitespace children from template padding
+    children = ValidComponentChildren.map(children, (child, i) => {
+      let viewId = `view_${i}`;
+      return (
+        <TabPane
+          compId={viewId}
+          key={viewId}
+        >
+          {React.cloneElement(child, {table, primKey})}
+        </TabPane>
+      );
+    });
     return (
       <div className="vertical stack" style={{position: 'absolute'}}>
         <div className="grow">
-          <TabbedArea
+          {children.length > 1 ? <TabbedArea
             activeTab={activeTab}
             onSwitch={(id) => setProps({activeTab: id})}
-           >
-            {ValidComponentChildren.map(children, (child, i) => {
-              let viewId = `view_${i}`;
-              return (
-                <TabPane
-                  compId={viewId}
-                  key={viewId}
-                >
-                  {React.cloneElement(child, {table, primKey})}
-                </TabPane>
-              );
-            })}
-          </TabbedArea>
+          >
+            {children}
+          </TabbedArea> :
+          children[0]}
         </div>
         <div>
-          <DataItemActions table={table} primKey={primKey} />
+          <DataItemActions table={table} primKey={primKey}/>
         </div>
       </div>
     );
