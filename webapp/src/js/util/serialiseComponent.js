@@ -24,9 +24,16 @@ export default function serialiseComponent(component) {
       otherFiltered[key] = val;
     }
   });
-  children = React.Children.map(children, serialiseComponent) || undefined;
+  let props = {};
+  if (children) {
+    props = { children: React.Children.map(children, serialiseComponent),
+      ...otherFiltered
+    }
+  } else {
+    props = otherFiltered;
+  }
   return Immutable.fromJS({
     type: displayName,
-    props: {children, ...otherFiltered}
+    props
   });
 }
