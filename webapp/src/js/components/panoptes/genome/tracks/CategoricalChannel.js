@@ -463,7 +463,7 @@ let Side = React.createClass({
   ],
   render() {
     let {query, table, track} = this.props;
-    return <div>
+    return <div className="side-name">
       <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural+':' : '')}</div>
       <div className="legend-element">
 

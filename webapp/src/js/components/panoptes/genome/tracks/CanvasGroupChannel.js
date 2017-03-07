@@ -130,7 +130,7 @@ let CanvasGroupChannel = React.createClass({
         width={width}
         sideWidth={sideWidth}
         height={height}
-        sideComponent={<div className="side-name">{side}</div>}
+        sideComponent={side}
         //Override component update to get latest in case of skipped render
         configComponent={controls}
         legendComponent={legend}
