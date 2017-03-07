@@ -45,17 +45,21 @@ let DataItem = React.createClass({
   render() {
     let {table, primKey, setProps, activeTab, children} = this.props;
     children = filterChildren(this, children); //Remove whitespace children from template padding
-    children = ValidComponentChildren.map(children, (child, i) => {
-      let viewId = `view_${i}`;
-      return (
-        <TabPane
-          compId={viewId}
-          key={viewId}
-        >
-          {React.cloneElement(child, {table, primKey})}
-        </TabPane>
-      );
-    });
+    if (children.length > 1) {
+      children = ValidComponentChildren.map(children, (child, i) => {
+        let viewId = `view_${i}`;
+        return (
+          <TabPane
+            compId={viewId}
+            key={viewId}
+          >
+            {React.cloneElement(child, {table, primKey})}
+          </TabPane>
+        );
+      });
+    } else {
+      children = ValidComponentChildren.map(children, (child, i) => React.cloneElement(child, {table, primKey}));
+    }
     return (
       <div className="vertical stack" style={{position: 'absolute'}}>
         <div className="grow">
