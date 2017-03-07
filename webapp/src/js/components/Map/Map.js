@@ -257,7 +257,7 @@ let Map = React.createClass({
       center = {lat: 0, lng: 0};
     }
     if (bounds === undefined && zoom === undefined) {
-      zoom = 0;
+      zoom = 2;
     }
 
     // NB: JSX children will overwrite the passed prop, if any.
