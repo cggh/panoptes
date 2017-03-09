@@ -26,6 +26,8 @@ import LegendElement from 'panoptes/LegendElement';
 import _filter from 'lodash/filter';
 import QueryString from 'panoptes/QueryString';
 import FilterButton from 'panoptes/FilterButton';
+import PropertyHeader from 'panoptes/PropertyHeader';
+
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
@@ -160,7 +162,8 @@ let Side = React.createClass({
         'childrenHash'
       ],
       redirect: [
-        'setProps'
+        'setProps',
+        'onLegendToggle'
       ]
     })
   ],
@@ -170,7 +173,12 @@ let Side = React.createClass({
     let trackNames = ValidComponentChildren.map(children, (child, i) =>
       <LegendElement
         key={child.props.track}
-        name={child.props.track}
+        name={<PropertyHeader className="table-row-header"
+                              name={this.tableConfig().propertiesById[child.props.track].name}
+                              description={this.tableConfig().propertiesById[child.props.track].description}
+                              tooltipPlacement={'bottom'}
+                              tooltipTrigger={['click']}
+        />}
         colour={child.props.colour}
         onPickColour={(colour) =>
           this.redirectedProps.setProps(
@@ -181,11 +189,13 @@ let Side = React.createClass({
     />);
     if (trackNames.length > 3) {
       let n = trackNames.length;
-      trackNames = trackNames.slice(0,2).concat(<div>+ {n-2} more</div>)
+      trackNames = trackNames.slice(0,2).concat(
+        <div>+ <a onClick={this.redirectedProps.onLegendToggle}>{n-2} more</a></div>
+      )
     }
-    return <div>
+    return <div className="side-name">
       <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural+':' : '')}</div>
-      <div>{trackNames}</div>
+      <div style={{marginLeft:"-13px"}}>{trackNames}</div>
     </div>;
   }
 

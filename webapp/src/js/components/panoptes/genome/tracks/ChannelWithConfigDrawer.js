@@ -51,12 +51,12 @@ let ChannelWithConfigDrawer = React.createClass({
     let {controlsOpen, legendOpen} = this.state;
 
     let effWidth = width - sideWidth;
-
+    let side = React.cloneElement(sideComponent, {onLegendToggle: this.handleLegendToggle});
     return (
       <div className="channel-container">
         <div className="channel-side" style={{width: `${sideWidth}px`}}>
           <div className="side-component">
-            {sideComponent}
+            {side}
           </div>
           {onClose ?
           <div className="close button">
