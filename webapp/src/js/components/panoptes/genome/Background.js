@@ -13,7 +13,9 @@ let Background = React.createClass({
     end: React.PropTypes.number,
     width: React.PropTypes.number,
     height: React.PropTypes.number,
-    sideWidth: React.PropTypes.number
+    sideWidth: React.PropTypes.number,
+    hoverPos: React.PropTypes.number,
+    onChangeHoverPos: React.PropTypes.func
   },
 
   componentDidMount() {
@@ -27,12 +29,16 @@ let Background = React.createClass({
   render() {
     const {width, height} = this.props;
     return (
-      <canvas className="background" ref="canvas" width={width} height={height}/>
+      <canvas className="background"
+              ref="canvas"
+              width={width}
+              height={height}
+      />
     );
   },
 
   paint() {
-    let {start, end, width, height, sideWidth} = this.props;
+    let {start, end, width, height, sideWidth, hoverPos} = this.props;
     const canvas = this.refs.canvas;
 
     let scale = scaleLinear().domain([start, end]).range([sideWidth, width]);
@@ -68,6 +74,16 @@ let Background = React.createClass({
     }
     ctx.lineWidth = 0.5;
     ctx.stroke();
+    if (hoverPos != null)
+    {
+      let x = scale(hoverPos);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'black';
+      ctx.beginPath();
+      ctx.moveTo(x, 40);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
   }
 
 });

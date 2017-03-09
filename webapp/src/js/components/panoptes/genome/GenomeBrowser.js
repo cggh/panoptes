@@ -64,7 +64,8 @@ let GenomeBrowser = React.createClass({
       springConfig: DEFAULT_SPRING,
       loading: 0,
       width: 0,
-      height: 0
+      height: 0,
+      hoverPos: null
     };
   },
 
@@ -95,6 +96,7 @@ let GenomeBrowser = React.createClass({
       nextProps.end !== this.props.end
       ) {
       nextProps.setProps({start: 0, end: this.config.chromosomes[nextProps.chromosome] || 10000});
+      this.setState({hoverPos: null}); //Clear the hoverPos
     }
     if (this.nextSpringConfig) {
       this.setState({springConfig: this.nextSpringConfig});
@@ -243,12 +245,38 @@ let GenomeBrowser = React.createClass({
     });
   },
 
+  handleHover(hoverPos) {
+    this.setState({hoverPos})
+  },
+
+  convertXY(e) {
+    let rect = this.refs.mainArea.getBoundingClientRect();
+    return [e.clientX - rect.left, e.clientY - rect.top];
+  },
+
+  handleMouseMove(e) {
+    if(!e.hoverHandled) {
+      let [x, y] = this.convertXY(e);
+      const {sideWidth, start, end} = this.props;
+      let {width} = this.state;
+      width = Math.max(0, width - scrollbarSize());
+      const scaleFactor = (end - start) / (width - sideWidth);
+      const hoverPos = Math.round(start + ((x - sideWidth) * scaleFactor));
+      this.handleHover(hoverPos)
+    }
+  },
+
+  handleMouseOver(e) {
+    this.handleMouseMove(e);
+  },
+
+
   render() {
     let {start, end, sideWidth, chromosome, children} = this.props;
     children = filterChildren(this, children); //Remove whitespace children from template padding
 
     chromosome = chromosome || this.defaultChrom;
-    let {loading} = this.state;
+    let {loading, hoverPos} = this.state;
     if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
 
@@ -284,7 +312,7 @@ let GenomeBrowser = React.createClass({
             onPinch={(e) => console.log('Pinch not implemented', e)}
             onWheel={this.handleMouseWheel}
           >
-            <div className="main-area">
+            <div ref="mainArea" className="main-area">
               <Motion ref="spring"
                       style={targetPos}
                       defaultStyle={initTargetPos}>
@@ -302,16 +330,27 @@ let GenomeBrowser = React.createClass({
                     end: end,
                     width: width,
                     sideWidth: sideWidth,
-                    onChangeLoadStatus: this.handleChangeLoadStatus
+                    hoverPos: hoverPos,
+                    onChangeLoadStatus: this.handleChangeLoadStatus,
+                    onChangeHoverPos: this.handleHover
                   };
                   return (
-                    <div className="tracks vertical stack">
+                    <div className="tracks vertical stack"
+                        onMouseMove={this.handleMouseMove}
+                        onMouseOver={this.handleMouseOver}
+                    >
                       <Background start={start} end={end} width={width} height={Math.max(0, height - CONTROLS_HEIGHT)}
-                                  sideWidth={sideWidth}/>
+                                  sideWidth={sideWidth}
+                                  onChangeHoverPos={this.handleHover}
+                                  hoverPos={hoverPos}
+                      />
 
                       <div className="fixed">
                         <GenomeScale start={start} end={end}
-                                     width={width} sideWidth={sideWidth}/>
+                                     width={width} sideWidth={sideWidth}
+                                     onChangeHoverPos={this.handleHover}
+                                     hoverPos={hoverPos}
+                        />
                         {ValidComponentChildren.map(children,
                           (child, i) => child.props.fixed ?
                             React.cloneElement(child, {

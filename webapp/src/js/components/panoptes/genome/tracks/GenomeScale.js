@@ -13,7 +13,8 @@ let GenomeScale = React.createClass({
     start: React.PropTypes.number,
     end: React.PropTypes.number,
     width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number
+    sideWidth: React.PropTypes.number,
+    hoverPos: React.PropTypes.number,
   },
 
   componentDidMount() {
@@ -40,7 +41,7 @@ let GenomeScale = React.createClass({
   },
 
   paint() {
-    let {start, end, width, sideWidth} = this.props;
+    let {start, end, width, sideWidth, hoverPos} = this.props;
     const canvas = this.refs.canvas;
 
     let scale = scaleLinear().domain([start, end]).range([0, width - sideWidth]);
@@ -80,6 +81,22 @@ let GenomeScale = React.createClass({
     }
     ctx.lineWidth = 0.5;
     ctx.stroke();
+    if (hoverPos != null) {
+      let x = scale(hoverPos);
+      ctx.beginPath();
+      ctx.moveTo(x, 34);
+      ctx.lineTo(x, 40);
+      ctx.stroke();
+      ctx.shadowColor="white";
+      ctx.strokeStyle="white";
+      ctx.shadowBlur=7;
+      ctx.lineWidth=5;
+      ctx.strokeText("▮▮" + format(hoverPos) + "▮▮", hoverPos == 0 && start == 0 ? x + 10 : x, 10);
+      ctx.shadowBlur=0;
+      ctx.fillStyle="black";
+      ctx.fillText(format(hoverPos), hoverPos == 0 && start == 0 ? x + 10 : x, 10);
+
+    }
   }
 });
 

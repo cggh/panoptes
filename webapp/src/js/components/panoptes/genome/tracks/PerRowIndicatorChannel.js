@@ -33,7 +33,8 @@ let PerRowIndicatorChannel = React.createClass({
     PureRenderWithRedirectedProps({
       redirect: [
         'setProps',
-        'onClose'
+        'onClose',
+        'onChangeHoverPos'
       ],
       check: [
         'start',
@@ -44,7 +45,8 @@ let PerRowIndicatorChannel = React.createClass({
         'name',
         'table',
         'colourProperty',
-        'query'
+        'query',
+        'hoverPos'
       ]
     }),
     FluxMixin,
@@ -64,7 +66,8 @@ let PerRowIndicatorChannel = React.createClass({
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
     colourProperty: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func
+    onChangeLoadStatus: React.PropTypes.func,
+    hoverPos: React.PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -79,13 +82,25 @@ let PerRowIndicatorChannel = React.createClass({
   getInitialState() {
     return {
       knownValues: null,
-      hoverIndex: null
+      hoverIndex: null,
+      hoverClick: null
     };
   },
 
   componentWillMount() {
     this.positions = [];
     this.tooBigBlocks = [];
+  },
+
+  componentWillReceiveProps({hoverPos}) {
+    let positions = this.positions;
+    for(let i = 0, n = positions.length; i < n; i++) {
+      if (positions[i] == hoverPos) {
+        this.setState({hoverIndex: i});
+        return;
+      }
+    }
+    this.setState({hoverIndex: null})
   },
 
   componentDidMount() {
@@ -331,43 +346,48 @@ let PerRowIndicatorChannel = React.createClass({
     } else if (this.state.knownValues) {
       this.setState({knownValues: null});
     }
-
+    this.setState({hoverIndex});
   },
 
   handleClick(e) {
-    let [x, y] = this.convertXY(e);
-    let id = this.xyToId(x, y);
-    if (id)
-      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: id});
+    if (this.state.hoverIndex != null) {
+      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverIndex]});
+    }
   },
 
-  xyToId(x, y) {
+  xyToIndex(x, y) {
     const psx = (HEIGHT / 2) - 7;
-    if (y < psx || y > psx + 12) {
-      return null;
-    }
     const {width, sideWidth, start, end} = this.props;
     const positions = this.positions;
     const scaleFactor = ((width - sideWidth) / (end - start));
     //Triangles/Lines
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
-    let best = 99999;
-    let bestPrimKey = null;
+    let nearest = 100;
+    let nearestClick = 100;
+    let nearestIndex = null;
+    let nearestClickIndex = null;
     for (let i = 0, l = numPositions; i < l; ++i) {
       const psx = scaleFactor * (positions[i] - start);
-      if (triangleMode) {
-        if (x < psx + 7 && x > psx - 7 && Math.abs(x - psx) < best) {
-          best = Math.abs(x - psx);
-          bestPrimKey = this.primKeys[i];
-        }
-      } else {
-        if (x < Math.ceil(psx) && x > Math.floor(psx)) {
-          return this.primKeys[i];
+      if (Math.abs(x - psx) < nearest) {
+          nearest = Math.abs(x - psx);
+          nearestIndex = i;
+      }
+      if (y < psx || y > psx + 12) {
+        if (triangleMode) {
+          if (x < psx + 7 && x > psx - 7 && Math.abs(x - psx) < nearestClick) {
+            nearestClick = Math.abs(x - psx);
+            nearestClickIndex = i;
+          }
+        } else {
+          if (x < Math.ceil(psx) && x > Math.floor(psx)) {
+            nearestClick = Math.abs(x - psx);
+            nearestClickIndex = i;
+          }
         }
       }
     }
-    return bestPrimKey;
+    return {nearestIndex, nearestClickIndex};
   },
 
   convertXY(e) {
@@ -375,40 +395,34 @@ let PerRowIndicatorChannel = React.createClass({
     return [e.clientX - rect.left, e.clientY - rect.top];
   },
 
-  setHover(hoverId) {
-    if (hoverId) {
-      for (let i = 0, l = this.positions.length; i < l; ++i) {
-        if (this.primKeys[i] === hoverId) {
-          this.setState({hoverIndex: i});
-          return;
-        }
-      }
-    } else {
-      this.setState({hoverIndex: null});
+  setHover({nearestIndex, nearestClickIndex}) {
+    if (this.props.onChangeHoverPos) {
+      this.props.onChangeHoverPos(this.positions[nearestIndex]);
     }
+    this.setState({hoverClick: nearestClickIndex != null});
   },
 
   handleMouseMove(e) {
+    e.persist();
+    e.hoverHandled = true;
     let [x, y] = this.convertXY(e);
-    let id = this.xyToId(x, y);
-    this.setHover(id);
+    let {nearestIndex, nearestClickIndex} = this.xyToIndex(x, y);
+    this.setHover({nearestIndex, nearestClickIndex});
   },
   handleMouseOver(e) {
-    let [x, y] = this.convertXY(e);
-    let id = this.xyToId(x, y);
-    this.setHover(id);
+    this.handleMouseMove(e);
   },
   handleMouseOut(e) {
-    this.setState({hoverIndex: null});
+    this.setState({hoverClick: false});
   },
 
   render() {
     const {start, end, width, sideWidth, table, colourProperty} = this.props;
-    const {knownValues, hoverIndex} = this.state;
+    const {knownValues, hoverIndex, hoverClick} = this.state;
     const config = this.config.tablesById[table];
     let hoverId = this.primKeys ? this.primKeys[hoverIndex] : null;
     const scaleFactor = ((width - sideWidth) / (end - start));
-    let hoverPos = hoverId ? scaleFactor * (this.positions[hoverIndex] - start) : null;
+    let hoverPx = hoverId ? scaleFactor * (this.positions[hoverIndex] - start) : null;
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -431,14 +445,14 @@ let PerRowIndicatorChannel = React.createClass({
       >
         <div className="canvas-container">
           <canvas ref="canvas"
-                  style={{cursor: hoverId ? 'pointer' : 'inherit'}}
+                  style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
                   width={width} height={HEIGHT}
                   onClick={this.handleClick}
                   onMouseOver={this.handleMouseOver}
                   onMouseMove={this.handleMouseMove}
                   onMouseOut={this.handleMouseOut}
           />
-          {hoverPos !== null ?
+          {hoverPx !== null && hoverPx > 0 && hoverPx < width ?
             <Tooltip placement={'bottom'}
                      visible={true}
                      overlay={<div>
@@ -450,7 +464,7 @@ let PerRowIndicatorChannel = React.createClass({
                               </tbody></table>
                             </div>}>
               <div
-                style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPos-6}px`, height: '12px', width: '12px'}}/>
+                style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPx-6}px`, height: '12px', width: '12px'}}/>
             </Tooltip>
             : null}</div>
 
