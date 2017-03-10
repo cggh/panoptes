@@ -93,11 +93,14 @@ let GenomeBrowser = React.createClass({
     //If just switching chrom then reset to full width
     if (nextProps.chromosome !== this.props.chromosome && nextProps.setProps &&
       nextProps.start === this.props.start &&
-      nextProps.end !== this.props.end
+      nextProps.end === this.props.end
       ) {
       nextProps.setProps({start: 0, end: this.config.chromosomes[nextProps.chromosome] || 10000});
-      this.setState({hoverPos: null}); //Clear the hoverPos
     }
+    if (nextProps.chromosome !== this.props.chromosome) {
+      this.setState({hoverPos: null});
+    }
+    
     if (this.nextSpringConfig) {
       this.setState({springConfig: this.nextSpringConfig});
       this.nextSpringConfig = null;
