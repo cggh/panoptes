@@ -70,8 +70,8 @@ let GenomeBrowserWithActions = React.createClass({
     children = React.Children.toArray(children);
     children.push(<AddChannelMessage key="_ACM_" setProps={this.props.setProps}/>);
     //Add fixed children to the top
-    children.unshift(<AnnotationChannel fixed/>);
-    children.unshift(<ReferenceSequence fixed/>);
+    children.push(<ReferenceSequence key="_ref_" fixed/>);
+    children.push(<AnnotationChannel key="_annot_" fixed/>);
 
     return (
       <Sidebar
