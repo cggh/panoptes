@@ -91,10 +91,10 @@ let GenomeScale = React.createClass({
       ctx.strokeStyle="white";
       ctx.shadowBlur=7;
       ctx.lineWidth=5;
-      ctx.strokeText("▮▮" + format(hoverPos) + "▮▮", hoverPos == 0 && start == 0 ? x + 10 : x, 10);
+      ctx.strokeText("▮▮" + hoverPos + "▮▮", hoverPos == 0 && start == 0 ? x + 10 : x, 10);
       ctx.shadowBlur=0;
       ctx.fillStyle="black";
-      ctx.fillText(format(hoverPos), hoverPos == 0 && start == 0 ? x + 10 : x, 10);
+      ctx.fillText(hoverPos, hoverPos == 0 && start == 0 ? x + 10 : x, 10);
 
     }
   }

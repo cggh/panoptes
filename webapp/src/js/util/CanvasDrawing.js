@@ -11,3 +11,21 @@ export function hatchRect(ctx, x1, y1, dx, dy, delta) {
   ctx.stroke();
   ctx.restore();
 }
+
+export function drawText(ctx, text, x, y) {
+  let {width} = ctx.measureText(text);
+  let height = ctx.measureText('M').width; //Yeah.... so the canvas API doesn't let you measure height
+  let oldFill = ctx.fillStyle;
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  let fadeX = x;
+  let fadeY = y;
+  if (ctx.textAlign == 'right') {
+    fadeX = x - width;
+  }
+  if (ctx.textBaseline == 'middle') {
+    fadeY = y - (height/2);
+  }
+  ctx.fillRect(fadeX, fadeY, width, height);
+  ctx.fillStyle = oldFill
+  ctx.fillText(text, x, y);
+}

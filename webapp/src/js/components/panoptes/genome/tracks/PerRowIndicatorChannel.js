@@ -67,7 +67,8 @@ let PerRowIndicatorChannel = React.createClass({
     query: React.PropTypes.string,
     colourProperty: React.PropTypes.string,
     onChangeLoadStatus: React.PropTypes.func,
-    hoverPos: React.PropTypes.number
+    hoverPos: React.PropTypes.number,
+    onChangeHoverPos: React.PropTypes.func
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -453,7 +454,8 @@ let PerRowIndicatorChannel = React.createClass({
                   onMouseOut={this.handleMouseOut}
           />
           {hoverPx !== null && hoverPx > 0 && hoverPx < width ?
-            <Tooltip placement={'bottom'}
+            <Tooltip placement={'right'}
+                     overlayStyle={{pointerEvents:'none'}}
                      visible={true}
                      overlay={<div>
                               <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hoverId}/></div>

@@ -270,6 +270,9 @@ let GenomeBrowser = React.createClass({
     this.handleMouseMove(e);
   },
 
+  handleMouseOut(e) {
+    this.handleHover(null);
+  },
 
   render() {
     let {start, end, sideWidth, chromosome, children} = this.props;
@@ -338,6 +341,7 @@ let GenomeBrowser = React.createClass({
                     <div className="tracks vertical stack"
                         onMouseMove={this.handleMouseMove}
                         onMouseOver={this.handleMouseOver}
+                        onMouseOut={this.handleMouseOut}
                     >
                       <Background start={start} end={end} width={width} height={Math.max(0, height - CONTROLS_HEIGHT)}
                                   sideWidth={sideWidth}
