@@ -17,6 +17,10 @@ let CanvasGroupChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
+        'onTap',
+        'onMouseMove',
+        'onMouseOver',
+        'onMouseOut',
         'onClose'
       ]
     })
@@ -37,13 +41,19 @@ let CanvasGroupChannel = React.createClass({
     legend: React.PropTypes.element,
     onClose: React.PropTypes.func,
     onTap: React.PropTypes.func,
+    onMouseOver: React.PropTypes.func,
+    onMouseOut: React.PropTypes.func,
+    onMouseMove: React.PropTypes.func,
     children: React.PropTypes.node
   },
 
   getDefaultProps() {
     return {
       height: 100,
-      onTap: () => null
+      onTap: () => null,
+      onMouseOver: () => null,
+      onMouseOut: () => null,
+      onMouseMove: () => null,
     };
   },
 
@@ -139,8 +149,14 @@ let CanvasGroupChannel = React.createClass({
           <Motion ref="spring" style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
-              return <Hammer onTap={this.props.onTap}>
-                <div className="numerical-channel-canvas-holder">
+              return <Hammer onTap={this.redirectedProps.onTap}>
+                <div
+                  className="numerical-channel-canvas-holder"
+                  style={this.props.style}
+                  onMouseOver={this.redirectedProps.onMouseOver}
+                  onMouseMove={this.redirectedProps.onMouseMove}
+                  onMouseOut={this.redirectedProps.onMouseOut}
+                 >
                   <YScale width={width - sideWidth} height={height} min={yMin} max={yMax} />
                   {React.Children.map(this.props.children, (child, index) => React.cloneElement(child, {
                     yMin,

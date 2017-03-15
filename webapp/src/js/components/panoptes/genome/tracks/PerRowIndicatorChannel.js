@@ -351,8 +351,8 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   handleClick(e) {
-    if (this.state.hoverIndex != null) {
-      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverIndex]});
+    if (this.state.hoverClick != null) {
+      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverClick]});
     }
   },
 
@@ -365,7 +365,7 @@ let PerRowIndicatorChannel = React.createClass({
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
     let nearest = 100;
-    let nearestClick = 100;
+    let nearestClick = 10;
     let nearestIndex = null;
     let nearestClickIndex = null;
     for (let i = 0, l = numPositions; i < l; ++i) {
@@ -400,7 +400,7 @@ let PerRowIndicatorChannel = React.createClass({
     if (this.props.onChangeHoverPos) {
       this.props.onChangeHoverPos(this.positions[nearestIndex]);
     }
-    this.setState({hoverClick: nearestClickIndex != null});
+    this.setState({hoverClick: nearestClickIndex});
   },
 
   handleMouseMove(e) {
