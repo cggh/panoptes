@@ -243,7 +243,7 @@ let NumericalSummaryTrack = React.createClass({
     let hoverAvg = null;
     let hoverPoint = null;
     //Max and min
-    if (!hideMinMax) {
+    if (!hideMinMax && this.pointsBlocks.length == 0) {
       ctx.beginPath();
       this.blocks.forEach((block) => {
         const window = block.window.array;
@@ -272,30 +272,32 @@ let NumericalSummaryTrack = React.createClass({
     let lastPointNull = true;
     let lastWindow = null;
     //Avg line
-    ctx.beginPath();
-    this.blocks.forEach((block) => {
-      const window = block.window.array;
-      const avg = block.avg.array;
-      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
-        if (avg[i] !== nullVal && avg[i] == +avg[i]) {  //If min is null then max, avg should be, check also for NaN as that is the NULL value for float types
-          const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
-          const yPixel = height - (yScaleFactor * (avg[i] - yMin));
-          if (lastPointNull || window[i] !== lastWindow + 1) {
-            ctx.moveTo(xPixel, yPixel);
-          } else {
-            ctx.lineTo(xPixel, yPixel);
-          }
-          ctx.lineTo(xPixel + pixelWindowSize, yPixel);
-          if (hoverPos != null && (window[i] * windowSize) < hoverPos && hoverPos < (window[i] + 1) * windowSize) {
+    if (this.pointsBlocks.length == 0) {
+      ctx.beginPath();
+      this.blocks.forEach((block) => {
+        const window = block.window.array;
+        const avg = block.avg.array;
+        for (let i = 0, iEnd = window.length; i < iEnd; i++) {
+          if (avg[i] !== nullVal && avg[i] == +avg[i]) {  //If min is null then max, avg should be, check also for NaN as that is the NULL value for float types
+            const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
+            const yPixel = height - (yScaleFactor * (avg[i] - yMin));
+            if (lastPointNull || window[i] !== lastWindow + 1) {
+              ctx.moveTo(xPixel, yPixel);
+            } else {
+              ctx.lineTo(xPixel, yPixel);
+            }
+            ctx.lineTo(xPixel + pixelWindowSize, yPixel);
+            if (hoverPos != null && (window[i] * windowSize) < hoverPos && hoverPos < (window[i] + 1) * windowSize) {
               hoverAvg = {xPixel, pixelWindowSize, yPixel, avg: avg[i]}
             }
+          }
+          lastPointNull = (avg[i] === nullVal || avg[i] != +avg[i]);
+          lastWindow = window[i];
         }
-        lastPointNull = (avg[i] === nullVal || avg[i] != +avg[i]);
-        lastWindow = window[i];
-      }
-    });
-    ctx.strokeStyle = colour;
-    ctx.stroke();
+      });
+      ctx.strokeStyle = colour;
+      ctx.stroke();
+    }
     // Circles for single data points
     ctx.beginPath();
     this.pointsBlocks.forEach((block) => {
