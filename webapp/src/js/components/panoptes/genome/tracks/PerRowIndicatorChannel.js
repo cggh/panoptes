@@ -1,6 +1,7 @@
 import React from 'react';
 import Tooltip from 'rc-tooltip';
 import Color from 'color';
+import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -445,14 +446,15 @@ let PerRowIndicatorChannel = React.createClass({
         onClose={this.redirectedProps.onClose}
       >
         <div className="canvas-container">
-          <canvas ref="canvas"
+          <Hammer onTap={this.handleClick}>
+            <canvas ref="canvas"
                   style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
                   width={width} height={HEIGHT}
-                  onClick={this.handleClick}
                   onMouseOver={this.handleMouseOver}
                   onMouseMove={this.handleMouseMove}
                   onMouseOut={this.handleMouseOut}
-          />
+            />
+          </Hammer>
           {hoverPx !== null && hoverPx > 0 && hoverPx < width ?
             <Tooltip placement={'right'}
                      overlayStyle={{pointerEvents:'none'}}

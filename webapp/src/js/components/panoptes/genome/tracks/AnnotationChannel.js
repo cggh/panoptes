@@ -1,6 +1,7 @@
 import React from 'react';
 import Tooltip from 'rc-tooltip';
 import _forEach from 'lodash/forEach';
+import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -358,14 +359,16 @@ let AnnotationChannel = React.createClass({
         onClose={null}
       >
         <div className="canvas-container">
-          <canvas ref="canvas"
-                  style={{cursor: clickIndex !== null ? 'pointer' : 'inherit'}}
-                  width={width} height={height}
-                  onClick={this.handleClick}
-                  onMouseOver={this.handleMouseOver}
-                  onMouseMove={this.handleMouseMove}
-                  onMouseOut={this.handleMouseOut}
-          />
+          <Hammer onTap={this.handleClick}>
+            <canvas ref="canvas"
+                    style={{cursor: clickIndex !== null ? 'pointer' : 'inherit'}}
+                    width={width} height={height}
+                    onClick={this.handleClick}
+                    onMouseOver={this.handleMouseOver}
+                    onMouseMove={this.handleMouseMove}
+                    onMouseOut={this.handleMouseOut}
+            />
+          </Hammer>
           {hovers}
         </div>
 
