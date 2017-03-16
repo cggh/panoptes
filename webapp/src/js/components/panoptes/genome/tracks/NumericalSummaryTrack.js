@@ -29,6 +29,9 @@ const DRAW_POINTS_THRESHOLD = 2000;
 let NumericalSummaryTrack = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
+      redirect: [
+        'onChangeHoverPos'
+      ],
       check: [
         'width',
         'height',
@@ -165,6 +168,7 @@ let NumericalSummaryTrack = React.createClass({
                 {
                   ...APIargs,
                   columns: [
+                    {expr: tableConfig.primKey, as: 'primKey'},
                     {expr: tableConfig.position, as: 'pos'},
                     {expr: track, as: 'value'}
                   ],
@@ -243,7 +247,7 @@ let NumericalSummaryTrack = React.createClass({
     let hoverAvg = null;
     let hoverPoint = null;
     //Max and min
-    if (!hideMinMax) {
+    if (!hideMinMax && this.pointsBlocks.length == 0) {
       ctx.beginPath();
       this.blocks.forEach((block) => {
         const window = block.window.array;
@@ -272,30 +276,32 @@ let NumericalSummaryTrack = React.createClass({
     let lastPointNull = true;
     let lastWindow = null;
     //Avg line
-    ctx.beginPath();
-    this.blocks.forEach((block) => {
-      const window = block.window.array;
-      const avg = block.avg.array;
-      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
-        if (avg[i] !== nullVal && avg[i] == +avg[i]) {  //If min is null then max, avg should be, check also for NaN as that is the NULL value for float types
-          const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
-          const yPixel = height - (yScaleFactor * (avg[i] - yMin));
-          if (lastPointNull || window[i] !== lastWindow + 1) {
-            ctx.moveTo(xPixel, yPixel);
-          } else {
-            ctx.lineTo(xPixel, yPixel);
-          }
-          ctx.lineTo(xPixel + pixelWindowSize, yPixel);
-          if (hoverPos != null && (window[i] * windowSize) < hoverPos && hoverPos < (window[i] + 1) * windowSize) {
+    if (this.pointsBlocks.length == 0) {
+      ctx.beginPath();
+      this.blocks.forEach((block) => {
+        const window = block.window.array;
+        const avg = block.avg.array;
+        for (let i = 0, iEnd = window.length; i < iEnd; i++) {
+          if (avg[i] !== nullVal && avg[i] == +avg[i]) {  //If min is null then max, avg should be, check also for NaN as that is the NULL value for float types
+            const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
+            const yPixel = height - (yScaleFactor * (avg[i] - yMin));
+            if (lastPointNull || window[i] !== lastWindow + 1) {
+              ctx.moveTo(xPixel, yPixel);
+            } else {
+              ctx.lineTo(xPixel, yPixel);
+            }
+            ctx.lineTo(xPixel + pixelWindowSize, yPixel);
+            if (hoverPos != null && (window[i] * windowSize) < hoverPos && hoverPos < (window[i] + 1) * windowSize) {
               hoverAvg = {xPixel, pixelWindowSize, yPixel, avg: avg[i]}
             }
+          }
+          lastPointNull = (avg[i] === nullVal || avg[i] != +avg[i]);
+          lastWindow = window[i];
         }
-        lastPointNull = (avg[i] === nullVal || avg[i] != +avg[i]);
-        lastWindow = window[i];
-      }
-    });
-    ctx.strokeStyle = colour;
-    ctx.stroke();
+      });
+      ctx.strokeStyle = colour;
+      ctx.stroke();
+    }
     // Circles for single data points
     ctx.beginPath();
     this.pointsBlocks.forEach((block) => {
@@ -390,11 +396,82 @@ let NumericalSummaryTrack = React.createClass({
     }
   },
 
+  xyToIndex(x, y) {
+    const {yMax, yMin, width, start, end, height} = this.props;
+    const xScaleFactor = width / (end - start);
+    const yScaleFactor = height / (yMax - yMin);
+
+    let nearest = 100;
+    let nearestClick = 10;
+    let nearestIndex = null;
+    let nearestClickIndex = null;
+
+    if (this.pointsBlocks) {
+      this.pointsBlocks.forEach((block, b) => {
+        const pos = block.pos.array;
+        const value = block.value.array;
+        for (let i = 0, iEnd = pos.length; i < iEnd; i++) {
+          const xPixel = xScaleFactor * (pos[i] - start);
+          const yPixel = height - (yScaleFactor * (value[i] - yMin));
+          if (Math.abs(x - xPixel) < nearest) {
+            nearest = Math.abs(x - xPixel);
+            nearestIndex = [b,i];
+          }
+          if (Math.abs(x - xPixel) < nearestClick && Math.abs(y - yPixel) < 5) {
+            nearestClick = Math.abs(x - xPixel);
+            nearestClickIndex = [b,i];
+          }
+        }
+      });
+      return {nearestIndex, nearestClickIndex};
+    }
+  },
+
+  convertXY(e) {
+    let rect = this.refs.canvas.getBoundingClientRect();
+    return [e.clientX - rect.left, e.clientY - rect.top];
+  },
+
+  setHover({nearestIndex, nearestClickIndex}) {
+    if (this.props.onChangeHoverPos) {
+      if (nearestIndex) {
+        let [b, i] = nearestIndex;
+        this.props.onChangeHoverPos(this.pointsBlocks[b].pos.array[i]);
+      } else {
+        this.props.onChangeHoverPos(null);
+      }
+    }
+    this.setState({hoverClick: nearestClickIndex});
+    return !!nearestClickIndex;
+  },
+
+  handleMouseMove(e) {
+    e.persist();
+    e.hoverHandled = true;
+    let [x, y] = this.convertXY(e);
+    let {nearestIndex, nearestClickIndex} = this.xyToIndex(x, y);
+    return this.setHover({nearestIndex, nearestClickIndex});
+  },
+  handleMouseOver(e) {
+    return this.handleMouseMove(e);
+  },
+  handleMouseOut(e) {
+    this.setState({hoverClick: false});
+    return false;
+  },
+  handleClick(e) {
+    if (this.state.hoverClick != null) {
+      let [b, i] = this.state.hoverClick;
+      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.pointsBlocks[b].primKey.array[i]});
+    }
+  },
 
   render() {
     const {width, height} = this.props;
     return (
-      <canvas ref="canvas" width={width} height={height}/>
+      <canvas ref="canvas"
+              width={width} height={height}
+      />
     );
   }
 

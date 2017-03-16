@@ -5,6 +5,8 @@ import _isFinite from 'lodash/isFinite';
 import _forEach from 'lodash/forEach';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
+import _map from 'lodash/map';
+import _some from 'lodash/some';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -20,7 +22,7 @@ import ValidComponentChildren from 'util/ValidComponentChildren';
 import ItemPicker from 'containers/ItemPicker';
 import {findBlock} from 'util/PropertyRegionCache';
 import SQL from 'panoptes/SQL';
-import DataTableWithActions from 'containers/DataTableWithActions';
+// import DataTableWithActions from 'containers/DataTableWithActions';
 import {categoryColours} from 'util/Colours';
 import LegendElement from 'panoptes/LegendElement';
 import _filter from 'lodash/filter';
@@ -57,7 +59,9 @@ let NumericalTrackGroupChannel = React.createClass({
   },
 
   getInitialState() {
-    return {};
+    return {
+      pointer: false,
+    };
   },
 
   getDefaultProps() {
@@ -66,44 +70,62 @@ let NumericalTrackGroupChannel = React.createClass({
     };
   },
 
-  handleTap(e) {
-    const {width, sideWidth, start, end} = this.props;
-    const rect = e.target.getBoundingClientRect();
-    const x = e.center.x - rect.left;
-    const y = e.center.y - rect.top;
-    const scaleFactor = ((width - sideWidth) / (end - start));
-    const windowStart = ((x - 3) / scaleFactor) + start;
-    const windowEnd = ((x + 3) / scaleFactor) + start;
-    const {summaryWindow} = findBlock({start, end, width});
-    const floor = Math.floor((windowStart + 0.5) / summaryWindow) * summaryWindow;
-    const ceil = Math.floor((windowEnd + 0.5) / summaryWindow) * summaryWindow;
-    const toOpen = {};
-    React.Children.forEach(this.props.children, (child) => {
-      if (child.props.table && child.props.track) {
-        toOpen[child.props.table] = toOpen[child.props.table] || [];
-        toOpen[child.props.table].push(child.props.track)
-      }
-    });
+  // Removed in favour of handling individual points in NumericalSummaryTrack
+  // handleTap(e) {
+  //   const {width, sideWidth, start, end} = this.props;
+  //   const rect = e.target.getBoundingClientRect();
+  //   const x = e.center.x - rect.left;
+  //   const y = e.center.y - rect.top;
+  //   const scaleFactor = ((width - sideWidth) / (end - start));
+  //   const windowStart = ((x - 3) / scaleFactor) + start;
+  //   const windowEnd = ((x + 3) / scaleFactor) + start;
+  //   const {summaryWindow} = findBlock({start, end, width});
+  //   const floor = Math.floor((windowStart + 0.5) / summaryWindow) * summaryWindow;
+  //   const ceil = Math.floor((windowEnd + 0.5) / summaryWindow) * summaryWindow;
+  //   const toOpen = {};
+  //   React.Children.forEach(this.props.children, (child) => {
+  //     if (child.props.table && child.props.track) {
+  //       toOpen[child.props.table] = toOpen[child.props.table] || [];
+  //       toOpen[child.props.table].push(child.props.track)
+  //     }
+  //   });
+  //
+  //   _forEach(toOpen, (columns, table) => {
+  //     const config = this.config.tablesById[table];
+  //     const query = SQL.WhereClause.encode(SQL.WhereClause.AND([
+  //       SQL.WhereClause.CompareFixed(config.chromosome, '=', this.props.chromosome),
+  //       SQL.WhereClause.CompareFixed(config.position, '<=', ceil),
+  //       SQL.WhereClause.CompareFixed(config.position, '>=', floor)
+  //     ]));
+  //     this.flux.actions.session.popupOpen(<DataTableWithActions
+  //       table={table}
+  //       columns={[config.primKey].concat(columns)}
+  //       query={query}
+  //     />);
+  //   });
+  // },
 
-    _forEach(toOpen, (columns, table) => {
-      const config = this.config.tablesById[table];
-      const query = SQL.WhereClause.encode(SQL.WhereClause.AND([
-        SQL.WhereClause.CompareFixed(config.chromosome, '=', this.props.chromosome),
-        SQL.WhereClause.CompareFixed(config.position, '<=', ceil),
-        SQL.WhereClause.CompareFixed(config.position, '>=', floor)
-      ]));
-      this.flux.actions.session.popupOpen(<DataTableWithActions
-        table={table}
-        columns={[config.primKey].concat(columns)}
-        query={query}
-      />);
-    });
+  componentWillUpdate() {
+    this.children = [];
   },
 
   getDefinedQuery(query, table) {
     return (query || this.props.query) ||
       ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
       SQL.nullQuery;
+  },
+
+  handleTap(e) {
+    _map(this.children, (child) => child.handleClick(e));
+  },
+  handleMouseOver(e) {
+    this.setState({pointer: _some(_map(this.children, (child) => child.handleMouseOver(e)))});
+  },
+  handleMouseMove(e) {
+    this.setState({pointer: _some(_map(this.children, (child) => child.handleMouseMove(e)))});
+  },
+  handleMouseOut(e) {
+    this.setState({pointer: _some(_map(this.children, (child) => child.handleMouseOut(e)))});
   },
 
   render() {
@@ -125,10 +147,15 @@ let NumericalTrackGroupChannel = React.createClass({
             ...this.props,
             width: width - sideWidth,
             colour: child.props.colour || this.config.tablesById[child.props.table].propertiesById[child.props.track].colour || colourFunc(child.props.track),
-            query: table ? query : undefined
+            query: table ? query : undefined,
+            ref: (node) => {if (node) this.children.push(node);}
           }));
     return (
       <CanvasGroupChannel onTap={this.handleTap}
+                          onMouseOver={this.handleMouseOver}
+                          onMouseMove={this.handleMouseMove}
+                          onMouseOut={this.handleMouseOut}
+                          style={{cursor: this.state.pointer ? 'pointer' : 'inherit'}}
                           {...this.props}
                           yMin={yMin}
                           yMax={yMax}

@@ -1,6 +1,7 @@
 import React from 'react';
 import Tooltip from 'rc-tooltip';
 import Color from 'color';
+import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -350,14 +351,8 @@ let PerRowIndicatorChannel = React.createClass({
     this.setState({hoverIndex});
   },
 
-  handleClick(e) {
-    if (this.state.hoverIndex != null) {
-      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverIndex]});
-    }
-  },
-
   xyToIndex(x, y) {
-    const psx = (HEIGHT / 2) - 7;
+    let psy = (HEIGHT / 2) - 6;
     const {width, sideWidth, start, end} = this.props;
     const positions = this.positions;
     const scaleFactor = ((width - sideWidth) / (end - start));
@@ -365,7 +360,7 @@ let PerRowIndicatorChannel = React.createClass({
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
     let nearest = 100;
-    let nearestClick = 100;
+    let nearestClick = 10;
     let nearestIndex = null;
     let nearestClickIndex = null;
     for (let i = 0, l = numPositions; i < l; ++i) {
@@ -374,14 +369,14 @@ let PerRowIndicatorChannel = React.createClass({
           nearest = Math.abs(x - psx);
           nearestIndex = i;
       }
-      if (y < psx || y > psx + 12) {
+      if (y > psy  && y < psy + 15) {
         if (triangleMode) {
           if (x < psx + 7 && x > psx - 7 && Math.abs(x - psx) < nearestClick) {
             nearestClick = Math.abs(x - psx);
             nearestClickIndex = i;
           }
         } else {
-          if (x < Math.ceil(psx) && x > Math.floor(psx)) {
+          if (Math.abs(x - psx) < nearestClick) {
             nearestClick = Math.abs(x - psx);
             nearestClickIndex = i;
           }
@@ -400,7 +395,7 @@ let PerRowIndicatorChannel = React.createClass({
     if (this.props.onChangeHoverPos) {
       this.props.onChangeHoverPos(this.positions[nearestIndex]);
     }
-    this.setState({hoverClick: nearestClickIndex != null});
+    this.setState({hoverClick: nearestClickIndex});
   },
 
   handleMouseMove(e) {
@@ -415,6 +410,11 @@ let PerRowIndicatorChannel = React.createClass({
   },
   handleMouseOut(e) {
     this.setState({hoverClick: false});
+  },
+  handleClick(e) {
+    if (this.state.hoverClick != null) {
+      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverClick]});
+    }
   },
 
   render() {
@@ -445,14 +445,15 @@ let PerRowIndicatorChannel = React.createClass({
         onClose={this.redirectedProps.onClose}
       >
         <div className="canvas-container">
-          <canvas ref="canvas"
+          <Hammer onTap={this.handleClick}>
+            <canvas ref="canvas"
                   style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
                   width={width} height={HEIGHT}
-                  onClick={this.handleClick}
                   onMouseOver={this.handleMouseOver}
                   onMouseMove={this.handleMouseMove}
                   onMouseOut={this.handleMouseOut}
-          />
+            />
+          </Hammer>
           {hoverPx !== null && hoverPx > 0 && hoverPx < width ?
             <Tooltip placement={'right'}
                      overlayStyle={{pointerEvents:'none'}}

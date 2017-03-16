@@ -206,15 +206,16 @@ let GenotypesTable = React.createClass({
       drawPixColWidth = pixColWidth - 2;
     }
     let gapWidth = pixColWidth - drawPixColWidth;
+    ctx.fillStyle = 'white';
     if (gapWidth > 0) {
       for (let i = 0; i < sourceWidth + 1; ++i) {
-        ctx.clearRect(((colStart + i) * pixColWidth) - (gapWidth / 2), 0, gapWidth, height);
+        ctx.fillRect(((colStart + i) * pixColWidth) - (gapWidth / 2), 0, gapWidth, height);
       }
     }
   },
 
   drawOverlay(ctx, block, sourceStart, sourceWidth, colStart) {
-    const {cellColour, table, rowHeight, width, start, end, colWidth} = this.props;
+    const {cellColour, table, rowHeight, width, height, start, end, colWidth, hoverPos} = this.props;
     const pixColWidth = colWidth * (width / (end - start));
     let config = this.config.twoDTablesById[table];
 
@@ -277,6 +278,30 @@ let GenotypesTable = React.createClass({
           } else {
             ctx.fillText(text, x, y);
           }
+        }
+      }
+    }
+    if (hoverPos) {
+      let drawPixColWidth = pixColWidth;
+      if (pixColWidth > 120) {
+        drawPixColWidth = 120;
+      } else if (pixColWidth > 40) {
+        drawPixColWidth = pixColWidth - 2;
+      }
+      for (let i = 0; i < sourceWidth; ++i) {
+        let pos = block['col_pos'].array[i + sourceStart];
+        if (pos == hoverPos) {
+          const x = ((colStart + i) * pixColWidth) + ((pixColWidth - drawPixColWidth)/2);
+          const x2 = x + drawPixColWidth;
+          ctx.fillStyle='black';
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          if ((x2-x) > 1) {
+            ctx.moveTo(x2, 0);
+            ctx.lineTo(x2, height);
+          }
+          ctx.stroke();
         }
       }
     }

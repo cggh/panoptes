@@ -113,74 +113,6 @@ function _decodeSummaryList(columns) {
   };
 }
 
-function annotationData(options) {
-  //TODO Extra field when needed by region channel?
-  assertRequired(options, [
-    'database', 'chrom', 'start', 'end']);
-  options.stop = options.end; //Rename to harmonise with rest of code
-  //These are the defaannults of the GFF parser on import
-  let defaults = {
-    datatype: 'annot',
-    table: 'annotation',
-    field_start: 'fstart',           //eslint-disable-line camelcase
-    field_stop: 'fstop',             //eslint-disable-line camelcase
-    field_name: 'fname',             //eslint-disable-line camelcase
-    field_id: 'fid',                 //eslint-disable-line camelcase
-    field_chrom: 'chromid',          //eslint-disable-line camelcase
-    ftype: 'gene',
-    fsubtype: 'CDS',
-    subfeatures: '1'
-  };
-  let params = _assign(defaults, options);
-  delete params.cancellation;
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  return requestJSON({
-    ...args,
-    params: params
-  })
-    .then((data) => {
-      let valListDecoder = DataDecoders.ValueListDecoder();
-      ['IDs', 'Names', 'ParentIDs', 'Sizes', 'Starts', 'Types'].forEach((key) =>
-        data[key] = valListDecoder.doDecode(data[key])
-      );
-      //Remap to sensible names
-      data = {
-        ids: data.IDs,
-        names: data.Names,
-        parents: data.ParentIDs,
-        sizes: data.Sizes,
-        starts: data.Starts,
-        types: data.Types
-      };
-      return data;
-    });
-}
-
-function summaryData(options) {
-  assertRequired(options, ['chromosome', 'columns', 'blocksize', 'blockstart', 'blockcount']);
-  let defaults = {};
-  let {chromosome, columns, blocksize, blockstart, blockcount} = _assign(defaults, options);
-
-  let collist = '';
-  _forEach(columns, (column) => {
-    if (collist.length > 0) collist += '~';
-    collist += `${column.folder}~${column.config}~${column.name}`;
-  });
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  return requestJSON({
-    ...args,
-    params: {
-      datatype: 'summinfo',
-      dataid: chromosome,
-      ids: collist,
-      blocksize: blocksize,
-      blockstart: blockstart,
-      blockcount: blockcount
-    }
-  })
-    .then(_decodeSummaryList(columns));
-}
-
 function treeData(options) {
   assertRequired(options, ['database', 'table', 'tree']);
   let {database, table, tree} = options;
@@ -562,7 +494,6 @@ const nullValues = {
 };
 
 export default {
-  annotationData,
   encodeQuery,
   errorMessage,
   fetchData,
@@ -581,9 +512,8 @@ export default {
   requestJSON,
   rowsCount,
   serverURL,
-  summaryData,
   storeData,
   treeData,
   twoDPageQuery,
-  staticContent,
+  staticContent
 };

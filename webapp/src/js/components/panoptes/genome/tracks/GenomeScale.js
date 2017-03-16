@@ -1,7 +1,7 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import tickWidth from 'panoptes/TickWidth';
-
+import {drawText} from 'util/CanvasDrawing';
 import {scaleLinear} from 'd3-scale';
 
 const HEIGHT = 40;
@@ -87,15 +87,7 @@ let GenomeScale = React.createClass({
       ctx.moveTo(x, 34);
       ctx.lineTo(x, 40);
       ctx.stroke();
-      ctx.shadowColor="white";
-      ctx.strokeStyle="white";
-      ctx.shadowBlur=7;
-      ctx.lineWidth=5;
-      ctx.strokeText("▮▮" + hoverPos + "▮▮", hoverPos == 0 && start == 0 ? x + 10 : x, 10);
-      ctx.shadowBlur=0;
-      ctx.fillStyle="black";
-      ctx.fillText(hoverPos, hoverPos == 0 && start == 0 ? x + 10 : x, 10);
-
+      drawText(ctx, hoverPos, x, 10);
     }
   }
 });

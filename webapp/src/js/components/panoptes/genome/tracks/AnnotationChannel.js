@@ -1,5 +1,7 @@
 import React from 'react';
 import Tooltip from 'rc-tooltip';
+import _forEach from 'lodash/forEach';
+import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -11,6 +13,7 @@ import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/FindBlocks';
+import SQL from 'panoptes/SQL';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 
@@ -29,7 +32,8 @@ let AnnotationChannel = React.createClass({
         'chromosome',
         'width',
         'sideWidth',
-        'name'
+        'name',
+        'hoverPos'
       ]
     }),
     FluxMixin,
@@ -45,13 +49,14 @@ let AnnotationChannel = React.createClass({
     sideWidth: React.PropTypes.number,
     name: React.PropTypes.string,
     onChangeLoadStatus: React.PropTypes.func,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    hoverPos: React.PropTypes.number
   },
 
   getInitialState() {
     return {
       height: 50,
-      hoverIndex: null
+      clickIndex: null
     };
   },
 
@@ -83,17 +88,30 @@ let AnnotationChannel = React.createClass({
       if (onChangeLoadStatus) onChangeLoadStatus('LOADING');
 
       let APIargs = {
+        typedArrays: true,
         database: this.config.dataset,
-        chrom: chromosome,
-        start: this.blockStart,
-        end: this.blockEnd
+        table: 'annotation',
+        order: [['asc', 'fstart']],
+        columns: [
+          {expr: 'fstart', as: 'starts'},
+          {expr: ['-', ['fstop', 'fstart']], as: 'sizes'},
+          {expr: 'fname', as: 'names'},
+          {expr: 'fnames', as: 'altNames'},
+          {expr: 'fid', as: 'ids'},
+          {expr: 'ftype', as: 'types'},
+          {expr: 'fparentid', as: 'parents'}
+        ],
+        query: SQL.WhereClause.encode(SQL.WhereClause.AND([
+          SQL.WhereClause.CompareFixed('chromid', '=', chromosome),
+          SQL.WhereClause.CompareFixed('fstart', '>=', this.blockStart),
+          SQL.WhereClause.CompareFixed('fstop', '<', this.blockEnd)]))
       };
 
       requestContext.request((componentCancellation) =>
         LRUCache.get(
-          'annotationData' + JSON.stringify(APIargs),
+          'query' + JSON.stringify(APIargs),
           (cacheCancellation) =>
-            API.annotationData({cancellation: cacheCancellation, ...APIargs}),
+            API.query({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
         )).then((data) => {
         if (onChangeLoadStatus) onChangeLoadStatus('DONE');
@@ -108,6 +126,7 @@ let AnnotationChannel = React.createClass({
         .catch((error) => {
           this.applyData(this.props, null);
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+          console.error(error);
         });
     }
   },
@@ -117,8 +136,15 @@ let AnnotationChannel = React.createClass({
       this.data = null;
       return;
     }
-    const {ids, parents, sizes, starts, types} = data;
-    //We make assumption here that the entries are ordered by start - this is how the annot datatype is currently set up on the server
+    let {ids, parents, sizes, starts, types, names, altNames} = data;
+    ids = ids.array;
+    parents = parents.array;
+    sizes = sizes.array;
+    starts = starts.array;
+    types = types.array;
+    names = names.array;
+    altNames = altNames.array;
+    //Note that the entries are ordered by start
     //Find the row for each gene and as we go record the gaps so we can decide what text to write
     let rows = new Array(ids.length);
     //let gaps = new Array(ids.length);
@@ -149,21 +175,21 @@ let AnnotationChannel = React.createClass({
       if (types[i] === 'CDS')
         rows[i] = rows[geneMap[parents[i]]];
     }
-    this.data = {...data, rows};
+    this.data = {ids, parents, sizes, starts, types, rows, names, altNames};
     this.draw(props);
   },
 
   draw(props) {
-    const {width, sideWidth, start, end} = props || this.props;
-    const {height, hoverIndex} = this.state;
-
+    const {width, sideWidth, start, end, hoverPos} = props || this.props;
+    const {height} = this.state;
+    const hovers = [];
     const canvas = this.refs.canvas;
     if (!canvas)
       return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!(this.data && this.data.starts)) return;
-    const {ids, names, sizes, starts, types, rows} = this.data;
+    const {ids, names, sizes, starts, types, rows, altNames} = this.data;
     ctx.strokeStyle = '#000';
     ctx.fillStyle = '#000';
     ctx.font = '10px monospace';
@@ -172,6 +198,9 @@ let AnnotationChannel = React.createClass({
     let lastTextAt = [];
     for (let i = 0, l = starts.length; i < l; ++i) {
       if (types[i] === 'gene') {
+        if (starts[i] <= hoverPos && starts[i] + sizes[i] > hoverPos) {
+          hovers.push(i);
+        }
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
         if (x2 > -60 && x1 < width + 4) {
@@ -203,9 +232,17 @@ let AnnotationChannel = React.createClass({
         }
       }
     }
-    if (hoverIndex !== null) {
+    _forEach(hovers, (hoverIndex) => {
       const x1 = scaleFactor * (starts[hoverIndex] - start);
-      let text = ids[hoverIndex] + (names[hoverIndex] && names[hoverIndex] !== ids[hoverIndex] ? ` - ${names[hoverIndex]}` : '');
+      const x2 = scaleFactor * ((starts[hoverIndex] + sizes[hoverIndex]) - start);
+      ctx.strokeRect(x1, (rows[hoverIndex] * ROW_HEIGHT) + 16, Math.max(0.125, x2 - x1), 10);   //Outline
+      let text = names[hoverIndex];
+      if (text) {
+        text += ', ' + ids[hoverIndex]
+      } else {
+        text = ids[hoverIndex];
+      }
+      if (altNames[hoverIndex]) text += ', ' + altNames[hoverIndex];
       if (text) {
         ctx.fillStyle = '#FFF';
         ctx.fillRect(x1 - 12, (rows[hoverIndex] * ROW_HEIGHT) + 4, 14 + text.length * 6, 10);
@@ -213,7 +250,7 @@ let AnnotationChannel = React.createClass({
         ctx.font = 'bold 10px monospace';
         ctx.fillText(text, x1, (rows[hoverIndex] * ROW_HEIGHT) + 14);
       }
-    }
+    });
     const desiredHeight = Math.max((maxRow + 1) * ROW_HEIGHT + 10, 40);
     if (desiredHeight !== height)
       this.setState({height: desiredHeight});
@@ -254,12 +291,12 @@ let AnnotationChannel = React.createClass({
     if (hoverId) {
       for (let i = 0, l = this.data.ids.length; i < l; ++i) {
         if (this.data.ids[i] === hoverId) {
-          this.setState({hoverIndex: i});
+          this.setState({clickIndex: i});
           return;
         }
       }
     } else {
-      this.setState({hoverIndex: null});
+      this.setState({clickIndex: null});
     }
   },
 
@@ -275,14 +312,37 @@ let AnnotationChannel = React.createClass({
     this.setHover(id);
   },
   handleMouseOut(e) {
-    this.setState({hoverIndex: null})
+    this.setState({clickIndex: null})
   },
 
   render() {
-    let {start, end, width, sideWidth, name} = this.props;
-    let {height, hoverIndex} = this.state;
-    let hoverId = this.data && this.data.ids ? this.data.ids[hoverIndex] : null;
-    let scaleFactor = ((width - sideWidth) / (end - start));
+    let {start, end, width, sideWidth, name, hoverPos} = this.props;
+    let {height, clickIndex} = this.state;
+    const hovers = [];
+    //Disabled for now as it covers over channels below and we can show the same info in the track
+    // if (hoverPos && this.data) {
+    //   let scaleFactor = ((width - sideWidth) / (end - start));
+    //   const {starts, sizes, names, ids, rows, types} = this.data;
+    //   for (let i = 0, l = starts.length; i < l; ++i) {
+    //     if (types[i] === 'gene' && starts[i] <= hoverPos && starts[i] + sizes[i] > hoverPos) {
+    //       hovers.push(
+    //         <Tooltip placement={'bottom'}
+    //                  visible={true}
+    //                  overlay={<div>
+    //                         {ids[i] + (names[i] && names[i] !== ids[i] ? ` - ${names[i]}` : '')}
+    //                       </div>}>
+    //           <div
+    //             style={{
+    //                     pointerEvents: 'none',
+    //                     position: 'absolute',
+    //                     top: `${(rows[i] * ROW_HEIGHT) + 10}px`,
+    //                     left: `${scaleFactor * ((starts[i] + (sizes[i]/2)) - start)}px`,
+    //                     height: '12px',
+    //                     width: '1px'}}></div>
+    //         </Tooltip>);
+    //     }
+    //   }
+    // }
 
     return (
       <ChannelWithConfigDrawer
@@ -299,30 +359,18 @@ let AnnotationChannel = React.createClass({
         onClose={null}
       >
         <div className="canvas-container">
-          <canvas ref="canvas"
-                  style={{cursor: hoverId !== null ? 'pointer' : 'inherit'}}
-                  width={width} height={height}
-                  onClick={this.handleClick}
-                  onMouseOver={this.handleMouseOver}
-                  onMouseMove={this.handleMouseMove}
-                  onMouseOut={this.handleMouseOut}
-          />
-          {hoverIndex !== null ?
-            <Tooltip placement={'bottom'}
-                     visible={true}
-                     overlay={<div>
-                              {this.data.ids[hoverIndex] + (this.data.names[hoverIndex] && this.data.names[hoverIndex] !== this.data.ids[hoverIndex] ? ` - ${this.data.names[hoverIndex]}` : '')}
-                            </div>}>
-              <div
-                style={{
-                pointerEvents: 'none',
-                position: 'absolute',
-                top: `${(this.data.rows[hoverIndex] * ROW_HEIGHT) + 10}px`,
-                left: `${scaleFactor * ((this.data.starts[hoverIndex] + (this.data.sizes[hoverIndex]/2)) - start)}px`,
-                height: '12px',
-                width: '1px'}}></div>
-            </Tooltip>
-            : null}</div>
+          <Hammer onTap={this.handleClick}>
+            <canvas ref="canvas"
+                    style={{cursor: clickIndex !== null ? 'pointer' : 'inherit'}}
+                    width={width} height={height}
+                    onClick={this.handleClick}
+                    onMouseOver={this.handleMouseOver}
+                    onMouseMove={this.handleMouseMove}
+                    onMouseOut={this.handleMouseOut}
+            />
+          </Hammer>
+          {hovers}
+        </div>
 
       </ChannelWithConfigDrawer>);
   }
