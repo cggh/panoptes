@@ -289,7 +289,7 @@ let GenotypesTable = React.createClass({
         drawPixColWidth = pixColWidth - 2;
       }
       for (let i = 0; i < sourceWidth; ++i) {
-        let pos = block['col_pos'].array[i + sourceStart];
+        let pos = block[`col_${this.config.tablesById[config.columnDataTable].position}`].array[i + sourceStart];
         if (pos == hoverPos) {
           const x = ((colStart + i) * pixColWidth) + ((pixColWidth - drawPixColWidth)/2);
           const x2 = x + drawPixColWidth;
