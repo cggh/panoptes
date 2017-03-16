@@ -1,6 +1,7 @@
 import React from 'react';
 import FileSaver from 'file-saver';
 import {Motion, spring} from 'react-motion';
+import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -45,7 +46,8 @@ let GenotypesChannel = React.createClass({
     PureRenderWithRedirectedProps({
       redirect: [
         'setProps',
-        'onClose'
+        'onClose',
+        'onChangeHoverPos'
       ],
       check: [
         'chromosome',
@@ -64,7 +66,8 @@ let GenotypesChannel = React.createClass({
         'rowHeight',
         'pageSize',
         'page',
-        'rowRandomSubsetSize'
+        'rowRandomSubsetSize',
+        'hoverPos'
       ]
     }),
     ConfigMixin,
@@ -110,6 +113,8 @@ let GenotypesChannel = React.createClass({
     cellHeight: React.PropTypes.string,
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
+    hoverPos: React.PropTypes.number,
+    onChangeHoverPos: React.PropTypes.func,
     layoutGaps: React.PropTypes.bool,
     onChangeLoadStatus: React.PropTypes.func,
     rowRandomSubsetSize: React.PropTypes.number
@@ -135,7 +140,8 @@ let GenotypesChannel = React.createClass({
       genomicPositions: new Float64Array(0),
       visibleGenomicPositions: new Float64Array(0),
       colWidth: 1,
-      visibleTop: 0
+      visibleTop: 0,
+      hoverClick: null
     };
   },
 
@@ -400,6 +406,7 @@ let GenotypesChannel = React.createClass({
     const rowTableConfig = this.config.tablesById[config.rowDataTable];
     //Concatenate all the positions for quick reference
     let genomicPositions = combineBlocks(dataBlocks, `col_${columnTableConfig.position}`);
+    let colPrimKeys = combineBlocks(dataBlocks, `col_${columnTableConfig.primKey}`);
     //Don't pass any data if there are no rows
     if (dataBlocks.length > 0 && dataBlocks[0][`row_${rowTableConfig.primKey}`].shape[0] === 0) {
       dataBlocks = [];
@@ -411,6 +418,7 @@ let GenotypesChannel = React.createClass({
       } : null,
       dataBlocks,
       genomicPositions,
+      colPrimKeys,
       ...this.layoutColumns(props, genomicPositions)
     });
   },
@@ -424,9 +432,76 @@ let GenotypesChannel = React.createClass({
       -(this.container.getBoundingClientRect().top - scrollDiv.getBoundingClientRect().top)})
   },
 
+  xyToIndex(x, y) {
+    const {width, sideWidth, start, end, rowHeight} = this.props;
+    const {rowData, layoutBlocks, genomicPositions, colPrimKeys, colWidth, visibleTop} = this.state;
+    const numRows = rowData ? rowData.id.shape[0] : 0;
+    const fanTop = Math.min(rowHeight * numRows,
+                  Math.max(0, visibleTop));
+    const scale =  (width - sideWidth) / (end - start);
+    const pixColWidth = colWidth * scale;
+
+    let nearest = 100;
+    let nearestClick = 10;
+    let nearestPos = null;
+    let nearestClickIndex = null;
+    for (let i = 0, iend = layoutBlocks.length; i < iend; ++i) {
+      const [blockStart, blockEnd, colStart] = layoutBlocks[i];
+      for (let j = blockStart, jCol = colStart + 0.5; j < blockEnd; ++j, ++jCol) {
+        const columnPixel = jCol * pixColWidth;
+        if (Math.abs(x - columnPixel) < nearest) {
+          nearest = Math.abs(x - columnPixel);
+          nearestPos = genomicPositions[j];
+        }
+        if (y < fanTop + FAN_HEIGHT && y > fanTop + FAN_HEIGHT - 20) { //Only click on hat
+        if (Math.abs(x - columnPixel) < nearestClick) {
+            nearestClick = Math.abs(x - columnPixel);
+            nearestClickIndex = colPrimKeys[j];
+          }
+        }
+      }
+    }
+    return {nearestPos, nearestClickIndex};
+  },
+
+  convertXY(e) {
+    let rect = this.container.getBoundingClientRect();
+    return [e.clientX - rect.left, e.clientY - rect.top];
+  },
+
+  setHover({nearestPos, nearestClickIndex}) {
+    if (this.props.onChangeHoverPos) {
+        this.props.onChangeHoverPos(nearestPos);
+    }
+    this.setState({hoverClick: nearestClickIndex});
+  },
+
+  handleMouseMove(e) {
+    e.persist();
+    e.hoverHandled = true;
+    let [x, y] = this.convertXY(e);
+    let {nearestPos, nearestClickIndex} = this.xyToIndex(x, y);
+    this.setHover({nearestPos, nearestClickIndex});
+  },
+  handleMouseOver(e) {
+    this.handleMouseMove(e);
+  },
+  handleMouseOut(e) {
+    this.setState({hoverClick: false});
+  },
+  handleClick(e) {
+    if (this.state.hoverClick != null) {
+      this.getFlux().actions.panoptes.dataItemPopup({
+        table: this.config.twoDTablesById[this.props.table].columnDataTable,
+        primKey: this.state.hoverClick
+      });
+    }
+  },
+
+
   render() {
-    let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
-    const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth, visibleTop} = this.state;
+    let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, hoverPos} = this.props;
+    const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth, visibleTop, hoverClick} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
     columnQuery = this.getDefinedQuery(columnQuery, config.columnDataTable);
@@ -465,36 +540,48 @@ let GenotypesChannel = React.createClass({
         <Motion style={colWidthSpring} defaultStyle={initColWidthSpring}>
           {(interpolated) => {
             let {colWidth} = interpolated;
-            return <div ref={(node) => this.container = node} className="genotypes-channel">
-              <div style={{height: FAN_HEIGHT+'px'}} />
-              <GenotypesTable
-                table={table}
-                rowData={rowData}
-                dataBlocks={dataBlocks}
-                layoutBlocks={layoutBlocks}
-                width={width - sideWidth}
-                height={rowHeight * numRows}
-                start={start}
-                end={end}
-                colWidth={colWidth}
-                cellColour={cellColour}
-                cellAlpha={cellAlpha}
-                cellHeight={cellHeight}
-                rowHeight={rowHeight}/>
-              <GenotypesFan
-                top={Math.min(rowHeight * numRows,
-                  Math.max(0, visibleTop))}
-                genomicPositions={genomicPositions}
-                layoutBlocks={layoutBlocks}
-                dataBlocks={dataBlocks}
-                width={width - sideWidth}
-                height={FAN_HEIGHT}
-                start={start}
-                end={end}
-                colWidth={colWidth}/>
-
-            </div>;
-            }}</Motion>
+            return <Hammer onTap={this.handleClick}>
+              <div
+                        ref={(node) => this.container = node}
+                        className="genotypes-channel"
+                        style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
+                        onMouseOver={this.handleMouseOver}
+                        onMouseMove={this.handleMouseMove}
+                        onMouseOut={this.handleMouseOut}
+              >
+                <div style={{height: FAN_HEIGHT+'px'}} />
+                <GenotypesTable
+                  table={table}
+                  rowData={rowData}
+                  dataBlocks={dataBlocks}
+                  layoutBlocks={layoutBlocks}
+                  width={width - sideWidth}
+                  height={rowHeight * numRows}
+                  start={start}
+                  end={end}
+                  colWidth={colWidth}
+                  cellColour={cellColour}
+                  cellAlpha={cellAlpha}
+                  cellHeight={cellHeight}
+                  rowHeight={rowHeight}
+                  hoverPos={hoverPos}
+                />
+                <GenotypesFan
+                  top={Math.min(rowHeight * numRows,
+                    Math.max(0, visibleTop))}
+                  genomicPositions={genomicPositions}
+                  layoutBlocks={layoutBlocks}
+                  dataBlocks={dataBlocks}
+                  width={width - sideWidth}
+                  height={FAN_HEIGHT}
+                  start={start}
+                  end={end}
+                  colWidth={colWidth}
+                  hoverPos={hoverPos}
+                />
+            </div>
+          </Hammer>;
+        }}</Motion>
       </ChannelWithConfigDrawer>);
   }
 });

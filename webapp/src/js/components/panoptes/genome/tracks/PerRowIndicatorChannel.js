@@ -351,14 +351,8 @@ let PerRowIndicatorChannel = React.createClass({
     this.setState({hoverIndex});
   },
 
-  handleClick(e) {
-    if (this.state.hoverClick != null) {
-      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverClick]});
-    }
-  },
-
   xyToIndex(x, y) {
-    const psx = (HEIGHT / 2) - 7;
+    let psy = (HEIGHT / 2) - 6;
     const {width, sideWidth, start, end} = this.props;
     const positions = this.positions;
     const scaleFactor = ((width - sideWidth) / (end - start));
@@ -375,14 +369,14 @@ let PerRowIndicatorChannel = React.createClass({
           nearest = Math.abs(x - psx);
           nearestIndex = i;
       }
-      if (y < psx || y > psx + 12) {
+      if (y > psy  && y < psy + 15) {
         if (triangleMode) {
           if (x < psx + 7 && x > psx - 7 && Math.abs(x - psx) < nearestClick) {
             nearestClick = Math.abs(x - psx);
             nearestClickIndex = i;
           }
         } else {
-          if (x < Math.ceil(psx) && x > Math.floor(psx)) {
+          if (Math.abs(x - psx) < nearestClick) {
             nearestClick = Math.abs(x - psx);
             nearestClickIndex = i;
           }
@@ -416,6 +410,11 @@ let PerRowIndicatorChannel = React.createClass({
   },
   handleMouseOut(e) {
     this.setState({hoverClick: false});
+  },
+  handleClick(e) {
+    if (this.state.hoverClick != null) {
+      this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverClick]});
+    }
   },
 
   render() {
