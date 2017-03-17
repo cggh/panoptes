@@ -6,8 +6,6 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-import 'template.scss';
-
 
 let Template = React.createClass({
 
@@ -32,7 +30,7 @@ let Template = React.createClass({
   render() {
     let {content, table, primKey} = this.props;
     return (
-        <ItemTemplate className="template-container" table={table} primKey={primKey}>
+        <ItemTemplate table={table} primKey={primKey}>
           {content}
         </ItemTemplate>
     );
