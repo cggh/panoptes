@@ -43,7 +43,7 @@ export default function(template, possibleTables) {
 
   // Provide the object of tracer functions as data to the compiled template.
   // Note: We don't need the returned HTML.
-  // This has the effect of calling each tracer if/when it is used,
+  // This has the effect of calling each tracer if/whjaaven it is used,
   //   thereby adding only used fields to the usedFields array.
   // Note: the same field might be added more than once.
   compiledTemplate(tracers);
