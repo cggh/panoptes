@@ -25,8 +25,22 @@ export default function(template, possibleTables) {
   hb.registerHelper('each', (context, options) => {
     if (context)
       context();
+    options.fn({});
+    options.inverse(this);
   });
 
+  hb.registerHelper('query', (options) => {
+    let {fn, inverse, hash} = options;
+    let {table, query, orderBy} = hash;
+    table = table || '';
+    query = query || '';
+    orderBy = orderBy || '';
+    Handlebars.compile(table)(this);
+    Handlebars.compile(query)(this);
+    Handlebars.compile(orderBy)(this);
+    fn({});
+    inverse(this);
+  });
 
   // Compose a tracers object, where each key is the name of a possibleTable
   //   and each value is a function to add that field to the usedFields list.
