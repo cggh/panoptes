@@ -32,7 +32,7 @@ columnDataTable
 
 columnIndexField
   *Text (required).* The property ID in the ``columnDataTable`` data table that maps into the ``columnIndexArray``
-  array in the zarr source file. ``columnIndexField`` and ``columnIndexArray`` together establish the link between the column data table values, and the data present in the zarr source file.
+  array in the zarr source dir. ``columnIndexField`` and ``columnIndexArray`` together establish the link between the column data table values, and the data present in the zarr source dir.
   Alternatively ``columnIndexArray`` can be omitted implying that the columns in zarr are in the same order as ``columnIndexField`` sorted.
   Note that "AutoKey" can be used if your rows do not have Unique IDs.
 
@@ -47,7 +47,7 @@ rowDataTable
 
 rowIndexField
   *Text (required).* The property ID in the ``rowDataTable`` data table that maps into ``rowIndexArray``
-  array in the zarr source file. ``rowIndexField`` and ``rowIndexArray`` together establish the link between the row data table values, and the data present in the zarr source dir.
+  array in the zarr source dir. ``rowIndexField`` and ``rowIndexArray`` together establish the link between the row data table values, and the data present in the zarr source dir.
   Alternatively ``rowIndexArray`` can be omitted implying that the rows in zarr are in the same order as ``rowIndexField`` sorted.
   Note that "AutoKey" can be used if your rows do not have Unique IDs.
 

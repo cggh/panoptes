@@ -31,6 +31,9 @@ icon
   *Text.* Specifies an icon that will be associated with the data table.
   The icon name can be chosen from the list specified in http://fortawesome.github.io/Font-Awesome/icons/.
 
+hdfPath
+  *Text.* If the data source is HDF5 then this can be used to specify the path within the HDF5 file to the arrays.
+
 isHidden
   *Boolean.* If set to true, the data table will not be displayed as a standalone entity
   (i.e. not mentioned on the intro page and no tab).
