@@ -13,7 +13,14 @@
         <p>The first variant position is <QueryResult table="variants" expression='"position"'/></p>
         <p>The average variant position is <QueryResult table="variants" expression='["avg",["position"]]'/>.</p>
         <p><QueryResult table="variants" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Extra_1","CompValue":"A","isRoot":true,"Tpe":"="}'/> variants have Extra 1 = 'A'</p>
-
+        <p>Here is an example of a template being filled for each row of a query, and a subquery for each row:<br/>
+            {{#query 'SiteID' 'Country' table='samplingsites'}}
+              {{ordinalize (add @index 1)}} site: {{SiteID}} in {{Country}} Samples at this site:
+              {{#query 'key' table='samples' query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Site_ID","CompValue":"{{SiteID}}","isRoot":true,"Tpe":"="}'}}
+                {{key}}
+              {{/query}}<br/>
+            {{/query}}
+        </p>
 
         <p>Some buttons that open popups:</p>
         <PopupButton label="Plot of Variants" icon="area-chart">
