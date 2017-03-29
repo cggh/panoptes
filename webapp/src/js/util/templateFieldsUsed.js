@@ -1,4 +1,4 @@
-import Handlebars from 'handlebars/dist/handlebars.js';
+import Handlebars from 'handlebars';
 import _uniq from 'lodash/uniq';
 
 export default function(template, possibleTables) {

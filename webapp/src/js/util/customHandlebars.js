@@ -5,9 +5,11 @@ import SQL from 'panoptes/SQL';
 import LRUCache from 'util/LRUCache';
 import Q from 'q';
 import _map from 'lodash/map';
+import handlebarsHelpers from 'handlebars-helpers';
 
-const customHandlebars = (config) => {
-  const hb = promisedHandlebars(Handlebars);
+const customHandlebars = ({dataset}) => {
+  let hb = promisedHandlebars(Handlebars);
+
   hb.registerHelper('query', function () {
     let columns = [];
     let options = arguments[arguments.length - 1];
@@ -27,10 +29,10 @@ const customHandlebars = (config) => {
         throw Error("orderBy should be a list of columns e.g. [['asc', 'col1'], ['desc', 'col2']] is currently: " + Handlebars.compile(orderBy)(this))
       }
     } else {
-      orderBy = null
+      orderBy = ""
     }
     let queryAPIargs = {
-      database: config.dataset,
+      database: dataset,
       table: table,
       columns: columns,
       orderBy: orderBy,
@@ -69,6 +71,21 @@ const customHandlebars = (config) => {
       }
     })
   });
+  handlebarsHelpers.array({handlebars: hb});
+  handlebarsHelpers.code({handlebars: hb});
+  handlebarsHelpers.collection({handlebars: hb});
+  handlebarsHelpers.comparison({handlebars: hb});
+  handlebarsHelpers.date({handlebars: hb});
+  handlebarsHelpers.html({handlebars: hb});
+  handlebarsHelpers.i18n({handlebars: hb});
+  handlebarsHelpers.inflection({handlebars: hb});
+  handlebarsHelpers.match({handlebars: hb});
+  handlebarsHelpers.math({handlebars: hb});
+  handlebarsHelpers.misc({handlebars: hb});
+  handlebarsHelpers.number({handlebars: hb});
+  handlebarsHelpers.object({handlebars: hb});
+  handlebarsHelpers.string({handlebars: hb});
+  handlebarsHelpers.url({handlebars: hb});
   return hb;
 };
 

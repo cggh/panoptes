@@ -2,15 +2,7 @@ import API from 'panoptes/API';
 import customHandlebars from 'util/customHandlebars';
 
 const hb = customHandlebars({
-  dataset: 'test',
-  tablesById: {
-    table1: {
-      propertiesById: {
-        colour: {},
-        size: {}
-      }
-    }
-  }
+  dataset: 'testDataset'
 });
 const templateData = {data: 'DATA'};
 
@@ -33,7 +25,6 @@ test('simple template renders', () => {
     expect(data).toBe('test DATA'));
 });
 
-
 test('query simple', () => {
   let template = hb.compile('test{{#query table="simple_table"}} Entry:{{@index}},{{colour}},{{size}}{{/query}}');
   return template(templateData).then((data) =>
@@ -48,7 +39,7 @@ test('query first and last', () => {
 
 test('query that returns no rows', () => {
   API.query.mockImplementationOnce(() => Promise.resolve([]));
-  let template = hb.compile('test{{#query table="no_rows_table"}} Entry:{{colour}},{{size}}{{else}}empty{{wtf}}{{/query}}');
+  let template = hb.compile('test{{#query table="no_rows_table"}} Entry:{{colour}},{{size}}{{else}}empty{{/query}}');
   return template(templateData).then((data) =>
     expect(data).toBe('testempty'));
 });
@@ -85,6 +76,13 @@ test('query passes columns along correctly', () => {
   let template = hb.compile('test{{#query "colour" "size" table="table4" }}{{/query}}');
   return template(templateData).then((data) => {
     expect(API.query.mock.calls[0][0]).toMatchObject({table: 'table4', columns: ['colour', 'size']});
+  });
+});
+
+test('can use a handlebars helper', () => {
+  let template = hb.compile('test{{ordinalize 1}}');
+  return template(templateData).then((data) => {
+    expect(data).toBe('test1st');
   });
 });
 

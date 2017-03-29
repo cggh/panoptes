@@ -75,13 +75,26 @@ module.exports = function (env) {
       chunkFilename: '[chunkhash].js',
       publicPath: isProd ? '/panoptes/' : '/'
     },
+    node: {
+      fs: "empty"
+    },
     module: {
       rules: [
+
         // required for react jsx and es6
+        {
+          test: /(handlebars-helper|is-descriptor|create-frame)/,
+          use: [
+            {loader: 'unlazy-loader'},
+          ]
+        },
         {
           test: /\.js?$/,
           exclude: /(node_modules|bower_components)/,
-          use: ['babel-loader']
+          use: [
+            {loader: 'unlazy-loader'}, //For handlebars-helper
+            {loader: 'babel-loader'}
+          ]
         },
         // required to write 'require('./style.css')'
         {
@@ -111,6 +124,9 @@ module.exports = function (env) {
       ]
     },
     resolve: {
+      alias: {
+        'handlebars' : 'handlebars/dist/handlebars.js'
+      },
       modules: [
         'src/js',
         'src/js/components',
