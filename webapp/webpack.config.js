@@ -76,7 +76,7 @@ module.exports = function (env) {
       publicPath: isProd ? '/panoptes/' : '/'
     },
     node: {
-      fs: "empty"
+      fs: "empty" //Needed for handlebars-helper
     },
     module: {
       rules: [
