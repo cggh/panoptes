@@ -14,7 +14,7 @@ let QueryResult = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('query', 'expression')
+    DataFetcherMixin('query', 'expression', 'table')
   ],
 
   propTypes: {
