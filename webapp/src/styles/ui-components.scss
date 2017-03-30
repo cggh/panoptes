@@ -351,7 +351,6 @@
 
 .stack.start-align {
   align-items: flex-start;
-  justify-content: center;
   .description {
     padding-top: 20px;
     padding-bottom: 0px;
@@ -553,6 +552,7 @@ input.invalid {
     }
     .DraftEditor-root {
       font-family: monospace;
+      font-size: 12px;
       border: 1px solid #ccc;
       cursor: text;
     }
@@ -711,4 +711,14 @@ input.invalid {
   font-size: 20px;
   font-weight: bold;
   color: darkred;
+}
+
+.edit-doc-page {
+  .editor {
+    width: 50%;
+  }
+  .preview {
+    width: 50%;
+    padding: 10px;
+  }
 }

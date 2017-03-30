@@ -11,6 +11,9 @@ import Loading from 'ui/Loading';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Icon from 'ui/Icon';
+import customHandlebars from 'util/customHandlebars';
+import HTMLWithComponents from 'panoptes/HTMLWithComponents';
+import _debounce from 'lodash/debounce';
 
 import 'prismjs/themes/prism.css'
 import 'draft-js/dist/Draft.css'
@@ -28,7 +31,8 @@ let EditDocPage = React.createClass({
     return {
       loadStatus: 'loading',
       editorState: EditorState.createEmpty(decorator),
-      content: ''
+      content: '',
+      rendered: '....loading preview'
     };
   },
 
@@ -43,8 +47,17 @@ let EditDocPage = React.createClass({
     return `Editing ${this.props.path}`;
   },
 
+  componentWillMount() {
+    this.handlebars = customHandlebars(this.config);
+    this.debouncedPreviewUpdate = _debounce(this.previewUpdate, 1000);
+  },
+
+  onConfigChange() {
+    this.handlebars = customHandlebars(this.config);
+  },
+
   setContent(content) {
-    var contentState = convertFromRaw({
+    let contentState = convertFromRaw({
       entityMap: {},
       blocks: [
         {
@@ -58,6 +71,7 @@ let EditDocPage = React.createClass({
       content,
       editorState: EditorState.createWithContent(contentState, decorator)
     });
+    this.previewUpdate(content);
   },
 
   fetchData(props, requestContext) {
@@ -96,23 +110,45 @@ let EditDocPage = React.createClass({
       .done();
   },
 
+  previewUpdate(content) {
+    try {
+      let template = this.handlebars.compile(content);
+      template({config: this.config})
+        .then((rendered) => this.setState({rendered}))
+        .catch((error) => {
+          this.setState({rendered: `Error ${error.message || error.statusText}`});
+        });
+    } catch (error) {
+      this.setState({rendered: `Error ${error.message}`});
+    }
+  },
+
   handleChange(editorState) {
-    this.setState({editorState, content: editorState.getCurrentContent().getPlainText()});
+    let content = editorState.getCurrentContent().getPlainText();
+    this.setState({editorState, content});
+    if (content !== this.state.content) {
+      this.debouncedPreviewUpdate(content);
+    }
   },
 
   render() {
-    const {editorState, content, loadStatus} = this.state;
+    const {editorState, content, loadStatus, rendered} = this.state;
     const actions = this.getFlux().actions;
 
     return <div className="large-modal edit-doc-page">
       <div className="load-container vertical stack">
-        <div className="editor grow scroll-within">
-          <Editor className="editor"
-                  editorState={editorState}
-                  onChange={this.handleChange}
-                  placeholder="Loading..."
-                  ref="editor"
-          />
+        <div className="grow horizontal stack">
+          <div className="editor scroll-within">
+            <Editor className="editor"
+                    editorState={editorState}
+                    onChange={this.handleChange}
+                    placeholder="Loading..."
+                    ref="editor"
+            />
+          </div>
+          <div className="preview scroll-within">
+            <HTMLWithComponents>{rendered}</HTMLWithComponents>
+          </div>
         </div>
         <div className="centering-container">
           <FlatButton
