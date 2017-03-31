@@ -22,7 +22,13 @@
             {{/query}}
         </p>
 
-        <p>Some buttons that open popups:</p>
+        <p>Some buttons that open popups or tabs:</p>
+        <PopupButton target="tab" label="Table of Samples" icon="table">
+            <DataTableWithActions table="samples"/>
+        </PopupButton>
+        <PopupButton target="tab" label="List of Contributors" icon="table">
+            <DataTableWithActions table="contributors"/>
+        </PopupButton>
         <PopupButton label="Plot of Variants" icon="area-chart">
             <TablePlot plotType="scatter" table="variants" horizontal="Value1" vertical="Value2"/>
         </PopupButton>
