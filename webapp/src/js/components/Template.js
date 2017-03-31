@@ -30,7 +30,7 @@ let Template = React.createClass({
   render() {
     let {content, table, primKey} = this.props;
     return (
-        <ItemTemplate table={table} primKey={primKey}>
+        <ItemTemplate className="page-template" table={table} primKey={primKey}>
           {content}
         </ItemTemplate>
     );
