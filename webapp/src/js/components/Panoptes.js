@@ -20,6 +20,7 @@ import Finder from 'containers/Finder';
 import Copy from 'ui/Copy';
 import Confirm from 'ui/Confirm';
 import SessionComponent from 'panoptes/SessionComponent';
+import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
@@ -191,7 +192,7 @@ let Header = React.createClass({
     // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
     return (
       <div className="header">
-        <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
+        <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
         <div className="username">
           { this.config.cas.service ? (userId == 'anonymous' ?
             <a href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
