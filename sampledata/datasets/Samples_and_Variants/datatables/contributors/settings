@@ -10,7 +10,7 @@ disableNotes: true
 
 primKey: ID
 
-itemTitle: <b>{{ID}}</b> {{Name}}
+itemTitle: <b>{{ID}}</b> {{lowercase Name}}
 
 properties:
 - id: ID

@@ -1,5 +1,6 @@
 import Handlebars from 'handlebars';
 import _uniq from 'lodash/uniq';
+import _map from 'lodash/map';
 
 export default function(template, possibleTables) {
 
@@ -10,26 +11,59 @@ export default function(template, possibleTables) {
   let hb = Handlebars.create();
 
   // Register helper functions to override the native Handlebar helpers.
-  hb.registerHelper('if', (conditional, options) => {
+  hb.registerHelper('helperMissing', function() {
+    let args = [];
+    let options = arguments[arguments.length - 1];
+    for (let i = 0; i < arguments.length - 1; i++) {
+      args.push(arguments[i]);
+    }
+    _map(args, (arg) => {
+      if (arg) {
+        arg();
+      }
+    });
+  });
+
+  hb.registerHelper('blockHelperMissing', function() {
+    let args = [];
+    let options = arguments[arguments.length - 1];
+    for (let i = 0; i < arguments.length - 1; i++) {
+      args.push(arguments[i]);
+    }
+    let {fn, inverse} = options;
+    _map(args, (arg) => {
+      if (arg) {
+        arg();
+      }
+    });
+    if (fn) {
+      fn(this);
+    }
+    if (inverse) {
+      inverse(this);
+    }
+  });
+
+    hb.registerHelper('if', function(conditional, options) {
     if (conditional)
       conditional();
     options.fn(this);
     options.inverse(this);
   });
 
-  hb.registerHelper('with', (context, options) => {
+  hb.registerHelper('with', function(context, options) {
     if (context)
       context();
   });
 
-  hb.registerHelper('each', (context, options) => {
+  hb.registerHelper('each', function(context, options) {
     if (context)
       context();
     options.fn({});
     options.inverse(this);
   });
 
-  hb.registerHelper('query', (options) => {
+  hb.registerHelper('query', function(options) {
     let {fn, inverse, hash} = options;
     let {table, query, orderBy} = hash;
     table = table || '';
