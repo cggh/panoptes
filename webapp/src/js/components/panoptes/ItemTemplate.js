@@ -1,5 +1,5 @@
 import React from 'react';
-import Handlebars from 'handlebars/dist/handlebars.js';
+import customHandlebars from 'util/customHandlebars';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -30,7 +30,7 @@ let ItemTemplate = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'primKey')
+    DataFetcherMixin('table', 'primKey', 'children')
   ],
 
   propTypes: {
@@ -41,6 +41,13 @@ let ItemTemplate = React.createClass({
     data: React.PropTypes.any
   },
 
+  componentWillMount() {
+    this.handlebars = customHandlebars(this.config);
+  },
+  onConfigChange() {
+    this.handlebars = customHandlebars(this.config);
+  },
+
   getInitialState() {
     return {
       loadStatus: 'loaded'
@@ -49,8 +56,14 @@ let ItemTemplate = React.createClass({
 
   fetchData(props, requestContext) {
     let {table, primKey, children, data} = props;
-    if (data)
+    if (data) {
+      this.handlebars.compile(children)({...data, config: this.config})
+        .then((rendered) =>
+          this.setState({
+            rendered
+          }));
       return;
+    }
     this.setState({loadStatus: 'loading'});
     let relations = this.config.tablesById[table].relationsParentOf;
     // Extract all the childTableIds
@@ -117,7 +130,15 @@ let ItemTemplate = React.createClass({
       .then((data) => {
         let templateData = data.pop();
         usedChildTables.map((tableName, index) => templateData[tableName] = data[index]);
-        this.setState({loadStatus: 'loaded', data: templateData});
+        return templateData;
+      })
+      .then((data) => {
+        this.handlebars.compile(children)({...data, config: this.config})
+          .then((rendered) =>
+            this.setState({
+              loadStatus: 'loaded',
+              rendered
+            }));
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
@@ -128,15 +149,11 @@ let ItemTemplate = React.createClass({
   },
 
   render() {
-    let {children} = this.props;
-    let {loadStatus} = this.state;
-    let data = this.props.data || this.state.data;
-    // Compile and evaluate the template.
-    let template = Handlebars.compile(children);
+    let {loadStatus, rendered} = this.state;
     return (
       <span className={this.props.className}>
-        {data ? <HTMLWithComponents className="item-template">
-                  {template(data)}
+        {rendered ? <HTMLWithComponents className="item-template">
+                  {rendered}
                 </HTMLWithComponents>
           : null}
         <Loading status={loadStatus}/>
