@@ -11,7 +11,7 @@
         to documentation part of this deployment.
         <p>This dataset contains <QueryResult table="samples"/> samples</p>
         <p>The first variant position is <QueryResult table="variants" expression='"position"'/></p>
-        <p>The average variant position is <QueryResult table="variants" expression='["avg",["position"]]'/>.</p>
+        <p>The average variant position is <QueryResult table="variants" expression='["avg",["position"]]' formatNumber=".5n"/>.</p>
         <p><QueryResult table="variants" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Extra_1","CompValue":"A","isRoot":true,"Tpe":"="}'/> variants have Extra 1 = 'A'</p>
         <p>Here is an example of a template being filled for each row of a query, and a subquery for each row:<br/>
             {{#query 'SiteID' 'Country' table='samplingsites'}}
