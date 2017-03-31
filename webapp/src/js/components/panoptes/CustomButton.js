@@ -16,7 +16,7 @@ let CustomButton = React.createClass({
     children: function(props, propName, componentName) {
       // Only accept a single child, of the appropriate type
       let children = filterChildren(this, React.Children.toArray(props[propName]));
-      if (!(children[0].type === Anchor && children[1].type === Content))
+      if (children.length < 2 || !(children[0].type === Anchor && children[1].type === Content))
         return new Error(
           '`' + componentName + '` ' +
           'should have two children: one Anchor followed by one Content'
@@ -46,7 +46,8 @@ let CustomButton = React.createClass({
   render() {
     let {children} = this.props;
     children = filterChildren(this, React.Children.toArray(children));
-    if (!((children[0].type === Anchor && children[1].type === Content) ||
+    if (children.length < 2 ||
+      !((children[0].type === Anchor && children[1].type === Content) ||
       (children[1].type === Anchor && children[0].type === Content)))
       throw Error(
         'CustomButton should have two children: one Anchor followed by one Content'
