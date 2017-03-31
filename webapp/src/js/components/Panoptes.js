@@ -92,7 +92,7 @@ let Panoptes = React.createClass({
               <div className="spinner" />
             </div>
             <div className="page">
-              <Header dataset={config.dataset} name={config.settings.name} logo={initialConfig.logo}/>
+              <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
               <div className="body">
                 <TabbedArea activeTab={tabs.get('selectedTab')}
                             unclosableTabs={tabs.get('unclosableTabs')}
