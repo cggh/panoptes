@@ -1,5 +1,7 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
+import uid from 'uid';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -31,6 +33,7 @@ import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';
 import Histogram from 'Histogram';
 import {scaleColour} from 'util/Colours';
+import PropertyLegend from 'panoptes/PropertyLegend';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
@@ -51,7 +54,10 @@ let TableMarkersLayer = React.createClass({
     crs: React.PropTypes.object,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    changeLayerStatus: React.PropTypes.func
+    changeLayerStatus: React.PropTypes.func,
+    addControl: React.PropTypes.func,
+    changeControl: React.PropTypes.func,
+    removeControl: React.PropTypes.func
   },
   propTypes: {
     highlight: React.PropTypes.string,
@@ -80,6 +86,37 @@ let TableMarkersLayer = React.createClass({
     return {
       markersGroupedByLocation: {}
     };
+  },
+
+  componentDidMount() {
+    let {table, markerColourProperty} = this.props;
+    let {addControl} = this.context;
+
+    if (table !== undefined && markerColourProperty !== undefined && addControl !== undefined) {
+      let legendControl = this.composeLegendControl({table, markerColourProperty});
+      this.legendControlId = uid(10);
+      legendControl.id = this.legendControlId;
+      addControl(legendControl);
+    }
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    let {table, markerColourProperty} = this.props;
+    let {changeControl} = this.context;
+
+    if (table !== undefined && markerColourProperty !== undefined && changeControl !== undefined) {
+      let legendControl = this.composeLegendControl({table, markerColourProperty});
+      legendControl.id = this.legendControlId;
+      changeControl(legendControl);
+    }
+  },
+
+  componentWillUnmount() {
+    let {removeControl} = this.context;
+
+    if (removeControl !== undefined) {
+      removeControl(this.legendControlId);
+    }
   },
 
   // Event handlers
@@ -280,6 +317,27 @@ let TableMarkersLayer = React.createClass({
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
         changeLayerStatus({loadStatus: 'error'});
       });
+  },
+
+  composeLegendControl(payload) {
+    let {table, markerColourProperty} = payload;
+
+    let legendControl = null;
+
+    if (table !== undefined && markerColourProperty !== undefined) {
+      let legend = ReactDOMServer.renderToStaticMarkup(
+          <PropertyLegend
+            flux={this.flux}
+            property={markerColourProperty}
+            table={table}
+          />
+      );
+      let position = 'bottomleft';
+      let className = 'legend';
+      legendControl = {component: legend, position, className};
+    }
+
+    return legendControl;
   },
 
   render() {
