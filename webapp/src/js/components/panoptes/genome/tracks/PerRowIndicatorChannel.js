@@ -433,7 +433,7 @@ let PerRowIndicatorChannel = React.createClass({
           <div className="side-name">
             <span>
               {this.getDefinedQuery() !== SQL.nullQuery ? <span>Filtered<br/></span> : null}
-              {name || this.config.tablesById[table].capNamePlural}
+              {this.config.tablesById[table].capNamePlural}
             </span>
           </div>
         }
