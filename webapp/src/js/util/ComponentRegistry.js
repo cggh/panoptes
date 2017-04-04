@@ -1,6 +1,5 @@
 const dynreq = require.context('../components', true);
 import getDisplayName from 'react-display-name';
-import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 
 if (typeof String.prototype.endsWith !== 'function') {
   String.prototype.endsWith = function(suffix) {
@@ -29,9 +28,11 @@ dynreq.keys().forEach((component) => {
 });
 
 //We now add in specific material-ui classes
+import {Card, CardActions, CardHeader, CardTitle, CardText} from 'material-ui/Card';
 typeByDisplayName['Card'] = Card;
 typeByDisplayName['CardActions'] = CardActions;
 typeByDisplayName['CardHeader'] = CardHeader;
+typeByDisplayName['CardTitle'] = CardHeader;
 typeByDisplayName['CardText'] = CardText;
 
 
