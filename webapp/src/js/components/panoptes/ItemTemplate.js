@@ -35,6 +35,7 @@ let ItemTemplate = React.createClass({
 
   propTypes: {
     className: React.PropTypes.string,
+    innerClassName: React.PropTypes.string,
     children: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
@@ -46,6 +47,12 @@ let ItemTemplate = React.createClass({
   },
   onConfigChange() {
     this.handlebars = customHandlebars(this.config);
+  },
+
+  getDefaultProps() {
+    return {
+      innerClassName: 'item-template'
+    }
   },
 
   getInitialState() {
@@ -152,7 +159,7 @@ let ItemTemplate = React.createClass({
     let {loadStatus, rendered} = this.state;
     return (
       <span className={this.props.className}>
-        {rendered ? <HTMLWithComponents className="item-template">
+        {rendered ? <HTMLWithComponents className={this.props.innerClassName}>
                   {rendered}
                 </HTMLWithComponents>
           : null}
