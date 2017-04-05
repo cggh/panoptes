@@ -105,6 +105,10 @@ let NumericalTrackGroupChannel = React.createClass({
   //   });
   // },
 
+  componentWillMount() {
+    this.children = [];
+  },
+
   componentWillUpdate() {
     this.children = [];
   },
