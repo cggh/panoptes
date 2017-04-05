@@ -1,6 +1,6 @@
 import React from 'react';
 import customHandlebars from 'util/customHandlebars';
-
+import Handlebars from 'handlebars';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -39,14 +39,15 @@ let ItemTemplate = React.createClass({
     children: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
+    immediate: React.PropTypes.bool,
     data: React.PropTypes.any
   },
 
   componentWillMount() {
-    this.handlebars = customHandlebars(this.config);
+    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
   },
   onConfigChange() {
-    this.handlebars = customHandlebars(this.config);
+    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
   },
 
   getDefaultProps() {
@@ -64,11 +65,17 @@ let ItemTemplate = React.createClass({
   fetchData(props, requestContext) {
     let {table, primKey, children, data} = props;
     if (data) {
-      this.handlebars.compile(children)({...data, config: this.config})
-        .then((rendered) =>
+      let result = this.handlebars.compile(children)({...data, config: this.config});
+      if (result.then) {
+        result.then((rendered) =>
           this.setState({
             rendered
           }));
+      } else {
+          this.setState({
+            rendered: result
+          });
+      }
       return;
     }
     this.setState({loadStatus: 'loading'});

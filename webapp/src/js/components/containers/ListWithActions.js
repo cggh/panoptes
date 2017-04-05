@@ -126,7 +126,6 @@ let ListWithActions = React.createClass({
                table={table}
                selectedPrimKey={selectedPrimKey}
                onSelect={this.handleSelect}
-               icon={this.icon()}
                autoSelectIfNoneSelected
                onRowsCountChange={this.handleRowsCountChange}
               />

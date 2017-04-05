@@ -7,9 +7,8 @@ import Q from 'q';
 import _map from 'lodash/map';
 import handlebarsHelpers from 'handlebars-helpers';
 
-const customHandlebars = ({dataset}) => {
-  let hb = promisedHandlebars(Handlebars);
-
+const customHandlebars = ({dataset, handlebars}) => {
+  let hb = handlebars || promisedHandlebars(Handlebars);
   hb.registerHelper('query', function () {
     let columns = [];
     let options = arguments[arguments.length - 1];

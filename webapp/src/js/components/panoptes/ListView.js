@@ -155,6 +155,7 @@ let ListView = React.createClass({
             table={table}
             primKey={primKey}
             data={row}
+            immediate={true}
           >
             {itemTitle}
           </ItemTemplate>
@@ -171,7 +172,7 @@ let ListView = React.createClass({
                   </Highlight>
               }
               onClick={() => this.handleSelect(primKey)}
-              leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+              leftIcon={icon ? <div><Icon fixedWidth={true} name={icon}/></div> : null}
             />
           );
         }
