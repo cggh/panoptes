@@ -1,6 +1,7 @@
 import Handlebars from 'handlebars';
 import _uniq from 'lodash/uniq';
 import _map from 'lodash/map';
+import _isFunction from 'lodash/isFunction';
 
 export default function(template, possibleTables) {
 
@@ -18,7 +19,7 @@ export default function(template, possibleTables) {
       args.push(arguments[i]);
     }
     _map(args, (arg) => {
-      if (arg) {
+      if (arg && _isFunction(arg)) {
         arg();
       }
     });
@@ -32,7 +33,7 @@ export default function(template, possibleTables) {
     }
     let {fn, inverse} = options;
     _map(args, (arg) => {
-      if (arg) {
+      if (arg && _isFunction(arg)) {
         arg();
       }
     });
