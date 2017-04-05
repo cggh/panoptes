@@ -1,5 +1,6 @@
 import {Map as LeafletMap} from 'react-leaflet';
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import displayName from 'react-display-name';
 import 'leaflet-loading/src/Control.Loading.js';
 
@@ -137,7 +138,7 @@ let Map = React.createClass({
 
     leafletControl.onAdd = function(map) {
       let div = window.L.DomUtil.create('div', 'map-custom-control ' + control.className);
-      div.innerHTML = control.component;
+      div.innerHTML = ReactDOMServer.renderToStaticMarkup(control.component);
       return div;
     };
 

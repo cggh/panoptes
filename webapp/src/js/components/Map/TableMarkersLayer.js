@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 
 import uid from 'uid';
 
@@ -321,12 +320,12 @@ let TableMarkersLayer = React.createClass({
     let legendControl = null;
 
     if (table !== undefined && markerColourProperty !== undefined) {
-      let legend = ReactDOMServer.renderToStaticMarkup(
-          <PropertyLegend
-            flux={this.flux}
-            property={markerColourProperty}
-            table={table}
-          />
+      let legend = (
+        <PropertyLegend
+          flux={this.flux}
+          property={markerColourProperty}
+          table={table}
+        />
       );
       let position = 'bottomleft';
       let className = 'legend';
