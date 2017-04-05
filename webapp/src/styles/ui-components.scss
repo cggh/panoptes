@@ -314,7 +314,7 @@
 }
 
 .sidebar {
-  width: 258px;
+  width: 273px;
   padding: 12px 9px;
 }
 
@@ -690,6 +690,15 @@ input.invalid {
   }
   .search {
     padding-left: 16px;
+  }
+  .item-list-container {
+    overflow-y:auto;
+    overflow-x:hidden;
+    width:100%;
+  }
+  .item-list {
+    width:100%;
+    overflow:visible;
   }
 }
 

@@ -103,8 +103,8 @@ let ListWithActions = React.createClass({
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
-      <div className="sidebar">
-        <div className="item-picker">
+      <div className="sidebar" style={{height:'100%'}}>
+        <div className="item-picker vertical stack">
           <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
           <FlatButton label="Download data"
                       primary={true}
@@ -119,15 +119,19 @@ let ListWithActions = React.createClass({
                        onChange={this.handleSearchChange}
             />
           </div>
-          <ListView
-             search={search}
-             table={table}
-             selectedPrimKey={selectedPrimKey}
-             onSelect={this.handleSelect}
-             icon={this.icon()}
-             autoSelectIfNoneSelected
-             onRowsCountChange={this.handleRowsCountChange}
-            />
+          <div className="item-list-container scroll-within grow">
+            <div className="item-list">
+              <ListView
+               search={search}
+               table={table}
+               selectedPrimKey={selectedPrimKey}
+               onSelect={this.handleSelect}
+               icon={this.icon()}
+               autoSelectIfNoneSelected
+               onRowsCountChange={this.handleRowsCountChange}
+              />
+            </div>
+          </div>
         </div>
       </div>
     );

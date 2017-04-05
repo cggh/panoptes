@@ -145,14 +145,10 @@ let ListView = React.createClass({
     }
 
     if (rows.length > 0) {
-
       let listItems = [];
-
       rows.map((row) => {
-
         let primKey = row[tableConfig.primKey];
         let className = selectedPrimKey !== primKey ? 'picked' : '';
-
         let itemTemplate = (
           <ItemTemplate
             flux={this.flux}
@@ -163,9 +159,7 @@ let ListView = React.createClass({
             {itemTitle}
           </ItemTemplate>
         );
-
         let content = search ? striptags(ReactDOMServer.renderToStaticMarkup(itemTemplate)).toLowerCase() : '';
-
         if (search && content.indexOf(search.toLowerCase()) !== -1 || !search) {
           listItems.push(
             <ListItem
@@ -181,7 +175,6 @@ let ListView = React.createClass({
             />
           );
         }
-
       });
 
 
