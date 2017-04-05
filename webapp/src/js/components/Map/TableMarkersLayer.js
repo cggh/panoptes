@@ -92,7 +92,7 @@ let TableMarkersLayer = React.createClass({
     let {table, markerColourProperty} = this.props;
     let {addControl} = this.context;
 
-    if (table !== undefined && markerColourProperty !== undefined && addControl !== undefined) {
+    if (table !== undefined && markerColourProperty !== undefined) {
       let legendControl = this.composeLegendControl({table, markerColourProperty});
       this.legendControlId = uid(10);
       legendControl.id = this.legendControlId;
@@ -104,7 +104,7 @@ let TableMarkersLayer = React.createClass({
     let {table, markerColourProperty} = this.props;
     let {changeControl} = this.context;
 
-    if (table !== undefined && markerColourProperty !== undefined && changeControl !== undefined) {
+    if (table !== undefined && markerColourProperty !== undefined) {
       let legendControl = this.composeLegendControl({table, markerColourProperty});
       legendControl.id = this.legendControlId;
       changeControl(legendControl);
@@ -112,11 +112,7 @@ let TableMarkersLayer = React.createClass({
   },
 
   componentWillUnmount() {
-    let {removeControl} = this.context;
-
-    if (removeControl !== undefined) {
-      removeControl(this.legendControlId);
-    }
+    this.context.removeControl(this.legendControlId);
   },
 
   // Event handlers
