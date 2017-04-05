@@ -77,6 +77,7 @@ let ListView = React.createClass({
     let queryAPIargs = {
       database: this.config.dataset,
       table: tableConfig.id,
+      orderBy: [['asc', this.config.tablesById[table].primKey]],
       columns: columns,
       start: 0,
       transpose: true
