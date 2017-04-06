@@ -10,7 +10,7 @@ disableNotes: true
 
 primKey: ID
 
-itemTitle: <b>{{ID}}</b> {{Name}}
+itemTitle: <b>{{ID}}</b> {{lowercase Name}}
 
 properties:
 - id: ID
@@ -71,5 +71,7 @@ dataItemViews:
     <h4>
       More information on the nature of contribution <DocLink href="samples.html">here</DocLink>
     </h4>
+    WTF
+    <Card><CardText> This text is on a mui card</CardText></Card>
 
 

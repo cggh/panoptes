@@ -27,6 +27,15 @@ dynreq.keys().forEach((component) => {
   }
 });
 
+//We now add in specific material-ui classes
+import {Card, CardActions, CardHeader, CardTitle, CardText} from 'material-ui/Card';
+typeByDisplayName['Card'] = Card;
+typeByDisplayName['CardActions'] = CardActions;
+typeByDisplayName['CardHeader'] = CardHeader;
+typeByDisplayName['CardTitle'] = CardHeader;
+typeByDisplayName['CardText'] = CardText;
+
+
 export default function(displayName) {
   return typeByDisplayName[displayName];
 }

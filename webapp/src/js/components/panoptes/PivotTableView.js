@@ -67,7 +67,8 @@ let PivotTableView = React.createClass({
     onOrderChange: React.PropTypes.func,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
-    className: React.PropTypes.string
+    className: React.PropTypes.string,
+    style: React.PropTypes.object
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -275,7 +276,7 @@ let PivotTableView = React.createClass({
 
 
   render() {
-    let {className, columnProperty, rowProperty, columnSortOrder, rowSortOrder} = this.props;
+    let {style, className, columnProperty, rowProperty, columnSortOrder, rowSortOrder} = this.props;
     let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -283,7 +284,7 @@ let PivotTableView = React.createClass({
     }
     return (
       <DetectResize onResize={this.handleResize}>
-        <div className={classNames('load-container', className)}>
+        <div style={style} className={classNames('load-container', className)}>
           <Table
             rowHeight={ROW_HEIGHT}
             rowsCount={uniqueRows.length}

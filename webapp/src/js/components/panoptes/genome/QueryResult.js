@@ -9,6 +9,8 @@ import API from "panoptes/API";
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 
+import {format} from 'd3-format';
+
 let QueryResult = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -21,6 +23,7 @@ let QueryResult = React.createClass({
     query: React.PropTypes.string,
     expression: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
+    formatNumber: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -73,7 +76,11 @@ let QueryResult = React.createClass({
   },
 
   render() {
+    let {formatNumber} = this.props;
     let {result} = this.state;
+    if (result && formatNumber) {
+      result = format(formatNumber)(result);
+    }
     return <span>{result ? result : '...'}</span>;
   }
 

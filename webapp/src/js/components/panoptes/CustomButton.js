@@ -4,6 +4,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 import Anchor from 'panoptes/Anchor';
 import Content from 'panoptes/Content';
+import _isArray from 'lodash/isArray';
 
 let CustomButton = React.createClass({
   mixins: [
@@ -35,6 +36,10 @@ let CustomButton = React.createClass({
     let {children, target} = this.props;
     children = filterChildren(this, React.Children.toArray(children));
     let [anchor, content] = children;
+    content = filterChildren(this, React.Children.toArray(content.props.children));
+    if (_isArray(content)) {
+      throw Error('Content can only have one child until https://github.com/facebook/react/issues/2127');
+    }
     const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
     if (target === 'tab') {
       this.getFlux().actions.session.tabOpen(content, !middleClick);

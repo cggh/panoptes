@@ -1,6 +1,6 @@
 import React from 'react';
-import Handlebars from 'handlebars/dist/handlebars.js';
-
+import customHandlebars from 'util/customHandlebars';
+import Handlebars from 'handlebars';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -30,15 +30,30 @@ let ItemTemplate = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'primKey')
+    DataFetcherMixin('table', 'primKey', 'children')
   ],
 
   propTypes: {
     className: React.PropTypes.string,
+    innerClassName: React.PropTypes.string,
     children: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
+    immediate: React.PropTypes.bool,
     data: React.PropTypes.any
+  },
+
+  componentWillMount() {
+    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
+  },
+  onConfigChange() {
+    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
+  },
+
+  getDefaultProps() {
+    return {
+      innerClassName: 'item-template'
+    }
   },
 
   getInitialState() {
@@ -49,8 +64,20 @@ let ItemTemplate = React.createClass({
 
   fetchData(props, requestContext) {
     let {table, primKey, children, data} = props;
-    if (data)
+    if (data) {
+      let result = this.handlebars.compile(children)({...data, config: this.config});
+      if (result.then) {
+        result.then((rendered) =>
+          this.setState({
+            rendered
+          }));
+      } else {
+          this.setState({
+            rendered: result
+          });
+      }
       return;
+    }
     this.setState({loadStatus: 'loading'});
     let relations = this.config.tablesById[table].relationsParentOf;
     // Extract all the childTableIds
@@ -117,7 +144,15 @@ let ItemTemplate = React.createClass({
       .then((data) => {
         let templateData = data.pop();
         usedChildTables.map((tableName, index) => templateData[tableName] = data[index]);
-        this.setState({loadStatus: 'loaded', data: templateData});
+        return templateData;
+      })
+      .then((data) => {
+        this.handlebars.compile(children)({...data, config: this.config})
+          .then((rendered) =>
+            this.setState({
+              loadStatus: 'loaded',
+              rendered
+            }));
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
@@ -128,15 +163,11 @@ let ItemTemplate = React.createClass({
   },
 
   render() {
-    let {children} = this.props;
-    let {loadStatus} = this.state;
-    let data = this.props.data || this.state.data;
-    // Compile and evaluate the template.
-    let template = Handlebars.compile(children);
+    let {loadStatus, rendered} = this.state;
     return (
       <span className={this.props.className}>
-        {data ? <HTMLWithComponents className="item-template">
-                  {template(data)}
+        {rendered ? <HTMLWithComponents className={this.props.innerClassName}>
+                  {rendered}
                 </HTMLWithComponents>
           : null}
         <Loading status={loadStatus}/>

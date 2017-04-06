@@ -77,6 +77,7 @@ let ListView = React.createClass({
     let queryAPIargs = {
       database: this.config.dataset,
       table: tableConfig.id,
+      orderBy: [['asc', this.config.tablesById[table].primKey]],
       columns: columns,
       start: 0,
       transpose: true
@@ -145,27 +146,22 @@ let ListView = React.createClass({
     }
 
     if (rows.length > 0) {
-
       let listItems = [];
-
       rows.map((row) => {
-
         let primKey = row[tableConfig.primKey];
         let className = selectedPrimKey !== primKey ? 'picked' : '';
-
         let itemTemplate = (
           <ItemTemplate
             flux={this.flux}
             table={table}
             primKey={primKey}
             data={row}
+            immediate={true}
           >
             {itemTitle}
           </ItemTemplate>
         );
-
         let content = search ? striptags(ReactDOMServer.renderToStaticMarkup(itemTemplate)).toLowerCase() : '';
-
         if (search && content.indexOf(search.toLowerCase()) !== -1 || !search) {
           listItems.push(
             <ListItem
@@ -177,11 +173,10 @@ let ListView = React.createClass({
                   </Highlight>
               }
               onClick={() => this.handleSelect(primKey)}
-              leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+              leftIcon={icon ? <div><Icon fixedWidth={true} name={icon}/></div> : null}
             />
           );
         }
-
       });
 
 
