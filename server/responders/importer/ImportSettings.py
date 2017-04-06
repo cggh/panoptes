@@ -508,13 +508,19 @@ class ImportSettings:
 
             #Now we need to update the original so it can be validated
             propsList = copy.deepcopy(self._settings["properties"])
+            copied = set()
             #Do it backwards so can deleted without changing the index
             for i, propDetails in reversed(list(enumerate(propsList))):
                 propid = propDetails['id']
-                if propid in self._propidMap:
+                if propid in self._propidMap and propid not in copied:
                     self._settings['properties'][i] = copy.deepcopy(self._propidMap[propid])
+                    copied.add(propid)
                 else:
                     del self._settings['properties'][i]
+            #Add entries for those props only referenced in a list.
+            for propid, propDetails in self._propidMap.items():
+                if propid not in copied:
+                    self._settings['properties'].append(propDetails)
 
     #Set any implied values here
     def _postProcess(self):
