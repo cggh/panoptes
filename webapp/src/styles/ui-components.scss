@@ -678,6 +678,15 @@ input.invalid {
   font-weight: inherit !important;
   line-height: inherit !important;
 }
+.tooltip-description {
+  max-width: 60vmin;
+}
+.tooltip-plot {
+  margin-top: 10px;
+  position: relative;
+  width: 60vmin;
+  height: 60vmin;
+}
 
 .item-picker {
   .picked {

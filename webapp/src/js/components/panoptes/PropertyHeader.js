@@ -12,6 +12,7 @@ import Icon from 'ui/Icon';
 
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
+import TablePlot from 'TablePlot';
 
 let PropertyHeader = React.createClass({
 
@@ -35,15 +36,22 @@ let PropertyHeader = React.createClass({
     const {table, propId, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
     const {name, description} = this.tableConfig().propertiesById[propId];
     delete other.columnKey;
-    let tooltip = '';
-    if (description) {
-      tooltip = <Tooltip placement={tooltipPlacement}
-                 trigger={tooltipTrigger}
-                 overlay={<span>{description}</span>}>
-          <Icon className="info" name="info-circle"/>
-        </Tooltip>;
-    }
-    return (
+    const tooltip = <Tooltip placement={tooltipPlacement}
+               trigger={tooltipTrigger}
+               overlay={<div className="vertical stack">
+                 <div className="tooltip-description">{description}</div>
+                 <div className="grow"><div className="tooltip-plot"><TablePlot
+                   table={table}
+                   plotType='histogram'
+                   // query={this.getDefinedQuery()}
+                   horizontal={propId}
+                   // randomSubsetSize={randomSubsetSize}
+                 /></div></div>
+               </div>
+                 }>
+        <Icon className="info" name="info-circle"/>
+      </Tooltip>;
+  return (
       <span onClick={(event) => {
         if (onClick && event.target.className.indexOf('info') == -1)
           onClick(event);
