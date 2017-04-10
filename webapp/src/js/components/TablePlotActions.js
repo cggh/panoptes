@@ -174,6 +174,7 @@ let TablePlotActions = React.createClass({
                 query={this.getDefinedQuery()}
                 {...dimensionProperties}
                 randomSubsetSize={randomSubsetSize}
+                displayModeBar={true}
               /> : null
             }
           </div>

@@ -17,7 +17,8 @@ let Plot = React.createClass({
     plotType: React.PropTypes.string,
     dimensionData: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {})),
     dimensionMetadata: React.PropTypes.object,
-    title: React.PropTypes.string
+    title: React.PropTypes.string,
+    displayModeBar: React.PropTypes.bool
   },
 
   getInitialState() {
@@ -29,7 +30,7 @@ let Plot = React.createClass({
 
   render() {
     let {width, height} = this.state;
-    let {plotType, dimensionData, dimensionMetadata, title} = this.props;
+    let {plotType, dimensionData, dimensionMetadata, title, displayModeBar} = this.props;
 
     // data and plotType-independent config
     const defaultLayout = {
@@ -45,7 +46,7 @@ let Plot = React.createClass({
     };
     const config = {
       showLink: false,
-      displayModeBar: true
+      displayModeBar: displayModeBar
     };
 
     let showLegend = false;

@@ -41,7 +41,8 @@ let TablePlot = React.createClass({
     table: React.PropTypes.string,
     query: React.PropTypes.string,
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
-    randomSubsetSize: React.PropTypes.number
+    randomSubsetSize: React.PropTypes.number,
+    displayModeBar: React.PropTypes.bool
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -149,7 +150,7 @@ let TablePlot = React.createClass({
   },
 
   render() {
-    const {plotType, table} = this.props;
+    const {plotType, table, displayModeBar} = this.props;
     const query = queryToString({
       query: this.getDefinedQuery(),
       properties: this.config.tablesById[table].properties
@@ -166,6 +167,7 @@ let TablePlot = React.createClass({
             dimensionData={this.state.dimensionData}
             dimensionMetadata={this.state.dimensionMetadata}
             title={title}
+            displayModeBar={displayModeBar}
           />
           : null
         }
