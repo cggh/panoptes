@@ -282,7 +282,7 @@ let DataTableView = React.createClass({
 
 
   render() {
-    let {className, columns, order} = this.props;
+    let {className, columns, order, table} = this.props;
     let {loadStatus, rows, width, height} = this.state;
 
     if (!this.tableConfig()) {
@@ -311,7 +311,7 @@ let DataTableView = React.createClass({
                   return;
                 }
                 let columnData = this.tableConfig().propertiesById[column];
-                let {id, isPrimKey, description, name} = columnData;
+                let {id, isPrimKey} = columnData;
                 let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
                 let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
                 return <Column
@@ -332,12 +332,12 @@ let DataTableView = React.createClass({
                         'sort-column-descending': desc
                       })}
                       style={{width: this.calcColumnWidthPx(column)}}
+                      table={table}
+                      propId={id}
                       onClick={() => this.handleOrderChange(id)}
                       prefix={(asc || desc) ?
                         <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> :
                         null}
-                      name={name}
-                      description={description}
                       tooltipPlacement={'bottom'}
                       tooltipTrigger={['click']}
                     />

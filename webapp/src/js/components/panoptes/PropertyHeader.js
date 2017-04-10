@@ -3,6 +3,8 @@ import React from 'react';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+
 
 // UI components
 import TooltipEllipsis from 'ui/TooltipEllipsis';
@@ -15,13 +17,14 @@ let PropertyHeader = React.createClass({
 
   mixins: [
     PureRenderMixin,
-    FluxMixin
+    FluxMixin,
+    ConfigMixin
   ],
 
   propTypes: {
     prefix: React.PropTypes.node,
-    name: React.PropTypes.string.isRequired,
-    description: React.PropTypes.string.isRequired,
+    table: React.PropTypes.string.isRequired,
+    propId: React.PropTypes.string.isRequired,
     tooltipPlacement: React.PropTypes.string.isRequired,
     tooltipTrigger: React.PropTypes.arrayOf(React.PropTypes.string),
     onClick: React.PropTypes.func
@@ -29,10 +32,9 @@ let PropertyHeader = React.createClass({
 
 
   render: function() {
-
-    let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
+    const {table, propId, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
+    const {name, description} = this.tableConfig().propertiesById[propId];
     delete other.columnKey;
-
     let tooltip = '';
     if (description) {
       tooltip = <Tooltip placement={tooltipPlacement}
@@ -41,8 +43,6 @@ let PropertyHeader = React.createClass({
           <Icon className="info" name="info-circle"/>
         </Tooltip>;
     }
-
-
     return (
       <span onClick={(event) => {
         if (onClick && event.target.className.indexOf('info') == -1)

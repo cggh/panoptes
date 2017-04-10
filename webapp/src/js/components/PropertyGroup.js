@@ -1,5 +1,5 @@
 import React from 'react';
-import _cloneDeep from 'lodash/cloneDeep';
+import _filter from 'lodash/filter';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -42,14 +42,14 @@ let PropertyGroup = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {table, primKey} = props;
+    let {table, primKey, propertyGroupId} = props;
 
     this.setState({loadStatus: 'loading'});
 
     let APIargs = {
       database: this.config.dataset,
       table,
-      columns: _map(this.config.tablesById[table].properties, 'id'),
+      columns: _map(_filter(this.config.tablesById[table].properties, {groupId: propertyGroupId} ), 'id'),
       primKey: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
@@ -80,32 +80,15 @@ let PropertyGroup = React.createClass({
   render() {
     let {table, propertyGroupId, className} = this.props;
     let {data, loadStatus} = this.state;
-
-    if (!data) return null;
-
-    if (!propertyGroupId) return null;
-
-    // Collect the propertiesData for the specified propertyGroup.
-    let propertyGroupPropertiesData = [];
-
-    // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _cloneDeep(this.config.tablesById[table].properties);
-
-    for (let i = 0; i < propertiesData.length; i++) {
-      if (propertiesData[i].groupId === propertyGroupId) {
-        // Only collect data for the specified propertyGroup.
-
-        // Augment the array element (an object) with the fetched value of the property.
-        propertiesData[i].value = data[propertiesData[i].id];
-
-        // Push the array element (an object) into the array of propertiesData for the specified propertyGroup.
-        propertyGroupPropertiesData.push(propertiesData[i]);
-      }
-    }
-
     return (
         <div>
-          <PropertyList propertiesData={propertyGroupPropertiesData} className={className} />
+          {data ? <PropertyList table={table}
+                        propertiesData={
+                          _map(
+                            _filter(this.config.tablesById[table].properties, {groupId: propertyGroupId} ),
+                            ({id}) => ({id, value:data[id]}))}
+                        className={className}
+          /> : null}
           <Loading status={loadStatus}/>
         </div>
     );

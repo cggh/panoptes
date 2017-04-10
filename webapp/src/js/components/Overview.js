@@ -1,5 +1,4 @@
 import React from 'react';
-import _cloneDeep from 'lodash/cloneDeep';
 import _map from 'lodash/map';
 
 // Mixins
@@ -68,9 +67,9 @@ let Overview = React.createClass({
     .catch(API.filterAborted)
     .catch(LRUCache.filterCancelled)
     .catch((error) => {
+      console.error(error);
       ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
       this.setState({loadStatus: 'error'});
-      console.error(error);
     });
   },
 
@@ -81,19 +80,13 @@ let Overview = React.createClass({
   render() {
     let {table, className} = this.props;
     let {data, loadStatus} = this.state;
-
-    if (!data) return null;
-
-    // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _cloneDeep(this.config.tablesById[table].properties);
-    for (let i = 0; i < propertiesData.length; i++) {
-      // Augment the array element (an object) with the fetched value of the property.
-      propertiesData[i].value = data[propertiesData[i].id];
-    }
-
     return (
         <div>
-          <PropertyList propertiesData={propertiesData} className={className} />
+          {data ? <PropertyList
+              table={table}
+              propertiesData={_map(this.tableConfig().properties, ({id}) => ({id, value:data[id]}))}
+              className={className}
+          /> : null}
           <Loading status={loadStatus}/>
         </div>
     );
