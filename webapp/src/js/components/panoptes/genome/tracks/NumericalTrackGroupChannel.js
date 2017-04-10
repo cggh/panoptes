@@ -205,8 +205,8 @@ let Side = React.createClass({
       <LegendElement
         key={child.props.track}
         name={<PropertyHeader className="table-row-header"
-                              name={this.tableConfig().propertiesById[child.props.track].name}
-                              description={this.tableConfig().propertiesById[child.props.track].description}
+                              table={table}
+                              propId={child.props.track}
                               tooltipPlacement={'bottom'}
                               tooltipTrigger={['click']}
         />}

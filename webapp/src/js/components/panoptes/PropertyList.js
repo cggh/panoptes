@@ -15,21 +15,27 @@ let PropertyList = React.createClass({
   ],
 
   propTypes: {
-    propertiesData: React.PropTypes.array.isRequired,
+    table: React.PropTypes.string.isRequired,
+    propertiesData: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        id: React.PropTypes.string.isRequired,
+        value: React.PropTypes.any
+      }
+    )).isRequired,
     className: React.PropTypes.string
   },
 
   render: function() {
 
-    let {propertiesData, className} = this.props;
+    let {propertiesData, className, table} = this.props;
 
     return (
       <table className={className}>
         <tbody>
           {
             propertiesData.map(
-              (propertyData, index) =>
-                <PropertyListItem key={index} rowIndex={index} propertyData={propertyData} tooltipPlacement={'right'} tooltipTrigger={['click']} />
+              ({id, value}) =>
+                <PropertyListItem key={id} table={table} propId={id} value={value} tooltipPlacement={'right'} tooltipTrigger={['click']} />
             )
           }
         </tbody>

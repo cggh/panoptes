@@ -43,14 +43,14 @@ let FieldList = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {table, primKey} = props;
+    let {table, primKey, fields} = props;
 
     this.setState({loadStatus: 'loading'});
 
     let APIargs = {
       database: this.config.dataset,
       table,
-      columns: _map(this.config.tablesById[table].properties, 'id'),
+      columns: fields,
       primKey: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
@@ -81,37 +81,12 @@ let FieldList = React.createClass({
   render() {
     let {table, fields, className} = this.props;
     let {data, loadStatus} = this.state;
-
-    if (!data) return null;
-
-    let propertiesDataIndexes = {};
-
-    // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _cloneDeep(this.config.tablesById[table].properties);
-
-    for (let i = 0; i < propertiesData.length; i++) {
-      // Augment the array element (an object) with the fetched value of the property.
-      propertiesData[i].value = data[propertiesData[i].id];
-
-      // Record which array index in propertiesData relates to which property Id.
-      propertiesDataIndexes[propertiesData[i].id] = i;
-    }
-
-    // Collect the propertiesData for the specified list of fields.
-    let fieldListPropertiesData = [];
-    fields.forEach((field) => {
-      let propertiesDataIndex = propertiesDataIndexes[field];
-      if (typeof propertiesDataIndex !== 'undefined') {
-        fieldListPropertiesData.push(propertiesData[propertiesDataIndex]);
-      } else {
-        console.warn('Foreign property: ' + field);
-      }
-    });
-
-
     return (
         <div>
-          <PropertyList propertiesData={fieldListPropertiesData} className={className} />
+          {data ? <PropertyList
+            table={table}
+            propertiesData={_map(fields, (id) => ({id, value: data[id]}))} className={className}
+          /> : null}
           <Loading status={loadStatus}/>
         </div>
     );
