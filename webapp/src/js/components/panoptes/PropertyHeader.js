@@ -13,6 +13,7 @@ import Icon from 'ui/Icon';
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
 import TablePlot from 'TablePlot';
+import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 let PropertyHeader = React.createClass({
 
@@ -39,7 +40,7 @@ let PropertyHeader = React.createClass({
     const tooltip = <Tooltip placement={tooltipPlacement}
                trigger={tooltipTrigger}
                overlay={<div className="vertical stack">
-                 <div className="tooltip-description">{description}</div>
+                 <div className="tooltip-description"><HTMLWithComponents>{description}</HTMLWithComponents></div>
                  <div className="grow"><div className="tooltip-plot"><TablePlot
                    table={table}
                    plotType='histogram'
