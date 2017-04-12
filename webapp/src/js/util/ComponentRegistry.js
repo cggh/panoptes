@@ -34,7 +34,9 @@ typeByDisplayName['CardActions'] = CardActions;
 typeByDisplayName['CardHeader'] = CardHeader;
 typeByDisplayName['CardTitle'] = CardHeader;
 typeByDisplayName['CardText'] = CardText;
-
+import {Tabs, Tab} from 'material-ui/Tabs';
+typeByDisplayName['Tabs'] = Tabs;
+typeByDisplayName['Tab'] = Tab;
 
 export default function(displayName) {
   return typeByDisplayName[displayName];
