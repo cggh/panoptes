@@ -602,10 +602,10 @@ input.invalid {
 }
 
 .prop.true {
-    color: $green;
+  color: $green !important;
 }
 .prop.false {
-  color: $red;
+  color: $red !important;
 }
 
 .table-row-cell {

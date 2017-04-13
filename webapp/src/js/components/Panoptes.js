@@ -30,7 +30,6 @@ import {
   blue500, blue700,
   pinkA200,
 } from 'material-ui/styles/colors';
-
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
 
@@ -39,6 +38,15 @@ import 'ui-components.scss';
 import 'main.scss';
 
 const muiTheme = getMuiTheme({
+  fontFamily: 'Roboto, sans-serif',
+  tableHeaderColumn: {
+    height: 56,
+    spacing: 12,
+  },
+  tableRowColumn: {
+    height: 48,
+    spacing: 12,
+  },
   palette: {
     primary1Color: blue500,
     primary2Color: blue700,
