@@ -291,10 +291,12 @@ let PivotTableView = React.createClass({
             <TableRow>
               <TableHeaderColumn style={{overflow: 'hidden'}}>
                 <div>
-                  <PropertyHeader className="table-row-header" style={{display:'flex', justifyContent:'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/>
+                  {columnProperty ? <PropertyHeader className="table-row-header" style={{display:'flex', justifyContent:'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> :
+                    ""}
                 </div>
                 <div>
-                  <PropertyHeader className="table-row-header"  style={{display:'flex', justifyContent:'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/>
+                  {rowProperty ? <PropertyHeader className="table-row-header"  style={{display:'flex', justifyContent:'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> :
+                    ""}
                 </div>
               </TableHeaderColumn>
               {uniqueColumns.map((columnHeading) => {
