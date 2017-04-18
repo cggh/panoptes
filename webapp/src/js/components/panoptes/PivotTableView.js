@@ -316,7 +316,7 @@ let PivotTableView = React.createClass({
                   <TableHeaderColumn
                     key={columnHeading}>
                     { columnHeading == '_all_' ?
-                      'All' :
+                      "All" :
                       <PropertyCell
                         className={classNames({
                           'table-row-cell': true,
@@ -326,7 +326,7 @@ let PivotTableView = React.createClass({
                           'sort-column-descending': desc
                         })}
                         style={{
-                          textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
+                          // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
                           background: background
                         }}
                         onClick={() => this.handleOrderChange('column', columnHeading)}
@@ -371,7 +371,7 @@ let PivotTableView = React.createClass({
                           'sort-column-descending': desc
                         })}
                         style={{
-                          textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
+                          // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
                           background: background
                         }}
                         onClick={() => this.handleOrderChange('row', rowHeading)}

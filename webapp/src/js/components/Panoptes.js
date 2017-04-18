@@ -47,6 +47,9 @@ const muiTheme = getMuiTheme({
     height: 48,
     spacing: 12,
   },
+  tableHeaderColumn: {
+    textColor: 'black'
+  },
   palette: {
     primary1Color: blue500,
     primary2Color: blue700,

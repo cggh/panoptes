@@ -616,9 +616,10 @@ input.invalid {
 
 .table-row-header {
   padding: 0 !important;
+  padding-left: 5px !important;
   height: 100%;
   display: flex;
-  justify-content: center;
+  //justify-content: center;
   align-items: center;
   .label {
     flex-shrink: 1;
