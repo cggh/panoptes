@@ -129,7 +129,8 @@ let GenotypesChannel = React.createClass({
       pageSize: 100,
       page: 0,
       cellColour: 'call',
-      rowSort: null
+      rowSort: null,
+      onChangeLoadStatus: () => null
     };
   },
 
