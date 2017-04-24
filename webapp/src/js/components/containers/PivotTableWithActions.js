@@ -69,7 +69,7 @@ let PivotTableWithActions = React.createClass({
   },
 
   handleOrderChange(axis, order) {
-    // NB: Not using merge syntax.
+    // NB: Not using merge syntax so that undefined can be set
     if (axis === 'column') {
       this.props.setProps((props) => props.set('columnSortOrder', order));
     } else if (axis === 'row') {
@@ -127,8 +127,8 @@ let PivotTableWithActions = React.createClass({
             <span className="block text">Column sort: {this.orderDescriptionString(columnSortOrder)}</span>
             <span className="block text">Row sort: {this.orderDescriptionString(rowSortOrder)}</span>
           </div>
-          <div className="grow">
-            <PivotTableView {...this.props} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
+          <div className="grow scroll-within">
+              <PivotTableView {...this.props} style={{height:'100%', overflow:'hidden'}} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
           </div>
         </div>
       </Sidebar>
