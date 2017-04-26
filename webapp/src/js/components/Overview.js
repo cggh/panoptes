@@ -84,7 +84,7 @@ let Overview = React.createClass({
         <div>
           {data ? <PropertyList
               table={table}
-              propertiesData={_map(this.tableConfig().properties, ({id}) => ({id, value:data[id]}))}
+              propertiesData={_map(this.tableConfig().visibleProperties, ({id}) => ({id, value: data[id]}))}
               className={className}
           /> : null}
           <Loading status={loadStatus}/>
