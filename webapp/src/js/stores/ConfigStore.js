@@ -307,6 +307,7 @@ const ConfigStore = Fluxxor.createStore({
         'Date': 0
       }[prop.dataType];
     });
+    table.visibleProperties = _filter(table.properties, (property) => property.showInTable);
     table.hasGeoCoord = !!(table.longitude && table.latitude);
   }
 
