@@ -47,7 +47,7 @@ const PropertySelector = React.createClass({
     if (table) {
       const propertyGroups = this.config.tablesById[table].propertyGroups;
       _each(propertyGroups, (group) => {
-        let filteredProps = _filter(group.properties, filter);
+        let filteredProps = _filter(group.visibleProperties, filter);
         if (filteredProps.length == 0) return;
         if (propertyMenu.length ) {
           propertyMenu.push(<Divider key={i++}/>);
