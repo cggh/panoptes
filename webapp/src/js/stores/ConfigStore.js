@@ -125,6 +125,7 @@ const ConfigStore = Fluxxor.createStore({
       table.propertyGroups.forEach((group) => {
         table.propertyGroupsById[group.id] = group;
         group.properties = []; //Added later in addPropertyConfig
+        group.visibleProperties = []; //Added later in addPropertyConfig
       });
       if (table.defaultQuery === '')
         table.defaultQuery = SQL.nullQuery;
@@ -204,16 +205,22 @@ const ConfigStore = Fluxxor.createStore({
       }
 
       //Assign property group
-      if (prop.groupId)
+      if (prop.groupId) {
         if (table.propertyGroupsById[prop.groupId]) {
           table.propertyGroupsById[prop.groupId].properties.push(prop);
+          if (prop.showInTable) {
+            table.propertyGroupsById[prop.groupId].visibleProperties.push(prop);
+          }
         }
-      if (!prop.groupId) {
+      } else {
         if (!table.propertyGroupsById['_UNGROUPED_']) {
-          table.propertyGroupsById['_UNGROUPED_'] = {id: '_UNGROUPED_', name: 'Properties', properties: []};
+          table.propertyGroupsById['_UNGROUPED_'] = {id: '_UNGROUPED_', name: 'Properties', properties: [], visibleProperties: []};
           table.propertyGroups.push(table.propertyGroupsById['_UNGROUPED_']);
         }
         table.propertyGroupsById['_UNGROUPED_'].properties.push(prop);
+        if (prop.showInTable) {
+          table.propertyGroupsById['_UNGROUPED_'].visibleProperties.push(prop);
+        }
       }
 
       if (prop.isFloat) {
