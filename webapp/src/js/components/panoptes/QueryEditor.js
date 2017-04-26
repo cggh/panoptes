@@ -358,7 +358,7 @@ let Criterion = React.createClass({
       <select ref="property" value={component.ColName} onChange={this.handlePropertyChange}>
         {_map(groups, (group) =>
           <optgroup key={group.id} label={group.name}>
-            {group.properties.map((property) => {
+            {group.visibleProperties.map((property) => {
               let {id, disabled, name} = property;
               return (
                 <option key={id}
@@ -402,7 +402,7 @@ let Criterion = React.createClass({
             if (group.id === 'other') return null;
             return (
               <optgroup key={group.id} label={group.name}>
-                {group.properties.map((property) => {
+                {group.visibleProperties.map((property) => {
                   let {id, disabled, name} = property;
                   return (
                     <option key={id}
