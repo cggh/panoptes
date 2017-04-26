@@ -281,7 +281,7 @@ let DataTableWithActions = React.createClass({
     let {table, columns, columnWidths, order, sidebar, setProps, searchText, maxRowsPerPage} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
     if (!columns) {
-      columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
+      columns = _filter(this.tableConfig().visibleProperties, (prop) => prop.showByDefault);
       columns = _map(columns, (prop) => prop.id);
     }
 
@@ -327,7 +327,7 @@ let DataTableWithActions = React.createClass({
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let columnPickerLabel = 'Pick columns';
-    if (columns !== undefined && columns.length === this.tableConfig().properties.length) {
+    if (columns !== undefined && columns.length === this.tableConfig().visibleProperties.length) {
       columnPickerLabel = 'Hide columns';
     } else if (columns !== undefined && columns.length === 0) {
       columnPickerLabel = 'Show columns';
@@ -469,7 +469,7 @@ let DataTableWithActions = React.createClass({
             <span className="block text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
-            <span className="block text">{columns !== undefined ? columns.length : 0} of {this.tableConfig().properties.length} columns shown</span>
+            <span className="block text">{columns !== undefined ? columns.length : 0} of {this.tableConfig().visibleProperties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{pageForwardNav}{shownRowsMessage}</span>
           </div>
           <div className="grow">
