@@ -48,7 +48,7 @@ let TreeContainer = React.createClass({
     if (table && tree) {
       this.setState({loadStatus: 'loading'});
 
-      let columns = _map(_filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable), (prop) => prop.id);
+      let columns = _map(_filter(this.tableConfig().visibleProperties, (prop) => prop.showByDefault), (prop) => prop.id);
 
       let treeAPIargs = {
         database: this.config.dataset,
