@@ -16,8 +16,8 @@ export default function downloadTableData(payload) {
 
   // If no columns have been specified, get all of the showable columns.
   if (!columns)
-    columns = Immutable.List(tableConfig.properties)
-      .filter((prop) => prop.showByDefault && prop.showInTable)
+    columns = Immutable.List(tableConfig.visibleProperties)
+      .filter((prop) => prop.showByDefault)
       .map((prop) => prop.id);
 
   // Calculate the number of data points in the requested download (rows x cols).
