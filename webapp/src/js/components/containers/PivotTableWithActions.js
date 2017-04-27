@@ -1,6 +1,8 @@
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -10,17 +12,16 @@ import FluxMixin from 'mixins/FluxMixin';
 // Lodash
 import _map from 'lodash/map';
 
-// Panoptes UI
+// Panoptes
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
-
-// Panoptes
 import PivotTableView from 'panoptes/PivotTableView';
 import PropertySelector from 'panoptes/PropertySelector';
 import FilterButton from 'panoptes/FilterButton';
 import SQL from 'panoptes/SQL';
 import QueryString from 'panoptes/QueryString';
 
+const NULL_PERCENTAGE = '— None —';
 
 let PivotTableWithActions = React.createClass({
   mixins: [
@@ -39,6 +40,7 @@ let PivotTableWithActions = React.createClass({
     rowSortOrder: React.PropTypes.array,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
+    percentage: React.PropTypes.string
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -77,6 +79,13 @@ let PivotTableWithActions = React.createClass({
     }
   },
 
+  handleChangePercentage(event, selectedIndex, selectedPercentage) {
+    if (selectedPercentage === NULL_PERCENTAGE) {
+      this.props.setProps({percentage: undefined});
+    } else {
+      this.props.setProps({percentage: selectedPercentage});
+    }
+  },
 
   orderDescriptionString(order) {
     if (order.length === 0) {
@@ -88,7 +97,7 @@ let PivotTableWithActions = React.createClass({
   },
 
   render() {
-    const {sidebar, table, columnProperty, rowProperty, setProps, columnSortOrder, rowSortOrder} = this.props;
+    const {sidebar, table, columnProperty, rowProperty, setProps, columnSortOrder, rowSortOrder, percentage} = this.props;
 
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
@@ -109,6 +118,17 @@ let PivotTableWithActions = React.createClass({
                             allowNull={true}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
                             onSelect={(v) => setProps({rowProperty: v})}/>
+          <SelectField
+            autoWidth={true}
+            floatingLabelText="Percentage"
+            onChange={(e, i, v) => this.handleChangePercentage(e, i, v)}
+            value={percentage}
+          >
+            <MenuItem key={NULL_PERCENTAGE} primaryText={NULL_PERCENTAGE} value={NULL_PERCENTAGE} />
+            <MenuItem key={'All'} primaryText={'All'} value={'All'} />
+            <MenuItem key={'Column'} primaryText={'Column'} value={'Column'} />
+            <MenuItem key={'Row'} primaryText={'Row'} value={'Row'} />
+          </SelectField>
         </div>
       </div>
     );
