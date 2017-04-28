@@ -19,7 +19,6 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import {
   Table,
   TableBody,
-  TableFooter,
   TableHeader,
   TableHeaderColumn,
   TableRow,
@@ -34,7 +33,6 @@ import PropertyCell from 'panoptes/PropertyCell';
 import PropertyHeader from 'panoptes/PropertyHeader';
 
 // UI components
-import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
 // TODO: global agreement on null (Formatter.js ?)
@@ -68,7 +66,8 @@ let PivotTableView = React.createClass({
     rowProperty: React.PropTypes.string,
     className: React.PropTypes.string,
     style: React.PropTypes.object,
-    height: React.PropTypes.string
+    height: React.PropTypes.string,
+    percentage: React.PropTypes.string
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -275,7 +274,7 @@ let PivotTableView = React.createClass({
 
   render() {
     let {style, className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table} = this.props;
-    let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow} = this.state;
+    let {uniqueRows, uniqueColumns, dataByColumnRow} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
@@ -291,12 +290,10 @@ let PivotTableView = React.createClass({
             <TableRow>
               <TableHeaderColumn style={{overflow: 'hidden'}}>
                 <div>
-                  {columnProperty ? <PropertyHeader className="table-row-header" style={{display:'flex', justifyContent:'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> :
-                    ""}
+                  {columnProperty ? <PropertyHeader className="table-row-header" style={{display: 'flex', justifyContent: 'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
                 </div>
                 <div>
-                  {rowProperty ? <PropertyHeader className="table-row-header"  style={{display:'flex', justifyContent:'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> :
-                    ""}
+                  {rowProperty ? <PropertyHeader className="table-row-header"  style={{display: 'flex', justifyContent: 'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
                 </div>
               </TableHeaderColumn>
               {uniqueColumns.map((columnHeading) => {
@@ -318,7 +315,7 @@ let PivotTableView = React.createClass({
                   <TableHeaderColumn
                     key={columnHeading}>
                     { columnHeading == '_all_' ?
-                      "All" :
+                      'All' :
                       <PropertyCell
                         className={classNames({
                           'table-row-cell': true,
@@ -381,19 +378,17 @@ let PivotTableView = React.createClass({
                         prop={rowPropConfig}
                         value={rowHeading === '__NULL__' ? null : rowHeading}/>}
                   </TableHeaderColumn>
-                  {uniqueColumns.map((columnHeading) => {
-                    return (
+                  {uniqueColumns.map((columnHeading) =>
                       <TableRowColumn>
                         {(dataByColumnRow[columnHeading][rowHeading] || '').toLocaleString()}
                       </TableRowColumn>
-                    );
-                  })}
+                  )}
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
-      );
+    );
     //
 
   }
