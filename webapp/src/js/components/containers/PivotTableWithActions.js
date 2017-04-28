@@ -148,7 +148,7 @@ let PivotTableWithActions = React.createClass({
             <span className="block text">Row sort: {this.orderDescriptionString(rowSortOrder)}</span>
           </div>
           <div className="grow scroll-within">
-              <PivotTableView {...this.props} style={{height:'100%', overflow:'hidden'}} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
+              <PivotTableView {...this.props} style={{height: '100%', overflow: 'hidden'}} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
           </div>
         </div>
       </Sidebar>
