@@ -53,7 +53,7 @@ let SessionComponent = createReactClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.updateTitleIcon && (prevState.component.get('type') !== this.state.component.get('type'))) {
+    if (this.props.updateTitleIcon && (!prevState.component || !this.state.component || (prevState.component.get('type') !== this.state.component.get('type')))) {
       this.props.updateTitleIcon();
     }
   },
@@ -63,11 +63,12 @@ let SessionComponent = createReactClass({
     const {component} = this.state;
     let actions = this.getFlux().actions.session;
 
-    return React.cloneElement(deserialiseComponent(component, [compId], {
+    return component ? React.cloneElement(deserialiseComponent(component, [compId], {
       setProps: actions.componentSetProps,
       replaceSelf: actions.componentReplace,
       updateTitleIcon: this.updateTitleIcon
-    }), {ref: 'child', replaceable});
+    }), {ref: 'child', replaceable})
+      : <span>Component does not exist</span>;
   },
 });
 
