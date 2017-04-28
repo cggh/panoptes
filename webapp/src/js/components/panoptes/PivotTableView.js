@@ -205,7 +205,7 @@ let PivotTableView = React.createClass({
 
         switch (percentage) {
           case undefined: {
-            // No op.
+            // No op. Show raw counts.
             break;
           }
           case 'All': {
@@ -215,7 +215,7 @@ let PivotTableView = React.createClass({
                 uniqueRows.forEach(
                   (rowValue) => {
                     if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / totalCount) * 100).toFixed(0) + '% (' + dataByColumnRow[columnValue][rowValue] + ')';
+                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / totalCount) * 100).toFixed(0) + '%';
                     }
                   }
                 );
@@ -224,15 +224,41 @@ let PivotTableView = React.createClass({
             break;
           }
           case 'Column': {
+            uniqueColumns.forEach(
+              (columnValue) => {
+                let columnTotalCount = dataByColumnRow[columnValue]['_all_'];
+                uniqueRows.forEach(
+                  (rowValue) => {
+                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
+                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / columnTotalCount) * 100).toFixed(0) + '%';
+                    }
+                  }
+                );
+              }
+            );
             break;
           }
           case 'Row': {
+            uniqueRows.forEach(
+              (rowValue) => {
+                let rowTotalCount = dataByColumnRow['_all_'][rowValue];
+                uniqueColumns.forEach(
+                  (columnValue) => {
+                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
+                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / rowTotalCount) * 100).toFixed(0) + '%';
+                    }
+
+                  }
+                );
+              }
+            );
             break;
           }
           default: {
             console.error('Unhandled value for percentage prop: %o', percentage);
           }
         }
+
 
         if (columnSortOrder && columnSortOrder.length) {
           uniqueRows = _orderBy(uniqueRows,
