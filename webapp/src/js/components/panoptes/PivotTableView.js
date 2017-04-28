@@ -204,10 +204,13 @@ let PivotTableView = React.createClass({
         }
 
         switch (display) {
-          case undefined: {
-            // No op. Show raw counts.
+
+          // No ops. Show raw counts.
+          case undefined:
+          case 'counts': {
             break;
           }
+
           case 'percentAll': {
             let totalCount = dataByColumnRow['_all_']['_all_'];
             uniqueColumns.forEach(
