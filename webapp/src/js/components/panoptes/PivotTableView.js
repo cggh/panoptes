@@ -67,7 +67,7 @@ let PivotTableView = React.createClass({
     className: React.PropTypes.string,
     style: React.PropTypes.object,
     height: React.PropTypes.string,
-    percentage: React.PropTypes.string
+    display: React.PropTypes.string
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -104,7 +104,7 @@ let PivotTableView = React.createClass({
       query,
       columnSortOrder,
       rowSortOrder,
-      percentage
+      display
     } = props;
 
     let columns = [
@@ -203,12 +203,12 @@ let PivotTableView = React.createClass({
           }
         }
 
-        switch (percentage) {
+        switch (display) {
           case undefined: {
             // No op. Show raw counts.
             break;
           }
-          case 'All': {
+          case 'percentAll': {
             let totalCount = dataByColumnRow['_all_']['_all_'];
             uniqueColumns.forEach(
               (columnValue) => {
@@ -223,7 +223,7 @@ let PivotTableView = React.createClass({
             );
             break;
           }
-          case 'Column': {
+          case 'percentColumn': {
             uniqueColumns.forEach(
               (columnValue) => {
                 let columnTotalCount = dataByColumnRow[columnValue]['_all_'];
@@ -238,7 +238,7 @@ let PivotTableView = React.createClass({
             );
             break;
           }
-          case 'Row': {
+          case 'percentRow': {
             uniqueRows.forEach(
               (rowValue) => {
                 let rowTotalCount = dataByColumnRow['_all_'][rowValue];
@@ -255,7 +255,7 @@ let PivotTableView = React.createClass({
             break;
           }
           default: {
-            console.error('Unhandled value for percentage prop: %o', percentage);
+            console.error('Unhandled value for display prop: %o', display);
           }
         }
 
