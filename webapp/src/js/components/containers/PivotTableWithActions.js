@@ -21,8 +21,6 @@ import FilterButton from 'panoptes/FilterButton';
 import SQL from 'panoptes/SQL';
 import QueryString from 'panoptes/QueryString';
 
-const NULL_PERCENTAGE = '— None —';
-
 let PivotTableWithActions = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -40,7 +38,7 @@ let PivotTableWithActions = React.createClass({
     rowSortOrder: React.PropTypes.array,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
-    percentage: React.PropTypes.string
+    display: React.PropTypes.string
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -52,7 +50,8 @@ let PivotTableWithActions = React.createClass({
       columnSortOrder: [],
       rowSortOrder: [],
       setProps: null,
-      sidebar: true
+      sidebar: true,
+      display: 'counts'
     };
   },
 
@@ -79,12 +78,8 @@ let PivotTableWithActions = React.createClass({
     }
   },
 
-  handleChangePercentage(event, selectedIndex, selectedPercentage) {
-    if (selectedPercentage === NULL_PERCENTAGE) {
-      this.props.setProps({percentage: undefined});
-    } else {
-      this.props.setProps({percentage: selectedPercentage});
-    }
+  handleChangeDisplay(event, selectedIndex, selectedDisplay) {
+    this.props.setProps({display: selectedDisplay});
   },
 
   orderDescriptionString(order) {
@@ -97,7 +92,7 @@ let PivotTableWithActions = React.createClass({
   },
 
   render() {
-    const {sidebar, table, columnProperty, rowProperty, setProps, columnSortOrder, rowSortOrder, percentage} = this.props;
+    const {sidebar, table, columnProperty, rowProperty, setProps, columnSortOrder, rowSortOrder, display} = this.props;
 
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
@@ -120,14 +115,14 @@ let PivotTableWithActions = React.createClass({
                             onSelect={(v) => setProps({rowProperty: v})}/>
           <SelectField
             autoWidth={true}
-            floatingLabelText="Percentage"
-            onChange={(e, i, v) => this.handleChangePercentage(e, i, v)}
-            value={percentage}
+            floatingLabelText="Display"
+            onChange={(e, i, v) => this.handleChangeDisplay(e, i, v)}
+            value={display}
           >
-            <MenuItem key={NULL_PERCENTAGE} primaryText={NULL_PERCENTAGE} value={NULL_PERCENTAGE} />
-            <MenuItem key={'All'} primaryText={'All'} value={'All'} />
-            <MenuItem key={'Column'} primaryText={'Column'} value={'Column'} />
-            <MenuItem key={'Row'} primaryText={'Row'} value={'Row'} />
+            <MenuItem key={'Counts'} primaryText={'Counts'} value={'counts'} />
+            <MenuItem key={'All'} primaryText={'Percentage of total'} value={'percentAll'} />
+            <MenuItem key={'Column'} primaryText={'Percentage of column total'} value={'percentColumn'} />
+            <MenuItem key={'Row'} primaryText={'Percentage of row total'} value={'percentRow'} />
           </SelectField>
         </div>
       </div>
