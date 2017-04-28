@@ -342,113 +342,113 @@ let PivotTableView = React.createClass({
     }
     //style={style} className={classNames('load-container', className)}
     return (
-        <Table wrapperStyle={style} classname={className} height={height}>
-          <TableHeader
-            adjustForCheckbox={false}
-            displaySelectAll={false}
+      <Table wrapperStyle={style} classname={className} height={height}>
+        <TableHeader
+          adjustForCheckbox={false}
+          displaySelectAll={false}
 
-          >
-            <TableRow>
-              <TableHeaderColumn style={{overflow: 'hidden'}}>
-                <div>
-                  {columnProperty ? <PropertyHeader className="table-row-header" style={{display: 'flex', justifyContent: 'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
-                </div>
-                <div>
-                  {rowProperty ? <PropertyHeader className="table-row-header"  style={{display: 'flex', justifyContent: 'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
-                </div>
-              </TableHeaderColumn>
-              {uniqueColumns.map((columnHeading) => {
-                const colPropConfig = this.tableConfig().propertiesById[columnProperty] || {};
-                const valueColours = colPropConfig.valueColours;
-                let background = 'inherit';
-                if (valueColours && columnHeading !== '_all_') {
-                  let col = valueColours[columnHeading] || valueColours['_other_'];
-                  if (col) {
-                    background = Color(col).lighten(0.3).string();
-                  }
-                }
-
-                let asc = _some(columnSortOrder, ([dir, val]) => dir === 'asc' && val === columnHeading);
-                let desc = _some(columnSortOrder, ([dir, val]) => dir === 'desc' && val === columnHeading);
-                let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
-                                                 name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
-                return (
-                  <TableHeaderColumn
-                    key={columnHeading}>
-                    { columnHeading == '_all_' ?
-                      'All' :
-                      <PropertyCell
-                        className={classNames({
-                          'table-row-cell': true,
-                          'pointer': true,
-                          'table-row-header': true,
-                          'sort-column-ascending': asc,
-                          'sort-column-descending': desc
-                        })}
-                        style={{
-                          // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
-                          background: background
-                        }}
-                        onClick={() => this.handleOrderChange('column', columnHeading)}
-                        prefix={icon}
-                        prop={colPropConfig}
-                        value={columnHeading === '__NULL__' ? null : columnHeading}/>}
-                  </TableHeaderColumn>);
-              })}
-            </TableRow>
-          </TableHeader>
-          <TableBody
-            displayRowCheckbox={false}
-            showRowHover={true}
-          >
-            {uniqueRows.map((rowHeading) => {
-              const rowPropConfig = this.tableConfig().propertiesById[rowProperty] || {};
-              const valueColours = rowPropConfig.valueColours;
+        >
+          <TableRow>
+            <TableHeaderColumn style={{overflow: 'hidden'}}>
+              <div>
+                {columnProperty ? <PropertyHeader className="table-row-header" style={{display: 'flex', justifyContent: 'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
+              </div>
+              <div>
+                {rowProperty ? <PropertyHeader className="table-row-header"  style={{display: 'flex', justifyContent: 'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
+              </div>
+            </TableHeaderColumn>
+            {uniqueColumns.map((columnHeading) => {
+              const colPropConfig = this.tableConfig().propertiesById[columnProperty] || {};
+              const valueColours = colPropConfig.valueColours;
               let background = 'inherit';
-              if (valueColours && rowHeading !== '_all_') {
-                let col = valueColours[rowHeading] || valueColours['_other_'];
+              if (valueColours && columnHeading !== '_all_') {
+                let col = valueColours[columnHeading] || valueColours['_other_'];
                 if (col) {
                   background = Color(col).lighten(0.3).string();
                 }
               }
 
-              let asc = _some(rowSortOrder, ([dir, val]) => dir === 'asc' && val === rowHeading);
-              let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
+              let asc = _some(columnSortOrder, ([dir, val]) => dir === 'asc' && val === columnHeading);
+              let desc = _some(columnSortOrder, ([dir, val]) => dir === 'desc' && val === columnHeading);
               let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
                                                name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
               return (
-                <TableRow key={rowHeading}>
-                  <TableHeaderColumn
-                    key={rowHeading}>
-                    { rowHeading == '_all_' ?
-                      'All' :
-                      <PropertyCell
-                        className={classNames({
-                          'table-row-cell': true,
-                          'pointer': true,
-                          'table-row-header': true,
-                          'sort-column-ascending': asc,
-                          'sort-column-descending': desc
-                        })}
-                        style={{
-                          // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
-                          background: background
-                        }}
-                        onClick={() => this.handleOrderChange('row', rowHeading)}
-                        prefix={icon}
-                        prop={rowPropConfig}
-                        value={rowHeading === '__NULL__' ? null : rowHeading}/>}
-                  </TableHeaderColumn>
-                  {uniqueColumns.map((columnHeading) =>
-                      <TableRowColumn>
-                        {(dataByColumnRow[columnHeading][rowHeading] || '').toLocaleString()}
-                      </TableRowColumn>
-                  )}
-                </TableRow>
-              );
+                <TableHeaderColumn
+                  key={columnHeading}>
+                  { columnHeading == '_all_' ?
+                    'All' :
+                    <PropertyCell
+                      className={classNames({
+                        'table-row-cell': true,
+                        'pointer': true,
+                        'table-row-header': true,
+                        'sort-column-ascending': asc,
+                        'sort-column-descending': desc
+                      })}
+                      style={{
+                        // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
+                        background: background
+                      }}
+                      onClick={() => this.handleOrderChange('column', columnHeading)}
+                      prefix={icon}
+                      prop={colPropConfig}
+                      value={columnHeading === '__NULL__' ? null : columnHeading}/>}
+                </TableHeaderColumn>);
             })}
-          </TableBody>
-        </Table>
+          </TableRow>
+        </TableHeader>
+        <TableBody
+          displayRowCheckbox={false}
+          showRowHover={true}
+        >
+          {uniqueRows.map((rowHeading) => {
+            const rowPropConfig = this.tableConfig().propertiesById[rowProperty] || {};
+            const valueColours = rowPropConfig.valueColours;
+            let background = 'inherit';
+            if (valueColours && rowHeading !== '_all_') {
+              let col = valueColours[rowHeading] || valueColours['_other_'];
+              if (col) {
+                background = Color(col).lighten(0.3).string();
+              }
+            }
+
+            let asc = _some(rowSortOrder, ([dir, val]) => dir === 'asc' && val === rowHeading);
+            let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
+            let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
+                                             name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+            return (
+              <TableRow key={rowHeading}>
+                <TableHeaderColumn
+                  key={rowHeading}>
+                  { rowHeading == '_all_' ?
+                    'All' :
+                    <PropertyCell
+                      className={classNames({
+                        'table-row-cell': true,
+                        'pointer': true,
+                        'table-row-header': true,
+                        'sort-column-ascending': asc,
+                        'sort-column-descending': desc
+                      })}
+                      style={{
+                        // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
+                        background: background
+                      }}
+                      onClick={() => this.handleOrderChange('row', rowHeading)}
+                      prefix={icon}
+                      prop={rowPropConfig}
+                      value={rowHeading === '__NULL__' ? null : rowHeading}/>}
+                </TableHeaderColumn>
+                {uniqueColumns.map((columnHeading) =>
+                  <TableRowColumn>
+                    {(dataByColumnRow[columnHeading][rowHeading] || '').toLocaleString()}
+                  </TableRowColumn>
+                )}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     );
     //
 
