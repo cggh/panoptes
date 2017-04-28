@@ -103,7 +103,8 @@ let PivotTableView = React.createClass({
       rowProperty,
       query,
       columnSortOrder,
-      rowSortOrder
+      rowSortOrder,
+      percentage
     } = props;
 
     let columns = [
@@ -182,7 +183,7 @@ let PivotTableView = React.createClass({
           (rowValue) => dataByColumnRow['_all_'][rowValue] = 0
         );
 
-        for (let i = 0; i < countData.length; ++i) {
+        for (let i = 0, len = countData.length; i < len; ++i) {
           dataByColumnRow['_all_']['_all_'] += countData[i];
 
           // Make null data consistently 'NULL'
@@ -199,6 +200,37 @@ let PivotTableView = React.createClass({
           }
           if (columnProperty && rowProperty) {
             dataByColumnRow[nulledColumnDatum][nulledRowDatum] = countData[i];
+          }
+        }
+
+        switch (percentage) {
+          case undefined: {
+            // No op.
+            break;
+          }
+          case 'All': {
+            let totalCount = dataByColumnRow['_all_']['_all_'];
+            uniqueColumns.forEach(
+              (columnValue) => {
+                uniqueRows.forEach(
+                  (rowValue) => {
+                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
+                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / totalCount) * 100).toFixed(0) + '% (' + dataByColumnRow[columnValue][rowValue] + ')';
+                    }
+                  }
+                );
+              }
+            );
+            break;
+          }
+          case 'Column': {
+            break;
+          }
+          case 'Row': {
+            break;
+          }
+          default: {
+            console.error('Unhandled value for percentage prop: %o', percentage);
           }
         }
 
