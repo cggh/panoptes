@@ -31,6 +31,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
 import PropertyCell from 'panoptes/PropertyCell';
 import PropertyHeader from 'panoptes/PropertyHeader';
+import DataTableWithActions from 'containers/DataTableWithActions';
 
 // UI components
 import Icon from 'ui/Icon';
@@ -332,6 +333,42 @@ let PivotTableView = React.createClass({
 
   },
 
+  handleOpenTableForCell(rowValue, columnValue) {
+
+    if (rowValue == undefined || columnValue == undefined) {
+      return;
+    }
+
+    let {table, columnProperty, rowProperty} = this.props;
+
+    let nullifiedRowValue = rowValue == '__NULL__' ? null : rowValue;
+    let nullifiedColumnValue = columnValue == '__NULL__' ? null : columnValue;
+
+    let rowValueClause = SQL.WhereClause.CompareFixed(rowProperty, '=', nullifiedRowValue);
+    let columnValueClause = SQL.WhereClause.CompareFixed(columnProperty, '=', nullifiedColumnValue);
+
+    let whereClause = undefined;
+
+    if (rowValue == '_all_' && columnValue == '_all_') {
+      whereClause = SQL.WhereClause.Trivial();
+    } else if (rowValue !== '_all_' && columnValue !== '_all_') {
+      whereClause = SQL.WhereClause.Compound('AND');
+      whereClause.addComponent(rowValueClause);
+      whereClause.addComponent(columnValueClause);
+    } else if (rowValue == '_all_') {
+      whereClause = columnValueClause;
+    } else if (columnValue == '_all_') {
+      whereClause = rowValueClause;
+    }
+
+    if (whereClause == undefined) {
+      console.error('Unhandled logic. rowValue: %o, columnValue: %o', rowValue, columnValue);
+    }
+
+    let query = SQL.WhereClause.encode(whereClause);
+
+    this.getFlux().actions.session.popupOpen(<DataTableWithActions table={table} query={query} sidebar={false} />);
+  },
 
   render() {
     let {style, className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table} = this.props;
@@ -342,7 +379,12 @@ let PivotTableView = React.createClass({
     }
     //style={style} className={classNames('load-container', className)}
     return (
-      <Table wrapperStyle={style} classname={className} height={height}>
+      <Table
+        wrapperStyle={style}
+        classname={className}
+        height={height}
+        onCellClick={(rowNumber, columnId) => this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId - 2])}
+      >
         <TableHeader
           adjustForCheckbox={false}
           displaySelectAll={false}
@@ -440,7 +482,7 @@ let PivotTableView = React.createClass({
                       value={rowHeading === '__NULL__' ? null : rowHeading}/>}
                 </TableHeaderColumn>
                 {uniqueColumns.map((columnHeading) =>
-                  <TableRowColumn>
+                  <TableRowColumn style={{cursor: 'pointer'}}>
                     {(dataByColumnRow[columnHeading][rowHeading] || '').toLocaleString()}
                   </TableRowColumn>
                 )}
