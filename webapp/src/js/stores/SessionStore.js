@@ -50,6 +50,7 @@ let SessionStore = createStore({
     return (payload) => {
       let oldState = this.state;
       action(payload);
+      console.log(this.state.toJS());
       if (!oldState.equals(this.state) || event === 'notify')
         this.emit(event);
     };
