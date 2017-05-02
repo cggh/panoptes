@@ -289,13 +289,13 @@ let PivotTableView = React.createClass({
 
         if (columnSortOrder && columnSortOrder.length) {
           uniqueRows = _orderBy(uniqueRows,
-            _map(columnSortOrder, ([dir, heading]) => (row) => dataByColumnRow[heading][row].displayValue),
+            _map(columnSortOrder, ([dir, heading]) => (row) => dataByColumnRow[heading][row].count),
             _map(columnSortOrder, ([dir, heading]) => dir));
         }
 
         if (rowSortOrder && rowSortOrder.length) {
           uniqueColumns = _orderBy(uniqueColumns,
-            _map(rowSortOrder, ([dir, heading]) => (col) => dataByColumnRow[col][heading].displayValue),
+            _map(rowSortOrder, ([dir, heading]) => (col) => dataByColumnRow[col][heading].count),
             _map(rowSortOrder, ([dir, heading]) => dir));
         }
 
