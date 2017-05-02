@@ -179,15 +179,16 @@ let PivotTableView = React.createClass({
 
         let dataByColumnRow = {};
         uniqueColumns.forEach(
-          (columnValue) => dataByColumnRow[columnValue] = {'_all_': 0}
+          (columnValue) => dataByColumnRow[columnValue] = {'_all_': {count: 0}}
         );
         dataByColumnRow['_all_'] = {};
         uniqueRows.forEach(
-          (rowValue) => dataByColumnRow['_all_'][rowValue] = 0
+          (rowValue) => dataByColumnRow['_all_'][rowValue] = {count: 0}
         );
 
         for (let i = 0, len = countData.length; i < len; ++i) {
-          dataByColumnRow['_all_']['_all_'] += countData[i];
+
+          dataByColumnRow['_all_']['_all_'].count += countData[i];
 
           // Make null data consistently 'NULL'
           let nulledColumnDatum = undefined;
@@ -195,33 +196,50 @@ let PivotTableView = React.createClass({
 
           if (columnProperty) {
             nulledColumnDatum = isNull(columnData[i]) ? '__NULL__' : columnData[i];
-            dataByColumnRow[nulledColumnDatum]['_all_'] += countData[i];
+            dataByColumnRow[nulledColumnDatum]['_all_'].count += countData[i];
           }
           if (rowProperty) {
             nulledRowDatum = isNull(rowData[i]) ? '__NULL__' : rowData[i];
-            dataByColumnRow['_all_'][nulledRowDatum] += countData[i];
+            dataByColumnRow['_all_'][nulledRowDatum].count += countData[i];
           }
           if (columnProperty && rowProperty) {
-            dataByColumnRow[nulledColumnDatum][nulledRowDatum] = countData[i];
+            dataByColumnRow[nulledColumnDatum][nulledRowDatum] = {count: countData[i]};
           }
+
         }
+
 
         switch (display) {
 
-          // No ops. Show raw counts.
+          // Show raw counts.
           case undefined:
           case 'counts': {
-            break;
-          }
-
-          case 'percentAll': {
-            let totalCount = dataByColumnRow['_all_']['_all_'];
             uniqueColumns.forEach(
               (columnValue) => {
                 uniqueRows.forEach(
                   (rowValue) => {
                     if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / totalCount) * 100).toFixed(0) + '%';
+                      return dataByColumnRow[columnValue][rowValue].displayValue = dataByColumnRow[columnValue][rowValue].count;
+                    } else {
+                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
+                    }
+                  }
+                );
+              }
+            );
+            break;
+          }
+
+          case 'percentAll': {
+            let totalCount = dataByColumnRow['_all_']['_all_'].count;
+            uniqueColumns.forEach(
+              (columnValue) => {
+                uniqueRows.forEach(
+                  (rowValue) => {
+                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
+                      return dataByColumnRow[columnValue][rowValue].displayValue = '' + ((dataByColumnRow[columnValue][rowValue].count / totalCount) * 100).toFixed(0) + '%';
+                    } else {
+                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
                     }
                   }
                 );
@@ -232,11 +250,13 @@ let PivotTableView = React.createClass({
           case 'percentColumn': {
             uniqueColumns.forEach(
               (columnValue) => {
-                let columnTotalCount = dataByColumnRow[columnValue]['_all_'];
+                let columnTotalCount = dataByColumnRow[columnValue]['_all_'].count;
                 uniqueRows.forEach(
                   (rowValue) => {
                     if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / columnTotalCount) * 100).toFixed(0) + '%';
+                      return dataByColumnRow[columnValue][rowValue].displayValue = '' + ((dataByColumnRow[columnValue][rowValue].count / columnTotalCount) * 100).toFixed(0) + '%';
+                    } else {
+                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
                     }
                   }
                 );
@@ -247,13 +267,14 @@ let PivotTableView = React.createClass({
           case 'percentRow': {
             uniqueRows.forEach(
               (rowValue) => {
-                let rowTotalCount = dataByColumnRow['_all_'][rowValue];
+                let rowTotalCount = dataByColumnRow['_all_'][rowValue].count;
                 uniqueColumns.forEach(
                   (columnValue) => {
                     if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue] = '' + ((dataByColumnRow[columnValue][rowValue] / rowTotalCount) * 100).toFixed(0) + '%';
+                      return dataByColumnRow[columnValue][rowValue].displayValue = '' + ((dataByColumnRow[columnValue][rowValue].count / rowTotalCount) * 100).toFixed(0) + '%';
+                    } else {
+                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
                     }
-
                   }
                 );
               }
@@ -268,13 +289,13 @@ let PivotTableView = React.createClass({
 
         if (columnSortOrder && columnSortOrder.length) {
           uniqueRows = _orderBy(uniqueRows,
-            _map(columnSortOrder, ([dir, heading]) => (row) => dataByColumnRow[heading][row]),
+            _map(columnSortOrder, ([dir, heading]) => (row) => dataByColumnRow[heading][row].displayValue),
             _map(columnSortOrder, ([dir, heading]) => dir));
         }
 
         if (rowSortOrder && rowSortOrder.length) {
           uniqueColumns = _orderBy(uniqueColumns,
-            _map(rowSortOrder, ([dir, heading]) => (col) => dataByColumnRow[col][heading]),
+            _map(rowSortOrder, ([dir, heading]) => (col) => dataByColumnRow[col][heading].displayValue),
             _map(rowSortOrder, ([dir, heading]) => dir));
         }
 
