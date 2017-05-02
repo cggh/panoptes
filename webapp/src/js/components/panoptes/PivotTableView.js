@@ -68,7 +68,8 @@ let PivotTableView = React.createClass({
     className: React.PropTypes.string,
     style: React.PropTypes.object,
     height: React.PropTypes.string,
-    display: React.PropTypes.string
+    display: React.PropTypes.string,
+    hasClickableCells: React.PropTypes.bool
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -78,7 +79,8 @@ let PivotTableView = React.createClass({
     return {
       query: undefined,
       columnSortOrder: [],
-      rowSortOrder: []
+      rowSortOrder: [],
+      hasClickableCells: true
     };
   },
 
@@ -371,19 +373,27 @@ let PivotTableView = React.createClass({
   },
 
   render() {
-    let {style, className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table} = this.props;
+    let {style, className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table, hasClickableCells} = this.props;
     let {uniqueRows, uniqueColumns, dataByColumnRow} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
     //style={style} className={classNames('load-container', className)}
+
+    let tableOnCellClick = null;
+    let tableRowColumnStyle = null;
+    if (hasClickableCells) {
+      tableOnCellClick = (rowNumber, columnId) => this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId - 2]);
+      tableRowColumnStyle = {cursor: 'pointer'};
+    }
+
     return (
       <Table
         wrapperStyle={style}
         classname={className}
         height={height}
-        onCellClick={(rowNumber, columnId) => this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId - 2])}
+        onCellClick={tableOnCellClick}
       >
         <TableHeader
           adjustForCheckbox={false}
@@ -482,7 +492,7 @@ let PivotTableView = React.createClass({
                       value={rowHeading === '__NULL__' ? null : rowHeading}/>}
                 </TableHeaderColumn>
                 {uniqueColumns.map((columnHeading) =>
-                  <TableRowColumn style={{cursor: 'pointer'}}>
+                  <TableRowColumn style={tableRowColumnStyle}>
                     {(dataByColumnRow[columnHeading][rowHeading] || '').toLocaleString()}
                   </TableRowColumn>
                 )}
