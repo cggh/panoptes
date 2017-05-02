@@ -372,7 +372,7 @@ class ImportSettings:
             value = testDict[pkey]
 
             #Check enumerated values
-            if 'values' in pdef:
+            if 'values' in pdef and ('allowOtherValues' not in pdef or not pdef['allowOtherValues']):
                 if value not in pdef['values']:
                     self._errors.append("Invalid value {} for key {}\n".format(value, pkey))
 
