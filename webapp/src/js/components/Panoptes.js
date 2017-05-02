@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from  'react';
 import createReactClass from 'create-react-class';
 import NotificationSystem from 'react-notification-system';
+import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
 import _assign from 'lodash.assign';
 
 // Mixins
@@ -15,6 +16,10 @@ import Modal from 'ui/Modal';
 import Copy from 'ui/Copy';
 import Confirm from 'ui/Confirm';
 import SessionComponent from 'panoptes/SessionComponent';
+import HTMLWithComponents from 'panoptes/HTMLWithComponents';
+import EmptyTab from 'containers/EmptyTab';
+import DatasetManagerActions from 'components/DatasetManagerActions';
+
 
 // Material UI
 import createPalette from 'material-ui/styles/createPalette';
@@ -28,6 +33,8 @@ import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
+import Menu, { MenuItem } from 'material-ui/Menu';
+import MoreVert from 'material-ui-icons/MoreVert';
 
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
@@ -157,6 +164,21 @@ let Header = createReactClass({
     logo: PropTypes.string
   },
 
+  getInitialState() {
+    return {
+      anchorEl: null,
+      open: false
+    }
+  },
+
+  handleClick(event) {
+    this.setState({ open: true, anchorEl: event.currentTarget });
+  },
+
+  handleRequestClose() {
+    this.setState({ open: false });
+  },
+
   handlePageLinkClick() {
     let introContent = 'Here\'s the link for this page, which you can copy and paste elsewhere: ';
     let selectedContent = window.location.href;
@@ -185,12 +207,35 @@ let Header = createReactClass({
     return (
       <AppBar position="static">
         <Toolbar>
-          <IconButton className={classes.menuButton} color="contrast" aria-label="Menu">
+          <IconButton color="contrast" aria-label="Menu">
             <MenuIcon />
           </IconButton>
           <Typography type="title" color="inherit">
-            {name}
+            {<HTMLWithComponents>{name}</HTMLWithComponents>}
           </Typography>
+          {this.config.user.isManager ? [<IconButton
+            style={{color: 'white'}}
+            aria-label="More"
+            aria-owns={this.state.open ? 'long-menu' : null}
+            aria-haspopup="true"
+            onClick={this.handleClick}
+          >
+            <MoreVert />
+          </IconButton>,
+          <Menu
+            id="long-menu"
+            anchorEl={this.state.anchorEl}
+            open={this.state.open}
+            onRequestClose={this.handleRequestClose}
+          >
+            <MenuItem selected={false} onClick={() => (this.handleRequestClose(), actions.session.tabOpen(<DatasetManagerActions />))}>Admin</MenuItem>
+            <MenuItem selected={false} onClick={() => (this.handleRequestClose(), actions.session.tabOpen(<EmptyTab />))}>Table/View list</MenuItem>
+            <MenuItem selected={false} onClick={() => (this.handleRequestClose(), window.location.href = this.config.cas.logout)}>Sign out</MenuItem>
+          </Menu>] : this.config.cas.service ? <Button color="primary">
+            <a style={{textDecoration:"inherit", color:'white'}} href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
+          </Button>: null
+          }
+
         </Toolbar>
       </AppBar>
     );
