@@ -9,7 +9,6 @@ import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _orderBy from 'lodash/orderBy';
-import _clone from 'lodash/clone';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
