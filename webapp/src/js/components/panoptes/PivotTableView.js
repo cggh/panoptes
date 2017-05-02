@@ -9,6 +9,7 @@ import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _orderBy from 'lodash/orderBy';
+import _cloneDeep from 'lodash/cloneDeep';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -32,9 +33,9 @@ import SQL from 'panoptes/SQL';
 import PropertyCell from 'panoptes/PropertyCell';
 import PropertyHeader from 'panoptes/PropertyHeader';
 import DataTableWithActions from 'containers/DataTableWithActions';
-
-// UI components
 import Icon from 'ui/Icon';
+
+const MAX_COLOR = Color('#44aafb');
 
 // TODO: global agreement on null (Formatter.js ?)
 function isNull(value) {
@@ -208,6 +209,16 @@ let PivotTableView = React.createClass({
 
         }
 
+        function calcPercentageData(dataObject, totalCount) {
+          if (dataObject !== undefined) {
+            let percentage = ((dataObject.count / totalCount) * 100).toFixed(0);
+            dataObject.backgroundColor = _cloneDeep(MAX_COLOR).lighten(0.58 * (1 - (percentage - 0) / 100)).string();
+            dataObject.displayValue = percentage + '%';
+            return dataObject;
+          } else {
+            return {displayValue: ''};
+          }
+        }
 
         switch (display) {
 
@@ -229,19 +240,12 @@ let PivotTableView = React.createClass({
             );
             break;
           }
-
           case 'percentAll': {
-            let totalCount = dataByColumnRow['_all_']['_all_'].count;
+            const totalCount = dataByColumnRow['_all_']['_all_'].count;
             uniqueColumns.forEach(
               (columnValue) => {
                 uniqueRows.forEach(
-                  (rowValue) => {
-                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue].displayValue = '' + ((dataByColumnRow[columnValue][rowValue].count / totalCount) * 100).toFixed(0) + '%';
-                    } else {
-                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
-                    }
-                  }
+                  (rowValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], totalCount)
                 );
               }
             );
@@ -252,13 +256,7 @@ let PivotTableView = React.createClass({
               (columnValue) => {
                 let columnTotalCount = dataByColumnRow[columnValue]['_all_'].count;
                 uniqueRows.forEach(
-                  (rowValue) => {
-                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue].displayValue = '' + ((dataByColumnRow[columnValue][rowValue].count / columnTotalCount) * 100).toFixed(0) + '%';
-                    } else {
-                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
-                    }
-                  }
+                  (rowValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], columnTotalCount)
                 );
               }
             );
@@ -269,13 +267,7 @@ let PivotTableView = React.createClass({
               (rowValue) => {
                 let rowTotalCount = dataByColumnRow['_all_'][rowValue].count;
                 uniqueColumns.forEach(
-                  (columnValue) => {
-                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue].displayValue = '' + ((dataByColumnRow[columnValue][rowValue].count / rowTotalCount) * 100).toFixed(0) + '%';
-                    } else {
-                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
-                    }
-                  }
+                  (columnValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], rowTotalCount)
                 );
               }
             );
@@ -413,10 +405,8 @@ let PivotTableView = React.createClass({
     //style={style} className={classNames('load-container', className)}
 
     let tableOnCellClick = null;
-    let tableRowColumnStyle = null;
     if (hasClickableCells) {
       tableOnCellClick = (rowNumber, columnId) => this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId - 2]);
-      tableRowColumnStyle = {cursor: 'pointer'};
     }
 
     return (
@@ -523,8 +513,8 @@ let PivotTableView = React.createClass({
                       value={rowHeading === '__NULL__' ? null : rowHeading}/>}
                 </TableHeaderColumn>
                 {uniqueColumns.map((columnHeading) =>
-                  <TableRowColumn style={tableRowColumnStyle}>
-                    {(dataByColumnRow[columnHeading][rowHeading] || '').toLocaleString()}
+                  <TableRowColumn style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}>
+                    {dataByColumnRow[columnHeading][rowHeading].displayValue.toLocaleString()}
                   </TableRowColumn>
                 )}
               </TableRow>
