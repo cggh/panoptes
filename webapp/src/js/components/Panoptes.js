@@ -21,6 +21,8 @@ import Copy from 'ui/Copy';
 import Confirm from 'ui/Confirm';
 import SessionComponent from 'panoptes/SessionComponent';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
+import DatasetManagerActions from 'DatasetManagerActions';
+import EmptyTab from 'containers/EmptyTab';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
@@ -31,6 +33,10 @@ import {
   pinkA200,
 } from 'material-ui/styles/colors';
 import AppBar from 'material-ui/AppBar';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import FlatButton from 'material-ui/FlatButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
@@ -196,8 +202,22 @@ let Header = React.createClass({
     //   </div>
     return (
       <AppBar
-        title={name}
-        iconClassNameRight="muidocs-icon-navigation-expand-more"
+        title={<HTMLWithComponents>{name}</HTMLWithComponents>}
+        showMenuIconButton={false}
+        iconElementRight={this.config.user.isManager ?
+          <IconMenu
+          iconButtonElement={
+            <IconButton><MoreVertIcon /></IconButton>
+          }
+          targetOrigin={{horizontal: 'right', vertical: 'top'}}
+          anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+        >
+          <MenuItem primaryText="Admin" onClick={() => actions.session.tabOpen(<DatasetManagerActions />)}/>
+          <MenuItem primaryText="Table/View list" onClick={() => actions.session.tabOpen(<EmptyTab />)}/>
+          <MenuItem primaryText="Sign out" onClick={() => window.location.href = this.config.cas.logout}/>
+        </IconMenu> :
+          this.config.cas.service ?
+            <FlatButton label={<a style={{textDecoration:"inherit", color:'white'}} href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>} /> : null}
       />
     );
     // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>

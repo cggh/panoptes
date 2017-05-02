@@ -55,7 +55,7 @@ let ViewList = React.createClass({
       <List style={this.props.style}>
         <Subheader>Open a view:</Subheader>
         {this.config.user.isManager ?
-          <ListItem primaryText="Dataset Manager"
+          <ListItem primaryText="Admin"
                     secondaryText="Import and configure datasets"
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
                     onClick={(e) => this.handleOpen(e, <DatasetManagerActions />)}/>
