@@ -9,6 +9,7 @@ import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _orderBy from 'lodash/orderBy';
+import _clone from 'lodash/clone';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -341,7 +342,7 @@ let PivotTableView = React.createClass({
       return;
     }
 
-    let {table, columnProperty, rowProperty} = this.props;
+    let {table, columnProperty, rowProperty, query} = this.props;
 
     let nullifiedRowValue = rowValue == '__NULL__' ? null : rowValue;
     let nullifiedColumnValue = columnValue == '__NULL__' ? null : columnValue;
@@ -349,27 +350,37 @@ let PivotTableView = React.createClass({
     let rowValueClause = SQL.WhereClause.CompareFixed(rowProperty, '=', nullifiedRowValue);
     let columnValueClause = SQL.WhereClause.CompareFixed(columnProperty, '=', nullifiedColumnValue);
 
-    let whereClause = undefined;
-
-    if (rowValue == '_all_' && columnValue == '_all_') {
-      whereClause = SQL.WhereClause.Trivial();
-    } else if (rowValue !== '_all_' && columnValue !== '_all_') {
-      whereClause = SQL.WhereClause.Compound('AND');
-      whereClause.addComponent(rowValueClause);
-      whereClause.addComponent(columnValueClause);
-    } else if (rowValue == '_all_') {
-      whereClause = columnValueClause;
-    } else if (columnValue == '_all_') {
-      whereClause = rowValueClause;
+    let tableCellQuery = undefined;
+    if (rowValue !== '_all_' && columnValue !== '_all_') {
+      tableCellQuery = SQL.WhereClause.Compound('AND');
+      tableCellQuery.addComponent(rowValueClause);
+      tableCellQuery.addComponent(columnValueClause);
+    } else if (columnValue !== '_all_') {
+      tableCellQuery = columnValueClause;
+    } else if (rowValue !== '_all_') {
+      tableCellQuery = rowValueClause;
     }
 
-    if (whereClause == undefined) {
+    let encodedTableCellQuery = undefined;
+    if (tableCellQuery !== undefined) {
+      let baseQueryDecoded = SQL.WhereClause.decode(query);
+      if (baseQueryDecoded.isTrivial) {
+        encodedTableCellQuery = SQL.WhereClause.encode(tableCellQuery);
+      } else {
+        let newAND = SQL.WhereClause.Compound('AND');
+        newAND.addComponent(baseQueryDecoded);
+        newAND.addComponent(tableCellQuery);
+        encodedTableCellQuery = SQL.WhereClause.encode(newAND);
+      }
+    } else {
+      encodedTableCellQuery = query;
+    }
+
+    if (encodedTableCellQuery == undefined) {
       console.error('Unhandled logic. rowValue: %o, columnValue: %o', rowValue, columnValue);
     }
 
-    let query = SQL.WhereClause.encode(whereClause);
-
-    this.getFlux().actions.session.popupOpen(<DataTableWithActions table={table} query={query} sidebar={false} />);
+    this.getFlux().actions.session.popupOpen(<DataTableWithActions table={table} query={encodedTableCellQuery} sidebar={false} />);
   },
 
   render() {
