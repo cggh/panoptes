@@ -143,6 +143,7 @@ class SettingsDataTable(ImportSettings):
                                                              'type': 'Text',
                                                              'required': True,
                                                              'description': 'Identifier of the custom view type (can be Overview, PropertyGroup, FieldList, ItemMap, PieChartMap) See DataItemViews settings for more details about defining custom data item views',
+                                                             'allowOtherValues': True,
                                                              'values':  OrderedDict((
                                                                         ('Overview', {
                                                                                  'description': 'Specifies the default data item view of Panoptes, including all fields'

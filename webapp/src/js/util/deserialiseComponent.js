@@ -32,7 +32,5 @@ export default function deserialiseComponent(component, path = null, mappedFunct
     }
     return React.createElement(type, {children, ...otherProps});
   }
-
   return _deserialiseComponent(component, path);
-
 }
