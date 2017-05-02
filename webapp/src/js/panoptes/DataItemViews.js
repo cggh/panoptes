@@ -5,6 +5,7 @@ import PieChartMap from 'Map/PieChart';
 import FieldList from 'FieldList';
 import PropertyGroup from 'PropertyGroup';
 import Template from 'Template';
+import ComponentRegistry from 'util/ComponentRegistry';
 
 function getViews(dataItemViews, hasGeoCoord) {
   /*eslint-disable react/display-name */
@@ -45,8 +46,13 @@ function getViews(dataItemViews, hasGeoCoord) {
   } else {
     dataItemViews.forEach((dataItemView, i) => {
       // Compose a tabPane for each of the specified dataItemViews
-      if (viewTypes[dataItemView.type])
+      if (viewTypes[dataItemView.type]) {
         views.push(viewTypes[dataItemView.type](dataItemView, i));
+      } else {
+        const type = ComponentRegistry(dataItemView.type) || dataItemView.type;
+        const props = {key :i, ...dataItemView.props};
+        views.push(React.createElement(type, props));
+      }
     });
   }
   return views;
