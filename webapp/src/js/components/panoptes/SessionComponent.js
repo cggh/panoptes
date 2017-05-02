@@ -29,7 +29,7 @@ let SessionComponent = createReactClass({
   getDefaultProps() {
     return {
       updateTitleIcon: () => null
-    }
+    };
   },
 
   componentWillMount() {
@@ -78,7 +78,7 @@ let SessionComponent = createReactClass({
         }), {ref: 'child', replaceable})
         : <span>Component does not exist</span>}
     </ErrorBoundary>;
-  },
+  }
 });
 
 export default SessionComponent;
