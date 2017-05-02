@@ -204,6 +204,7 @@ let Header = React.createClass({
       <AppBar
         title={<HTMLWithComponents>{name}</HTMLWithComponents>}
         showMenuIconButton={false}
+        onTitleTouchTap={() => actions.session.tabSwitch('FirstTab')}
         iconElementRight={this.config.user.isManager ?
           <IconMenu
           iconButtonElement={
