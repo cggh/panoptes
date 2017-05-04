@@ -1,0 +1,336 @@
+import React from 'react';
+
+// Mixins
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import FluxMixin from 'mixins/FluxMixin';
+
+// Lodash
+import _isEmpty from 'lodash/isEmpty';
+
+import _sum from 'lodash/sum';
+import _filter from 'lodash/filter';
+import _map from 'lodash/map';
+import _forEach from 'lodash/forEach';
+
+// Panoptes
+import API from 'panoptes/API';
+import CalcMapBounds from 'util/CalcMapBounds';
+import ComponentMarker from 'Map/ComponentMarker';
+import ErrorReport from 'panoptes/ErrorReporter';
+import FeatureGroup from 'Map/FeatureGroup';
+import LRUCache from 'util/LRUCache';
+import SQL from 'panoptes/SQL';
+import GeoLayouter from 'utils/GeoLayouter';
+import Polyline from 'Map/Polyline';
+import PieChart from 'PieChart';
+import DataTableWithActions from 'containers/DataTableWithActions';
+import ListWithActions from 'containers/ListWithActions';
+import {categoryColours} from 'util/Colours';
+
+let ColumnPieChartMarkersLayer = React.createClass({
+
+  mixins: [
+    FluxMixin,
+    ConfigMixin,
+    DataFetcherMixin('highlight', 'primKey', 'query', 'table', 'markerColourProperty')
+  ],
+
+  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
+  // in which case, we copy those props into context. Props override context.
+
+  contextTypes: {
+    crs: React.PropTypes.object,
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
+    changeLayerStatus: React.PropTypes.func
+  },
+  propTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
+    primKey: React.PropTypes.string, // if not specified then all table records are used
+    query: React.PropTypes.string,
+    table: React.PropTypes.string,
+    markerSizeProperty: React.PropTypes.string,
+    prefix: React.PropTypes.string.isRequired
+  },
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
+    onClickMarker: React.PropTypes.func
+  },
+
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map,
+      onClickMarker: this.handleClickSingleMarker
+    };
+  },
+
+  getInitialState() {
+    return {
+      clusterMarkers: {}
+    };
+  },
+
+  // Event handlers
+  handleClickClusterMarker(e, primKeyValue) {
+    let {table} = this.props;
+    let primKeyProperty = this.config.tablesById[table].primKey;
+
+    const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
+    if (!middleClick) {
+      e.originalEvent.stopPropagation();
+    }
+    let switchTo = !middleClick;
+
+    if (this.config.tablesById[table].listView) {
+      this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
+    } else {
+      let encodedPopupQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyProperty, '=', primKeyValue));
+      this.getFlux().actions.session.popupOpen(<DataTableWithActions key={table + '_' + encodedPopupQuery} table={table} query={encodedPopupQuery}/>, switchTo);
+    }
+  },
+
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
+  },
+
+  fetchData(props, requestContext) {
+
+    let {primKey, table, query, markerSizeProperty, prefix} = props;
+    let {changeLayerStatus} = this.context;
+
+    // Invalidate state if the table has changed.
+    if (table !== this.props.table) {
+      this.setState({clusterMarkers: {}});
+    }
+    changeLayerStatus({loadStatus: 'loading'});
+
+    let tableConfig = this.config.tablesById[table];
+    if (tableConfig === undefined) {
+      console.error('tableConfig === undefined');
+      return null;
+    }
+    // Check that the table specified for locations has geographic coordinates.
+    if (tableConfig.hasGeoCoord === false) {
+      console.error('tableConfig.hasGeoCoord === false');
+      return null;
+    }
+
+    let locationPrimKeyProperty = tableConfig.primKey;
+
+    // TODO: support lngProperty and latProperty props, to specify different geo columns.
+    // If specified, use the lat lng properties from the props.
+    // Otherwise, use the lat lng properties from the config.
+    // let locationLongitudeProperty = lngProperty ? lngProperty : locationTableConfig.longitude;
+    // let locationLatitudeProperty = latProperty ? latProperty : locationTableConfig.latitude;
+
+    let locationLongitudeProperty = tableConfig.longitude;
+    let locationLatitudeProperty = tableConfig.latitude;
+
+    let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
+
+    // Get the list of properties that have the specfied prefix.
+    let propertiesWithPrefix = Object.keys(tableConfig.propertiesById).filter((key) => key.startsWith(prefix));
+    locationColumns = locationColumns.concat(propertiesWithPrefix);
+
+    if (markerSizeProperty !== undefined) {
+      if (tableConfig.propertiesById[markerSizeProperty] === undefined) {
+        console.error('The specified markerSizeProperty ' + markerSizeProperty + ' was not found in the table ' + table);
+      } else {
+        locationColumns.push(markerSizeProperty);
+      }
+    }
+
+    requestContext.request(
+      (componentCancellation) => {
+
+        // Get all markers using the specified table.
+        let locationAPIargs = {
+          columns: locationColumns,
+          database: this.config.dataset,
+          query: this.getDefinedQuery(query, table),
+          table: tableConfig.id,
+          transpose: true
+        };
+
+        return LRUCache.get(
+          'query' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+            API.query({
+              cancellation: cacheCancellation,
+              ...locationAPIargs
+            }),
+          componentCancellation
+        );
+
+      })
+      .then((data) => {
+
+        let markers = []; // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
+        let clusterMarkers = [];
+
+        // Translate the fetched locationData into markers.
+        let locationTableConfig = this.config.tablesById[table];
+        let locationPrimKeyProperty = locationTableConfig.primKey;
+
+        const colourFunction = categoryColours('__default__');
+
+        for (let i = 0; i < data.length; i++) {
+
+          let locationDataPrimKey = data[i][locationPrimKeyProperty];
+
+          let lat = parseFloat(data[i][locationTableConfig.latitude]);
+          let lng = parseFloat(data[i][locationTableConfig.longitude]);
+
+          markers.push({lat, lng}); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
+
+          let clusterMarker = {
+            chartDataTable: table,
+            key: locationDataPrimKey,
+            primKey: locationDataPrimKey,
+            name: locationTableConfig.propertiesById[locationPrimKeyProperty].name + ': ' + locationDataPrimKey,
+            chartData: [],
+            table,
+            lat,
+            lng,
+            originalLat: lat,
+            originalLng: lng,
+            sum: 0
+          };
+
+          // Make pie slices for all of the values in the prefixed columns of this row.
+          for (let j = 0; j < propertiesWithPrefix.length; j++) {
+
+            let propertyWithPrefix = propertiesWithPrefix[j];
+            let value = data[i][propertyWithPrefix];
+
+            let pieChartSector = {
+              name: locationTableConfig.propertiesById[propertyWithPrefix].name + ': ' + value,
+              value,
+              color: colourFunction(propertyWithPrefix)
+            };
+
+            clusterMarker.chartData.push(pieChartSector);
+            clusterMarker.sum += value;
+          }
+
+          if (markerSizeProperty !== undefined) {
+            clusterMarker.size = data[i][markerSizeProperty];
+          } else {
+            clusterMarker.size = clusterMarker.sum;
+          }
+          clusterMarker.originalRadius = Math.sqrt(clusterMarker.size);
+
+          clusterMarkers.push(clusterMarker);
+
+        }
+
+        this.setState({clusterMarkers});
+        changeLayerStatus({loadStatus: 'loaded', bounds: CalcMapBounds.calcMapBounds(markers)});
+
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        changeLayerStatus({loadStatus: 'error'});
+      });
+  },
+
+  render() {
+
+    let {crs, layerContainer, map} = this.context;
+    let {clusterMarkers} = this.state;
+
+    if (_isEmpty(clusterMarkers)) {
+      return null;
+    }
+
+    if (clusterMarkers.length > 0) {
+
+      // TODO: Extract this code to a common place.
+      // NB: Copied from TableMarkersLayer; copied from PieChartMarkersLayer
+      let size = map.getSize();
+      let bounds = map.getBounds();
+      let pixelArea = size.x * size.y;
+      let pieAreaSum = _sum(_map(
+        _filter(clusterMarkers, (marker) => {
+          let {lat, lng} = marker;
+          return bounds.contains([lat, lng]);
+        }),
+        (marker) => marker.originalRadius * marker.originalRadius * 2 * Math.PI)
+      );
+      let lengthRatio = this.lastLengthRatio || 1;
+      if (pieAreaSum > 0) {
+        lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
+      }
+      this.lastLengthRatio = lengthRatio;
+      _forEach(clusterMarkers, (marker) => marker.radius = marker.originalRadius * lengthRatio);
+
+      return (
+        <FeatureGroup
+          layerContainer={layerContainer}
+          map={map}
+        >
+          <GeoLayouter nodes={clusterMarkers}>
+            {
+              (renderNodes) =>
+                <FeatureGroup>
+                  {
+                    renderNodes.map(
+                      (marker, i) => {
+
+                        let clusterComponent = (
+                            <PieChart
+                              chartData={marker.chartData}
+                              crs={crs}
+                              hideValues={true}
+                              lat={marker.lat}
+                              lng={marker.lng}
+                              originalLat={marker.originalLat}
+                              originalLng={marker.originalLng}
+                              radius={marker.radius}
+                              faceText={(marker.size).toFixed(0)}
+                              name={marker.name}
+                            />
+                        );
+
+                        return (
+                          <ComponentMarker
+                            key={'ComponentMarker_' + i}
+                            position={{lat: marker.lat, lng: marker.lng}}
+                            onClick={(e) => this.handleClickClusterMarker(e, marker.primKey)}
+                            zIndexOffset={0}
+                          >
+                            {clusterComponent}
+                          </ComponentMarker>
+                        );
+
+                      }
+                    ).concat(
+                      renderNodes.map(
+                        (marker, i) =>
+                          <Polyline
+                            className="panoptes-table-markers-layer-polyline"
+                            key={'Polyline_' + i}
+                            positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
+                          />
+                      )
+                    )
+                  }
+                </FeatureGroup>
+            }
+          </GeoLayouter>
+        </FeatureGroup>
+      );
+    }
+
+  }
+
+});
+
+export default ColumnPieChartMarkersLayer;

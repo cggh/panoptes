@@ -1,0 +1,43 @@
+nameSingle: thing
+namePlural: things
+description: A table of geographic things for example purposes.
+primKey: ID
+
+properties:
+- id: ID
+  name: Thing ID
+  dataType: Text
+
+- id: Location
+  name: Location
+  dataType: Text
+  isCategorical: true
+
+- id: Longitude
+  name: Longitude
+  dataType: GeoLongitude
+
+- id: Latitude
+  name: Latitude
+  dataType: GeoLatitude
+
+- id: eyeColour_blue
+  name: Blue eyes
+  dataType: Float
+  minVal: 0
+  maxVal: 10
+  showBar: true
+
+- id: eyeColour_red
+  name: Red eyes
+  dataType: Float
+  minVal: 0
+  maxVal: 10
+  showBar: true
+  
+- id: size
+  name: Size
+  dataType: Float
+  minVal: 0
+  maxVal: 10000
+  showBar: true
