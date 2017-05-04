@@ -75,22 +75,14 @@ let ColumnPieChartMarkersLayer = React.createClass({
   },
 
   // Event handlers
-  handleClickClusterMarker(e, primKeyValue) {
+  handleClickClusterMarker(e, primKey) {
     let {table} = this.props;
-    let primKeyProperty = this.config.tablesById[table].primKey;
 
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    let switchTo = !middleClick;
-
-    if (this.config.tablesById[table].listView) {
-      this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
-    } else {
-      let encodedPopupQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyProperty, '=', primKeyValue));
-      this.getFlux().actions.session.popupOpen(<DataTableWithActions key={table + '_' + encodedPopupQuery} table={table} query={encodedPopupQuery}/>, switchTo);
-    }
+    this.getFlux().actions.panoptes.dataItemPopup({table, primKey, switchTo: !middleClick});
   },
 
   getDefinedQuery(query, table) {
