@@ -101,7 +101,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {primKey, table, query, markerSizeProperty, prefix} = props;
+    let {table, query, markerSizeProperty, prefix} = props;
     let {changeLayerStatus} = this.context;
 
     // Invalidate state if the table has changed.
