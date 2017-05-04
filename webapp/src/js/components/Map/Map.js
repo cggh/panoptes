@@ -29,7 +29,8 @@ const ALLOWED_CHILDREN = [
   'TileLayer',
   'FeatureGroup',
   'Marker',
-  'Overlay'
+  'Overlay',
+  'ColumnPieChartMarkersLayer'
 ];
 
 /* To use maps in templates
