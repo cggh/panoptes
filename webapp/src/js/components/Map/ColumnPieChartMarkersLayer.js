@@ -33,7 +33,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('highlight', 'primKey', 'query', 'table', 'markerColourProperty')
+    DataFetcherMixin('primKey', 'query', 'table')
   ],
 
   //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
