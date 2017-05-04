@@ -102,13 +102,27 @@ let TableMarkersLayer = React.createClass({
     if (this.config.tablesById[table].listView) {
       this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
     } else {
-      let whereClause = SQL.WhereClause.AND([
+
+      let encodedPopupQuery = undefined;
+
+      let positionQuery = SQL.WhereClause.AND([
         SQL.WhereClause.CompareFixed(latProperty, '=', originalLat),
         SQL.WhereClause.CompareFixed(lngProperty, '=', originalLng)
       ]);
-      whereClause.isRoot = true;
-      let query = SQL.WhereClause.encode(whereClause);
-      this.getFlux().actions.session.popupOpen(<DataTableWithActions key={table + '_' + query} table={table} query={query}/>, switchTo);
+
+      let baseQueryDecoded = SQL.WhereClause.decode(this.props.query);
+      if (baseQueryDecoded.isTrivial) {
+        positionQuery.isRoot = true;
+        encodedPopupQuery = SQL.WhereClause.encode(positionQuery);
+      } else {
+        let newAND = SQL.WhereClause.Compound('AND');
+        newAND.addComponent(baseQueryDecoded);
+        newAND.addComponent(positionQuery);
+        newAND.isRoot = true;
+        encodedPopupQuery = SQL.WhereClause.encode(newAND);
+      }
+
+      this.getFlux().actions.session.popupOpen(<DataTableWithActions key={table + '_' + encodedPopupQuery} table={table} query={encodedPopupQuery}/>, switchTo);
     }
   },
 
