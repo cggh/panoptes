@@ -24,8 +24,6 @@ import SQL from 'panoptes/SQL';
 import GeoLayouter from 'utils/GeoLayouter';
 import Polyline from 'Map/Polyline';
 import PieChart from 'PieChart';
-import DataTableWithActions from 'containers/DataTableWithActions';
-import ListWithActions from 'containers/ListWithActions';
 import {categoryColours} from 'util/Colours';
 
 let ColumnPieChartMarkersLayer = React.createClass({
