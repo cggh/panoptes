@@ -255,6 +255,14 @@
   opacity: .5;
 }
 
+.top-bar-title {
+  display: inline-block;
+}
+.top-bar-logo {
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
 .top-bar {
   background: $primary-color;
   box-shadow: $z-1-shadow;
@@ -294,7 +302,6 @@
   .disabled {
     color: $light-primary-color;
   }
-
 }
 
 .load-container {
