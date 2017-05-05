@@ -101,14 +101,14 @@ let PivotTableWithActions = React.createClass({
                             label="Column"
                             allowNull={true}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => setProps({columnProperty: v})}/>
+                            onSelect={(v) => setProps({columnProperty: v, columnSortOrder: undefined})}/>
           <PropertySelector table={table}
                             key="rowProperty"
                             value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
                             label="Row"
                             allowNull={true}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => setProps({rowProperty: v})}/>
+                            onSelect={(v) => setProps({rowProperty: v, rowSortOrder: undefined})}/>
           <SelectField
             autoWidth={true}
             floatingLabelText="Display"
