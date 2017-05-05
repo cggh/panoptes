@@ -78,10 +78,6 @@ let PivotTableWithActions = React.createClass({
     }
   },
 
-  handleChangeDisplay(event, selectedIndex, selectedDisplay) {
-    this.props.setProps({display: selectedDisplay});
-  },
-
   orderDescriptionString(order) {
     if (order.length === 0) {
       return 'None';
@@ -116,7 +112,7 @@ let PivotTableWithActions = React.createClass({
           <SelectField
             autoWidth={true}
             floatingLabelText="Display"
-            onChange={(e, i, v) => this.handleChangeDisplay(e, i, v)}
+            onChange={(e, i, v) => setProps({display: v})}
             value={display}
           >
             <MenuItem key={'Counts'} primaryText={'Counts'} value={'counts'} />
