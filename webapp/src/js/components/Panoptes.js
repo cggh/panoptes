@@ -211,7 +211,7 @@ let Header = createReactClass({
             <MenuIcon />
           </IconButton>
           <Typography type="title" color="inherit" onClick={() => actions.session.tabSwitch('FirstTab')}>
-            {<HTMLWithComponents>{name}</HTMLWithComponents>}
+            {<span><img className="top-bar-logo" src={logo}/><HTMLWithComponents className="top-bar-title">{name}</HTMLWithComponents></span>}
           </Typography>
           {this.config.user.isManager ? [<IconButton
             style={{color: 'white'}}
