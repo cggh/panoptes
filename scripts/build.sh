@@ -115,6 +115,10 @@ if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
     cp -r $PROJECT_ROOT/sampledata/* $SOURCEDATADIR
 fi
 
+echo -e "${green}  Linking SOURCEDIR/components to webapp/src/js/components/custom"
+mkdir -p $SOURCEDATADIR/components
+ln -sf $SOURCEDATADIR/components $PROJECT_ROOT/webapp/src/js/components/custom
+
 echo -e "${green}Done!${NC}"
 
 popd  > /dev/null
