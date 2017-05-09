@@ -83,11 +83,6 @@ let ListView = React.createClass({
       transpose: true
     };
 
-    let rowsCountAPIargs = {
-      database: this.config.dataset,
-      table: tableConfig.id
-    };
-
     requestContext.request((componentCancellation) =>
       Promise.all([
         LRUCache.get(
@@ -97,9 +92,9 @@ let ListView = React.createClass({
           componentCancellation
         ),
         LRUCache.get(
-          'rowsCount' + JSON.stringify(rowsCountAPIargs),
+          'rowsCount' + JSON.stringify(queryAPIargs),
           (cacheCancellation) =>
-            API.rowsCount({cancellation: cacheCancellation, ...rowsCountAPIargs}),
+            API.rowsCount({cancellation: cacheCancellation, ...queryAPIargs}),
           componentCancellation
         )
       ])
