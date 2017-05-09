@@ -81,6 +81,8 @@ def handler(start_response, requestData):
             for join in joins:
                 if 'type' in join and join['type'] in ['', 'INNER', 'LEFT', 'RIGHT', 'FULL']:
                     sqlQuery += " {0} JOIN {1} ON {2} = {3}".format(join['type'].upper(), DBTBESC(join['foreignTable']), DBCOLESC(join['foreignColumn']), DBCOLESC(join['column']))
+                else:
+                    raise SyntaxError('Join type not valid')
             if len(whereClause.querystring_params) > 0:
                 sqlQuery += " WHERE {0}".format(whereClause.querystring_params)
             if groupBy and len(groupBy) > 0:
