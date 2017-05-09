@@ -38,6 +38,8 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
 
+console.log(typeByDisplayName);
+
 export default function(displayName) {
   return typeByDisplayName[displayName];
 }

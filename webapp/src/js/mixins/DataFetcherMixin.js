@@ -17,7 +17,7 @@ let DataFetcherMixin = function() {
     },
 
     _getDataIfNeeded(lastProps, nextProps) {
-      if (propsToWatch.some((key) => !Immutable.is(lastProps[key], nextProps[key])))
+      if (!(propsToWatch.length > 0) || propsToWatch.some((key) => !Immutable.is(lastProps[key], nextProps[key])))
         this.fetchData(nextProps, this._requestContext);
     },
     componentWillUnmount() {
