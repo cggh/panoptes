@@ -38,7 +38,6 @@ def handler(start_response, requestData):
     content = json.loads(content) if len(content) > 0 else None
     if not content:
         raise SyntaxError('No query parameters supplied')
-
     tableId = content['table']
     query = content['query']
     orderBy = json.loads(content.get('orderBy', '[]'))
@@ -59,7 +58,7 @@ def handler(start_response, requestData):
     if content.get('randomSample', False):
         randomSample = int(content['randomSample'])
     cacheData = content.get('cache', True)
-
+    joins = json.loads(content.get('joins', '[]'))
     cache = getCache()
     cacheKey = json.dumps([tableId, query, orderBy, distinct, columns, groupBy, database, startRow, endRow])
     data = None
@@ -75,11 +74,13 @@ def handler(start_response, requestData):
             whereClause.ParameterPlaceHolder = '%s'
             whereClause.Decode(query, True)
             whereClause.CreateSelectStatement()
-
             sqlQuery = "SELECT "
             if distinct:
                 sqlQuery += " DISTINCT "
             sqlQuery += "{0} FROM {1}".format(','.join(columns), DBTBESC(tableId))
+            for join in joins:
+                if 'type' in join and join['type'] in ['', 'INNER', 'LEFT', 'RIGHT', 'FULL']:
+                    sqlQuery += " {0} JOIN {1} ON {2} = {3}".format(join['type'].upper(), DBTBESC(join['foreignTable']), DBCOLESC(join['foreignColumn']), DBCOLESC(join['column']))
             if len(whereClause.querystring_params) > 0:
                 sqlQuery += " WHERE {0}".format(whereClause.querystring_params)
             if groupBy and len(groupBy) > 0:
@@ -94,6 +95,7 @@ def handler(start_response, requestData):
             if DQXDbTools.LogRequests:
                 DQXUtils.LogServer('###QRY:'+sqlQuery)
                 DQXUtils.LogServer('###PARAMS:'+str(whereClause.queryparams))
+                DQXUtils.LogServer('###JOINS:'+str(joins))
 
             cur.execute(sqlQuery, whereClause.queryparams)
             rows = cur.fetchall()
