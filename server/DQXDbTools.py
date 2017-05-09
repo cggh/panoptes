@@ -266,7 +266,11 @@ def ToSafeIdentifier(st):
 def DBCOLESC(arg):
     if arg == "*":
         return arg
-    return '"'+ToSafeIdentifier(arg)+'"'
+    if '.' in arg:
+        table, column = arg.split('.')
+        return '"'+ToSafeIdentifier(table)+'"."'+ToSafeIdentifier(column)+'"'
+    else:
+        return '"'+ToSafeIdentifier(arg)+'"'
 
 def DBTBESC(arg):
     return '"'+ToSafeIdentifier(arg)+'"'
