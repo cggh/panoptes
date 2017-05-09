@@ -417,10 +417,12 @@ function query(options) {
     transpose: false,
     typedArrays: false,
     randomSample: undefined,
-    cache: true
+    cache: true,
+    joins: []
   };
   let {database, table, columns, query, orderBy, groupBy,
-    start, stop, distinct, transpose, randomSample, cache, typedArrays} = {...defaults, ...options};
+    start, stop, distinct, transpose, randomSample, cache, typedArrays, joins} = {...defaults, ...options};
+
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,
@@ -438,7 +440,8 @@ function query(options) {
     orderBy: JSON.stringify(orderBy),
     groupBy: groupBy.join('~'),
     randomSample,
-    cache
+    cache,
+    joins: JSON.stringify(joins)
   }))
   .then((columns) => {
     if (!typedArrays) {
