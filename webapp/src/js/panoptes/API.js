@@ -299,25 +299,12 @@ function importDataset(dataset) {
 }
 
 function rowsCount(options) {
-  assertRequired(options, ['database', 'table']);
 
-  // NB: If no maxRowsCount (maxRecordCount) is specified, then DQXServer's getrecordcount.py defaults to 10000
-  let defaults = {
-    query: SQL.nullQuery
-  };
+  options.transpose = true;
+  options.columns = [{expr: JSON.parse(JSON.stringify(['count', ['*']])), as: 'TotalRecordCount'}];
+  options.orderBy = [];
 
-  let {database, table, query} = {...defaults, ...options};
-
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  return requestJSON({
-    ...args,
-    params: {
-      datatype: 'getrecordcount',
-      database: database,
-      tbname: table,
-      qry: encodeQuery(query)
-    }
-  }).then((response) => response.TotalRecordCount);
+  return query(options).then((response) => response[0].TotalRecordCount);
 }
 
 function modifyConfig(options) {
