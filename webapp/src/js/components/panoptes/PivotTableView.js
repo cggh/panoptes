@@ -9,7 +9,6 @@ import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _orderBy from 'lodash/orderBy';
-import _cloneDeep from 'lodash/cloneDeep';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -212,7 +211,7 @@ let PivotTableView = React.createClass({
         function calcPercentageData(dataObject, totalCount) {
           if (dataObject !== undefined) {
             let percentage = ((dataObject.count / totalCount) * 100).toFixed(0);
-            dataObject.backgroundColor = _cloneDeep(MAX_COLOR).lighten(0.58 * (1 - (percentage - 0) / 100)).string();
+            dataObject.backgroundColor = Color(MAX_COLOR).lighten(0.58 * (1 - (percentage - 0) / 100)).string();
             dataObject.displayValue = percentage + '%';
             return dataObject;
           } else {
