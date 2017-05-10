@@ -32,10 +32,9 @@ let PropertyHeader = React.createClass({
     onClick: React.PropTypes.func
   },
 
-
   render: function() {
     const {table, propId, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
-    const {name, description} = this.tableConfig().propertiesById[propId];
+    const {tableId, name, description} = this.propertiesByColumn(propId);
     delete other.columnKey;
     const tooltip = <Tooltip placement={tooltipPlacement}
                trigger={tooltipTrigger}
@@ -43,7 +42,7 @@ let PropertyHeader = React.createClass({
                  <div className="tooltip-description"><HTMLWithComponents>{description}</HTMLWithComponents></div>
                  <div className="grow"><div className="tooltip-plot"><TablePlot
                    table={table}
-                   plotType='histogram'
+                   plotType="histogram"
                    // query={this.getDefinedQuery()}
                    horizontal={propId}
                    // randomSubsetSize={randomSubsetSize}
@@ -52,14 +51,14 @@ let PropertyHeader = React.createClass({
                  }>
         <Icon className="info" name="info-circle"/>
       </Tooltip>;
-  return (
+    return (
       <span onClick={(event) => {
         if (onClick && event.target.className.indexOf('info') == -1)
           onClick(event);
       }}
         {...other}>
         {prefix}
-        <TooltipEllipsis className="label">{name}</TooltipEllipsis>
+        <TooltipEllipsis className="label">{tableId !== table ? description : name}</TooltipEllipsis>
         {tooltip}
       </span>
     );
