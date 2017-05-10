@@ -34,7 +34,7 @@ let PropertyHeader = React.createClass({
 
   render: function() {
     const {table, propId, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
-    const {tableId, name, description} = this.propertiesByColumn(propId);
+    const {name, description} = this.propertiesByColumn(propId);
     delete other.columnKey;
     const tooltip = <Tooltip placement={tooltipPlacement}
                trigger={tooltipTrigger}
@@ -58,7 +58,7 @@ let PropertyHeader = React.createClass({
       }}
         {...other}>
         {prefix}
-        <TooltipEllipsis className="label">{tableId !== table ? description : name}</TooltipEllipsis>
+        <TooltipEllipsis className="label">{name}</TooltipEllipsis>
         {tooltip}
       </span>
     );
