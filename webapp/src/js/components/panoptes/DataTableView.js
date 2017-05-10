@@ -45,7 +45,7 @@ let DataTableView = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'columns', 'order', 'startRowIndex')
+    DataFetcherMixin('table', 'query', 'columns', 'order', 'startRowIndex', 'joins')
   ],
 
   propTypes: {
@@ -61,7 +61,8 @@ let DataTableView = React.createClass({
     onFetchedRowsCountChange: React.PropTypes.func,
     onTotalRowsCountChange: React.PropTypes.func,
     className: React.PropTypes.string,
-    maxRowsPerPage: React.PropTypes.number
+    maxRowsPerPage: React.PropTypes.number,
+    joins: React.PropTypes.array
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -109,7 +110,7 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, columns, order, startRowIndex, query, maxRowsPerPage} = props;
+    let {table, columns, order, startRowIndex, query, maxRowsPerPage, joins} = props;
     let {showableRowsCount} = this.state;
 
     if (columns.length > 0) {
@@ -128,22 +129,17 @@ let DataTableView = React.createClass({
       let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
       let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
 
-      let queryAPIargs = {
+      let queryAPIargs = this.resolveJoins({
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
-        columns: columns,
+        columns,
         orderBy: order,
         query: this.getDefinedQuery(query, table),
         start: fetchStartRowIndex,
         stop: fetchStopRowIndex,
-        transpose: true //We want rows, not columns
-      };
-
-      let rowsCountAPIargs = {
-        database: this.config.dataset,
-        table: this.config.tablesById[table].id,
-        query: this.getDefinedQuery(query, table)
-      };
+        transpose: true, //We want rows, not columns,
+        joins
+      });
 
       requestContext.request((componentCancellation) =>
         Promise.all([
@@ -154,19 +150,17 @@ let DataTableView = React.createClass({
             componentCancellation
           ),
           LRUCache.get(
-            'rowsCount' + JSON.stringify(rowsCountAPIargs),
+            'rowsCount' + JSON.stringify(queryAPIargs),
             (cacheCancellation) =>
-              API.rowsCount({cancellation: cacheCancellation, ...rowsCountAPIargs}),
+              API.rowsCount({cancellation: cacheCancellation, ...queryAPIargs}),
             componentCancellation
           )
         ])
       )
       .then(([rows, rowsCount]) => {
-
         if (fetchStartRowIndex !== undefined && startRowIndex !== undefined && stopRowIndex !== undefined) {
           rows = rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1);
         }
-
         this.setState({
           loadStatus: 'loaded',
           rows,
@@ -182,6 +176,83 @@ let DataTableView = React.createClass({
     } else {
       this.setState({rows: []});
     }
+  },
+
+  resolveJoins(queryAPIargs) {
+
+
+    if (queryAPIargs.joins !== undefined) {
+
+      // If there are joins, make sure we qualify each column name to avoid ambiguity.
+
+      for (let i = 0; i < queryAPIargs.joins.length; i++) {
+
+        let join = queryAPIargs.joins[i];
+        if (join.column.indexOf('.') == -1) {
+          join.column = queryAPIargs.table + '.' + join.column;
+        }
+        if (join.foreignColumn.indexOf('.') == -1) {
+          join.foreignColumn = join.foreignTable + '.' + join.foreignColumn;
+        }
+
+      }
+
+      // Assume that unqualified columns in the list belong to queryAPIargs.table
+      for (let i = 0; i < queryAPIargs.columns.length; i++) {
+        if (queryAPIargs.columns[i].indexOf('.') == -1) {
+          queryAPIargs.columns[i] = queryAPIargs.table + '.' + queryAPIargs.columns[i];
+        }
+      }
+
+
+    } else {
+
+      // Extract implicit joins; joins implied by columns belonging to other tables.
+
+      queryAPIargs.joins = [];
+
+      for (let i = 0; i < queryAPIargs.columns.length; i++) {
+
+        let column = queryAPIargs.columns[i];
+
+        if (column.indexOf('.') !== -1) {
+
+          let [tableId] = column.split('.');
+
+          if (tableId !== queryAPIargs.table) {
+
+            let relation = undefined;
+            for (let j = 0; j < this.config.tablesById[queryAPIargs.table].relationsChildOf.length; j++) {
+              if (this.config.tablesById[queryAPIargs.table].relationsChildOf[j].tableId == tableId) {
+                relation = this.config.tablesById[queryAPIargs.table].relationsChildOf[j];
+                break;
+              }
+            }
+
+            if (relation === undefined) {
+              console.error(`There is no relation configured for the child table ${tableId} for parent table ${queryAPIargs.table}.`);
+              return;
+            }
+
+            let join = {};
+            join.type = '';
+            join.foreignTable = relation.tableId;
+            join.foreignColumn = relation.tableId + '.' + relation.parentTable.primKey;
+            join.column = queryAPIargs.table + '.' + relation.childPropId;
+
+            queryAPIargs.joins.push(join);
+          }
+        }
+
+      }
+
+      if (queryAPIargs.joins.length == 0) {
+        queryAPIargs.joins = undefined;
+      }
+
+    }
+
+    return queryAPIargs;
   },
 
   handleColumnResize(width, column) {
@@ -240,15 +311,15 @@ let DataTableView = React.createClass({
       return columnWidths[column];
     }
 
-    let columnData = this.tableConfig().propertiesById[column];
+    let columnData = this.propertiesByColumn(column);
 
     // If a pixel width for this column is in the config, use that.
     if (columnData.defaultWidth) {
       return columnData.defaultWidth;
     }
 
-    if (MEASURED_COLUMN_WIDTHS[this.props.table] && MEASURED_COLUMN_WIDTHS[this.props.table][column]) {
-      return MEASURED_COLUMN_WIDTHS[this.props.table][column];
+    if (MEASURED_COLUMN_WIDTHS[columnData.tableId] && MEASURED_COLUMN_WIDTHS[columnData.tableId][columnData.id]) {
+      return MEASURED_COLUMN_WIDTHS[columnData.tableId][columnData.id];
     }
     // NB: Columns need to be initialized with at least a non-null.
     let columnWidthPx = 0;
@@ -257,12 +328,12 @@ let DataTableView = React.createClass({
     // sort icon (20px)
     // + info icon (20px) (if set on this column)
     // + columnResizerContainer(6px, inc. columnResizerKnob (4px))
-    let paddingWidthPx = 26 + (this.tableConfig().propertiesById[column].description ? 20 : 0);
+    let paddingWidthPx = 26 + (columnData.description ? 20 : 0);
 
     // NB: This method is not supported by IE < v9.0
     // Also used in GenotypesTable.js
 
-    let propertyHeaderElementId = 'PropertyHeader_' + columnData.id;
+    let propertyHeaderElementId = 'PropertyHeader_' + column;
     let propertyHeaderElement = document.getElementById(propertyHeaderElementId);
 
     if (propertyHeaderElement !== undefined && propertyHeaderElement !== null) {
@@ -273,8 +344,8 @@ let DataTableView = React.createClass({
       // NB: syntax [font style][font weight][font size][font face]
       canvas2dContext.font = propertyHeaderTextElementStyles['fontStyle'] + ' ' + propertyHeaderTextElementStyles['fontWeight'] + ' ' + propertyHeaderTextElementStyles['fontSize'] + ' "' + propertyHeaderTextElementStyles['fontFamily'] + '"';
       columnWidthPx = Math.ceil(canvas2dContext.measureText(columnData.name).width) + paddingWidthPx;
-      MEASURED_COLUMN_WIDTHS[this.props.table] = MEASURED_COLUMN_WIDTHS[this.props.table] || {};
-      MEASURED_COLUMN_WIDTHS[this.props.table][column] = columnWidthPx;
+      MEASURED_COLUMN_WIDTHS[columnData.tableId] = MEASURED_COLUMN_WIDTHS[columnData.tableId] || {};
+      MEASURED_COLUMN_WIDTHS[columnData.tableId][columnData.id] = columnWidthPx;
     }
 
     return columnWidthPx;
@@ -306,25 +377,22 @@ let DataTableView = React.createClass({
               isColumnResizing={false}
             >
               {columns.map((column) => {
-                if (!this.tableConfig().propertiesById[column]) {
-                  console.error(`Column ${column} doesn't exist on ${this.props.table}.`);
-                  return;
-                }
-                let columnData = this.tableConfig().propertiesById[column];
+
+                let columnData = this.propertiesByColumn(column);
                 let {id, isPrimKey} = columnData;
                 let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
                 let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
                 return <Column
                   width={this.calcColumnWidthPx(column)}
-                  key={id}
-                  columnKey={id}
+                  key={column}
+                  columnKey={column}
                   fixed={isPrimKey}
                   allowCellsRecycling={true}
                   isResizable={true}
                   minWidth={50}
                   header={
                     <PropertyHeader
-                      id={'PropertyHeader_' + id}
+                      id={'PropertyHeader_' + column}
                       className={classNames({
                         'pointer': true,
                         'table-row-header': true,
@@ -333,8 +401,8 @@ let DataTableView = React.createClass({
                       })}
                       style={{width: this.calcColumnWidthPx(column)}}
                       table={table}
-                      propId={id}
-                      onClick={() => this.handleOrderChange(id)}
+                      propId={column}
+                      onClick={() => this.handleOrderChange(column)}
                       prefix={(asc || desc) ?
                         <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> :
                         null}
