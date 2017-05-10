@@ -8,6 +8,46 @@
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet fermentum purus. Suspendisse finibus ligula id auctor vestibulum. Nam finibus eros turpis, ac laoreet nisl finibus vitae. Maecenas et ex mauris. Vestibulum et dapibus quam. Curabitur id porttitor dui. Ut et sem a turpis commodo pulvinar sed congue risus. Donec cursus ipsum maximus justo malesuada vehicula. Sed facilisis ut massa nec finibus. In in rutrum justo, eget iaculis metus. Curabitur non urna gravida, finibus tortor in, convallis nisl. Suspendisse sem quam, rhoncus in ornare id, consectetur eget lacus. Proin dapibus augue orci, fringilla aliquet nibh pellentesque sit amet. Donec id iaculis mauris.
 </p>
 
+<p>A table showing UK sampling sites joined to contributors using an implicit join determined by relation config and "table.column" specification.</p>
+<div style="height: 150px; width: 600px">
+  <DataTableView 
+    table="samplingsites" 
+    columns='["SiteID", "Country", "Contributor_ID", "contributors.Name"]'
+    query='{
+      "whcClass": "comparefixed",
+      "isCompound": false,
+      "isTrivial": false,
+      "isRoot": true,
+      "ColName": "Country",
+      "CompValue": "UK",
+      "Tpe": "="
+    }'
+  />
+</div>
+
+
+<p>Another table showing UK sampling sites explicitly inner joined to contributors on Contributor_ID and then left joined to populations on Latitude, 
+  showing the name of the contributor and the SampleCount of the population.</p>
+<div style="height: 150px; width: 600px">
+  <DataTableView 
+    table="samplingsites" 
+    columns='["SiteID", "Country", "contributors.Name", "populations.SampleCount"]'
+    query='{
+      "whcClass": "comparefixed",
+      "isCompound": false,
+      "isTrivial": false,
+      "isRoot": true,
+      "ColName": "Country",
+      "CompValue": "UK",
+      "Tpe": "="
+    }'
+    joins='[
+      {"type": "INNER", "foreignTable": "contributors", "foreignColumn": "ID", "column": "Contributor_ID"},
+      {"type": "LEFT", "foreignTable": "populations", "foreignColumn": "Longitude", "column": "Longitude"}
+    ]'
+  />
+</div>
+
 <h2>Related topics</h2>
 <ul>
     <li>
