@@ -114,7 +114,8 @@ SQL.WhereClause._fieldComparisonOperators = [
     Create: function() {
       return SQL.WhereClause.CompareFixed('', 'CONTAINS', '');
     },
-    fieldType: 'value'
+    fieldType: 'value',
+    allowSubstring: true
   },
   {
     ID: 'NOTCONTAINS', name: 'Does not contain',
@@ -122,7 +123,8 @@ SQL.WhereClause._fieldComparisonOperators = [
     Create: function() {
       return SQL.WhereClause.CompareFixed('', 'NOTCONTAINS', '');
     },
-    fieldType: 'value'
+    fieldType: 'value',
+    allowSubstring: true
   },
   {
     ID: 'STARTSWITH', name: 'Starts with',
@@ -130,7 +132,8 @@ SQL.WhereClause._fieldComparisonOperators = [
     Create: function() {
       return SQL.WhereClause.CompareFixed('', 'STARTSWITH', '');
     },
-    fieldType: 'value'
+    fieldType: 'value',
+    allowSubstring: true
   },
   {
     ID: 'LIKE', name: 'Like',
@@ -138,7 +141,8 @@ SQL.WhereClause._fieldComparisonOperators = [
     Create: function() {
       return SQL.WhereClause.CompareFixed('', 'LIKE', '');
     },
-    fieldType: 'value'
+    fieldType: 'value',
+    allowSubstring: true
   },
   {
     ID: 'ISPRESENT', name: 'Is present', MultiChoiceInt: true,

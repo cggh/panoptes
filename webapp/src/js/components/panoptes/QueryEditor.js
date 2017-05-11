@@ -425,7 +425,7 @@ let Criterion = React.createClass({
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
     if (currentOperator.fieldType === 'value') {
-      if (property.distinctValues && !property.isBoolean) {
+      if (property.distinctValues && !currentOperator.allowSubstring && !property.isBoolean) {
 
         fields = (
           <div className="fields">
