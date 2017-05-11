@@ -344,6 +344,7 @@ let Criterion = React.createClass({
       );
 
     let groups = _clone(this.tableConfig().propertyGroupsById);
+
     //Disabled until full subset implementation
     // groups.other = {
     //   id: 'other',
@@ -398,7 +399,7 @@ let Criterion = React.createClass({
 
     let otherColumnSelect = () =>
       <select className="field" value={component.ColName2} onChange={(value) => this.handleValueChange({input: 'otherColumn', value})}>
-          {groups.map((group) => {
+          {_map(groups, (group) => {
             if (group.id === 'other') return null;
             return (
               <optgroup key={group.id} label={group.name}>
