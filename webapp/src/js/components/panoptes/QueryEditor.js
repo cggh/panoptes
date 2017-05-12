@@ -1,7 +1,3 @@
-import _clone from 'lodash/clone';
-import _find from 'lodash/find';
-import _map from 'lodash/map';
-
 import React from 'react';
 import classNames from 'classnames';
 
@@ -18,7 +14,9 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Icon from 'ui/Icon';
 import _assign from 'lodash/assign';
-
+import _clone from 'lodash/clone';
+import _find from 'lodash/find';
+import _map from 'lodash/map';
 
 let Component = React.createClass({
   propTypes: {
@@ -109,37 +107,31 @@ let Criterion = React.createClass({
 
     let {component, onChange} = this.props;
 
-    // Get the property info for this table's primary key.
-    let property = this.tableConfig().propertiesById[this.tableConfig().primKey];
+    let newComponent = this.newComponent();
 
-    // Get the valid operators for this table's primary key.
-    let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
+    this.setState({CompValue: newComponent.CompValue});
 
-    // Create a new clean component, based on the first valid operator for this table's primary key.
-    let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: validOperators[0].ID}).Create();
-
-    // Set the new component's primary column name to this table's primary key.
-    newComponent.ColName = this.tableConfig().primKey;
+    // Set the new component's column names to this table's primary key.
+    ['ColName', 'ColName2'].forEach((name) => {
+      this.setState({[name]: this.tableConfig().primKey});
+    });
 
     // Set the new component's isTrivial to false, i.e. the query will no longer be SELECT * FROM table.
     newComponent.isTrivial = false;
 
     // Wipe the state clean.
-    ['CompValue', 'CompValueMin', 'CompValueMax', 'Offset', 'Factor'].forEach((name) => {
-      this.setState({[name]: undefined});
-    });
+    let initState = {
+      CompValue: newComponent.CompValue,
+      CompValueMin: undefined,
+      CompValueMax: undefined,
+      Offset: undefined,
+      Factor: undefined
+    };
+
+    this.setState(initState);
 
     // Swap the specified component for the new component.
     _assign(component, newComponent);
-
-    // Set the CompValue to the property's default.
-    let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
-    if (currentOperator.fieldType === 'value') {
-      // The defaultValue might be badly formatted, so we format it.
-      // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
-      component.CompValue = Deformatter(property, Formatter(property, property.defaultValue));
-      this.setState({CompValue: component.CompValue});
-    }
 
     onChange();
   },
@@ -155,12 +147,29 @@ let Criterion = React.createClass({
   },
 
   newComponent() {
-    let config = this.tableConfig();
 
-    // The defaultValue might be badly formatted, so we format it.
-    // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
-    let CompValue = Deformatter(config.propertiesById[config.primKey], Formatter(config.propertiesById[config.primKey], config.propertiesById[config.primKey].defaultValue));
-    return SQL.WhereClause.CompareFixed(config.primKey, '=', CompValue);
+    // Get the property info for this table's primary key column.
+    let property = this.tableConfig().propertiesById[this.tableConfig().primKey];
+
+    // Get the valid operators for this table's primary key.
+    let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
+
+    // Create a new clean component, based on the first valid operator for this table's primary key.
+    let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: validOperators[0].ID}).Create();
+
+    ['ColName', 'ColName2'].forEach((name) => {
+      newComponent[name] = this.tableConfig().primKey;
+    });
+
+    // Set the CompValue to the property's default.
+    let currentOperator = validOperators.filter((op) => op.ID === newComponent.type)[0];
+    if (currentOperator.fieldType === 'value') {
+      // The defaultValue might be badly formatted, so we format it.
+      // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
+      newComponent.CompValue = Deformatter(property, Formatter(property, property.defaultValue));
+    }
+
+    return newComponent;
   },
 
   handleAddOr() {
@@ -208,6 +217,10 @@ let Criterion = React.createClass({
     ['ColName', 'ColName2'].forEach((name) => {
       if (component[name] !== undefined) {
         newComponent[name] = component[name];
+      } else if (this.state[name] !== undefined) {
+        newComponent[name] = this.state[name];
+      } else {
+        newComponent[name] = this.tableConfig().primKey;
       }
     });
 
@@ -258,12 +271,13 @@ let Criterion = React.createClass({
     component.Factor = undefined;
     component.Offset = undefined;
     component.subset = undefined;
+    component.ColName2 = undefined;
 
-    // Set the CompValue to the property's default.
     if (currentOperator.fieldType === 'value') {
+      // Set the CompValue to the property's default.
       // The defaultValue might be badly formatted, so we format it.
       // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
-      this.handleValueChange({input: 'value', value: property.defaultValue});
+      component.CompValue = Formatter(property, property.defaultValue);
     }
 
     this.validateOperatorAndValues();
@@ -284,9 +298,14 @@ let Criterion = React.createClass({
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
     if (payload && payload.input) {
-      // The payload.value might be badly formatted, so we format it.
-      // The this[input] value needs to be formatted, because it needs to be user-friendly.
-      this[payload.input] = Formatter(property, payload.value);
+      if (payload.input === 'otherColumn') {
+        // NB: Formatter(property, payload.value) would return "NULL"
+        this[payload.input] = payload.value;
+      } else {
+        // The payload.value might be badly formatted, so we format it.
+        // The this[input] value needs to be formatted, because it needs to be user-friendly.
+        this[payload.input] = Formatter(property, payload.value);
+      }
     }
 
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
@@ -307,8 +326,9 @@ let Criterion = React.createClass({
         CompValueMax: component.CompValueMax
       });
     } else if (currentOperator.fieldType === 'otherColumn') {
-      // The CompValues need to be deformatted, because they need to be SQL-friendly.
-      component.ColName2 = Deformatter(property, this.otherColumn);
+      // NB: Deformatter(property, this.otherColumn) would return null
+      component.ColName2 = this.otherColumn;
+      this.setState({ColName2: component.ColName2});
     } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
       component.ColName2 = this.otherColumn;
       // The component.Factor and .Offset need to be deformatted, because they need to be SQL-friendly.
@@ -376,6 +396,7 @@ let Criterion = React.createClass({
     );
 
     let property = this.tableConfig().propertiesById[component.ColName];
+
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let operatorSelect = null;
     if (validOperators.length == 1) {
@@ -398,7 +419,7 @@ let Criterion = React.createClass({
     }
 
     let otherColumnSelect = () =>
-      <select className="field" value={component.ColName2} onChange={(value) => this.handleValueChange({input: 'otherColumn', value})}>
+      <select className="field" value={component.ColName2} onChange={(event) => this.handleValueChange({input: 'otherColumn', value: event.target.value})}>
           {_map(groups, (group) => {
             if (group.id === 'other') return null;
             return (
