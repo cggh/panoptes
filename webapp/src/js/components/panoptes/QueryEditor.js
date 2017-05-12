@@ -273,12 +273,9 @@ let Criterion = React.createClass({
     component.subset = undefined;
     component.ColName2 = undefined;
 
-    if (currentOperator.fieldType === 'value') {
-      // Set the CompValue to the property's default.
-      // The defaultValue might be badly formatted, so we format it.
-      // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
-      component.CompValue = Formatter(property, property.defaultValue);
-    }
+    // Set the CompValue to the property's default.
+    // The defaultValue might be badly formatted, so we format it.
+    component.CompValue = Formatter(property, property.defaultValue);
 
     this.validateOperatorAndValues();
     onChange();
