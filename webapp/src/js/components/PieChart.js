@@ -100,11 +100,11 @@ let PieChart = React.createClass({
     };
 
     return (
-      <svg style={{overflow: 'visible'}} width={radius} height={radius}>
+      <svg style={{overflow: 'visible', position: 'absolute'}} width={radius} height={radius}>
         <g transform={'rotate(90)'}>
           {sectors}
         </g>
-        <text style={faceTextStyle} x="0" y="0" textAnchor="middle" alignmentBaseline="middle">{faceText}</text>
+        {radius > 10 ? <text style={faceTextStyle} x="0" y="0" textAnchor="middle" alignmentBaseline="middle">{faceText}</text> : null}
       </svg>
     );
 
