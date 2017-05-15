@@ -136,6 +136,8 @@ class LoadTable(threading.Thread):
         with open(self._sourceFileName, 'r') as sourceFile:
             header_names = sourceFile.readline().strip().replace(' ', '_').split(self._separator)
         for col in self._loadSettings.getPropertyNames():
+            if '.' in col:
+                raise Exception("Column IDs cannot include '.' (%s - %s)" % (col, tableid))
             if col not in header_names and col != 'AutoKey':
                 raise Exception("Can't find column %s in data file for %s" % (col, tableid))
         additional_cols = []
