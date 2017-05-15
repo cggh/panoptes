@@ -328,7 +328,6 @@ class WhereClause:
 
         processed = False
 
-
         if statm['Tpe'] == 'ISPRESENT':
             processed = True
             st = '{0} IS NOT NULL'.format(DBCOLESC(statm['ColName']))
@@ -345,13 +344,13 @@ class WhereClause:
 
         if statm['Tpe'] == 'ISEMPTYSTR':
             processed = True
-            st = '{0}=""'.format(DBCOLESC(statm['ColName']))
+            st = '{0}=\'\''.format(DBCOLESC(statm['ColName']))
             self.querystring += st
             self.querystring_params += st
 
         if statm['Tpe'] == 'ISNOTEMPTYSTR':
             processed = True
-            st = '{0}<>""'.format(DBCOLESC(statm['ColName']))
+            st = '{0}<>\'\''.format(DBCOLESC(statm['ColName']))
             self.querystring += st
             self.querystring_params += st
 
