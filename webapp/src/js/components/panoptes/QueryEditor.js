@@ -227,6 +227,15 @@ let Criterion = React.createClass({
     // Get the property info for the new component's primary column.
     let property = this.tableConfig().propertiesById[newComponent.ColName];
 
+    // Get the dataType of the new component's secondary column.
+    let dataTypeColName2 = this.tableConfig().propertiesById[newComponent.ColName2].dataType;
+
+    // Don't allow ColName2 to be a Text dataType if ColName is not a Text dataType.
+    // Avoid MonetDB error in version Dec2016-SP3
+    if (property.dataType !== 'Text' && dataTypeColName2 === 'Text') {
+      newComponent.ColName2 = newComponent.ColName;
+    }
+
     // Copy over the comparison(?) value properties, either from the the current component or otherwise the state, to the new component, to preserve them.
     ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
       if (component[name] !== undefined) {
@@ -419,10 +428,14 @@ let Criterion = React.createClass({
       <select className="field" value={component.ColName2} onChange={(event) => this.handleValueChange({input: 'otherColumn', value: event.target.value})}>
           {_map(groups, (group) => {
             if (group.id === 'other') return null;
+            const dataTypeColName1 = property.dataType;
             return (
               <optgroup key={group.id} label={group.name}>
                 {group.visibleProperties.map((property) => {
-                  let {id, disabled, name} = property;
+                  let {id, disabled, name, dataType} = property;
+                  if (dataTypeColName1 !== 'Text' && dataType === 'Text') {
+                    return null;
+                  }
                   return (
                     <option key={id}
                             value={id}
