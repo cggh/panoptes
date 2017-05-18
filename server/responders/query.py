@@ -97,7 +97,6 @@ def handler(start_response, requestData):
             if DQXDbTools.LogRequests:
                 DQXUtils.LogServer('###QRY:'+sqlQuery)
                 DQXUtils.LogServer('###PARAMS:'+str(whereClause.queryparams))
-                DQXUtils.LogServer('###JOINS:'+str(joins))
 
             cur.execute(sqlQuery, whereClause.queryparams)
             rows = cur.fetchall()
