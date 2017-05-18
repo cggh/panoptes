@@ -210,6 +210,7 @@ let DataTableView = React.createClass({
       // Extract implicit joins; joins implied by columns belonging to other tables.
 
       queryAPIargs.joins = [];
+      let foreignTables = [];
 
       for (let i = 0; i < queryAPIargs.columns.length; i++) {
 
@@ -219,7 +220,7 @@ let DataTableView = React.createClass({
 
           let [tableId] = column.split('.');
 
-          if (tableId !== queryAPIargs.table) {
+          if (tableId !== queryAPIargs.table && foreignTables.indexOf(tableId) == -1) {
 
             let relation = undefined;
             for (let j = 0; j < this.config.tablesById[queryAPIargs.table].relationsChildOf.length; j++) {
@@ -241,6 +242,8 @@ let DataTableView = React.createClass({
             join.column = queryAPIargs.table + '.' + relation.childPropId;
 
             queryAPIargs.joins.push(join);
+
+            foreignTables.push(tableId);
           }
         }
 
