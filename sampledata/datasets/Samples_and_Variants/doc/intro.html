@@ -8,11 +8,11 @@
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet fermentum purus. Suspendisse finibus ligula id auctor vestibulum. Nam finibus eros turpis, ac laoreet nisl finibus vitae. Maecenas et ex mauris. Vestibulum et dapibus quam. Curabitur id porttitor dui. Ut et sem a turpis commodo pulvinar sed congue risus. Donec cursus ipsum maximus justo malesuada vehicula. Sed facilisis ut massa nec finibus. In in rutrum justo, eget iaculis metus. Curabitur non urna gravida, finibus tortor in, convallis nisl. Suspendisse sem quam, rhoncus in ornare id, consectetur eget lacus. Proin dapibus augue orci, fringilla aliquet nibh pellentesque sit amet. Donec id iaculis mauris.
 </p>
 
-<p>A table showing UK sampling sites joined to contributors using an implicit join determined by the relation config of samplingsites, with the foreign column specified here as "contributors.Name" in the columns prop.</p>
-<div style="height: 150px; width: 500px">
+<p>A table showing UK sampling sites joined to contributors using an implicit join determined by the relation config of samplingsites, with the foreign columns specified here as "contributors.Name" and "contributors.Contact" in the columns prop.</p>
+<div style="height: 150px; width: 550px">
   <DataTableView 
     table="samplingsites" 
-    columns='["SiteID", "Country", "Contributor_ID", "contributors.Name"]'
+    columns='["SiteID", "Country", "Contributor_ID", "contributors.Name", "contributors.Contact"]'
     query='{
       "whcClass": "comparefixed",
       "isCompound": false,
