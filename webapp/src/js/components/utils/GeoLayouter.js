@@ -7,6 +7,41 @@ import _values from 'lodash/values';
 import _assign from 'lodash/assign';
 import _min from 'lodash/min';
 
+const NODE_MARGIN = 5;
+
+//Cribbed from https://github.com/d3/d3-force/blob/master/src/link.js
+let forceCrossLink = function(links) {
+  if (links == null) links = [];
+  function force(alpha) {
+    for (let i = 0, n = links.length; i < n; i++) {
+      //Source is fixed node, target is render
+      let linkA = links[i], sourceA = linkA.source, targetA = linkA.target;
+      for (let j = i+1; j < n; j++) {
+        let linkB = links[j], sourceB = linkB.source, targetB = linkB.target;
+          let s1_x, s1_y, s2_x, s2_y;
+          s1_x = targetA.x - sourceA.x;
+          s1_y = targetA.y - sourceA.y;
+          s2_x = targetB.x - sourceB.x;
+          s2_y = targetB.y - sourceB.y;
+          let s, t;
+          s = (-s1_y * (sourceA.x - sourceB.x) + s1_x * (sourceA.y - sourceB.y)) / (-s2_x * s1_y + s1_x * s2_y);
+          t = ( s2_x * (sourceA.y - sourceB.y) - s2_y * (sourceA.x - sourceB.x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+          if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            // Collision detected - swap the positions of the targets
+            [targetA.x, targetB.x] = [targetB.x, targetA.x];
+            [targetA.y, targetB.y] = [targetB.y, targetA.y];
+          }
+      }
+    }
+  }
+
+  force.links = function(_) {
+    links = _;
+  };
+  return force;
+};
+
 let GeoLayouter = React.createClass({
   propTypes: {
     nodes: React.PropTypes.array.isRequired,
@@ -33,15 +68,17 @@ let GeoLayouter = React.createClass({
     let updatedRenderNodesByKey = {};
     let updatedFixedNodesByKey = {};
     let updateLinks = [];
-    let fixedRadius = map.project(map.unproject({y: 0, x: _min([map.getSize().x,map.getSize().y])/100}), 0).x;
+    let fixedRadius = map.project(map.unproject({y: 0, x: 5}), 0).x;
     let radiusScale = map.project(map.unproject({y: 0, x: 1}), 0).x;
 
+    let onlyNewNodes = true;
     _forEach(nodes, (node) => {
       let {x, y} = map.project(node, 0);
       let {lat, lng} = node;
       let key = node.key;
       if (this.fixedNodesByKey[key] && this.renderNodesByKey[key]) {
         //We've seen this node copy across
+        onlyNewNodes = false;
         updatedFixedNodesByKey[key] = this.fixedNodesByKey[key];
         updatedRenderNodesByKey[key] = this.renderNodesByKey[key];
         //It's position might have changed so update the fixed node
@@ -59,10 +96,11 @@ let GeoLayouter = React.createClass({
       } else {
         //This node is new
         updatedFixedNodesByKey[key] = {x, y, fx:x, fy:y, lat, lng, fixed: true};
-        updatedRenderNodesByKey[key] = Object.assign(node, {x, y, fixed: false, fixedNode: updatedFixedNodesByKey[key]})
+        const initialOffset = Math.sqrt(Math.pow((node.radius + NODE_MARGIN) * radiusScale, 2)/2);
+        updatedRenderNodesByKey[key] = Object.assign(node, {x: x - initialOffset, y: y - initialOffset, fixed: false, fixedNode: updatedFixedNodesByKey[key]})
       }
       updatedFixedNodesByKey[key].collisionRadius = fixedRadius;
-      updatedRenderNodesByKey[key].collisionRadius = updatedRenderNodesByKey[key].radius * radiusScale;
+      updatedRenderNodesByKey[key].collisionRadius = (updatedRenderNodesByKey[key].radius + NODE_MARGIN) * radiusScale;
       updateLinks.push({
         source: updatedFixedNodesByKey[key],
         target: updatedRenderNodesByKey[key],
@@ -75,8 +113,14 @@ let GeoLayouter = React.createClass({
     let allNodes = _values(_values(updatedFixedNodesByKey)).concat(this.renderNodes);
     this.sim.nodes(allNodes);
     this.sim.force('link').links(updateLinks);
+    this.sim.force('cross').links(updateLinks);
     this.sim.alpha(1);
     this.sim.restart();
+    if (onlyNewNodes) {
+      for (let i=0; i <500; i++) {
+        this.sim.tick()
+      }
+    }
   },
   // Lifecycle methods
   componentWillMount() {
@@ -85,8 +129,9 @@ let GeoLayouter = React.createClass({
     this.sim = forceSimulation()
     // Set up force options.
       .force("collide", forceCollide((node) => node.collisionRadius).strength(1))
-      .force("link", forceLink().distance((link) => link.distance))
-      .force("repel", forceManyBody().distanceMin(0.1).strength((node) => node.fixed ? 0 : -.30))
+      .force("link", forceLink().distance((link) => link.distance).strength(1))
+      .force("cross", forceCrossLink())
+      // .force("repel", forceManyBody().strength((node) => node.fixed ? 0 : -.10).distanceMax(1))
     ;
     this.updateNodes(this.props.nodes);
     // On every tick event triggered by d3's layout force, this.handleTick will be called.

@@ -104,7 +104,7 @@ let PieChart = React.createClass({
         <g transform={'rotate(90)'}>
           {sectors}
         </g>
-        {radius > 10 ? <text style={faceTextStyle} x="0" y="0" textAnchor="middle" alignmentBaseline="middle">{faceText}</text> : null}
+        {radius > 9 ? <text style={faceTextStyle} x="0" y="0" textAnchor="middle" alignmentBaseline="middle">{faceText}</text> : null}
       </svg>
     );
 
