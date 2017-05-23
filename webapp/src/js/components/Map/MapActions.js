@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 
 import jsxToString from 'jsx-to-string';
 import scrollbarSize from 'scrollbar-size';
@@ -36,7 +35,6 @@ import TableMap from 'Map/Table';
 import TableMarkersLayer from 'Map/TableMarkersLayer';
 import TileLayer from 'Map/TileLayer';
 import PropertySelector from 'panoptes/PropertySelector';
-import PropertyLegend from 'panoptes/PropertyLegend';
 
 import 'map.scss';
 
@@ -346,21 +344,6 @@ let MapActions = React.createClass({
       if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
         query = this.getDefinedQuery();
       }
-
-      let legend = ReactDOMServer.renderToStaticMarkup(
-          <PropertyLegend
-            flux={this.flux}
-            property={markerColourProperty}
-            table={table}
-          />
-      );
-      let position = 'bottomleft';
-      let className = 'legend';
-
-      if (customMapControls === undefined) {
-        customMapControls = [];
-      }
-      customMapControls.push({component: legend, position, className});
 
       // NB: This might not be used, if/when only a table has been selected.
       markersLayerComponent = (

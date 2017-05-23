@@ -1,7 +1,9 @@
 import {Map as LeafletMap} from 'react-leaflet';
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import displayName from 'react-display-name';
 import 'leaflet-loading/src/Control.Loading.js';
+
 
 //Panoptes
 import filterChildren from 'util/filterChildren';
@@ -88,13 +90,19 @@ let Map = React.createClass({
   },
   childContextTypes: {
     crs: React.PropTypes.object,
-    changeLayerStatus: React.PropTypes.func
+    changeLayerStatus: React.PropTypes.func,
+    addControl: React.PropTypes.func,
+    changeControl: React.PropTypes.func,
+    removeControl: React.PropTypes.func
   },
 
   getChildContext() {
     return {
       crs: (this.map !== undefined && this.map !== null) ? this.map.leafletElement.options.crs : window.L.CRS.EPSG3857,
-      changeLayerStatus: this.handleChangeLayerStatus
+      changeLayerStatus: this.handleChangeLayerStatus,
+      addControl: this.handleRegisterComponentControl,
+      changeControl: this.handleRegisterComponentControl,
+      removeControl: this.handleUnregisterComponentControl
     };
   },
   getDefaultProps() {
@@ -113,44 +121,97 @@ let Map = React.createClass({
     };
   },
 
-  componentDidUpdate() {
-    this.updateCustomControls();
+  componentWillMount() {
+    this.componentControls = {};
+    this.renderedComponentControls = [];
+    this.renderedCustomControls = [];
   },
 
-  updateCustomControls() {
+  componentDidUpdate() {
+    this.refreshControls();
+  },
+
+  handleRegisterComponentControl(control) {
+
+    // NB: this.map is not available yet.
+
+    let leafletControl = window.L.control({position: control.position});
+
+    leafletControl.onAdd = function(map) {
+      let div = window.L.DomUtil.create('div', 'map-custom-control ' + control.className);
+      div.innerHTML = ReactDOMServer.renderToStaticMarkup(control.component);
+      return div;
+    };
+
+    this.componentControls[control.id] = leafletControl;
+
+  },
+
+  handleUnregisterComponentControl(controlId) {
+    delete this.componentControls[controlId];
+  },
+
+
+  refreshControls() {
 
     let {customControls} = this.props;
+
+    // NB: this.map might now be available.
 
     if (this.map !== undefined) {
 
       // TODO: performance & parsimony
 
-      // Remove all the previous controls
-      if (this.customControls !== undefined && this.customControls.length > 0) {
-        for (let i = 0, len = this.customControls.length; i < len; i++) {
-          this.map.leafletElement.removeControl(this.customControls[i]);
+      // Remove all the rendered custom controls.
+      if (this.renderedCustomControls !== undefined && this.renderedCustomControls.length > 0) {
+        for (let i = 0, len = this.renderedCustomControls.length; i < len; i++) {
+          this.map.leafletElement.removeControl(this.renderedCustomControls[i]);
         }
       }
-      // Reset the register of custom controls.
-      this.customControls = undefined;
 
+      // Remove all the rendered component controls.
+      if (this.renderedComponentControls !== undefined && Object.keys(this.renderedComponentControls).length > 0) {
+        for (let i = 0, len = this.renderedComponentControls.length; i < len; i++) {
+          this.map.leafletElement.removeControl(this.renderedComponentControls[i]);
+        }
+      }
+
+      // Add all the customControls.
       if (customControls !== undefined) {
 
-        this.customControls = [];
+        // Reset the register of rendered custom controls.
+        this.renderedCustomControls = [];
 
         for (let i = 0, len = customControls.length; i < len; i++) {
 
-          let control = window.L.control({position: customControls[i].position});
+          let customControl = customControls[i];
 
-          control.onAdd = function(map) {
-            let div = window.L.DomUtil.create('div', 'map-custom-control ' + customControls[i].className);
-            div.innerHTML = customControls[i].component;
+          let leafletControl = window.L.control({position: customControl.position});
+
+          leafletControl.onAdd = function(map) {
+            let div = window.L.DomUtil.create('div', 'map-custom-control ' + customControl.className);
+            div.innerHTML = customControl.component;
             return div;
           };
+          leafletControl.addTo(this.map.leafletElement);
 
-          control.addTo(this.map.leafletElement);
+          // Register the rendered custom control.
+          this.renderedCustomControls.push(leafletControl);
+        }
+      }
 
-          this.customControls.push(control);
+
+      // Add all the componentControls.
+      if (this.componentControls !== undefined) {
+
+        // Reset the register of rendered component controls.
+        this.renderedComponentControls = [];
+
+        for (let key in this.componentControls) {
+          let leafletControl = this.componentControls[key];
+          leafletControl.addTo(this.map.leafletElement);
+          // Register the rendered component control.
+          this.renderedComponentControls.push(leafletControl);
         }
       }
 

@@ -75,7 +75,7 @@
         </div>
         <p>A complex map:</p>
         <div style="width:300px;height:300px">
-            <Map center='{"lat": 1, "lng": -1.1}' zoom="2">
+            <Map center='{"lat": 1, "lng": -1.1}' zoom="2" customControls='[{"component": "<div class=\"legend\"><div class=\"legend-element\">Custom Control</div></div>", "position": "topright", "className": "legend"}]'>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap.Mapnik">
                         <TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"/>
@@ -99,7 +99,7 @@
                         </FeatureGroup>
                     </BaseLayer>
                     <Overlay name="Sampling Sites">
-                        <TableMarkersLayer table="samplingsites"/>
+                        <TableMarkersLayer table="samplingsites" markerColourProperty="Country"/>
                     </Overlay>
                     <Overlay checked name="Layer group with circles">
                         <FeatureGroup>
