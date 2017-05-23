@@ -38,7 +38,6 @@ import TableMap from 'Map/Table';
 import TableMarkersLayer from 'Map/TableMarkersLayer';
 import TileLayer from 'Map/TileLayer';
 import PropertySelector from 'panoptes/PropertySelector';
-import PropertyLegend from 'panoptes/PropertyLegend';
 import baseLayerProviders from 'util/baseLayerProviders';
 
 import 'map.scss';
@@ -209,7 +208,6 @@ let MapActions = React.createClass({
     let baseLayerComponent = null;
     let overlayLayerComponent = null;
 
-    let customMapControls = undefined;
     let query = undefined;
 
     if (table !== undefined && table !== NULL_MARKER_LAYER) {
@@ -217,21 +215,6 @@ let MapActions = React.createClass({
       if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
         query = this.getDefinedQuery();
       }
-
-      let legend = ReactDOMServer.renderToStaticMarkup(
-          <PropertyLegend
-            flux={this.flux}
-            property={markerColourProperty}
-            table={table}
-          />
-      );
-      let position = 'bottomleft';
-      let className = 'legend';
-
-      if (customMapControls === undefined) {
-        customMapControls = [];
-      }
-      customMapControls.push({component: legend, position, className});
 
       // NB: This might not be used, if/when only a table has been selected.
       markersLayerComponent = (
@@ -320,7 +303,6 @@ let MapActions = React.createClass({
     let map = (
       <Map
         center={center}
-        customControls={customMapControls}
         setProps={setProps}
         onChange={this.handleChangeMap}
         zoom={zoom}
@@ -334,7 +316,6 @@ let MapActions = React.createClass({
           query={query}
           markerColourProperty={markerColourProperty}
           center={center}
-          customControls={customMapControls}
           setProps={setProps}
           table={table}
           onChange={this.handleChangeMap}
@@ -362,7 +343,6 @@ let MapActions = React.createClass({
       map = (
         <Map
           center={center}
-          customControls={customMapControls}
           setProps={setProps}
           onChange={this.handleChangeMap}
           zoom={zoom}
@@ -377,12 +357,6 @@ let MapActions = React.createClass({
 
     }
 
-
-    // FIXME: jsxToString produces markup like: center={{"lat": -0.7031073524364783, "lng": 1.40625}}
-    // Whereas we need markup like: center='{"lat": -0.7031073524364783, "lng": 1.40625}'
-
-    // Wrap the map template code in a container with dimensions.
-    let templateCode = '<div style="width:300px;height:300px">' + jsxToString(map, {ignoreProps: ['setProps', 'onChange']}) + '</div>';
 
     let sidebarContent = (
       <div className="sidebar map-sidebar">
@@ -425,16 +399,6 @@ let MapActions = React.createClass({
               allowNull={true}
             />
           : null }
-          {
-            this.config.user.isManager  && false ?  //Disabling this for now till we have a generic system for all components
-              <TextField
-                floatingLabelText="Template code:"
-                multiLine={true}
-                textareaStyle={{fontFamily: "'Courier New', Courier, monospace", fontSize: '8pt', lineHeight: '8pt'}}
-                value={templateCode}
-              />
-            : null
-          }
         </div>
       </div>
     );
