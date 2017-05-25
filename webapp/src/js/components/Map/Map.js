@@ -5,7 +5,7 @@ import 'leaflet-loading/src/Control.Loading.js';
 
 //Panoptes
 import filterChildren from 'util/filterChildren';
-import MapControlComponent from 'Map/MapControlComponent';
+
 // Panoptes components
 import DetectResize from 'utils/DetectResize';
 import Loading from 'ui/Loading';
@@ -190,6 +190,8 @@ let Map = React.createClass({
 
         if (this.props.setProps !== undefined) {
           this.props.setProps({center: newCenter, zoom: newZoom});
+        } else {
+          this.forceUpdate();
         }
       }
     }
