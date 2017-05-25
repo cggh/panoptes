@@ -80,7 +80,6 @@ let Map = React.createClass({
   propTypes: {
     center: React.PropTypes.object,
     children: React.PropTypes.node,
-    customControls: React.PropTypes.array,
     setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when component is in templates
     onChange: React.PropTypes.func,
     title: React.PropTypes.string,
@@ -111,51 +110,6 @@ let Map = React.createClass({
       bounds: undefined,
       loadStatus: 'loaded'
     };
-  },
-
-  componentDidUpdate() {
-    this.updateCustomControls();
-  },
-
-  updateCustomControls() {
-
-    let {customControls} = this.props;
-
-    if (this.map !== undefined) {
-
-      // TODO: performance & parsimony
-
-      // Remove all the previous controls
-      if (this.customControls !== undefined && this.customControls.length > 0) {
-        for (let i = 0, len = this.customControls.length; i < len; i++) {
-          this.map.leafletElement.removeControl(this.customControls[i]);
-        }
-      }
-      // Reset the register of custom controls.
-      this.customControls = undefined;
-
-      if (customControls !== undefined) {
-
-        this.customControls = [];
-
-        for (let i = 0, len = customControls.length; i < len; i++) {
-
-          let control = window.L.control({position: customControls[i].position});
-
-          control.onAdd = function(map) {
-            let div = window.L.DomUtil.create('div', 'map-custom-control ' + customControls[i].className);
-            div.innerHTML = customControls[i].component;
-            return div;
-          };
-
-          control.addTo(this.map.leafletElement);
-
-          this.customControls.push(control);
-        }
-      }
-
-    }
-
   },
 
   // Event handlers
@@ -236,12 +190,11 @@ let Map = React.createClass({
 
         if (this.props.setProps !== undefined) {
           this.props.setProps({center: newCenter, zoom: newZoom});
+        } else {
+          this.forceUpdate();
         }
-
       }
-
     }
-
   },
 
   title() {

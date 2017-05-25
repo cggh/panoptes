@@ -31,6 +31,8 @@ import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';
 import Histogram from 'Histogram';
 import {scaleColour} from 'util/Colours';
+import PropertyLegend from 'panoptes/PropertyLegend';
+import MapControlComponent from 'Map/MapControlComponent'
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
@@ -292,6 +294,7 @@ let TableMarkersLayer = React.createClass({
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        console.error(error);
         changeLayerStatus({loadStatus: 'error'});
       });
   },
@@ -496,6 +499,12 @@ let TableMarkersLayer = React.createClass({
           layerContainer={layerContainer}
           map={map}
         >
+          <MapControlComponent position="bottomleft">
+            <PropertyLegend
+              property={markerColourProperty}
+              table={table}
+            />
+          </MapControlComponent>
           <GeoLayouter nodes={clusterMarkers}>
             {
               (renderNodes) =>

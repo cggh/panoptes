@@ -8,6 +8,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 
 const ALLOWED_CHILDREN = [
+  'MapControlComponent',
   'ComponentMarker',
   'TableMarkersLayer',
   'Marker',
