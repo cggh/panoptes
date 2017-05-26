@@ -26,3 +26,4 @@ MapControlComponent.contextTypes = {
   map: React.PropTypes.object
 };
 
+MapControlComponent.displayName = "MapControlComponent";
