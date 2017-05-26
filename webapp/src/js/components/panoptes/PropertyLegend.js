@@ -37,7 +37,7 @@ let PropertyLegend = React.createClass({
       ];
     } else if (propConfig.isCategorical || propConfig.isText) {
       elements = _map(
-        propConfig.distinctValues || knownValues || [],
+        knownValues || propConfig.distinctValues || [],
         (value) => (
           <LegendElement key={value} name={value !== null ? value : 'NULL'} colour={colourFunc(value)} />
         )
@@ -60,7 +60,6 @@ let PropertyLegend = React.createClass({
         <div key="max" className="legend-element">{max || propConfig.maxVal}</div>
       ];
     }
-
     return <div className="legend">
       <div className="legend-element">{propConfig.name}:</div>
       {elements}

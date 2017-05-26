@@ -14,6 +14,7 @@ import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _forEach from 'lodash/forEach';
 import _size from 'lodash/size';
+import _keys from 'lodash/keys';
 
 // Panoptes
 import API from 'panoptes/API';
@@ -322,6 +323,7 @@ let TableMarkersLayer = React.createClass({
 
     const locationsCount = Object.keys(markersGroupedByLocation).length;
     const markersCount = _size(markersGroupedByLocation);
+    const uniqueValues = {};
 
     for (let location in markersGroupedByLocation) {
 
@@ -330,6 +332,7 @@ let TableMarkersLayer = React.createClass({
       if (markersAtLocationCount === 1) {
 
         let marker = markersGroupedByLocation[location][0];
+        uniqueValues[marker.value] = true;
 
         if (marker.isHighlighted || (locationsCount === 1 && markersAtLocationCount === 1 && markerColourProperty === undefined)) {
 
@@ -385,6 +388,7 @@ let TableMarkersLayer = React.createClass({
 
         for (let i = 0, len = markersGroupedByLocation[location].length; i < len; i++) {
           let value = markersGroupedByLocation[location][i].value;
+          uniqueValues[value] = true;
           if (markersGroupedByValue[value] === undefined) {
             markersGroupedByValue[value] = [];
           }
@@ -447,6 +451,7 @@ let TableMarkersLayer = React.createClass({
           // NB: the key for undefined values is the string "undefined"
           let markerChartData = [];
           for (let value in markersGroupedByValue) {
+            uniqueValues[value] = true;
             markerChartData.push({
               name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural,
               value: markersGroupedByValue[value].length,
@@ -493,7 +498,6 @@ let TableMarkersLayer = React.createClass({
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(clusterMarkers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
-
       return (
         <FeatureGroup
           layerContainer={layerContainer}
@@ -503,6 +507,7 @@ let TableMarkersLayer = React.createClass({
             <PropertyLegend
               property={markerColourProperty}
               table={table}
+              knownValues={_keys(uniqueValues)}
             />
           </MapControlComponent>
           <GeoLayouter nodes={clusterMarkers}>
