@@ -299,11 +299,11 @@ function importDataset(dataset) {
 }
 
 function rowsCount(options) {
-
   options.transpose = true;
   options.columns = [{expr: JSON.parse(JSON.stringify(['count', ['*']])), as: 'TotalRecordCount'}];
   options.orderBy = [];
-
+  options.start = undefined;
+  options.stop = undefined;
   return query(options).then((response) => response[0].TotalRecordCount);
 }
 
