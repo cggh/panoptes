@@ -284,7 +284,7 @@ let Criterion = React.createClass({
 
     // Set the CompValue to the property's default.
     // The defaultValue might be badly formatted, so we format it.
-    component.CompValue = Formatter(property, property.defaultValue);
+    component.CompValue = Deformatter(property, Formatter(property, property.defaultValue));
 
     this.validateOperatorAndValues();
     onChange();
@@ -298,7 +298,6 @@ let Criterion = React.createClass({
   },
 
   handleValueChange(payload) {
-
     let {component, onChange} = this.props;
     let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
@@ -310,7 +309,7 @@ let Criterion = React.createClass({
       } else {
         // The payload.value might be badly formatted, so we format it.
         // The this[input] value needs to be formatted, because it needs to be user-friendly.
-        this[payload.input] = Formatter(property, payload.value);
+        this[payload.input] = Formatter(property, Deformatter(property, payload.value));
       }
     }
 
@@ -482,7 +481,6 @@ let Criterion = React.createClass({
           </div>
         );
       } else if (property.isBoolean) {
-
         fields = (
           <div className="fields">
             <select
