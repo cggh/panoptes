@@ -257,9 +257,10 @@ class DBCursor(object):
 
 def ToSafeIdentifier(st):
     st = str(st)
-    removelist=['"', "'", ';', '`', '\x00', '\n', '\r', '\x1a']
-    for it in removelist:
-        st = st.replace(it, "")
+    if st is not None:
+        removelist=['"', "'", ';', '`', '\x00', '\n', '\r', '\x1a']
+        for it in removelist:
+            st = st.replace(it, "")
     return st
 
 
