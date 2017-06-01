@@ -33,7 +33,7 @@ import ListWithActions from 'containers/ListWithActions';
 import Histogram from 'Histogram';
 import {scaleColour} from 'util/Colours';
 import PropertyLegend from 'panoptes/PropertyLegend';
-import MapControlComponent from 'Map/MapControlComponent'
+import MapControlComponent from 'Map/MapControlComponent';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
