@@ -25,6 +25,8 @@ import GeoLayouter from 'utils/GeoLayouter';
 import Polyline from 'Map/Polyline';
 import PieChart from 'PieChart';
 import {categoryColours} from 'util/Colours';
+import MapControlComponent from 'Map/MapControlComponent';
+import PropertyPrefixLegend from 'panoptes/PropertyPrefixLegend';
 
 let ColumnPieChartMarkersLayer = React.createClass({
 
@@ -233,6 +235,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
 
   render() {
 
+    let {table, prefix} = this.props;
     let {crs, layerContainer, map} = this.context;
     let {clusterMarkers} = this.state;
 
@@ -266,6 +269,9 @@ let ColumnPieChartMarkersLayer = React.createClass({
           layerContainer={layerContainer}
           map={map}
         >
+          <MapControlComponent position="bottomleft">
+            <PropertyPrefixLegend table={table} prefix={prefix} />
+          </MapControlComponent>
           <GeoLayouter nodes={clusterMarkers}>
             {
               (renderNodes) =>
