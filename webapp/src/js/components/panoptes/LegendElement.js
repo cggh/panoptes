@@ -13,6 +13,7 @@ let LegendElement = React.createClass({
   ],
 
   propTypes: {
+    name: React.PropTypes.string,
     colour: React.PropTypes.string,
     onPickColour: React.PropTypes.func
   },
@@ -34,7 +35,7 @@ let LegendElement = React.createClass({
   },
 
   render() {
-    const {colour, onPickColour} = this.props;
+    const {name, colour, onPickColour} = this.props;
     return (
       <div className="legend-element" key={name}>
         <Tooltip placement={'bottom'}
