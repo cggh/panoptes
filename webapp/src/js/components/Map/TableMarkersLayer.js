@@ -168,7 +168,10 @@ let TableMarkersLayer = React.createClass({
     let locationLongitudeProperty = tableConfig.longitude;
     let locationLatitudeProperty = tableConfig.latitude;
 
-    let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
+    let locationColumns = new Set();
+    locationColumns.add(locationPrimKeyProperty);
+    locationColumns.add(locationLongitudeProperty);
+    locationColumns.add(locationLatitudeProperty);
 
     // If no highlight has been specified, but a primKey has been then convert primKey to a highlight.
     if (highlight === undefined && primKey !== undefined) {
@@ -182,7 +185,7 @@ let TableMarkersLayer = React.createClass({
         if (tableConfig.propertiesById[highlightField] === undefined) {
           console.error('The specified highlight field ' + highlightField + ' was not found in the table ' + table);
         } else {
-          locationColumns.push(highlightField);
+          locationColumns.add(highlightField);
         }
       }
     }
@@ -191,7 +194,7 @@ let TableMarkersLayer = React.createClass({
       if (tableConfig.propertiesById[markerColourProperty] === undefined) {
         console.error('The specified markerColourProperty field ' + markerColourProperty + ' was not found in the table ' + table);
       } else {
-        locationColumns.push(markerColourProperty);
+        locationColumns.add(markerColourProperty);
       }
     }
 
@@ -200,7 +203,7 @@ let TableMarkersLayer = React.createClass({
 
         // Get all markers using the specified table.
         let locationAPIargs = {
-          columns: locationColumns,
+          columns: Array.from(locationColumns),
           database: this.config.dataset,
           query: this.getDefinedQuery(query, table),
           table: tableConfig.id,
