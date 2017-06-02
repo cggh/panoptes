@@ -29,12 +29,12 @@ let LegendElement = React.createClass({
         colour={colour}
         colours={colours}
         onPick={this.handlePickColour}
-      />)
+      />);
     }
   },
 
   render() {
-    const {name, colour, onPickColour} = this.props;
+    const {colour, onPickColour} = this.props;
     return (
       <div className="legend-element" key={name}>
         <Tooltip placement={'bottom'}
@@ -44,7 +44,7 @@ let LegendElement = React.createClass({
                    colours={colours}
                    onPick={this.handlePickColour}
                    />}>
-          <i className="fa fa-square" style={{color: colour, cursor:(onPickColour ? 'pointer' : 'inherit')}}/>
+          <i className="fa fa-square" style={{color: colour, cursor: (onPickColour ? 'pointer' : 'inherit')}}/>
         </Tooltip>
         <TooltipEllipsis className="label">
           {name}
