@@ -15,6 +15,8 @@ import Polyline from 'Map/Polyline';
 import GeoLayouter from 'utils/GeoLayouter';
 import LRUCache from 'util/LRUCache';
 import PieChart from 'PieChart';
+import MapControlComponent from 'Map/MapControlComponent';
+import ColoursLegend from 'panoptes/ColoursLegend';
 
 // Lodash
 import _sumBy from 'lodash/sumBy';
@@ -66,7 +68,8 @@ let PieChartMarkersLayer = React.createClass({
   },
   getInitialState() {
     return {
-      markers: []
+      markers: [],
+      colours: {}
     };
   },
 
@@ -173,6 +176,7 @@ let PieChartMarkersLayer = React.createClass({
       .then(([locationData, chartData]) => {
 
         let markers = [];
+        let colours = [];
 
         // Translate the fetched locationData and chartData into markers.
         let locationTableConfig = this.config.tablesById[locationDataTable];
@@ -189,15 +193,37 @@ let PieChartMarkersLayer = React.createClass({
               value: (chartData[chartDataColumnIndex] !== undefined && chartData[chartDataColumnIndex] !== null) ? (chartData[chartDataColumnIndex]).toFixed(2) : 0,
               color: componentColumns[j].color
             });
+
+            if (componentColumns[j].color in colours
+              && colours[componentColumns[j].color].name !== undefined
+              && colours[componentColumns[j].color].name !== componentColumns[j].name
+            ) {
+              console.warn('Colour %o has more than one name: 1) %o 2) %o', componentColumns[j].color, colours[componentColumns[j].color].name, componentColumns[j].name);
+            }
+
+            colours[componentColumns[j].color] = {name: componentColumns[j].name};
           }
 
           let sum = _sumBy(markerChartData, 'value');
           if (sum < 1) {
+
+            let name = (residualFractionName !== undefined && residualFractionName !== null) ? residualFractionName : defaultResidualFractionName;
+            let color = (residualSectorColor !== undefined && residualSectorColor !== null) ? residualSectorColor : defaultResidualSectorColor;
+
             markerChartData.push({
-              name: (residualFractionName !== undefined && residualFractionName !== null) ? residualFractionName : defaultResidualFractionName,
+              name,
               value: (1 - sum).toFixed(2),
-              color: (residualSectorColor !== undefined && residualSectorColor !== null) ? residualSectorColor : defaultResidualSectorColor
+              color
             });
+
+            if (color in colours
+              && colours[color].name !== undefined
+              && colours[color].name !== name
+            ) {
+              console.warn('residualSectorColor %o already has another name: 1) %o 2) %o', color, colours[color].name, name);
+            }
+
+            colours[color] = {name};
           }
 
           markers.push({
@@ -218,7 +244,7 @@ let PieChartMarkersLayer = React.createClass({
 
         // NB: calcMapBounds is only based on lat lng positions, not radii.
         let bounds = CalcMapBounds.calcMapBounds(markers);
-        this.setState({markers});
+        this.setState({markers, colours});
         changeLayerStatus({loadStatus: 'loaded', bounds: bounds});
 
       })
@@ -234,7 +260,7 @@ let PieChartMarkersLayer = React.createClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markers} = this.state;
+    let {markers, colours} = this.state;
 
     let size = map.getSize();
     let bounds = map.getBounds();
@@ -257,45 +283,53 @@ let PieChartMarkersLayer = React.createClass({
     }
 
     return (
-      <GeoLayouter nodes={markers}>
-        {
-          (renderNodes) =>
-            <FeatureGroup
-              layerContainer={layerContainer}
-              map={map}
-            >
-              {renderNodes.map(
-                  (marker, i) =>
-                      <ComponentMarker
-                        key={i}
-                        position={{lat: marker.lat, lng: marker.lng}}
-                        onClick={(e) => this.handleClickMarker(e, marker)}
-                      >
-                        <PieChart
-                          chartData={marker.chartData}
-                          crs={crs}
-                          key={i}
-                          lat={marker.lat}
-                          lng={marker.lng}
-                          name={marker.name}
-                          originalLat={marker.lat}
-                          originalLng={marker.lng}
-                          radius={marker.radius}
-                        />
-                      </ComponentMarker>
-                ).concat(
-                  renderNodes.map(
+      <FeatureGroup
+        layerContainer={layerContainer}
+        map={map}
+      >
+        <MapControlComponent position="bottomleft">
+          <ColoursLegend colours={colours} />
+        </MapControlComponent>
+        <GeoLayouter nodes={markers}>
+          {
+            (renderNodes) =>
+              <FeatureGroup
+                layerContainer={layerContainer}
+                map={map}
+              >
+                {renderNodes.map(
                     (marker, i) =>
-                      <Polyline
-                        className="panoptes-pie-chart-markers-layer-polyline"
-                        positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
-                      />
+                        <ComponentMarker
+                          key={i}
+                          position={{lat: marker.lat, lng: marker.lng}}
+                          onClick={(e) => this.handleClickMarker(e, marker)}
+                        >
+                          <PieChart
+                            chartData={marker.chartData}
+                            crs={crs}
+                            key={i}
+                            lat={marker.lat}
+                            lng={marker.lng}
+                            name={marker.name}
+                            originalLat={marker.lat}
+                            originalLng={marker.lng}
+                            radius={marker.radius}
+                          />
+                        </ComponentMarker>
+                  ).concat(
+                    renderNodes.map(
+                      (marker, i) =>
+                        <Polyline
+                          className="panoptes-pie-chart-markers-layer-polyline"
+                          positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
+                        />
+                    )
                   )
-                )
-              }
-            </FeatureGroup>
-        }
-      </GeoLayouter>
+                }
+              </FeatureGroup>
+          }
+        </GeoLayouter>
+      </FeatureGroup>
     );
 
   }
