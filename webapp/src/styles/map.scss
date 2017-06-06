@@ -68,6 +68,11 @@
   stroke-width: 0.5;
 }
 
+.panoptes-chart-pie-sector-highlighted {
+  stroke: $light-primary-color;
+  stroke-width: 4;
+}
+
 .panoptes-histogram {
   overflow: visible;
   position: absolute;
@@ -79,12 +84,12 @@
 
 .panoptes-histogram-axes {
   stroke: black;
-  stroke-width: 2px;
+  stroke-width: 2;
 }
 
-.panoptes-cluster-bubble {
-  stroke: rgb(0, 0, 0);
-  stroke-width: 0.5;
+.panoptes-histogram-axes-highlighted {
+  stroke: $light-primary-color;
+  stroke-width: 4;
 }
 
 .panoptes-table-markers-layer-polyline {
@@ -98,4 +103,3 @@
   fill: none;
   stroke-width: 1;
 }
-
