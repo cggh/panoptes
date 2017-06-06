@@ -70,7 +70,7 @@ let PieChart = React.createClass({
           arcDescriptor={arcDescriptors[i]}
           outerRadius={radius}
           fillColor={sectorData.color}
-          title={sectorData.title}
+          title={sectorData.title !== 'undefined' ? sectorData.title : JSON.stringify(sectorData)}
           className={isHighlighted ? 'panoptes-chart-pie-sector-highlighted' : 'panoptes-chart-pie-sector'}
         />
     );

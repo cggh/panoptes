@@ -347,6 +347,7 @@ let TableMarkersLayer = React.createClass({
         let markerChartData = [];
         for (let value in markersGroupedByValue) {
           markerChartData.push({
+            name: markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural) + (value !== 'undefined' ? ' with ' + value : ''),
             value: markersGroupedByValue[value][0].value,
             color: markersGroupedByValue[value][0].valueAsColour
           });
@@ -396,7 +397,7 @@ let TableMarkersLayer = React.createClass({
         for (let value in markersGroupedByValue) {
           uniqueValues[value] = true;
           markerChartData.push({
-            name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural,
+            name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural),
             value: markersGroupedByValue[value].length,
             color: markersGroupedByValue[value][0].valueAsColour
           });
@@ -464,7 +465,7 @@ let TableMarkersLayer = React.createClass({
 
                         let clusterComponent = undefined;
 
-                        if (marker.clusterType === 'pieChart') {
+                        if (marker.clusterType === 'pieChart' || marker.markersAtLocationCount === 1) {
 
                           clusterComponent = (
                               <PieChart
@@ -476,7 +477,7 @@ let TableMarkersLayer = React.createClass({
                                 originalLat={marker.originalLat}
                                 originalLng={marker.originalLng}
                                 radius={marker.radius}
-                                faceText={marker.count}
+                                faceText={marker.count !== undefined ? marker.count : 1}
                                 isHighlighted={marker.isHighlighted}
                               />
                           );
