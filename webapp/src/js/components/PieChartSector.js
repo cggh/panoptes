@@ -16,8 +16,7 @@ let PieChartSector = React.createClass({
   getDefaultProps() {
     return {
       outerRadius: 20,
-      innerRadius: 0,
-      className: 'pie-chart-sector'
+      innerRadius: 0
     };
   },
 

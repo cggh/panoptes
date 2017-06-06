@@ -321,165 +321,112 @@ let TableMarkersLayer = React.createClass({
       markerColourPropertyIsCategorical = this.config.tablesById[table].propertiesById[markerColourProperty].isCategorical;
     }
 
-    let singleMarkerComponents = [];
     let clusterMarkers = [];
-
-    const locationsCount = Object.keys(markersGroupedByLocation).length;
-    const markersCount = _size(markersGroupedByLocation);
     const uniqueValues = {};
 
     for (let location in markersGroupedByLocation) {
 
       let markersAtLocationCount = markersGroupedByLocation[location].length;
 
-      if (markersAtLocationCount === 1) {
+      // If the cluster contains markers of the same value,
+      // then use a cluster bubble (circled total number) rather than a pie chart.
 
-        let marker = markersGroupedByLocation[location][0];
-        uniqueValues[marker.value] = true;
+      // Group markers by their value.
+      let markersGroupedByValue = {};
 
-        if (marker.isHighlighted || (locationsCount === 1 && markersAtLocationCount === 1 && markerColourProperty === undefined)) {
-
-          // NB: Don't give highlighted markers the default colour,
-          // because it might lose its highlighted-ness amongst other (non-highlighted) default-coloured markers.
-
-          singleMarkerComponents.push(
-            <ComponentMarker
-              key={location}
-              position={{lat: marker.lat, lng: marker.lng}}
-              title={marker.title}
-              onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
-              zIndexOffset={2 * markersCount}
-              fillColour={marker.valueAsColour !== DEFAULT_MARKER_FILL_COLOUR ? marker.valueAsColour : undefined}
-            />
-          );
-
-        } else {
-
-          let title = marker.title;
-          if (markerColourProperty !== undefined && markerColourProperty !== null) {
-            if (marker.value !== undefined) {
-              title = `${this.config.tablesById[table].propertiesById[markerColourProperty].name}: ${marker.value}`;
-            }
-            if (markerColourProperty !== this.config.tablesById[table].primKey) {
-              title = `${this.config.tablesById[table].propertiesById[this.config.tablesById[table].primKey].name}: ${marker.primKey}\n` + title;
-            }
-          }
-
-          singleMarkerComponents.push(
-            <ComponentMarker
-              key={title}
-              position={{lat: marker.lat, lng: marker.lng}}
-              title={title}
-              onClick={(e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey})}
-              zIndexOffset={markersCount}
-            >
-              <svg height="12" width="12">
-                <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill={marker.valueAsColour} />
-              </svg>
-            </ComponentMarker>
-          );
-
+      for (let i = 0, len = markersGroupedByLocation[location].length; i < len; i++) {
+        let value = markersGroupedByLocation[location][i].value;
+        uniqueValues[value] = true;
+        if (markersGroupedByValue[value] === undefined) {
+          markersGroupedByValue[value] = [];
         }
+        markersGroupedByValue[value].push(markersGroupedByLocation[location][i]);
+      }
+
+
+      if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
+
+        //// Prepare a histogram
+
+        // Create a chart item (histogram bin) for each unique marker value.
+        // NB: all markers that have the same value also have the same valueAsColour.
+        let markerChartData = [];
+        for (let value in markersGroupedByValue) {
+          markerChartData.push({
+            value: markersGroupedByValue[value][0].value,
+            color: markersGroupedByValue[value][0].valueAsColour
+          });
+        }
+
+        // NB: The originalRadius is for the GeoLayouter collision detection.
+        const histogramRadius = Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2));
+
+        // NB: The colours associated with the individual values
+        // can not be applied to the histogram,
+        // at least not to the fillColour of the bins,
+        // because each bin represents a range of values.
+
+        clusterMarkers.push({
+          clusterType: 'histogram',
+          chartDataTable: table,
+          key: location,
+          lat: markersGroupedByLocation[location][0].lat,
+          lng: markersGroupedByLocation[location][0].lng,
+          originalRadius: histogramRadius,
+          chartData: markerChartData,
+          table,
+          primKey: markersGroupedByLocation[location][0].primKey,
+          colourScaleFunction: scaleColour([minValue, maxValue]),
+          latProperty: markersGroupedByLocation[location][0].latProperty,
+          lngProperty: markersGroupedByLocation[location][0].lngProperty,
+          originalLat: markersGroupedByLocation[location][0].originalLat,
+          originalLng: markersGroupedByLocation[location][0].originalLng,
+          markersAtLocationCount
+        });
 
       } else {
 
-        // If the cluster contains markers of the same value,
-        // then use a cluster bubble (circled total number) rather than a pie chart.
+        // Includes markerColourPropertyIsCategorical
+        // as well as neither isCategorical nor isNumerical
 
-        // Group markers by their value.
-        let markersGroupedByValue = {};
+        // NB: This includes that case when a primary key is selected as markerColourProperty.
+        // The primary key property (isPrimKey) should not be categorical, if it is to be unique,
+        // but showing a pieChart is more visually useful than showing a histogram.
 
-        for (let i = 0, len = markersGroupedByLocation[location].length; i < len; i++) {
-          let value = markersGroupedByLocation[location][i].value;
+        //// Prepare a pie chart
+
+        // Create a chart item (pie chart sector) for each unique marker value.
+        // NB: all markers that have the same value also have the same colour.
+        // NB: the key for undefined values is the string "undefined"
+        let markerChartData = [];
+        for (let value in markersGroupedByValue) {
           uniqueValues[value] = true;
-          if (markersGroupedByValue[value] === undefined) {
-            markersGroupedByValue[value] = [];
-          }
-          markersGroupedByValue[value].push(markersGroupedByLocation[location][i]);
-        }
-
-
-        if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
-
-          //// Prepare a histogram
-
-          // Create a chart item (histogram bin) for each unique marker value.
-          // NB: all markers that have the same value also have the same valueAsColour.
-          let markerChartData = [];
-          for (let value in markersGroupedByValue) {
-            markerChartData.push({
-              value: markersGroupedByValue[value][0].value,
-              color: markersGroupedByValue[value][0].valueAsColour
-            });
-          }
-
-          // NB: The originalRadius is for the GeoLayouter collision detection.
-          const histogramRadius = Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2));
-
-          // NB: The colours associated with the individual values
-          // can not be applied to the histogram,
-          // at least not to the fillColour of the bins,
-          // because each bin represents a range of values.
-
-          clusterMarkers.push({
-            clusterType: 'histogram',
-            chartDataTable: table,
-            key: location,
-            lat: markersGroupedByLocation[location][0].lat,
-            lng: markersGroupedByLocation[location][0].lng,
-            originalRadius: histogramRadius,
-            chartData: markerChartData,
-            table,
-            primKey: markersGroupedByLocation[location][0].primKey,
-            colourScaleFunction: scaleColour([minValue, maxValue]),
-            latProperty: markersGroupedByLocation[location][0].latProperty,
-            lngProperty: markersGroupedByLocation[location][0].lngProperty,
-            originalLat: markersGroupedByLocation[location][0].originalLat,
-            originalLng: markersGroupedByLocation[location][0].originalLng
+          markerChartData.push({
+            name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural,
+            value: markersGroupedByValue[value].length,
+            color: markersGroupedByValue[value][0].valueAsColour
           });
-
-        } else {
-
-          // Includes markerColourPropertyIsCategorical
-          // as well as neither isCategorical nor isNumerical
-
-          // NB: This includes that case when a primary key is selected as markerColourProperty.
-          // The primary key property (isPrimKey) should not be categorical, if it is to be unique,
-          // but showing a pieChart is more visually useful than showing a histogram.
-
-          //// Prepare a pie chart
-
-          // Create a chart item (pie chart sector) for each unique marker value.
-          // NB: all markers that have the same value also have the same colour.
-          // NB: the key for undefined values is the string "undefined"
-          let markerChartData = [];
-          for (let value in markersGroupedByValue) {
-            uniqueValues[value] = true;
-            markerChartData.push({
-              name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + this.config.tablesById[table].namePlural,
-              value: markersGroupedByValue[value].length,
-              color: markersGroupedByValue[value][0].valueAsColour
-            });
-          }
-          clusterMarkers.push({
-            clusterType: 'pieChart',
-            chartDataTable: table,
-            key: location,
-            lat: markersGroupedByLocation[location][0].lat,
-            lng: markersGroupedByLocation[location][0].lng,
-            originalRadius: Math.sqrt(markersGroupedByLocation[location].length),
-            chartData: markerChartData,
-            table,
-            primKey: markersGroupedByLocation[location][0].primKey,
-            count: markersGroupedByLocation[location].length,
-            latProperty: markersGroupedByLocation[location][0].latProperty,
-            lngProperty: markersGroupedByLocation[location][0].lngProperty,
-            originalLat: markersGroupedByLocation[location][0].originalLat,
-            originalLng: markersGroupedByLocation[location][0].originalLng
-          });
-
         }
+        clusterMarkers.push({
+          clusterType: 'pieChart',
+          chartDataTable: table,
+          key: location,
+          lat: markersGroupedByLocation[location][0].lat,
+          lng: markersGroupedByLocation[location][0].lng,
+          originalRadius: Math.sqrt(markersGroupedByLocation[location].length),
+          chartData: markerChartData,
+          table,
+          primKey: markersGroupedByLocation[location][0].primKey,
+          count: markersGroupedByLocation[location].length,
+          latProperty: markersGroupedByLocation[location][0].latProperty,
+          lngProperty: markersGroupedByLocation[location][0].lngProperty,
+          originalLat: markersGroupedByLocation[location][0].originalLat,
+          originalLng: markersGroupedByLocation[location][0].originalLng,
+          markersAtLocationCount
+        });
+
       }
+
     }
 
     if (clusterMarkers.length > 0) {
@@ -521,18 +468,7 @@ let TableMarkersLayer = React.createClass({
                     renderNodes.map(
                       (marker, i) => {
 
-                        let bubbleRadius = marker.radius > MINIMUM_BUBBLE_RADIUS ? marker.radius : MINIMUM_BUBBLE_RADIUS;
-
-                        // Default to using a bubble cluster marker.valueAsColour
-                        let clusterComponent = (
-                          <svg style={{overflow: 'visible'}} width={bubbleRadius} height={bubbleRadius}>
-                            <g className="panoptes-cluster-bubble" style={{fill: marker.valueAsColour}}>
-                              <title>{marker.title}</title>
-                              <circle cx="0" cy="0" r={bubbleRadius} />
-                              <text x="0" y="0" textAnchor="middle" alignmentBaseline="middle" fontSize="10">{marker.count}</text>
-                            </g>
-                          </svg>
-                        );
+                        let clusterComponent = undefined;
 
                         if (marker.clusterType === 'pieChart') {
 
@@ -547,6 +483,7 @@ let TableMarkersLayer = React.createClass({
                                 originalLng={marker.originalLng}
                                 radius={marker.radius}
                                 faceText={marker.count}
+                                isHighlighted={marker.isHighlighted}
                               />
                           );
 
@@ -570,9 +507,12 @@ let TableMarkersLayer = React.createClass({
                                 colourScaleFunction={marker.colourScaleFunction}
                                 minValue={minValue}
                                 maxValue={maxValue}
+                                isHighlighted={marker.isHighlighted}
                               />
                           );
 
+                        } else {
+                          console.error('Unhandled marker.clusterType: %o', marker.clusterType);
                         }
 
                         let onClickPayload = {
@@ -583,11 +523,16 @@ let TableMarkersLayer = React.createClass({
                           lngProperty: marker.lngProperty
                         };
 
+                        let onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
+                        if (marker.markersAtLocationCount === 1) {
+                          onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
+                        }
+
                         return (
                           <ComponentMarker
                             key={'ComponentMarker_' + i}
                             position={{lat: marker.lat, lng: marker.lng}}
-                            onClick={(e) => this.handleClickClusterMarker(e, onClickPayload)}
+                            onClick={onClick}
                             zIndexOffset={0}
                           >
                             {clusterComponent}
@@ -610,19 +555,10 @@ let TableMarkersLayer = React.createClass({
                 </FeatureGroup>
             }
           </GeoLayouter>
-          <FeatureGroup
-            children={singleMarkerComponents}
-          />
         </FeatureGroup>
       );
     } else {
-      return (
-        <FeatureGroup
-          children={singleMarkerComponents}
-          layerContainer={layerContainer}
-          map={map}
-        />
-      );
+      return null;
     }
 
   }
