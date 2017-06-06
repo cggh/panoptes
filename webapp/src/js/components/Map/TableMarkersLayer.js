@@ -341,7 +341,7 @@ let TableMarkersLayer = React.createClass({
       }
 
 
-      if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
+      if ((markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) && markersAtLocationCount !== 1) {
 
         //// Prepare a histogram
 
@@ -350,7 +350,6 @@ let TableMarkersLayer = React.createClass({
         let markerChartData = [];
         for (let value in markersGroupedByValue) {
           markerChartData.push({
-            name: markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural) + (value !== 'undefined' ? ' with ' + value : ''),
             value: markersGroupedByValue[value][0].value,
             color: markersGroupedByValue[value][0].valueAsColour
           });
@@ -399,8 +398,14 @@ let TableMarkersLayer = React.createClass({
         let markerChartData = [];
         for (let value in markersGroupedByValue) {
           uniqueValues[value] = true;
+
+          let name = (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural);
+          if (markerColourPropertyIsNumerical) {
+            name = markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural) + (value !== 'undefined' ? ' with ' + value : '');
+          }
+
           markerChartData.push({
-            name: (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural),
+            name,
             value: markersGroupedByValue[value].length,
             color: markersGroupedByValue[value][0].valueAsColour
           });
