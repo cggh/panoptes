@@ -325,9 +325,6 @@ let TableMarkersLayer = React.createClass({
 
       let markersAtLocationCount = markersGroupedByLocation[location].length;
 
-      // If the cluster contains markers of the same value,
-      // then use a cluster bubble (circled total number) rather than a pie chart.
-
       // Group markers by their value.
       let markersGroupedByValue = {};
 
