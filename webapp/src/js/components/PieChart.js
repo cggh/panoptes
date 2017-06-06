@@ -25,7 +25,8 @@ let PieChart = React.createClass({
     originalLng: React.PropTypes.number,
     radius: React.PropTypes.number,
     hideValues: React.PropTypes.bool,
-    faceText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+    faceText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
+    isHighlighted: React.PropTypes.bool
   },
 
   getDefaultProps() {
@@ -34,12 +35,13 @@ let PieChart = React.createClass({
       name: '',
       residualFractionName: 'Other',
       radius: 5,
-      faceText: ''
+      faceText: '',
+      isHighlighted: false
     };
   },
 
   render() {
-    let {chartData, hideValues, name, radius, faceText} = this.props;
+    let {chartData, hideValues, name, radius, faceText, isHighlighted} = this.props;
 
     let sectorsData = [];
     let pieData = [];
@@ -69,7 +71,7 @@ let PieChart = React.createClass({
           outerRadius={radius}
           fillColor={sectorData.color}
           title={sectorData.title}
-          className="panoptes-chart-pie-sector"
+          className={isHighlighted ? 'panoptes-chart-pie-sector-highlighted' : 'panoptes-chart-pie-sector'}
         />
     );
 
