@@ -15,7 +15,7 @@ let ColoursLegend = React.createClass({
     let {colours} = this.props;
 
     return <div className="legend">
-    {Object.keys(colours).map(
+    {Object.keys(colours).sort().map(
       (colour) =>
       <LegendElement key={colour} name={colours[colour].name} colour={colour} />
     )}
