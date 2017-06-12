@@ -22,7 +22,7 @@ let PropertyPrefixLegend = React.createClass({
     let tableConfig = this.config.tablesById[table];
 
     // Get the list of properties that have the specfied prefix.
-    let propertiesWithPrefix = Object.keys(tableConfig.propertiesById).filter((key) => key.startsWith(prefix));
+    let propertiesWithPrefix = Object.keys(tableConfig.propertiesById).filter((key) => key.startsWith(prefix)).sort();
 
     // Compose the legendElements
     for (let i = 0; i < propertiesWithPrefix.length; i++) {
