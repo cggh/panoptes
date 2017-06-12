@@ -4,6 +4,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import LegendElement from 'panoptes/LegendElement';
 import {propertyColour, scaleColour} from 'util/Colours';
 import _map from 'lodash/map';
+import _sortBy from 'lodash/sortBy';
 import FluxMixin from 'mixins/FluxMixin';
 
 let PropertyLegend = React.createClass({
@@ -28,16 +29,20 @@ let PropertyLegend = React.createClass({
     const colourFunc = propertyColour(propConfig);
     let elements = null;
     if (propConfig.valueColours) {
-      elements = _map(propConfig.valueColours, (colour, key) => (
-        <LegendElement key={key} name={key === '_other_' ? 'Other' : key} colour={colour} />));
+      let valueColoursKeys = Object.keys(propConfig.valueColours);
+      elements = _map(valueColoursKeys.sort(),
+        (key) => (
+          <LegendElement key={key} name={key === '_other_' ? 'Other' : key} colour={propConfig.valueColours[key]} />
+        )
+      );
     } else if (propConfig.isBoolean) {
       elements = [
-        <LegendElement key="true" name="True" colour={colourFunc(true)} />,
-        <LegendElement key="false" name="False" colour={colourFunc(false)} />
+        <LegendElement key="false" name="False" colour={colourFunc(false)} />,
+        <LegendElement key="true" name="True" colour={colourFunc(true)} />
       ];
     } else if (propConfig.isCategorical || propConfig.isText) {
       elements = _map(
-        knownValues || propConfig.distinctValues || [],
+        (knownValues || propConfig.distinctValues || []).sort(),
         (value) => (
           <LegendElement key={value} name={value !== null ? value : 'NULL'} colour={colourFunc(value)} />
         )
