@@ -54,6 +54,10 @@ properties:
     tableId: contributors           # Data table id of the parent table
     forwardName: is contributed by  # Display name of the relation from child to parent
     reverseName: contributed from   # Display name of the relation from parent to child
+  valueColours:
+     C0001: rgb(255,128,60)
+     C0002: rgb(0,180,0)
+     _other_: rgb(128, 128, 128)
 
 
 
