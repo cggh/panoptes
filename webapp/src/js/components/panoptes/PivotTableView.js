@@ -217,7 +217,7 @@ let PivotTableView = React.createClass({
             dataObject.sortValue = percentage;
             return dataObject;
           } else {
-            return {displayValue: '', sortValue: null};
+            return {displayValue: '', sortValue: ''};
           }
         }
 
@@ -235,7 +235,7 @@ let PivotTableView = React.createClass({
                       dataByColumnRow[columnValue][rowValue].sortValue = dataByColumnRow[columnValue][rowValue].count;
                       return;
                     } else {
-                      return dataByColumnRow[columnValue][rowValue] = {displayValue: '', sortValue: null};
+                      return dataByColumnRow[columnValue][rowValue] = {displayValue: '', sortValue: 0};
                     }
                   }
                 );
