@@ -171,8 +171,8 @@ let PivotTableView = React.createClass({
         let uniqueRows = rowData ? _uniq(rowData) : [];
 
         // Make null headings consistently 'NULL'
-        uniqueColumns = _map(uniqueColumns, (heading) => isNull(heading) ? '__NULL__' : heading);
-        uniqueRows = _map(uniqueRows, (heading) => isNull(heading) ? '__NULL__' : heading);
+        uniqueColumns = _map(uniqueColumns, (heading) => isNull(heading) ? '__NULL__' : heading).sort();
+        uniqueRows = _map(uniqueRows, (heading) => isNull(heading) ? '__NULL__' : heading).sort();
 
         // Add the '_all_' headings
         uniqueColumns.unshift('_all_');
