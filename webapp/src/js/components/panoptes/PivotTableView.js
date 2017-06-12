@@ -214,9 +214,10 @@ let PivotTableView = React.createClass({
             let percentage = ((dataObject.count / totalCount) * 100).toFixed(0);
             dataObject.backgroundColor = Color(MAX_COLOR).lighten(0.58 * (1 - (percentage - 0) / 100)).string();
             dataObject.displayValue = percentage + '%';
+            dataObject.sortValue = percentage;
             return dataObject;
           } else {
-            return {displayValue: ''};
+            return {displayValue: '', sortValue: null};
           }
         }
 
@@ -230,9 +231,11 @@ let PivotTableView = React.createClass({
                 uniqueRows.forEach(
                   (rowValue) => {
                     if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      return dataByColumnRow[columnValue][rowValue].displayValue = dataByColumnRow[columnValue][rowValue].count;
+                      dataByColumnRow[columnValue][rowValue].displayValue = dataByColumnRow[columnValue][rowValue].count;
+                      dataByColumnRow[columnValue][rowValue].sortValue = dataByColumnRow[columnValue][rowValue].count;
+                      return;
                     } else {
-                      return dataByColumnRow[columnValue][rowValue] = {displayValue: ''};
+                      return dataByColumnRow[columnValue][rowValue] = {displayValue: '', sortValue: null};
                     }
                   }
                 );
@@ -281,13 +284,13 @@ let PivotTableView = React.createClass({
 
         if (columnSortOrder && columnSortOrder.length) {
           uniqueRows = _orderBy(uniqueRows,
-            _map(columnSortOrder, ([dir, heading]) => (row) => dataByColumnRow[heading][row].count),
+            _map(columnSortOrder, ([dir, heading]) => (row) => dataByColumnRow[heading][row].sortValue),
             _map(columnSortOrder, ([dir, heading]) => dir));
         }
 
         if (rowSortOrder && rowSortOrder.length) {
           uniqueColumns = _orderBy(uniqueColumns,
-            _map(rowSortOrder, ([dir, heading]) => (col) => dataByColumnRow[col][heading].count),
+            _map(rowSortOrder, ([dir, heading]) => (col) => dataByColumnRow[col][heading].sortValue),
             _map(rowSortOrder, ([dir, heading]) => dir));
         }
 
