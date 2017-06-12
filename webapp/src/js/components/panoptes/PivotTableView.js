@@ -53,7 +53,8 @@ let PivotTableView = React.createClass({
       'columnProperty',
       'rowProperty',
       'columnSortOrder',
-      'rowSortOrder'
+      'rowSortOrder',
+      'display'
     )
   ],
 
