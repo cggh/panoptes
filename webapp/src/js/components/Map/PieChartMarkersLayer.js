@@ -176,7 +176,7 @@ let PieChartMarkersLayer = React.createClass({
       .then(([locationData, chartData]) => {
 
         let markers = [];
-        let colours = [];
+        let colours = {};
 
         // Translate the fetched locationData and chartData into markers.
         let locationTableConfig = this.config.tablesById[locationDataTable];
