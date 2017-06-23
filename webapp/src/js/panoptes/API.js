@@ -424,7 +424,7 @@ function query(options) {
     columnNameSet.add(columnName);
   }
 
-  if (ambiguousColumnNames.length > 0) {
+  if (ambiguousColumnNames.length > 0 && joins.length > 0) {
     throw Error(`Ambiguous column names are not yet supported: ${ambiguousColumnNames}.`);
   }
 
