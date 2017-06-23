@@ -8,7 +8,7 @@ let ColoursLegend = React.createClass({
   ],
 
   propTypes: {
-    colours: React.PropTypes.array.isRequired
+    colours: React.PropTypes.object.isRequired
   },
 
   render() {
