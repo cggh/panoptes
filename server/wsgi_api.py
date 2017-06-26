@@ -69,8 +69,8 @@ def application(environ, start_response):
             start_response(status, response_headers)
             yield response
     except Exception as e:
-        start_response('500 Server Error', [])
         traceback.print_exc()
+        start_response('500 Server Error', [])
         yield str(e)
 
 
