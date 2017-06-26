@@ -37,7 +37,7 @@ def response(returndata):
         cur.execute(sqlquery, whc.queryparams)
         yield '\t'.join(str(col[0]) for col in cur.description) + '\n'
         for row in cur.fetchall() :
-            line = '\t'.join([str(x.encode('ascii', 'replace')) if isinstance(x, basestring) else str(x) for x in row]) + '\n'
+            line = '\t'.join([x.encode('ascii', 'replace') if isinstance(x, basestring) else str(x) for x in row]) + '\n'
             yield line
         if DQXDbTools.LogRequests:
             DQXUtils.LogServer('###QRY:' + sqlquery)
