@@ -75,7 +75,7 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => {
     },
     render()
     {
-      return <WrappedComponent {...this.state} {...this.props} />;
+      return <WrappedComponent {...this.state} {...this.props} config={this.config}/>;
     }
   });
 };
