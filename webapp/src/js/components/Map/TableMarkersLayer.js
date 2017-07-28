@@ -63,7 +63,8 @@ let TableMarkersLayer = React.createClass({
     primKey: React.PropTypes.string, // if not specified then all table records are used
     query: React.PropTypes.string,
     table: React.PropTypes.string,
-    markerColourProperty: React.PropTypes.string
+    markerColourProperty: React.PropTypes.string,
+    showLegend: React.PropTypes.bool
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -82,6 +83,12 @@ let TableMarkersLayer = React.createClass({
   getInitialState() {
     return {
       markersGroupedByLocation: {}
+    };
+  },
+
+  getDefaultProps() {
+    return {
+      showLegend: true
     };
   },
 
@@ -306,7 +313,7 @@ let TableMarkersLayer = React.createClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table} = this.props;
+    let {markerColourProperty, table, showLegend} = this.props;
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
 
     if (_isEmpty(markersGroupedByLocation)) {
@@ -456,13 +463,16 @@ let TableMarkersLayer = React.createClass({
           layerContainer={layerContainer}
           map={map}
         >
-          <MapControlComponent position="bottomleft">
-            <PropertyLegend
-              property={markerColourProperty}
-              table={table}
-              knownValues={_keys(uniqueValues)}
-            />
-          </MapControlComponent>
+          {showLegend ?
+            <MapControlComponent position="bottomleft">
+              <PropertyLegend
+                property={markerColourProperty}
+                table={table}
+                knownValues={_keys(uniqueValues)}
+              />
+            </MapControlComponent>
+          : null
+          }
           <GeoLayouter nodes={clusterMarkers}>
             {
               (renderNodes) =>

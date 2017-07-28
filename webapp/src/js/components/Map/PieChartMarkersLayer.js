@@ -49,7 +49,8 @@ let PieChartMarkersLayer = React.createClass({
     locationNameProperty: React.PropTypes.string,
     locationSizeProperty: React.PropTypes.string,
     residualFractionName: React.PropTypes.string,
-    residualSectorColor: React.PropTypes.string
+    residualSectorColor: React.PropTypes.string,
+    showLegend: React.PropTypes.bool
   },
   childContextTypes: {
     onClickMarker: React.PropTypes.func
@@ -63,7 +64,8 @@ let PieChartMarkersLayer = React.createClass({
   getDefaultProps() {
     return {
       defaultResidualFractionName: 'Other',
-      defaultResidualSectorColor: 'rgb(191,191,191)'
+      defaultResidualSectorColor: 'rgb(191,191,191)',
+      showLegend: true
     };
   },
   getInitialState() {
@@ -259,6 +261,7 @@ let PieChartMarkersLayer = React.createClass({
 
   render() {
 
+    let {showLegend} = this.props;
     let {crs, layerContainer, map} = this.context;
     let {markers, colours} = this.state;
 
@@ -287,9 +290,12 @@ let PieChartMarkersLayer = React.createClass({
         layerContainer={layerContainer}
         map={map}
       >
-        <MapControlComponent position="bottomleft">
-          <ColoursLegend colours={colours} />
-        </MapControlComponent>
+        {showLegend ?
+          <MapControlComponent position="bottomleft">
+            <ColoursLegend colours={colours} />
+          </MapControlComponent>
+        : null
+        }
         <GeoLayouter nodes={markers}>
           {
             (renderNodes) =>
