@@ -12,11 +12,12 @@ let PropertyPrefixLegend = React.createClass({
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
-    prefix: React.PropTypes.string.isRequired
+    prefix: React.PropTypes.string.isRequired,
+    maxLegendItems: React.PropTypes.number
   },
 
   render() {
-    let {table, prefix} = this.props;
+    let {table, prefix, maxLegendItems} = this.props;
     let legendElements = [];
     const colourFunction = categoryColours('__default__');
     let tableConfig = this.config.tablesById[table];
@@ -32,7 +33,10 @@ let PropertyPrefixLegend = React.createClass({
     }
 
     return <div className="legend">
-      {legendElements}
+      {maxLegendItems !== undefined && legendElements.length < maxLegendItems ?
+        legendElements
+      : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
+      }
     </div>;
   }
 });

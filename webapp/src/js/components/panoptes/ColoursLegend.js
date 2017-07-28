@@ -8,17 +8,23 @@ let ColoursLegend = React.createClass({
   ],
 
   propTypes: {
-    colours: React.PropTypes.object.isRequired
+    colours: React.PropTypes.object.isRequired,
+    maxLegendItems: React.PropTypes.number
   },
 
   render() {
-    let {colours} = this.props;
+    let {colours, maxLegendItems} = this.props;
 
-    return <div className="legend">
-    {Object.keys(colours).sort().map(
+    let legendElements = Object.keys(colours).sort().map(
       (colour) =>
       <LegendElement key={colour} name={colours[colour].name} colour={colour} />
-    )}
+    );
+
+    return <div className="legend">
+    {maxLegendItems !== undefined && legendElements.length < maxLegendItems ?
+      legendElements
+    : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
+    }
     </div>;
   }
 });

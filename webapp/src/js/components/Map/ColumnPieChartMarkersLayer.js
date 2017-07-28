@@ -52,7 +52,9 @@ let ColumnPieChartMarkersLayer = React.createClass({
     query: React.PropTypes.string,
     table: React.PropTypes.string,
     markerSizeProperty: React.PropTypes.string,
-    prefix: React.PropTypes.string.isRequired
+    prefix: React.PropTypes.string.isRequired,
+    showLegend: React.PropTypes.bool,
+    maxLegendItems: React.PropTypes.number
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -71,6 +73,12 @@ let ColumnPieChartMarkersLayer = React.createClass({
   getInitialState() {
     return {
       clusterMarkers: {}
+    };
+  },
+
+  getDefaultProps() {
+    return {
+      showLegend: true
     };
   },
 
@@ -235,7 +243,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
 
   render() {
 
-    let {table, prefix} = this.props;
+    let {table, prefix, showLegend, maxLegendItems} = this.props;
     let {crs, layerContainer, map} = this.context;
     let {clusterMarkers} = this.state;
 
@@ -269,9 +277,12 @@ let ColumnPieChartMarkersLayer = React.createClass({
           layerContainer={layerContainer}
           map={map}
         >
-          <MapControlComponent position="bottomleft">
-            <PropertyPrefixLegend table={table} prefix={prefix} />
-          </MapControlComponent>
+          {showLegend ?
+            <MapControlComponent position="bottomleft">
+              <PropertyPrefixLegend table={table} prefix={prefix} maxLegendItems={maxLegendItems} />
+            </MapControlComponent>
+          : null
+          }
           <GeoLayouter nodes={clusterMarkers}>
             {
               (renderNodes) =>
