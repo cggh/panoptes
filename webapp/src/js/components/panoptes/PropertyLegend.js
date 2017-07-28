@@ -28,21 +28,21 @@ let PropertyLegend = React.createClass({
     if (!table || !property) return null;
     const propConfig = this.config.tablesById[table].propertiesById[property];
     const colourFunc = propertyColour(propConfig);
-    let elements = null;
+    let legendElements = null;
     if (propConfig.valueColours) {
       let valueColoursKeys = Object.keys(propConfig.valueColours);
-      elements = _map(valueColoursKeys.sort(),
+      legendElements = _map(valueColoursKeys.sort(),
         (key) => (
           <LegendElement key={key} name={key === '_other_' ? 'Other' : key} colour={propConfig.valueColours[key]} />
         )
       );
     } else if (propConfig.isBoolean) {
-      elements = [
+      legendElements = [
         <LegendElement key="false" name="False" colour={colourFunc(false)} />,
         <LegendElement key="true" name="True" colour={colourFunc(true)} />
       ];
     } else if (propConfig.isCategorical || propConfig.isText) {
-      elements = _map(
+      legendElements = _map(
         (knownValues || propConfig.distinctValues || []).sort(),
         (value) => (
           <LegendElement key={value} name={value !== null ? value : 'NULL'} colour={colourFunc(value)} />
@@ -55,7 +55,7 @@ let PropertyLegend = React.createClass({
         background += `,${colour(i)} ${i * 100}%`;
       }
       background += ')';
-      elements = [
+      legendElements = [
         <div key="min" className="legend-element">{min || propConfig.minVal}</div>,
         <div key="bar" className="legend-element">
           <div
@@ -68,9 +68,9 @@ let PropertyLegend = React.createClass({
     }
     return <div className="legend">
       <div className="legend-element">{propConfig.name}:</div>
-      {maxLegendItems !== undefined && elements.length < maxLegendItems ?
-        elements
-      : elements.slice(0, maxLegendItems)
+      {maxLegendItems !== undefined && legendElements.length < maxLegendItems ?
+        legendElements
+      : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
       }
     </div>;
   }
