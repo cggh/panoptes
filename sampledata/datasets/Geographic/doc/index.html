@@ -19,4 +19,11 @@
       <ColumnPieChartMarkersLayer table="things" prefix="eyeColour_" markerSizeProperty="size" />
     </Map>
   </div>
+  <p>Here's a map with a its legend hidden (otherwise shown by default), by setting the showLegend attribute to a value interpreted as Boolean false, which is currently anything except "true" or "yes" (case-insensitive) or "1" or the empty string "". If you only specify showLegend, without specifying a value, then that equates to an empty string, equivalent to showLegend="", which in turn is interpreted as Boolean true.</p>
+  <div style="width:600px;height:300px">
+    <Map>
+      <TileLayer />
+      <ColumnPieChartMarkersLayer table="things" prefix="eyeColour_" markerSizeProperty="size" showLegend="no" />
+    </Map>
+  </div>
 </div>

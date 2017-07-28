@@ -57,6 +57,11 @@ let HTMLWithComponents = React.createClass({
               if (type.propTypes) {
                   switch (type.propTypes[key]) {
                   case React.PropTypes.bool:
+                    // If the attribute is specfied without a value, e.g. showLegend,
+                    // then value will be an empty string here, which we will interpret as true.
+                    // (Ordinarily, empty string values are interpreted as false in JavaScript.)
+                    value = value == '' || value.toLowerCase() === 'true' || value.toLowerCase() === 'yes' || value.toLowerCase() === '1' ? true : false;
+                    break;
                   case React.PropTypes.bool.isRequired:
                     value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
                     break;
