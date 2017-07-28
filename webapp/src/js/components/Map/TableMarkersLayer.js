@@ -37,7 +37,6 @@ import MapControlComponent from 'Map/MapControlComponent';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
-const MINIMUM_BUBBLE_RADIUS = 10;
 
 let TableMarkersLayer = React.createClass({
 
@@ -64,7 +63,8 @@ let TableMarkersLayer = React.createClass({
     query: React.PropTypes.string,
     table: React.PropTypes.string,
     markerColourProperty: React.PropTypes.string,
-    showLegend: React.PropTypes.bool
+    showLegend: React.PropTypes.bool,
+    maxLegendItems: React.PropTypes.number
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -313,7 +313,7 @@ let TableMarkersLayer = React.createClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table, showLegend} = this.props;
+    let {markerColourProperty, table, showLegend, maxLegendItems} = this.props;
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
 
     if (_isEmpty(markersGroupedByLocation)) {
@@ -469,6 +469,7 @@ let TableMarkersLayer = React.createClass({
                 property={markerColourProperty}
                 table={table}
                 knownValues={_keys(uniqueValues)}
+                maxLegendItems={maxLegendItems}
               />
             </MapControlComponent>
           : null

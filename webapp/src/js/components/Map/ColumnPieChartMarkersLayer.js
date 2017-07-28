@@ -53,7 +53,8 @@ let ColumnPieChartMarkersLayer = React.createClass({
     table: React.PropTypes.string,
     markerSizeProperty: React.PropTypes.string,
     prefix: React.PropTypes.string.isRequired,
-    showLegend: React.PropTypes.bool
+    showLegend: React.PropTypes.bool,
+    maxLegendItems: React.PropTypes.number
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -242,7 +243,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
 
   render() {
 
-    let {table, prefix, showLegend} = this.props;
+    let {table, prefix, showLegend, maxLegendItems} = this.props;
     let {crs, layerContainer, map} = this.context;
     let {clusterMarkers} = this.state;
 
@@ -278,7 +279,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
         >
           {showLegend ?
             <MapControlComponent position="bottomleft">
-              <PropertyPrefixLegend table={table} prefix={prefix} />
+              <PropertyPrefixLegend table={table} prefix={prefix} maxLegendItems={maxLegendItems} />
             </MapControlComponent>
           : null
           }

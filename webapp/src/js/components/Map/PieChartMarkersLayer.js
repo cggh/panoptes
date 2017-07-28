@@ -50,7 +50,8 @@ let PieChartMarkersLayer = React.createClass({
     locationSizeProperty: React.PropTypes.string,
     residualFractionName: React.PropTypes.string,
     residualSectorColor: React.PropTypes.string,
-    showLegend: React.PropTypes.bool
+    showLegend: React.PropTypes.bool,
+    maxLegendItems: React.PropTypes.number
   },
   childContextTypes: {
     onClickMarker: React.PropTypes.func
@@ -261,7 +262,7 @@ let PieChartMarkersLayer = React.createClass({
 
   render() {
 
-    let {showLegend} = this.props;
+    let {showLegend, maxLegendItems} = this.props;
     let {crs, layerContainer, map} = this.context;
     let {markers, colours} = this.state;
 
@@ -292,7 +293,7 @@ let PieChartMarkersLayer = React.createClass({
       >
         {showLegend ?
           <MapControlComponent position="bottomleft">
-            <ColoursLegend colours={colours} />
+            <ColoursLegend colours={colours} maxLegendItems={maxLegendItems} />
           </MapControlComponent>
         : null
         }
