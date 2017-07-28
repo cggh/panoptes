@@ -26,4 +26,11 @@
       <ColumnPieChartMarkersLayer table="things" prefix="eyeColour_" markerSizeProperty="size" showLegend="no" />
     </Map>
   </div>
+  <p>Here's a map with the number of legend items limited to 3.</p>
+  <div style="width:600px;height:300px">
+    <Map>
+      <TileLayer />
+      <TableMarkersLayer table="things" maxLegendItems="3" markerColourProperty="eyeColour_blue" />
+    </Map>
+  </div>
 </div>
