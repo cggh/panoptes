@@ -48,7 +48,6 @@ let TableGeoJSONsLayer = React.createClass({
   propTypes: {
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    primKey: React.PropTypes.string, // if not specified then all table records are used
     query: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     colourProperty: React.PropTypes.string,
@@ -56,15 +55,13 @@ let TableGeoJSONsLayer = React.createClass({
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    onClickGeoJSON: React.PropTypes.func
+    map: React.PropTypes.object
   },
 
   getChildContext() {
     return {
       layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
-      map: this.props.map !== undefined ? this.props.map : this.context.map,
-      onClickGeoJSON: this.handleClickGeoJSON
+      map: this.props.map !== undefined ? this.props.map : this.context.map
     };
   },
 
@@ -214,7 +211,7 @@ let TableGeoJSONsLayer = React.createClass({
                 <GeoJSON
                   key={'GeoJSON_' + i}
                   json={geoJSON.json}
-                  colour={geoJSON.colour}
+                  colour={geoJSON.valueAsColour}
                   weight={geoJSON.weight}
                   opacity={geoJSON.opacity}
                 />
