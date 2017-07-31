@@ -14,3 +14,7 @@ properties:
 - id: regionPolygon
   name: Polygon
   dataType: GeoJSON
+
+- id: colour
+  name: Colour
+  dataType: Text
