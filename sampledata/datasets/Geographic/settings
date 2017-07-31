@@ -1,7 +1,7 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/dataset.html
 
 name: Geographic
-  functionality of Panoptes
+nameBanner: Geographic examples
 
 dataTables:
 - samples
