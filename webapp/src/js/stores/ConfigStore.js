@@ -141,7 +141,7 @@ const ConfigStore = Fluxxor.createStore({
     table.properties.forEach((prop) => {
       table.propertiesById[prop.id] = prop;
       prop.tableId = table.id;
-      if (prop.dataType == 'Text')
+      if (prop.dataType == 'Text' || prop.dataType == 'GeoJSON')
         prop.isText = true;
       if ((prop.dataType == 'Float') || (prop.dataType == 'Double') || (prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude')) {
         prop.isFloat = true;

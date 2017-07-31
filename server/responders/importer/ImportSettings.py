@@ -30,7 +30,8 @@ class ImportSettings:
                                    'type': 'Text',
                                    'required': True,
                                    'description': 'Data type of the values in the property. Absent values can be coded by an empty string.',
-                                   'values':  OrderedDict(( ('Text', {
+                                   'values':  OrderedDict((
+                                                ('Text', {
                                                      'description': 'text strings'
                                                      }),
                                                ('Float', {
@@ -59,8 +60,11 @@ class ImportSettings:
                                                       }),
                                                ('Date', {
                                                     'description': 'calendar dates, ISO formatted (i.e. YYYY-MM-DD).'
+                                                      }),
+                                               ('GeoJSON', {
+                                                    'description': 'GeoJSON, i.e. http://geojson.org/'
                                                       })
-                                               ))
+                                             ))
                                           }),
                             ('name', {
                                    'type': 'Text',
