@@ -6,4 +6,5 @@ name: Geographic
 dataTables:
 - samples
 - things
+- regions
 
