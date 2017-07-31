@@ -34,7 +34,8 @@ def GetSQLDataType(dataType):
         'Boolean': 'boolean',
         'GeoLatitude': 'real',
         'GeoLongitude': 'real',
-        'Date': 'timestamp'
+        'Date': 'timestamp',
+        'GeoJSON': 'text'
     }[dataType]
 
 def GetTempFileName():
