@@ -1,0 +1,61 @@
+import React from 'react';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import SQL from 'panoptes/SQL';
+import DataTableView from 'panoptes/DataTableView';
+import {Card, CardText} from 'material-ui/Card';
+
+let TableWithLegend = React.createClass({
+  mixins: [FluxMixin, ConfigMixin],
+
+  propTypes: {
+    table: React.PropTypes.string,
+    query: React.PropTypes.string,
+    order: React.PropTypes.array,
+    columns: React.PropTypes.array,
+    columnWidths: React.PropTypes.object,
+    children: React.PropTypes.node
+  },
+
+  getInitialState() {
+    return {}
+  },
+
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
+  },
+
+  handleOrderChange(order) {
+    this.setState({order})
+  },
+
+  render() {
+    let {table, query, order, columns, columnWidths, children} = this.props;
+    order = this.state.order || order;
+    query = this.getDefinedQuery(query, table);
+
+    return(
+      <div className="vertical stack">
+        <div className="centering-container">
+          <Card style={{width:'500px'}}>{children}</Card>
+        </div>
+        <div className="centering-container grow">
+          <div style={{width:'90%', height:'100%'}}>
+              <DataTableView table={table}
+                                query={query}
+                                order={order}
+                                columns={columns}
+                                columnWidths={columnWidths}
+                                onColumnResize={this.handleColumnResize}
+                                onOrderChange={this.handleOrderChange}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+
+export default TableWithLegend;
