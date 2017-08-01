@@ -23,6 +23,13 @@ import _min from 'lodash/min';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-loading/src/Control.Loading.css';
 
+// Workaround for default marker icons.
+import L from 'leaflet';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({iconUrl, shadowUrl});
+L.Marker.prototype.options.icon = DefaultIcon;
+
 const ALLOWED_CHILDREN = [
   'LayersControl',
   'TableMarkersLayer',
@@ -30,7 +37,8 @@ const ALLOWED_CHILDREN = [
   'FeatureGroup',
   'Marker',
   'Overlay',
-  'ColumnPieChartMarkersLayer'
+  'ColumnPieChartMarkersLayer',
+  'TableGeoJSONsLayer'
 ];
 
 /* To use maps in templates

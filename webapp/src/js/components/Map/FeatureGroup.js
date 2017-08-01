@@ -19,7 +19,8 @@ const ALLOWED_CHILDREN = [
   'TileLayer',
   'PieChartMarkersLayer',
   'Polyline',
-  'GeoLayouter'
+  'GeoLayouter',
+  'GeoJSON'
 ];
 
 let FeatureGroup = React.createClass({

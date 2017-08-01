@@ -1,0 +1,20 @@
+nameSingle: region
+namePlural: regions
+primKey: region_id
+
+properties:
+- id: region_id
+  name: ID
+  dataType: Text
+
+- id: name
+  name: Name
+  dataType: Text
+
+- id: regionPolygon
+  name: Polygon
+  dataType: GeoJSON
+
+- id: colour
+  name: Colour
+  dataType: Text
