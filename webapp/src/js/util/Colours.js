@@ -241,7 +241,7 @@ export function isValidColour(colour) {
     return true;
   } else if (colour.charAt(0) === '#') {
     colour = colour.substring(1);
-    return [3, 4, 6, 8].indexOf(colour.length) > -1 && !isNaN(parseInt(colour, 16));
+    return [3, 4, 6, 8].indexOf(colour.length) !== -1 && !isNaN(parseInt(colour, 16));
   } else {
     return /^(rgb|hsl)a?\((\d+%?(deg|rad|grad|turn)?[,\s]+){2,3}[\s\/]*[\d\.]+%?\)$/i.test(colour);
   }
