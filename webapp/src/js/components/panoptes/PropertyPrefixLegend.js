@@ -33,7 +33,7 @@ let PropertyPrefixLegend = React.createClass({
     }
 
     return <div className="legend">
-      {maxLegendItems !== undefined && legendElements.length < maxLegendItems ?
+      {maxLegendItems === undefined || (maxLegendItems !== undefined && legendElements.length < maxLegendItems) ?
         legendElements
       : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
       }
