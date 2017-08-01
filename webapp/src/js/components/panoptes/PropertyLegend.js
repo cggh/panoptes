@@ -65,7 +65,7 @@ let PropertyLegend = React.createClass({
         <div key="max" className="legend-element">{max || propConfig.maxVal}</div>
       ];
     }
-console.log('maxLegendItems: ', maxLegendItems);
+
     return <div className="legend">
       <div className="legend-element">{propConfig.name}:</div>
       {maxLegendItems === undefined || (maxLegendItems !== undefined && legendElements.length < maxLegendItems) ?
