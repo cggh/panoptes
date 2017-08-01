@@ -1,12 +1,5 @@
 import React from 'react';
 
-// Workaround for default marker icons.
-import L from 'leaflet';
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-let DefaultIcon = L.icon({iconUrl, shadowUrl});
-L.Marker.prototype.options.icon = DefaultIcon;
-
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -201,7 +194,6 @@ let TableGeoJSONsLayer = React.createClass({
           <PropertyLegend
             property={colourProperty}
             table={table}
-            knownValues={geoJSONs.map((geoJSON) => geoJSON.title)}
           />
         </MapControlComponent>
         <FeatureGroup>
