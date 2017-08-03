@@ -187,8 +187,12 @@ export const x11Colours = [
 ];
 
 export function categoryColours(identifier) {
-  if (!exisitingScales[identifier])
-    exisitingScales[identifier] = (value) => isValidColour(value) ? value : scaleOrdinal().range(colours)(value);
+  if (!exisitingScales[identifier]) {
+    // scaleFunction needs to be defined outside the assigned anonymous function,
+    // otherwise a new scale will be assigned for each value.
+    let scaleFunction = scaleOrdinal().range(colours);
+    exisitingScales[identifier] = (value) => isValidColour(value) ? value : scaleFunction(value);
+  }
   return exisitingScales[identifier];
 }
 
