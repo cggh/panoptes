@@ -1,78 +1,59 @@
 import React from 'react';
-import PureRenderMixin from 'mixins/PureRenderMixin';
-import ConfigMixin from 'mixins/ConfigMixin';
+import _isEmpty from 'lodash/isEmpty';
+import SQL from 'panoptes/SQL';
+import withAPIData from 'hoc/withAPIData';
 import LegendElement from 'panoptes/LegendElement';
-import {propertyColour, scaleColour} from 'util/Colours';
-import _map from 'lodash/map';
-import FluxMixin from 'mixins/FluxMixin';
+import {propertyColour} from 'util/Colours';
 
 let ColourPropertyLegend = React.createClass({
-  mixins: [
-    PureRenderMixin,
-    FluxMixin,
-    ConfigMixin
-  ],
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
     labelProperty: React.PropTypes.string,
-    knownValues: React.PropTypes.array,
-    min: React.PropTypes.number,
-    max: React.PropTypes.number,
     maxLegendItems: React.PropTypes.number,
-    colourProperty: React.PropTypes.string.isRequired
+    colourProperty: React.PropTypes.string.isRequired,
+    config: React.PropTypes.object, // This will be provided via withAPIData
+    data: React.PropTypes.array // This will be provided via withAPIData
+  },
+
+  getDefaultProps() {
+    return {
+      query: SQL.nullQuery
+    };
   },
 
   render() {
-    let {table, labelProperty, knownValues, min, max, maxLegendItems, colourProperty} = this.props;
+    let {table, labelProperty, maxLegendItems, colourProperty, config, data} = this.props;
 
-    // NOTE: render() is still called when isRequired props are not supplied.
+    // NOTE: render() is still called when isRequired props are undefined.
+
+    if (data === undefined || data === null) {
+      return null;
+    }
 
     // If a labelProperty has not been provided, then use the table's primKey.
-    labelProperty = labelProperty === undefined ? this.config.tablesById[table].primKey : labelProperty;
+    labelProperty = labelProperty === undefined ? config.tablesById[table].primKey : labelProperty;
 
-    const labelPropConfig = this.config.tablesById[table].propertiesById[labelProperty];
-    const colourPropConfig = this.config.tablesById[table].propertiesById[colourProperty];
+    const labelPropConfig = config.tablesById[table].propertiesById[labelProperty];
+    const colourPropConfig = config.tablesById[table].propertiesById[colourProperty];
     const colourFunc = propertyColour(colourPropConfig);
 
-    // Compose the list of legendElements.
-    let legendElements = null;
-    if (colourPropConfig.valueColours) {
-      let valueColoursKeys = Object.keys(colourPropConfig.valueColours);
-      legendElements = _map(valueColoursKeys.sort(),
-        (key) => (
-          <LegendElement key={key} name={key === '_other_' ? 'Other' : key} colour={colourPropConfig.valueColours[key]} />
-        )
-      );
-    } else if (colourPropConfig.isBoolean) {
-      legendElements = [
-        <LegendElement key="false" name="False" colour={colourFunc(false)} />,
-        <LegendElement key="true" name="True" colour={colourFunc(true)} />
-      ];
-    } else if (colourPropConfig.isCategorical || colourPropConfig.isText) {
-      legendElements = _map(
-        (knownValues || colourPropConfig.distinctValues || []).sort(),
-        (value) => (
-          <LegendElement key={value} name={value !== null ? value : 'NULL'} colour={colourFunc(value)} />
-        )
-      );
-    } else {
-      const colour = scaleColour([0, 1]);
-      let background = `linear-gradient(to right, ${colour(0)} 0%`;
-      for (let i = 0.1; i < 1; i += 0.1) {
-        background += `,${colour(i)} ${i * 100}%`;
-      }
-      background += ')';
-      legendElements = [
-        <div key="min" className="legend-element">{min || colourPropConfig.minVal}</div>,
-        <div key="bar" className="legend-element">
-          <div
-            style={{width: '100px', height: '10px', background: background}}
-          >
-          </div>
-        </div>,
-        <div key="max" className="legend-element">{max || labelPropConfig.maxVal}</div>
-      ];
+    // Translate the apiData data into legendElements.
+    let legendElements = [];
+
+    for (let i = 0; i < data.length; i++) {
+
+      let label = data[i][labelProperty];
+      let colour = data[i][colourProperty];
+
+      let legendElement = <LegendElement key={'LegendElement_' + i} name={label !== null ? label : 'NULL'} colour={colourFunc(colour)} />;
+
+      legendElements.push(legendElement);
+
+    }
+
+    if (_isEmpty(legendElements)) {
+      return null;
     }
 
     return <div className="legend">
@@ -83,6 +64,26 @@ let ColourPropertyLegend = React.createClass({
       }
     </div>;
   }
+});
+
+ColourPropertyLegend = withAPIData(ColourPropertyLegend, ({config, props}) => {
+
+  let {table, colourProperty, labelProperty, query} = props;
+
+  let columns = [colourProperty, (labelProperty === undefined ? config.tablesById[table].primKey : labelProperty)];
+
+  return {
+    data: {
+      method: 'query',
+      args: {
+        database: config.dataset,
+        table,
+        columns,
+        query,
+        transpose: true
+      }
+    }
+  };
 });
 
 export default ColourPropertyLegend;
