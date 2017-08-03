@@ -15,7 +15,7 @@ import FeatureGroup from 'Map/FeatureGroup';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';
-import PropertyLegend from 'panoptes/PropertyLegend';
+import ColourPropertyLegend from 'panoptes/ColourPropertyLegend';
 import MapControlComponent from 'Map/MapControlComponent';
 import GeoJSON from 'GeoJSON';
 
@@ -27,7 +27,7 @@ let TableGeoJSONsLayer = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'colourProperty', 'geoJsonProperty')
+    DataFetcherMixin('table', 'query', 'colourProperty', 'geoJsonProperty', 'labelProperty')
   ],
 
   //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
@@ -44,7 +44,8 @@ let TableGeoJSONsLayer = React.createClass({
     query: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     colourProperty: React.PropTypes.string,
-    geoJsonProperty: React.PropTypes.string.isRequired
+    geoJsonProperty: React.PropTypes.string.isRequired,
+    labelProperty: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -72,7 +73,7 @@ let TableGeoJSONsLayer = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {table, query, colourProperty, geoJsonProperty} = props;
+    let {table, query, colourProperty, geoJsonProperty, labelProperty} = props;
     let {changeLayerStatus} = this.context;
 
     changeLayerStatus({loadStatus: 'loading'});
@@ -100,6 +101,14 @@ let TableGeoJSONsLayer = React.createClass({
         console.error('The specified colourProperty field ' + colourProperty + ' was not found in the table ' + table);
       } else {
         fetchColumns.add(colourProperty);
+      }
+    }
+
+    if (labelProperty !== undefined && typeof labelProperty === 'string' && labelProperty !== '') {
+      if (tableConfig.propertiesById[labelProperty] === undefined) {
+        console.error('The specified labelProperty field ' + labelProperty + ' was not found in the table ' + table);
+      } else {
+        fetchColumns.add(labelProperty);
       }
     }
 
@@ -152,7 +161,7 @@ let TableGeoJSONsLayer = React.createClass({
           let geoJSON = {
             table,
             primKey,
-            title: primKey,
+            title: labelProperty !== undefined ? labelProperty : primKey,
             valueAsColour,
             value,
             json
@@ -178,7 +187,7 @@ let TableGeoJSONsLayer = React.createClass({
   render() {
 
     let {layerContainer, map} = this.context;
-    let {colourProperty, table} = this.props;
+    let {colourProperty, table, labelProperty} = this.props;
     let {geoJSONs} = this.state;
 
     if (_isEmpty(geoJSONs)) {
@@ -190,12 +199,16 @@ let TableGeoJSONsLayer = React.createClass({
         layerContainer={layerContainer}
         map={map}
       >
-        <MapControlComponent position="bottomleft">
-          <PropertyLegend
-            property={colourProperty}
-            table={table}
-          />
-        </MapControlComponent>
+        {colourProperty ?
+          <MapControlComponent position="bottomleft">
+            <ColourPropertyLegend
+              colourProperty={colourProperty}
+              table={table}
+              labelProperty={labelProperty}
+            />
+          </MapControlComponent>
+          : null
+        }
         <FeatureGroup>
           {
             geoJSONs.map(

@@ -17,11 +17,11 @@
     </Map>
   </div>
   
-  <p>Here's the same map with a query:</p>
+  <p>Here's the same map with a query and a specified labelProperty for the legend:</p>
   <div style="width:600px;height:300px">
     <Map>
       <TileLayer />
-      <TableGeoJSONsLayer table="regions" geoJsonProperty="regionPolygon" colourProperty="colour" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"colour","CompValue":"red","isRoot":true,"Tpe":"="}' />
+      <TableGeoJSONsLayer table="regions" geoJsonProperty="regionPolygon" colourProperty="colour" labelProperty="name" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"colour","CompValue":"red","isRoot":true,"Tpe":"="}' />
     </Map>
   </div>
   
