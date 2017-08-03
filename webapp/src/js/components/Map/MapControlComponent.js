@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
+import ReactDOM from 'react-dom';
 import {MapControl} from 'react-leaflet';
 import {control, DomUtil} from 'leaflet';
 
@@ -13,9 +13,12 @@ export default class MapControlComponent extends MapControl {
   createLeafletElement({children, position, className}) {
     let con = control({position});
     con.onAdd = (map) => {
-      let div = DomUtil.create('div', 'map-custom-control ' + className);
-      div.innerHTML = ReactDOMServer.renderToStaticMarkup(React.cloneElement(React.Children.only(children), {flux: this.context.flux}));
-      return div;
+      this.div = DomUtil.create('div', 'map-custom-control ' + className);
+      ReactDOM.render(React.cloneElement(React.Children.only(children), {flux: this.context.flux}), this.div);
+      return this.div;
+    };
+    con.onRemove = (map) => {
+      ReactDOM.unmountComponentAtNode(this.div);
     };
     return con;
   }
