@@ -25,4 +25,13 @@
     </Map>
   </div>
   
+  
+  <p>Here's a map with maxLegendItems set to 2:</p>
+  <div style="width:600px;height:300px">
+    <Map>
+      <TileLayer />
+      <TableGeoJSONsLayer table="regions" geoJsonProperty="regionPolygon" colourProperty="colour" labelProperty="name" maxLegendItems="2" />
+    </Map>
+  </div>
+  
 </div>
