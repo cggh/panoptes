@@ -13,7 +13,6 @@ import _sum from 'lodash/sum';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _forEach from 'lodash/forEach';
-import _size from 'lodash/size';
 import _keys from 'lodash/keys';
 
 // Panoptes
