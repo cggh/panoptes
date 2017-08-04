@@ -12,7 +12,7 @@ const PanoptesActions = (config) => ({
 
     // NB: If tableDataItemViews is undefined or null, then default views (Overview and maybe Map) will be returned by getViews().
     let views = DataItemViews.getViews(tableDataItemViews, config.tablesById[table].hasGeoCoord);
-    this.dispatch(SESSION.POPUP_OPEN, {
+    this.dispatch(SESSION.TAB_OPEN, {
       component: serialiseComponent(
         <DataItem table={table} primKey={primKey}>
           {views}
