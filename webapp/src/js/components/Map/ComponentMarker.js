@@ -85,16 +85,22 @@ let ComponentMarker = React.createClass({
 
     // NB: any className to override the default white squares set by Leaflet CSS.
 
+    // NB: setting DivIcon's onClick to undefined does not prevent it being called downstream.
+    let existentialProps = {};
+    if (onClick !== undefined) {
+      existentialProps.onClick = (e) => onClick(e, this);
+    }
+
     return (
       <DivIcon
         alt={alt}
         className={null}
-        onClick={(e) => onClick(e, this)}
         opacity={opacity}
         position={position}
         title={title}
         iconSize={0}
         zIndexOffset={zIndexOffset}
+        {...existentialProps}
       >
         {React.Children.only(children)}
       </DivIcon>

@@ -33,6 +33,7 @@ let TableGeoJSONsLayer = React.createClass({
     colourProperty: React.PropTypes.string,
     geoJsonProperty: React.PropTypes.string.isRequired,
     labelProperty: React.PropTypes.string,
+    showLegend: React.PropTypes.bool,
     maxLegendItems: React.PropTypes.number,
     config: React.PropTypes.object, // This will be provided via withAPIData
     data: React.PropTypes.array // This will be provided via withAPIData
@@ -58,6 +59,7 @@ let TableGeoJSONsLayer = React.createClass({
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
+      showLegend: true
     };
   },
 
@@ -70,7 +72,7 @@ let TableGeoJSONsLayer = React.createClass({
   render() {
 
     let {layerContainer, map} = this.context;
-    let {colourProperty, table, labelProperty, geoJsonProperty, maxLegendItems, config, data} = this.props;
+    let {colourProperty, table, labelProperty, geoJsonProperty, showLegend, maxLegendItems, config, data} = this.props;
 
     if (data === undefined || data === null) {
       return null;
@@ -119,7 +121,7 @@ let TableGeoJSONsLayer = React.createClass({
         layerContainer={layerContainer}
         map={map}
       >
-        {colourProperty ?
+        {showLegend && colourProperty !== undefined ?
           <MapControlComponent position="bottomleft">
             <ColourPropertyLegend
               colourProperty={colourProperty}

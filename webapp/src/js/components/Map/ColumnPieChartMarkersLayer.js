@@ -54,6 +54,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
     markerSizeProperty: React.PropTypes.string,
     prefix: React.PropTypes.string.isRequired,
     showLegend: React.PropTypes.bool,
+    disableOnClickMarker: React.PropTypes.bool,
     maxLegendItems: React.PropTypes.number
   },
   childContextTypes: {
@@ -78,7 +79,8 @@ let ColumnPieChartMarkersLayer = React.createClass({
 
   getDefaultProps() {
     return {
-      showLegend: true
+      showLegend: true,
+      disableOnClickMarker: false
     };
   },
 
@@ -243,7 +245,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
 
   render() {
 
-    let {table, prefix, showLegend, maxLegendItems} = this.props;
+    let {table, prefix, showLegend, disableOnClickMarker, maxLegendItems} = this.props;
     let {crs, layerContainer, map} = this.context;
     let {clusterMarkers} = this.state;
 
@@ -310,7 +312,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
                           <ComponentMarker
                             key={'ComponentMarker_' + i}
                             position={{lat: marker.lat, lng: marker.lng}}
-                            onClick={(e) => this.handleClickClusterMarker(e, marker.primKey)}
+                            onClick={!disableOnClickMarker ? (e) => this.handleClickClusterMarker(e, marker.primKey) : undefined}
                             zIndexOffset={0}
                           >
                             {clusterComponent}

@@ -38,4 +38,11 @@
       <TableMarkersLayer table="things" maxLegendItems="3" markerColourProperty="eyeColour_blue" />
     </Map>
   </div>
+  <h2>Map with disableOnClickMarker set to something falsey. (See showLegend above for notes on how Booleans are interpreted.)</h2>
+  <div style="height: 200px; width: 500px">
+    <Map zoom="3">
+        <TileLayer />
+        <TableMarkersLayer table="things" markerColourProperty="ID" disableOnClickMarker="yes" />
+    </Map>
+  </div>
 </div>

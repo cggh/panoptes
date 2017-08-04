@@ -51,6 +51,7 @@ let PieChartMarkersLayer = React.createClass({
     residualFractionName: React.PropTypes.string,
     residualSectorColor: React.PropTypes.string,
     showLegend: React.PropTypes.bool,
+    disableOnClickMarker: React.PropTypes.bool,
     maxLegendItems: React.PropTypes.number
   },
   childContextTypes: {
@@ -66,7 +67,8 @@ let PieChartMarkersLayer = React.createClass({
     return {
       defaultResidualFractionName: 'Other',
       defaultResidualSectorColor: 'rgb(191,191,191)',
-      showLegend: true
+      showLegend: true,
+      disableOnClickMarker: false
     };
   },
   getInitialState() {
@@ -262,7 +264,7 @@ let PieChartMarkersLayer = React.createClass({
 
   render() {
 
-    let {showLegend, maxLegendItems} = this.props;
+    let {showLegend, maxLegendItems, disableOnClickMarker} = this.props;
     let {crs, layerContainer, map} = this.context;
     let {markers, colours} = this.state;
 
@@ -309,7 +311,7 @@ let PieChartMarkersLayer = React.createClass({
                         <ComponentMarker
                           key={i}
                           position={{lat: marker.lat, lng: marker.lng}}
-                          onClick={(e) => this.handleClickMarker(e, marker)}
+                          onClick={!disableOnClickMarker ? (e) => this.handleClickMarker(e, marker) : undefined}
                         >
                           <PieChart
                             chartData={marker.chartData}

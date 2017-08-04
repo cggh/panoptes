@@ -63,7 +63,8 @@ let TableMarkersLayer = React.createClass({
     table: React.PropTypes.string,
     markerColourProperty: React.PropTypes.string,
     showLegend: React.PropTypes.bool,
-    maxLegendItems: React.PropTypes.number
+    maxLegendItems: React.PropTypes.number,
+    disableOnClickMarker: React.PropTypes.bool
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -87,7 +88,8 @@ let TableMarkersLayer = React.createClass({
 
   getDefaultProps() {
     return {
-      showLegend: true
+      showLegend: true,
+      disableOnClickMarker: false
     };
   },
 
@@ -312,7 +314,7 @@ let TableMarkersLayer = React.createClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table, showLegend, maxLegendItems} = this.props;
+    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker} = this.props;
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
 
     if (_isEmpty(markersGroupedByLocation)) {
@@ -536,9 +538,12 @@ let TableMarkersLayer = React.createClass({
                           lngProperty: marker.lngProperty
                         };
 
-                        let onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
-                        if (marker.markersAtLocationCount === 1) {
-                          onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
+                        let onClick = undefined;
+                        if (!disableOnClickMarker) {
+                          onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
+                          if (marker.markersAtLocationCount === 1) {
+                            onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
+                          }
                         }
 
                         return (
