@@ -82,17 +82,24 @@ if (dataset) {
       const defaultState = {
         session: {
           components: {
-            FirstTab: config.docs['index.html'] ? {
+            FirstTab: {
               type: 'DocPage',
               props: {
                 path: 'index.html'
               }
-            } : {
+            },
+            InitialDocPage: {
+              type: 'DocPage',
+              props: {
+                path: 'guidebook.html'
+              }
+            },
+            InitialOtherPage: {
               type: 'EmptyTab'
             }
           },
           tabs: {
-            components: ['FirstTab'],
+            components: ['FirstTab', 'InitialDocPage', 'InitialOtherPage'] ,
             selectedTab: 'FirstTab',
             unclosableTabs: ['FirstTab'],
             unreplaceableTabs: ['FirstTab']
