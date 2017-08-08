@@ -4,6 +4,7 @@ import createReactClass from 'create-react-class';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
 import _assign from 'lodash.assign';
+import SwipeableViews from 'react-swipeable-views';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -35,6 +36,7 @@ import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import MoreVert from 'material-ui-icons/MoreVert';
+import Tabs, { Tab } from 'material-ui/Tabs';
 
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
@@ -104,10 +106,11 @@ let Panoptes = createReactClass({
   },
 
   getStateFromFlux() {
-    let {tabs, popups} = this.getFlux().store('SessionStore').getState().toObject();
+    let {tabs, popups, components} = this.getFlux().store('SessionStore').getState().toObject();
     return {
       tabs,
       popups,
+      components,
       modal: this.getFlux().store('SessionStore').getModal(),
       panoptes: this.getFlux().store('PanoptesStore').getState()
     };
@@ -117,10 +120,57 @@ let Panoptes = createReactClass({
     this.getFlux().actions.session.appResize();
   },
 
+  isDocPage(component) {
+    return component.type === 'DocPage' ||  component.type ===  'DataItem';
+  },
+
+  handleChangeTab(event, index) {
+    let actions = this.getFlux().actions.session;
+    let {tabs,  components} = this.state;
+    tabs = tabs.toJS();
+    components = components.toJS();
+    //Filter all the DocPage components to a list
+    let docPages = [];
+    let others = [];
+    tabs.components.forEach((component) => {
+      if (component !== 'FirstTab') {
+        (this.isDocPage(components[component]) ? docPages : others).push(component);
+      }
+    });
+    if (index === 0) {
+      actions.tabSwitch('FirstTab');
+    }
+    if (index === 1) {
+      actions.tabSwitch(docPages[docPages.length-1]);
+    }
+    if (index === 2) {
+      actions.tabSwitch(others[others.length-1]);
+    }
+  },
+
   render() {
     let actions = this.getFlux().actions.session;
-    let {tabs, popups, modal} = this.state;
+    let {tabs, popups, modal, components} = this.state;
     let config = this.config;
+    tabs = tabs.toJS();
+    components = components.toJS();
+    //Filter all the DocPage components to a list
+    let docPages = [];
+    let others = [];
+    tabs.components.forEach((component) => {
+      (this.isDocPage(components[component]) ? docPages : others).push(component)
+    });
+    let tabIndex = 0;
+    let selectedDocPage = 'InitialDocPage';
+    let selectedOther = 'InitialOther';
+    if (tabs.selectedTab !== "FirstTab" && docPages.indexOf(tabs.selectedTab) >= 0) {
+      tabIndex = 1;
+      selectedDocPage = tabs.selectedTab;
+    }
+    if (others.indexOf(tabs.selectedTab) >= 0) {
+      tabIndex = 2;
+      selectedOther = tabs.selectedTab;
+    }
     // NB: initialConfig is actually defined (in index.html)
     return (
       <DetectResize onResize={this.handleResize}>
@@ -131,11 +181,33 @@ let Panoptes = createReactClass({
             </div>
             <div className="page">
               <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
-              <div className="body scroll-within">
-                  <SessionComponent compId={tabs.get('selectedTab')} />
-              </div>
+              <Tabs
+                onChange={this.handleChangeTab}
+                value={tabIndex}
+                indicatorColor="primary"
+                textColor="primary"
+                centered
+              >
+                <Tab label="Home" />
+                <Tab label="Guidebook" />
+                <Tab label="Viewer" />
+              </Tabs>
+              <SwipeableViews
+                index={tabIndex}
+                onChangeIndex={this.handleChangeTab}
+              >
+                <div className="body scroll-within">
+                  <SessionComponent compId={"FirstTab"} />
+                </div>
+                <div className="body scroll-within">
+                  <SessionComponent compId={selectedDocPage} />
+                </div>
+                <div className="body scroll-within">
+                  <SessionComponent compId={selectedOther} />
+                </div>
+              </SwipeableViews>
             </div>
-            <Modal visible={modal ? true : false}
+            <Modal visible={!!modal}
               onClose={actions.modalClose}>
               {modal ?
                 React.cloneElement(modal, {setProps: actions.modalSetProps})
