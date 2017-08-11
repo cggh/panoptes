@@ -20,7 +20,7 @@ let GeoJSON = React.createClass({
   getDefaultProps() {
     return {
       colour: '#006400',
-      weight: 5,
+      weight: 2,
       opacity: 0.65
     };
   },
