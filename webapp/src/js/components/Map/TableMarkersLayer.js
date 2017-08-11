@@ -64,7 +64,8 @@ let TableMarkersLayer = React.createClass({
     markerColourProperty: React.PropTypes.string,
     showLegend: React.PropTypes.bool,
     maxLegendItems: React.PropTypes.number,
-    disableOnClickMarker: React.PropTypes.bool
+    disableOnClickMarker: React.PropTypes.bool,
+    clusterMarkers: React.PropTypes.bool
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -89,7 +90,8 @@ let TableMarkersLayer = React.createClass({
   getDefaultProps() {
     return {
       showLegend: true,
-      disableOnClickMarker: false
+      disableOnClickMarker: false,
+      clusterMarkers: true
     };
   },
 
@@ -314,7 +316,7 @@ let TableMarkersLayer = React.createClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker} = this.props;
+    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker, clusterMarkers} = this.props;
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
 
     if (_isEmpty(markersGroupedByLocation)) {
@@ -329,7 +331,7 @@ let TableMarkersLayer = React.createClass({
       markerColourPropertyIsCategorical = this.config.tablesById[table].propertiesById[markerColourProperty].isCategorical;
     }
 
-    let clusterMarkers = [];
+    let clusteredMarkers = [];
     const uniqueValues = {};
 
     for (let location in markersGroupedByLocation) {
@@ -371,7 +373,7 @@ let TableMarkersLayer = React.createClass({
         // at least not to the fillColour of the bins,
         // because each bin represents a range of values.
 
-        clusterMarkers.push({
+        clusteredMarkers.push({
           clusterType: 'histogram',
           chartDataTable: table,
           key: location,
@@ -418,7 +420,7 @@ let TableMarkersLayer = React.createClass({
             color: markersGroupedByValue[value][0].valueAsColour
           });
         }
-        clusterMarkers.push({
+        clusteredMarkers.push({
           clusterType: 'pieChart',
           chartDataTable: table,
           key: location,
@@ -440,14 +442,14 @@ let TableMarkersLayer = React.createClass({
 
     }
 
-    if (clusterMarkers.length > 0) {
+    if (clusteredMarkers.length > 0) {
 
       // NB: Copied from PieChartMarkersLayer
       let size = map.getSize();
       let bounds = map.getBounds();
       let pixelArea = size.x * size.y;
       let pieAreaSum = _sum(_map(
-        _filter(clusterMarkers, (marker) => {
+        _filter(clusteredMarkers, (marker) => {
           let {lat, lng} = marker;
           return bounds.contains([lat, lng]);
         }),
@@ -458,7 +460,7 @@ let TableMarkersLayer = React.createClass({
         lengthRatio = Math.sqrt(0.05 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
-      _forEach(clusterMarkers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
+      _forEach(clusteredMarkers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
       return (
         <FeatureGroup
           layerContainer={layerContainer}
@@ -475,104 +477,142 @@ let TableMarkersLayer = React.createClass({
             </MapControlComponent>
           : null
           }
-          <GeoLayouter nodes={clusterMarkers}>
-            {
-              (renderNodes) =>
-                <FeatureGroup>
-                  {
-                    renderNodes.map(
-                      (marker, i) => {
-
-                        let clusterComponent = undefined;
-
-                        if (marker.clusterType === 'pieChart' || marker.markersAtLocationCount === 1) {
-
-                          clusterComponent = (
-                              <PieChart
-                                chartData={marker.chartData}
-                                crs={crs}
-                                hideValues={true}
-                                lat={marker.lat}
-                                lng={marker.lng}
-                                originalLat={marker.originalLat}
-                                originalLng={marker.originalLng}
-                                radius={marker.radius}
-                                faceText={marker.count !== undefined ? marker.count : 1}
-                                isHighlighted={marker.isHighlighted}
-                              />
-                          );
-
-                        } else if (marker.clusterType === 'histogram') {
-
-                          const histogramWidth = Math.sqrt(Math.pow(marker.radius, 2) / 2) * 2;
-
-                          clusterComponent = (
-                              <Histogram
-                                chartData={marker.chartData}
-                                width={histogramWidth}
-                                height={histogramWidth}
-                                radius={marker.radius}
-                                lat={marker.lat}
-                                lng={marker.lng}
-                                originalLat={marker.originalLat}
-                                originalLng={marker.originalLng}
-                                unitNameSingle={this.config.tablesById[table].nameSingle}
-                                unitNamePlural={this.config.tablesById[table].namePlural}
-                                valueName={this.config.tablesById[table].propertiesById[markerColourProperty].name}
-                                colourScaleFunction={marker.colourScaleFunction}
-                                minValue={minValue}
-                                maxValue={maxValue}
-                                isHighlighted={marker.isHighlighted}
-                              />
-                          );
-
-                        } else {
-                          console.error('Unhandled marker.clusterType: %o', marker.clusterType);
-                        }
-
-                        let onClickPayload = {
-                          table: marker.table,
-                          originalLat: marker.originalLat,
-                          originalLng: marker.originalLng,
-                          latProperty: marker.latProperty,
-                          lngProperty: marker.lngProperty
-                        };
-
-                        let onClick = undefined;
-                        if (!disableOnClickMarker) {
-                          onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
-                          if (marker.markersAtLocationCount === 1) {
-                            onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
-                          }
-                        }
-
-                        return (
-                          <ComponentMarker
-                            key={'ComponentMarker_' + i}
-                            position={{lat: marker.lat, lng: marker.lng}}
-                            onClick={onClick}
-                            zIndexOffset={0}
-                          >
-                            {clusterComponent}
-                          </ComponentMarker>
-                        );
-
-
-                      }
-                    ).concat(
+          {clusterMarkers ?
+            <GeoLayouter nodes={clusteredMarkers}>
+              {
+                (renderNodes) =>
+                  <FeatureGroup>
+                    {
                       renderNodes.map(
-                        (marker, i) =>
-                          <Polyline
-                            className="panoptes-table-markers-layer-polyline"
-                            key={'Polyline_' + i}
-                            positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
-                          />
+                        (marker, i) => {
+
+                          let clusterComponent = undefined;
+
+                          if (marker.clusterType === 'pieChart' || marker.markersAtLocationCount === 1) {
+
+                            clusterComponent = (
+                                <PieChart
+                                  chartData={marker.chartData}
+                                  crs={crs}
+                                  hideValues={true}
+                                  lat={marker.lat}
+                                  lng={marker.lng}
+                                  originalLat={marker.originalLat}
+                                  originalLng={marker.originalLng}
+                                  radius={marker.radius}
+                                  faceText={marker.count !== undefined ? marker.count : 1}
+                                  isHighlighted={marker.isHighlighted}
+                                />
+                            );
+
+                          } else if (marker.clusterType === 'histogram') {
+
+                            const histogramWidth = Math.sqrt(Math.pow(marker.radius, 2) / 2) * 2;
+
+                            clusterComponent = (
+                                <Histogram
+                                  chartData={marker.chartData}
+                                  width={histogramWidth}
+                                  height={histogramWidth}
+                                  radius={marker.radius}
+                                  lat={marker.lat}
+                                  lng={marker.lng}
+                                  originalLat={marker.originalLat}
+                                  originalLng={marker.originalLng}
+                                  unitNameSingle={this.config.tablesById[table].nameSingle}
+                                  unitNamePlural={this.config.tablesById[table].namePlural}
+                                  valueName={this.config.tablesById[table].propertiesById[markerColourProperty].name}
+                                  colourScaleFunction={marker.colourScaleFunction}
+                                  minValue={minValue}
+                                  maxValue={maxValue}
+                                  isHighlighted={marker.isHighlighted}
+                                />
+                            );
+
+                          } else {
+                            console.error('Unhandled marker.clusterType: %o', marker.clusterType);
+                          }
+
+                          let onClickPayload = {
+                            table: marker.table,
+                            originalLat: marker.originalLat,
+                            originalLng: marker.originalLng,
+                            latProperty: marker.latProperty,
+                            lngProperty: marker.lngProperty
+                          };
+
+                          let onClick = undefined;
+                          if (!disableOnClickMarker) {
+                            onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
+                            if (marker.markersAtLocationCount === 1) {
+                              onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
+                            }
+                          }
+
+                          return (
+                            <ComponentMarker
+                              key={'ComponentMarker_' + i}
+                              position={{lat: marker.lat, lng: marker.lng}}
+                              onClick={onClick}
+                              zIndexOffset={0}
+                            >
+                              {clusterComponent}
+                            </ComponentMarker>
+                          );
+
+
+                        }
+                      ).concat(
+                        renderNodes.map(
+                          (marker, i) =>
+                            <Polyline
+                              className="panoptes-table-markers-layer-polyline"
+                              key={'Polyline_' + i}
+                              positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
+                            />
+                        )
                       )
-                    )
+                    }
+                  </FeatureGroup>
+              }
+            </GeoLayouter>
+          :
+            <FeatureGroup>
+              {
+                clusteredMarkers.map(
+                  (marker, i) => {
+
+                    let onClickPayload = {
+                      table: marker.table,
+                      originalLat: marker.originalLat,
+                      originalLng: marker.originalLng,
+                      latProperty: marker.latProperty,
+                      lngProperty: marker.lngProperty
+                    };
+
+                    let onClick = undefined;
+                    if (!disableOnClickMarker) {
+                      onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
+                      if (marker.markersAtLocationCount === 1) {
+                        onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
+                      }
+                    }
+
+                    return (
+                      <ComponentMarker
+                        key={'ComponentMarker_' + i}
+                        position={{lat: marker.lat, lng: marker.lng}}
+                        onClick={onClick}
+                        zIndexOffset={0}
+                      >
+                      </ComponentMarker>
+                    );
+
                   }
-                </FeatureGroup>
-            }
-          </GeoLayouter>
+                )
+              }
+            </FeatureGroup>
+          }
         </FeatureGroup>
       );
     } else {
