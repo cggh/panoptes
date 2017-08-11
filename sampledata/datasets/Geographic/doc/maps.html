@@ -4,7 +4,24 @@
   <div style="width:600px;height:300px">
     <Map>
       <TileLayer />
-      <TableMarkersLayer table="things" clusterMarkers="false" />
+      <TableMarkersLayer table="things" clusterMarkers="false">
+        <svg style="overflow: visible; width: 25px; height: 25px" viewBox="0 0 24 24">
+          <g transform="translate(-6, -14)">
+            <g transform="scale(0.4) translate(18, 10)">
+              <path
+                fill="blue"
+                d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+              />
+            </g>
+            <path
+              fill="blue"
+              d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"
+              stroke="black"
+              strokeWidth="1"
+            />
+          </g>
+        </svg>
+      </TableMarkersLayer>
     </Map>
   </div>
 </div>
