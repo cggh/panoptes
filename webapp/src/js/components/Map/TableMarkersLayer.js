@@ -33,9 +33,14 @@ import Histogram from 'Histogram';
 import {scaleColour} from 'util/Colours';
 import PropertyLegend from 'panoptes/PropertyLegend';
 import MapControlComponent from 'Map/MapControlComponent';
+import filterChildren from 'util/filterChildren';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
+
+const ALLOWED_CHILDREN = [
+  'svg'
+];
 
 let TableMarkersLayer = React.createClass({
 
@@ -65,7 +70,8 @@ let TableMarkersLayer = React.createClass({
     showLegend: React.PropTypes.bool,
     maxLegendItems: React.PropTypes.number,
     disableOnClickMarker: React.PropTypes.bool,
-    clusterMarkers: React.PropTypes.bool
+    clusterMarkers: React.PropTypes.bool,
+    children: React.PropTypes.node
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -316,8 +322,10 @@ let TableMarkersLayer = React.createClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker, clusterMarkers} = this.props;
+    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker, clusterMarkers, children} = this.props;
+
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     if (_isEmpty(markersGroupedByLocation)) {
       return null;
@@ -598,14 +606,19 @@ let TableMarkersLayer = React.createClass({
                       }
                     }
 
+                    let existentialProps = {};
+                    if (children !== undefined && children !== null) {
+                      existentialProps.children = children;
+                    }
+
                     return (
                       <ComponentMarker
                         key={'ComponentMarker_' + i}
                         position={{lat: marker.lat, lng: marker.lng}}
                         onClick={onClick}
                         zIndexOffset={0}
-                      >
-                      </ComponentMarker>
+                        {...existentialProps}
+                      />
                     );
 
                   }
