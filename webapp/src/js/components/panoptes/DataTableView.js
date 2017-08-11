@@ -36,7 +36,7 @@ import Icon from 'ui/Icon';
 import DetectResize from 'utils/DetectResize';
 
 // Constants in this component
-const MAX_COLOR = Color('#44aafb');
+const MAX_COLOR = Color('#d62728');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 const PREDEFINED_COLUMN_WIDTH = 90;
