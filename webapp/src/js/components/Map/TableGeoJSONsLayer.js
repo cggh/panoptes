@@ -97,18 +97,18 @@ let TableGeoJSONsLayer = React.createClass({
         value = nullifiedValue;
       }
 
-      let json = JSON.parse(data[i][geoJsonProperty]);
-
-      let geoJSON = {
-        table,
-        primKey,
-        title: labelProperty !== undefined ? labelProperty : primKey,
-        valueAsColour,
-        value,
-        json
-      };
-
-      geoJSONs.push(geoJSON);
+      if (data[i][geoJsonProperty]) {
+        let json =  JSON.parse(data[i][geoJsonProperty]);
+        let geoJSON = {
+          table,
+          primKey,
+          title: labelProperty !== undefined ? labelProperty : primKey,
+          valueAsColour,
+          value,
+          json
+        };
+        geoJSONs.push(geoJSON);
+      }
 
     }
 
