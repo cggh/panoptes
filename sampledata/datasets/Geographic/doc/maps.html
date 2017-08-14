@@ -1,25 +1,41 @@
 <title>Examples of Maps</title>
 <div style="margin: 10px">
-  <h2>A simple map of markers</h2>
+  <h2>A map of markers</h2>
   <div style="width:600px;height:300px">
     <Map>
       <TileLayer />
       <TableMarkersLayer table="things" clusterMarkers="false">
-        <svg style="overflow: visible; width: 25px; height: 25px" viewBox="0 0 24 24">
-          <g transform="translate(-6, -14)">
-            <g transform="scale(0.4) translate(18, 10)">
-              <path
-                fill="blue"
-                d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-              />
-            </g>
-            <path
-              fill="blue"
-              d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"
-              stroke="black"
-              strokeWidth="1"
-            />
-          </g>
+        <!-- 
+            The size of the svg.style.width and height scales the entire graphic to that size.
+            In this example, the size of the canvas in units (100x100) is scaled to the size of the SVG in pixels (50pxx50px), which is a scale of 50%, 0.5, 1:2. 
+        -->
+        <!-- 
+          The viewbox can be thought of as a unit-based canvas, defined via viewBox="min-X min-Y max-X max-Y".
+          The min-X min-Y can also be thought of as the viewBox's origin, within a 2-dimensional unit space.
+        -->
+        <!-- 
+          If svg style.overflow is not set to visible, then it defaults to hidden, and any graphic outside the viewbox will not be shown. 
+          In this example, the two circles are centred on (0, 0), so only their bottom-right quarters fall within the viewBox.
+        -->
+        <svg style="overflow: visible; width: 50px; height: 50px" viewBox="0 0 100 100">
+          <circle cx="0" cy="0" r="50" strokeWidth="5" stroke="red" fill="transparent" />
+          <circle cx="0" cy="0" r="1" fill="red" />
+        </svg>
+      </TableMarkersLayer>
+      <TableMarkersLayer table="things" clusterMarkers="false">
+        <!-- This example is similar to above, except that the viewBox min-X and min-Y have been shifted 50 units, and the circle centres shifted accordingly.  -->
+        <!-- In this example, the two circles are centred on (50, 50) in the unit space, but the viewBox only covers the bottom-right quarter of the unit space.  -->
+        <svg style="overflow: visible; width: 50px; height: 50px" viewBox="50 50 100 100">
+          <circle cx="50" cy="50" r="40" strokeWidth="3" stroke="blue" fill="transparent" />
+          <circle cx="50" cy="50" r="5" stroke="blue" fill="transparent" />
+        </svg>
+      </TableMarkersLayer>
+      <TableMarkersLayer table="things" clusterMarkers="false">
+        <!-- In this example, there is no need to show the overflow if the entire element is shifted to realign the center of the circles with the origin of the element. -->
+        <!-- Setting the position to either "absolute" or "relative" seems to work. -->
+        <svg style="width: 50px; height: 50px; position: relative; left: -25px; top: -25px;" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="30" strokeWidth="3" stroke="green" fill="transparent" />
+          <circle cx="50" cy="50" r="10" stroke="green" fill="transparent" />
         </svg>
       </TableMarkersLayer>
     </Map>
