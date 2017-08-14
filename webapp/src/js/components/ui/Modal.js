@@ -74,12 +74,13 @@ let Modal = React.createClass({
     };
 
     let hotKeysKeyMap = {
-      'handleKonami': 'up up down down left right left right b a enter',
+      'handleKonami': 'up up down down left right left right b a',
       'handleClose': ['escape'],
       'handleEnter': ['enter']
     };
+    let w = 'color:burlywood;', b = 'color:firebrick;', ws = `background-${w}`, bs = `background-${b}`, wp = 'color:white;', bp = 'color:black;', f = 'font-size:20pt;font-family:"Courier New";line-height:1;', bw = `${ws}${bp}${f}`, bb = `${bs}${bp}${f}`, ew = `${ws}${w}${f}`, eb = `${bs}${b}${f}`, ww = `${ws}${wp}${f}`, wb = `${bs}${wp}${f}`;
     let hotKeysHandlers = {
-      'handleKonami': (e) => { console.error('kong.am.i'); },
+      'handleKonami': (e) => { console.log('%c♜%c♞%c♝%c♛%c♚%c♝%c♞%c♜\n%c♟%c♟%c♟%c♟%c♟%c♟%c♟%c♟\n%c♟%c♟%c♟%c♟%c♟%c♟%c♟%c♟\n%c♟%c♟%c♟%c♟%c♟%c♟%c♟%c♟\n%c♟%c♟%c♟%c♟%c♟%c♟%c♟%c♟\n%c♟%c♟%c♟%c♟%c♟%c♟%c♟%c♟\n%c♟%c♟%c♟%c♟%c♟%c♟%c♟%c♟\n%c♜%c♞%c♝%c♛%c♚%c♝%c♞%c♜\n', bw, bb, bw, bb, bw, bb, bw, bb, bb, bw, bb, bw, bb, bw, bb, bw, ew, eb, ew, eb, ew, eb, ew, eb, eb, ew, eb, ew, eb, ew, eb, ew, ew, eb, ew, eb, ew, eb, ew, eb, eb, ew, eb, ew, eb, ew, eb, ew, ww, wb, ww, wb, ww, wb, ww, wb, wb, ww, wb, ww, wb, ww, wb, ww); },
       'handleClose': (e) => { !uncloseable ? onClose() : null; },
       'handleEnter': (e) => { this.child && this.child.handleEnter ? this.child.handleEnter() : null; }
     };
