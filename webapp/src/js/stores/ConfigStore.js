@@ -243,7 +243,8 @@ const ConfigStore = Fluxxor.createStore({
         'Boolean': 'String',
         'GeoLatitude': 'FloatH',
         'GeoLongitude': 'FloatH',
-        'Date': 'FloatH'
+        'Date': 'FloatH',
+        'GeoJSON': 'String'
       }[prop.dataType];
 
       let encodingTypes = {
@@ -292,7 +293,8 @@ const ConfigStore = Fluxxor.createStore({
         'Boolean': 'center',
         'GeoLatitude': 'right',
         'GeoLongitude': 'right',
-        'Date': 'center'
+        'Date': 'center',
+        'GeoJSON': 'left'
       }[prop.dataType];
       prop.description = prop.description || '';
       prop.showBar = prop.showBar || (prop.barWidth > 0);
@@ -311,7 +313,8 @@ const ConfigStore = Fluxxor.createStore({
         'Boolean': true,
         'GeoLatitude': 0,
         'GeoLongitude': 0,
-        'Date': 0
+        'Date': 0,
+        'GeoJSON': ''
       }[prop.dataType];
     });
     table.visibleProperties = _filter(table.properties, (property) => property.showInTable);
