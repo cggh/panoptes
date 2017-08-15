@@ -91,7 +91,7 @@ class ImportSettings:
                             ('isCategorical', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'description': 'Set automatically for columns with <50 distinct entries, unless set here. Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n'
+                                   'description': 'Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n When isCategorical is not set and the property has fewer than 50 distinct values and the dataType is not GeoJSON, then isCategorical is automatically set to True. \n'
                                    }),
                             ('valueColours', {
                                    'type': 'Block',
