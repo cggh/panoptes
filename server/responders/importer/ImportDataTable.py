@@ -56,7 +56,7 @@ class ImportDataTable(BaseImport):
                 if 'isCategorical' not in prop and self._dao._execSqlQuery(
                         'select count(distinct "{0}") from "{1}"'.format(prop_id, table_id))[0][0] < 50:
                     result['isCategorical'] = True
-                if (result.get('isCategorical', False) or prop.get('isCategorical', False)):
+                if ((result.get('isCategorical', False) or prop.get('isCategorical', False))) and prop['dataType'] != 'GeoJSON':
                     result['distinctValues'] = map(lambda a: encode(a[0]), self._dao._execSqlQuery(
                         'select distinct "{0}" from "{1}" order by "{0}"'.format(prop_id, table_id)))
                 if 'maxVal' not in prop and prop['dataType'] in valueTypes:
