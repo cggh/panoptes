@@ -46,6 +46,24 @@
         <PopupButton label="Tree of samples" target="tab">
             <TreeContainer table="samples" tree="tree2"/>
         </PopupButton>
+        <p>A drop down that chooses a component</p>
+        <SelectComponent hintText="Choose a thing:">
+            <option label="Text1" index="1">
+                <p>Text 1</p>
+            </option>
+            <option label="Text2" index="2">
+                <p>Text 1</p>
+            </option>
+        </SelectComponent>
+        <p>A drop down that chooses a component, that already has a selection</p>
+        <SelectComponent hintText="Choose a thing:" selectedIndex="1">
+            <option label="Text1" index="1">
+                <p>Text 1</p>
+            </option>
+            <option label="Text2" index="2">
+                <p>Text 1</p>
+            </option>
+        </SelectComponent>
         <p>A custom button targeting a tab:</p>
 	    <CustomButton target="tab">
             <Anchor>
