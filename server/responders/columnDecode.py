@@ -5,7 +5,7 @@ decoders = {
 
 for _op in ['/', '+', '-', '*']:
     decoders[_op] = (lambda op: lambda a, b: _decode(a) + op + _decode(b))(_op)
-for _op in ['count', 'max', 'min', 'avg']:
+for _op in ['count', 'max', 'min', 'avg', 'distinct']:
     decoders[_op] = (lambda op: lambda a: op + '(' + _decode(a) + ')')(_op)
 for _op in ['median', 'stddev_samp', 'stddev_pop', 'var_samp', 'var_pop']:
     #For some reason these need a prefix
