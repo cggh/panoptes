@@ -15,7 +15,8 @@ let QueryResult = React.createClass({
     query: React.PropTypes.string,
     expression: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
-    formatNumber: React.PropTypes.string
+    formatNumber: React.PropTypes.string,
+    distinct: React.PropTypes.bool
   },
 
   getDefaultProps() {
@@ -44,7 +45,8 @@ QueryResult = withAPIData(QueryResult, ({config, props}) => (
         database: config.dataset,
         table: props.table,
         columns: [{expr: JSON.parse(props.expression), as: 'result'}],
-        query: props.query
+        query: props.query,
+        distinct: props.distinct
       }
     }
   })
