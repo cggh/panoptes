@@ -1,0 +1,11 @@
+title: Panoptes server
+description: This is a server for a Panoptes web application.
+termsOfService: http://panoptes.readthedocs.io
+contact:
+  name: Development discussion
+  url: https://groups.google.com/forum/#!forum/panoptes-dev
+  email: panoptes-dev@googlegroups.com
+license:
+  name: GNU Affero General Public License v3.0
+  url: https://raw.githubusercontent.com/cggh/panoptes/master/LICENSE
+version: 0.1.0
