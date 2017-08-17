@@ -1,6 +1,5 @@
 import React from 'react';
 
-import SQL from 'panoptes/SQL';
 import withAPIData from 'hoc/withAPIData';
 import _isUndefined from 'lodash/isUndefined';
 import templateFieldsUsed from 'util/templateFieldsUsed';
@@ -13,8 +12,10 @@ import ItemTemplate from 'panoptes/ItemTemplate';
 import FluxMixin from 'mixins/FluxMixin';
 import DataItem from 'DataItem';
 import DataItemViews from 'panoptes/DataItemViews';
+import SQL from 'panoptes/SQL';
+import resolveJoins from 'panoptes/resolveJoins';
 
-let ChooseRow = React.createClass({
+let SelectRow = React.createClass({
 
   mixins: [
     FluxMixin,
@@ -24,6 +25,7 @@ let ChooseRow = React.createClass({
   propTypes: {
     query: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
+    queryTable: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -38,13 +40,13 @@ let ChooseRow = React.createClass({
     let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
     let itemTitle = tableConfig.itemTitle || `{{${tableConfig.primKey}}}`;
     if (_isUndefined(data)) {
-      return <SelectField hintText="Loading..." disabled={true} >
+      return <SelectField hintText="Loading..." disabled={true}>
       </SelectField>;
     } else if (data.length === 0) {
       return <SelectField hintText={`No ${tableConfig.capNamePlural} to choose from`} disabled={true}>
       </SelectField>;
     } else {
-      return <SelectField hintText={`Choose a ${tableConfig.capNameSingle}`} onChange={(e,k,v) => {
+      return <SelectField hintText={`Choose a ${tableConfig.capNameSingle}`} onChange={(e, k, v) => {
         this.getFlux().actions.session.popupOpen(<DataItem primKey={v} table={table}>{views}</DataItem>);
       }}>
         {_map(data, (row) =>
@@ -64,27 +66,28 @@ let ChooseRow = React.createClass({
   }
 });
 
-ChooseRow = withAPIData(ChooseRow, ({config, props}) => {
-  let {table, query} = props;
+SelectRow = withAPIData(SelectRow, ({config, props}) => {
+  let {table, query, queryTable} = props;
   let tableConfig = config.tablesById[table];
   let itemTitle = tableConfig.itemTitle || `{{${tableConfig.primKey}}}`;
   let columns = templateFieldsUsed(itemTitle, _keys(tableConfig.propertiesById));
   columns.push(tableConfig.primKey);
   columns = _uniq(columns);
-
-  return ({
+  columns = _map(columns, (column) => `${table}.${column}`);
+  return {
     data: {
       method: 'query',
-      args: {
+      args: resolveJoins({
         database: config.dataset,
-        table: table,
+        table: queryTable || table,
         columns: columns,
         query: query,
-        transpose: true
-      }
+        transpose: true,
+        distinct: true
+      }, config)
     }
-  });
+  };
 });
 
-export default ChooseRow;
+export default SelectRow;
 

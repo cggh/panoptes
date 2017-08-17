@@ -26,6 +26,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
 import PropertyCell from 'panoptes/PropertyCell';
 import PropertyHeader from 'panoptes/PropertyHeader';
+import resolveJoins from 'panoptes/resolveJoins';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -129,7 +130,7 @@ let DataTableView = React.createClass({
       let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
       let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
 
-      let queryAPIargs = this.resolveJoins({
+      let queryAPIargs = resolveJoins({
         database: this.config.dataset,
         table: this.config.tablesById[table].id,
         columns,
@@ -139,7 +140,7 @@ let DataTableView = React.createClass({
         stop: fetchStopRowIndex,
         transpose: true, //We want rows, not columns,
         joins
-      });
+      }, this.config);
 
       requestContext.request((componentCancellation) =>
         Promise.all([
@@ -176,86 +177,6 @@ let DataTableView = React.createClass({
     } else {
       this.setState({rows: []});
     }
-  },
-
-  resolveJoins(queryAPIargs) {
-
-
-    if (queryAPIargs.joins !== undefined) {
-
-      // If there are joins, make sure we qualify each column name to avoid ambiguity.
-
-      for (let i = 0; i < queryAPIargs.joins.length; i++) {
-
-        let join = queryAPIargs.joins[i];
-        if (join.column.indexOf('.') == -1) {
-          join.column = queryAPIargs.table + '.' + join.column;
-        }
-        if (join.foreignColumn.indexOf('.') == -1) {
-          join.foreignColumn = join.foreignTable + '.' + join.foreignColumn;
-        }
-
-      }
-
-      // Assume that unqualified columns in the list belong to queryAPIargs.table
-      for (let i = 0; i < queryAPIargs.columns.length; i++) {
-        if (queryAPIargs.columns[i].indexOf('.') == -1) {
-          queryAPIargs.columns[i] = queryAPIargs.table + '.' + queryAPIargs.columns[i];
-        }
-      }
-
-
-    } else {
-
-      // Extract implicit joins; joins implied by columns belonging to other tables.
-
-      queryAPIargs.joins = [];
-      let foreignTables = [];
-
-      for (let i = 0; i < queryAPIargs.columns.length; i++) {
-
-        let column = queryAPIargs.columns[i];
-
-        if (column.indexOf('.') !== -1) {
-
-          let [tableId] = column.split('.');
-
-          if (tableId !== queryAPIargs.table && foreignTables.indexOf(tableId) == -1) {
-
-            let relation = undefined;
-            for (let j = 0; j < this.config.tablesById[queryAPIargs.table].relationsChildOf.length; j++) {
-              if (this.config.tablesById[queryAPIargs.table].relationsChildOf[j].tableId == tableId) {
-                relation = this.config.tablesById[queryAPIargs.table].relationsChildOf[j];
-                break;
-              }
-            }
-
-            if (relation === undefined) {
-              console.error(`There is no relation configured for the child table ${tableId} for parent table ${queryAPIargs.table}.`);
-              return;
-            }
-
-            let join = {};
-            join.type = '';
-            join.foreignTable = relation.tableId;
-            join.foreignColumn = relation.tableId + '.' + relation.parentTable.primKey;
-            join.column = queryAPIargs.table + '.' + relation.childPropId;
-
-            queryAPIargs.joins.push(join);
-
-            foreignTables.push(tableId);
-          }
-        }
-
-      }
-
-      if (queryAPIargs.joins.length == 0) {
-        queryAPIargs.joins = undefined;
-      }
-
-    }
-
-    return queryAPIargs;
   },
 
   handleColumnResize(width, column) {
