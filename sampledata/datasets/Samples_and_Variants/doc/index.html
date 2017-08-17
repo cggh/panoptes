@@ -82,7 +82,10 @@
             </Content>
         </ToggleBox>
         <div> A drop down allowing one to select a row:<br/>
-            <ChooseRow table="contributors">
+            <SelectRow table="contributors">
+        </div>
+        <div> A drop down allowing one to select a row, restricted to a query on a related table:<br/>
+            <SelectRow table="contributors" queryTable="samples" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Site_ID","CompValue":"St01","isRoot":true,"ColName2":"key","Tpe":"="}'>
         </div>
         <PopupButton label="Table with legend" target="tab">
             <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
