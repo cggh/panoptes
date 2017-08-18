@@ -32,7 +32,7 @@ import {Card, CardActions, CardHeader, CardTitle, CardText} from 'material-ui/Ca
 typeByDisplayName['Card'] = Card;
 typeByDisplayName['CardActions'] = CardActions;
 typeByDisplayName['CardHeader'] = CardHeader;
-typeByDisplayName['CardTitle'] = CardHeader;
+typeByDisplayName['CardTitle'] = CardTitle;
 typeByDisplayName['CardText'] = CardText;
 import {Tabs, Tab} from 'material-ui/Tabs';
 typeByDisplayName['Tabs'] = Tabs;
