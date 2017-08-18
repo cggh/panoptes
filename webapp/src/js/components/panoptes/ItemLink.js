@@ -28,15 +28,19 @@ let ItemLink = React.createClass({
   // TODO: primKey might need formatting (using panoptes/Formatter) but would need property.isBoolean, etc.
 
   render() {
-    let {primKey} = this.props;
-    return (
-      <span
-        className="prop internal-link"
-        onClick={(e) => this.handleClick(e)}
-      >
+    let {primKey, children} = this.props;
+    if (!children) {
+      return (
+        <span
+          className="prop internal-link"
+          onClick={(e) => this.handleClick(e)}
+        >
       {primKey}
       </span>
-    );
+      );
+    } else {
+      return <div style={{cursor:'pointer'}} onClick={(e) => this.handleClick(e)}>{children}</div>;
+    }
   }
 
 });
