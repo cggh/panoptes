@@ -1,5 +1,5 @@
 import Immutable from 'immutable';
-import _omit from 'lodash/omit';
+import _omit from 'lodash.omit';
 import {shallowEqualImmutable} from 'react-immutable-render-mixin';
 
 let PureRenderWithRedirectedProps = function({check, redirect}) {

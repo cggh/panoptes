@@ -3,11 +3,11 @@ import Sidebar from 'ui/Sidebar';
 import scrollbarSize from 'scrollbar-size';
 
 // Lodash
-import _clone from 'lodash/clone';
-import _filter from 'lodash/filter';
-import _map from 'lodash/map';
-import _forEach from 'lodash/forEach';
-import _assign from 'lodash/assign';
+import _clone from 'lodash.clone';
+import _filter from 'lodash.filter';
+import _map from 'lodash.map';
+import _forEach from 'lodash.foreach';
+import _assign from 'lodash.assign';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';

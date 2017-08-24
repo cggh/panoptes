@@ -2,7 +2,7 @@ import React from 'react';
 import createPlotlyComponent from 'react-plotlyjs';
 import Plotly from 'plotly.js/dist/plotly-cartesian';
 const PlotlyComponent = createPlotlyComponent(Plotly);
-import _reduce from 'lodash/reduce';
+import _reduce from 'lodash.reduce';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';

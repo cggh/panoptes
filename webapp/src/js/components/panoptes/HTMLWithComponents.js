@@ -1,8 +1,8 @@
 import React from 'react';
 import HtmlToReact from 'html-to-react';
 import ComponentRegistry from 'util/ComponentRegistry';
-import _forEach from 'lodash/forEach';
-import _camelCase from 'lodash/camelCase';
+import _forEach from 'lodash.foreach';
+import _camelCase from 'lodash.camelcase';
 import DocLink from 'panoptes/DocLink';
 
 function createStyleJsonFromString(styleString) {

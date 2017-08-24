@@ -1,6 +1,6 @@
 import React from 'react';
-import _some from 'lodash/some';
-import _filter from 'lodash/filter';
+import _some from 'lodash.some';
+import _filter from 'lodash.filter';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';

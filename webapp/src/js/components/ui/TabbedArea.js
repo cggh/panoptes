@@ -1,13 +1,13 @@
 import React from 'react';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import classNames from 'classnames';
-import _isEqual from 'lodash/isEqual';
-import _forEach from 'lodash/forEach';
+import _isEqual from 'lodash.isequal';
+import _forEach from 'lodash.foreach';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
 import Draggable from 'react-draggable';
 import filterChildren from 'util/filterChildren';
-import _assign from 'lodash/assign';
+import _assign from 'lodash.assign';
 import Immutable from 'immutable';
 
 let TabbedArea = React.createClass({

@@ -1,6 +1,6 @@
 import React from 'react';
 import FluxMixin from 'mixins/FluxMixin';
-import _isEmpty from 'lodash/isEmpty';
+import _isEmpty from 'lodash.isempty';
 import FeatureGroup from 'Map/FeatureGroup';
 import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';

@@ -2,7 +2,7 @@ import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import EditYAMLConfig from 'panoptes/EditYAMLConfig';
 import FlatButton from 'material-ui/FlatButton';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 import Divider from 'material-ui/Divider';
 
 // Mixins

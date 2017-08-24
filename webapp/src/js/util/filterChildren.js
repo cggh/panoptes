@@ -1,8 +1,8 @@
 import displayName from 'react-display-name';
-import _includes from 'lodash/includes';
-import _isString from 'lodash/isString';
-import _isArray from 'lodash/isArray';
-import _filter from 'lodash/filter';
+import _includes from 'lodash.includes';
+import _isString from 'lodash.isstring';
+import _isArray from 'lodash.isarray';
+import _filter from 'lodash.filter';
 
 export default function filterChildren(parent, children, allowed) {
   if (!children || children.length === 0)

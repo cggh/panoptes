@@ -6,12 +6,12 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Lodash
-import _isEmpty from 'lodash/isEmpty';
+import _isEmpty from 'lodash.isempty';
 
-import _sum from 'lodash/sum';
-import _filter from 'lodash/filter';
-import _map from 'lodash/map';
-import _forEach from 'lodash/forEach';
+import _sum from 'lodash.sum';
+import _filter from 'lodash.filter';
+import _map from 'lodash.map';
+import _forEach from 'lodash.foreach';
 
 // Panoptes
 import API from 'panoptes/API';

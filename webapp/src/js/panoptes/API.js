@@ -1,13 +1,13 @@
 import qajax from 'qajax';
 import arrayBufferDecode from 'panoptes/arrayBufferDecode';
-import _keys from 'lodash/keys';
-import _forEach from 'lodash/forEach';
-import _isNumber from 'lodash/isNumber';
-import {assertRequired} from 'util/Assert';
+import _keys from 'lodash.keys';
+import _forEach from 'lodash.foreach';
+import _isNumber from 'lodash.isnumber';
+import assertRequired from 'util/Assert';
 import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';
 import Base64 from 'panoptes/Base64';
-import _assign from 'lodash/assign';
+import _assign from 'lodash.assign';
 
 const serverURL = '/panoptes/api';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import Immutable from 'immutable';
-import _isFunction from 'lodash/isFunction';
+import _isFunction from 'lodash.isfunction';
 
 // This component wraps a component that has a "setProps" method,
 // such that it's props will be changed by the call to update eg:

@@ -19,11 +19,11 @@ import MapControlComponent from 'Map/MapControlComponent';
 import ColoursLegend from 'panoptes/ColoursLegend';
 
 // Lodash
-import _sumBy from 'lodash/sumBy';
-import _filter from 'lodash/filter';
-import _map from 'lodash/map';
-import _forEach from 'lodash/forEach';
-import _sum from 'lodash/sum';
+import _sumBy from 'lodash.sumby';
+import _filter from 'lodash.filter';
+import _map from 'lodash.map';
+import _forEach from 'lodash.foreach';
+import _sum from 'lodash.sum';
 
 let PieChartMarkersLayer = React.createClass({
 

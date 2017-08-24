@@ -1,5 +1,5 @@
-import _isFinite from 'lodash/isFinite';
-import _debounce from 'lodash/debounce';
+import _isFinite from 'lodash.isfinite';
+import _debounce from 'lodash.debounce';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import TextField from 'material-ui/TextField';

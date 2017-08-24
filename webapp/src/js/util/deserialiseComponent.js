@@ -1,8 +1,8 @@
 import React from 'react';
 import {List} from 'immutable';
 import ComponentRegistry from 'util/ComponentRegistry';
-import _isString from 'lodash/isString';
-import _forEach from 'lodash/forEach';
+import _isString from 'lodash.isstring';
+import _forEach from 'lodash.foreach';
 
 export default function deserialiseComponent(component, path = null, mappedFunctions = {}) {
   function _deserialiseComponent(component, path) {

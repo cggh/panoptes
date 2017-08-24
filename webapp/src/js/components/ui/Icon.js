@@ -2,7 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 const PropTypes = React.PropTypes;
-import _startsWith from 'lodash/startsWith';
+import _startsWith from 'lodash.startswith';
 
 const dynreq = require.context('../../../images', true);
 const dynamicRequire = (path) => dynreq('./' + path);

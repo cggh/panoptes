@@ -5,8 +5,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import Divider from 'material-ui/Divider';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import _each from 'lodash/each';
-import _filter from 'lodash/filter';
+import _each from 'lodash.foreach';
+import _filter from 'lodash.filter';
 
 
 const PropertySelector = React.createClass({

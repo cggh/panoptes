@@ -10,7 +10,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
 
 // Lodash
-import _forEach from 'lodash/forEach';
+import _forEach from 'lodash.foreach';
 
 const TOPBAR_HEIGHT = 33; //Mirrors css variable
 

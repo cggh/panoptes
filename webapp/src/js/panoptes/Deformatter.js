@@ -1,4 +1,4 @@
-import _indexOf from 'lodash/indexOf';
+import _indexOf from 'lodash.indexof';
 
 let DateTime2JD = function(date) {
   return date.getTime() / (24.0 * 60 * 60 * 1000) + 2440587.5;

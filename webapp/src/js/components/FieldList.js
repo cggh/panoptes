@@ -1,12 +1,12 @@
 import React from 'react';
-import _cloneDeep from 'lodash/cloneDeep';
+import _cloneDeep from 'lodash.clonedeep';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 
 // Utils
 import LRUCache from 'util/LRUCache';

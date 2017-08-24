@@ -1,10 +1,10 @@
 import React from 'react';
 import Immutable from 'immutable';
 import getDisplayName from 'react-display-name';
-import _map from 'lodash/map';
-import _isString from 'lodash/isString';
-import _isFunction from 'lodash/isFunction';
-import _isArray from 'lodash/isArray';
+import _map from 'lodash.map';
+import _isString from 'lodash.isstring';
+import _isFunction from 'lodash.isfunction';
+import _isArray from 'lodash.isarray';
 
 export default function serialiseComponent(component) {
   if (_isArray(component)) {

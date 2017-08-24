@@ -1,5 +1,5 @@
 import React from 'react';
-import _filter from 'lodash/filter';
+import _filter from 'lodash.filter';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -13,7 +13,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 
 // Utils
 import LRUCache from 'util/LRUCache';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 
 // UI components
 import Loading from 'ui/Loading';

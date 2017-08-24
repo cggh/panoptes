@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Highlight from 'react-highlighter';
-import _uniq from 'lodash/uniq';
-import _keys from 'lodash/keys';
+import _uniq from 'lodash.uniq';
+import _keys from 'lodash.keys';
 import striptags from 'striptags';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';

@@ -1,12 +1,12 @@
 import React from 'react';
-import _isFinite from 'lodash/isFinite';
-import _debounce from 'lodash/debounce';
-import _map from 'lodash/map';
-import _max from 'lodash/max';
-import _uniq from 'lodash/uniq';
-import _sum from 'lodash/sum';
-import _sortedIndex from 'lodash/sortedIndex';
-import _sortedLastIndex from 'lodash/sortedLastIndex';
+import _isFinite from 'lodash.isfinite';
+import _debounce from 'lodash.debounce';
+import _map from 'lodash.map';
+import _max from 'lodash.max';
+import _uniq from 'lodash.uniq';
+import _sum from 'lodash.sum';
+import _sortedIndex from 'lodash.sortedindex';
+import _sortedLastIndex from 'lodash.sortedlastindex';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';

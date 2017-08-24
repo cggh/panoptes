@@ -1,11 +1,11 @@
 import React from 'react';
 
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
-import _find from 'lodash/find';
+import _find from 'lodash.find';
 
 let SelectComponent = React.createClass({
 

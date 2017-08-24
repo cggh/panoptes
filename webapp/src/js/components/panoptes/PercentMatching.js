@@ -4,7 +4,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import SQL from 'panoptes/SQL';
 import withAPIData from 'hoc/withAPIData';
 import {format, precisionFixed} from 'd3-format';
-import _isUndefined from 'lodash/isUndefined';
+import _isUndefined from 'lodash.isundefined';
 
 let PercentMatching = React.createClass({
   mixins: [

@@ -3,12 +3,12 @@ import classNames from 'classnames';
 import Color from 'color';
 
 // Lodash
-import _uniq from 'lodash/uniq';
-import _some from 'lodash/some';
-import _forEach from 'lodash/forEach';
-import _filter from 'lodash/filter';
-import _map from 'lodash/map';
-import _orderBy from 'lodash/orderBy';
+import _uniq from 'lodash.uniq';
+import _some from 'lodash.some';
+import _forEach from 'lodash.foreach';
+import _filter from 'lodash.filter';
+import _map from 'lodash.map';
+import _orderBy from 'lodash.orderby';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';

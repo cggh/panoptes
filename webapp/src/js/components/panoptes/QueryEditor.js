@@ -13,10 +13,10 @@ import PropertyInput from 'panoptes/PropertyInput';
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Icon from 'ui/Icon';
-import _assign from 'lodash/assign';
-import _clone from 'lodash/clone';
-import _find from 'lodash/find';
-import _map from 'lodash/map';
+import _assign from 'lodash.assign';
+import _clone from 'lodash.clone';
+import _find from 'lodash.find';
+import _map from 'lodash.map';
 
 let Component = React.createClass({
   propTypes: {

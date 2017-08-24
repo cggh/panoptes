@@ -2,8 +2,8 @@ import React from 'react';
 import Phylocanvas from 'react-phylocanvas';
 import {treeTypes} from 'phylocanvas';
 
-import _keys from 'lodash/keys';
-import _isEqual from 'lodash/isEqual';
+import _keys from 'lodash.keys';
+import _isEqual from 'lodash.isequal';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';

@@ -8,16 +8,16 @@ import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps'
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-import _filter from 'lodash/filter';
-import _sumBy from 'lodash/sumBy';
-import _sortedIndex from 'lodash/sortedIndex';
-import _sortedLastIndex from 'lodash/sortedLastIndex';
-import _sortBy from 'lodash/sortBy';
-import _last from 'lodash/last';
-import _some from 'lodash/some';
-import _takeRight from 'lodash/takeRight';
-import _unique from 'lodash/uniq';
-import _isFinite from 'lodash/isFinite';
+import _filter from 'lodash.filter';
+import _sumBy from 'lodash.sumby';
+import _sortedIndex from 'lodash.sortedindex';
+import _sortedLastIndex from 'lodash.sortedlastindex';
+import _sortBy from 'lodash.sortby';
+import _last from 'lodash.last';
+import _some from 'lodash.some';
+import _takeRight from 'lodash.takeright';
+import _unique from 'lodash.uniq';
+import _isFinite from 'lodash.isfinite';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';

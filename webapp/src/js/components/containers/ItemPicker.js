@@ -3,9 +3,9 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import Highlight from 'react-highlighter';
 import Pluralise from 'ui/Pluralise';
 
-import _map from 'lodash/map';
-import _some from 'lodash/some';
-import _keys from 'lodash/keys';
+import _map from 'lodash.map';
+import _some from 'lodash.some';
+import _keys from 'lodash.keys';
 
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';

@@ -1,6 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import _isArray from 'lodash/isArray';
+import _isArray from 'lodash.isarray';
 import filterChildren from 'util/filterChildren';
 
 //Child of CustomButton

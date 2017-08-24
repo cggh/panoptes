@@ -2,7 +2,7 @@ import React from  'react';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
 import {Map} from 'immutable';
-import _assign from 'lodash/assign';
+import _assign from 'lodash.assign';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';

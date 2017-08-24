@@ -2,7 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
-import _isArray from 'lodash/isArray';
+import _isArray from 'lodash.isarray';
 import CustomButton from 'panoptes/CustomButton';
 import Anchor from 'panoptes/Anchor';
 import Content from 'panoptes/Content';

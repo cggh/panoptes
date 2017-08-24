@@ -2,7 +2,7 @@ import React from 'react';
 import {scaleLinear} from 'd3-scale';
 import {histogram} from 'd3-array';
 
-import _maxBy from 'lodash/maxBy';
+import _maxBy from 'lodash.maxby';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import HistogramBin from 'HistogramBin';

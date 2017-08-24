@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import offset from 'bloody-offset';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import ConfigMixin from 'mixins/ConfigMixin';
-import _has from 'lodash/has';
-import _forEach from 'lodash/forEach';
-import _head from 'lodash/head';
-import _keys from 'lodash/keys';
+import _has from 'lodash.has';
+import _forEach from 'lodash.foreach';
+import _head from 'lodash.head';
+import _keys from 'lodash.keys';
 import {scaleLinear} from 'd3-scale';
 import scrollbarSize from 'scrollbar-size';
 import ValidComponentChildren from 'util/ValidComponentChildren';
@@ -23,7 +23,7 @@ import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
-import _isNumber from 'lodash/isNumber';
+import _isNumber from 'lodash.isnumber';
 
 const DEFAULT_SPRING = {stiffness: 160, damping: 30};
 const FLING_SPRING = {stiffness: 60, damping: 15};
@@ -100,7 +100,7 @@ let GenomeBrowser = React.createClass({
     if (nextProps.chromosome !== this.props.chromosome) {
       this.setState({hoverPos: null});
     }
-    
+
     if (this.nextSpringConfig) {
       this.setState({springConfig: this.nextSpringConfig});
       this.nextSpringConfig = null;

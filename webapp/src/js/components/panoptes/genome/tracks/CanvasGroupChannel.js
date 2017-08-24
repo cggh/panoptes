@@ -1,6 +1,6 @@
 import React from 'react';
-import _isFinite from 'lodash/isFinite';
-import _map from 'lodash/map';
+import _isFinite from 'lodash.isfinite';
+import _map from 'lodash.map';
 import Hammer from 'react-hammerjs';
 
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';

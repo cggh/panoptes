@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import _assign from 'lodash/assign';
+import _assign from 'lodash.assign';
 
 let TabPane = React.createClass({
   mixins: [PureRenderMixin],
