@@ -3,7 +3,7 @@ const APICONST = Constants.API;
 import API from 'panoptes/API';
 
 import ErrorReport from 'panoptes/ErrorReporter.js';
-import {assertRequired} from 'util/Assert';
+import assertRequired from 'util/Assert';
 
 let APIActions = {
   fetchUser(dataset) {

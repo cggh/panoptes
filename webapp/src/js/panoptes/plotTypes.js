@@ -1,7 +1,7 @@
-import _reduce from 'lodash/reduce';
-import _uniq from 'lodash/uniq';
-import _values from 'lodash/values';
-import _map from 'lodash/map';
+import _reduce from 'lodash.reduce';
+import _uniq from 'lodash.uniq';
+import _values from 'lodash.values';
+import _map from 'lodash.map';
 
 import {scaleColours} from 'util/Colours';
 

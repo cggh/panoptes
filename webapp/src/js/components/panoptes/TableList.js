@@ -1,5 +1,5 @@
 import React from 'react';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';

@@ -13,7 +13,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Icon from 'ui/Icon';
 import customHandlebars from 'util/customHandlebars';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
-import _debounce from 'lodash/debounce';
+import _debounce from 'lodash.debounce';
 
 import 'prismjs/themes/prism.css'
 import 'draft-js/dist/Draft.css'

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import _filter from 'lodash/filter';
-import _map from 'lodash/map';
-import _reduce from 'lodash/reduce';
-import _pickBy from 'lodash/pickBy';
+import _filter from 'lodash.filter';
+import _map from 'lodash.map';
+import _reduce from 'lodash.reduce';
+import _pickBy from 'lodash.pickby';
 
 import Plot from 'Plot';
 import PureRenderMixin from 'mixins/PureRenderMixin';

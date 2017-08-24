@@ -1,5 +1,5 @@
-import _has from 'lodash/has';
-import _without from 'lodash/without';
+import _has from 'lodash.has';
+import _without from 'lodash.without';
 import Q from 'q';
 
 const CANCELLED = {status: '__CANCELLED__'};

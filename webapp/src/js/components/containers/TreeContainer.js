@@ -1,10 +1,10 @@
 import React from 'react';
 import {treeTypes} from 'phylocanvas';
 
-import _keys from 'lodash/keys';
-import _map from 'lodash/map';
-import _filter from 'lodash/filter';
-import _keyBy from 'lodash/keyBy';
+import _keys from 'lodash.keys';
+import _map from 'lodash.map';
+import _filter from 'lodash.filter';
+import _keyBy from 'lodash.keyby';
 
 import Tree from 'panoptes/Tree';
 import PureRenderMixin from 'mixins/PureRenderMixin';

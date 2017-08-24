@@ -1,11 +1,11 @@
 import React from 'react';
 
 import withAPIData from 'hoc/withAPIData';
-import _isUndefined from 'lodash/isUndefined';
+import _isUndefined from 'lodash.isundefined';
 import templateFieldsUsed from 'util/templateFieldsUsed';
-import _uniq from 'lodash/uniq';
-import _keys from 'lodash/keys';
-import _map from 'lodash/map';
+import _uniq from 'lodash.uniq';
+import _keys from 'lodash.keys';
+import _map from 'lodash.map';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import ItemTemplate from 'panoptes/ItemTemplate';

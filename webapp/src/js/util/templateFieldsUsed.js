@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars';
-import _uniq from 'lodash/uniq';
-import _map from 'lodash/map';
-import _isFunction from 'lodash/isFunction';
+import _uniq from 'lodash.uniq';
+import _map from 'lodash.map';
+import _isFunction from 'lodash.isfunction';
 
 export default function(template, possibleTables) {
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import manualTween from 'util/manualTween';
-import _transform from 'lodash/transform';
-import _filter from 'lodash/filter';
+import _transform from 'lodash.transform';
+import _filter from 'lodash.filter';
 import {hatchRect} from 'util/CanvasDrawing';
 
 const HAT_HEIGHT = 20;

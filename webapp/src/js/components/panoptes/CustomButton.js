@@ -4,7 +4,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 import Anchor from 'panoptes/Anchor';
 import Content from 'panoptes/Content';
-import _isArray from 'lodash/isArray';
+import _isArray from 'lodash.isarray';
 
 let CustomButton = React.createClass({
   mixins: [

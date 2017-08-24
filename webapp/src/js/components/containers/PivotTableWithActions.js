@@ -10,7 +10,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Lodash
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 
 // Panoptes
 import SidebarHeader from 'ui/SidebarHeader';

@@ -12,12 +12,12 @@ import Loading from 'ui/Loading';
 import TileLayer from 'Map/TileLayer';
 
 // Lodash
-import _cloneDeep from 'lodash/cloneDeep';
-import _isArray from 'lodash/isArray';
-import _isEqual from 'lodash/isEqual';
-import _isObject from 'lodash/isObject';
-import _max from 'lodash/max';
-import _min from 'lodash/min';
+import _cloneDeep from 'lodash.clonedeep';
+import _isArray from 'lodash.isarray';
+import _isEqual from 'lodash.isequal';
+import _isObject from 'lodash.isobject';
+import _max from 'lodash.max';
+import _min from 'lodash.min';
 
 // CSS
 import 'leaflet/dist/leaflet.css';

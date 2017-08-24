@@ -1,5 +1,5 @@
 import keyMirror from 'keymirror';
-import _forOwn from 'lodash/forOwn';
+import _forOwn from 'lodash.forown';
 
 function nameSpace(namespace, obj) {
   let res = {};

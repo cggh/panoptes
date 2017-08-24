@@ -4,10 +4,10 @@ import {treeTypes} from 'phylocanvas';
 import titleCase from 'title-case';
 import Sidebar from 'ui/Sidebar';
 
-import _map from 'lodash/map';
-import _has from 'lodash/has';
-import _filter from 'lodash/filter';
-import _keys from 'lodash/keys';
+import _map from 'lodash.map';
+import _has from 'lodash.has';
+import _filter from 'lodash.filter';
+import _keys from 'lodash.keys';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';

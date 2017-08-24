@@ -1,11 +1,11 @@
 import React from 'react';
 import {line, area} from 'd3-shape';
-import _isFinite from 'lodash/isFinite';
-import _map from 'lodash/map';
-import _debounce from 'lodash/debounce';
-import _min from 'lodash/min';
-import _max from 'lodash/max';
-import _uniq from 'lodash/uniq';
+import _isFinite from 'lodash.isfinite';
+import _map from 'lodash.map';
+import _debounce from 'lodash.debounce';
+import _min from 'lodash.min';
+import _max from 'lodash.max';
+import _uniq from 'lodash.uniq';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -27,7 +27,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Slider from 'material-ui/Slider';
 import FilterButton from 'panoptes/FilterButton';
-import _assign from 'lodash/assign';
+import _assign from 'lodash.assign';
 
 
 const INTERPOLATIONS = [

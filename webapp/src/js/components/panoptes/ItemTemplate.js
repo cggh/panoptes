@@ -11,7 +11,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import templateFieldsUsed from 'util/templateFieldsUsed';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 
 // Panoptes components
 import API from 'panoptes/API';

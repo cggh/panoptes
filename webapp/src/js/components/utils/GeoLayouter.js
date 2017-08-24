@@ -2,10 +2,10 @@ import {forceSimulation, forceLink, forceManyBody, forceCollide} from 'd3-force'
 import React from 'react';
 
 // Lodash
-import _forEach from 'lodash/forEach';
-import _values from 'lodash/values';
-import _assign from 'lodash/assign';
-import _min from 'lodash/min';
+import _forEach from 'lodash.foreach';
+import _values from 'lodash.values';
+import _assign from 'lodash.assign';
+import _min from 'lodash.min';
 
 const NODE_MARGIN = 5;
 

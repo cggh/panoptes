@@ -51,7 +51,9 @@ module.exports = function (env) {
       new CopyWebpackPlugin([
         //Using this method for the favicons - this method should not be used generally, esp in JS where one can require(IMAGE_PATH)
         {from: 'src/images/favicons', to: 'images/favicons'},
-      ])
+      ]),
+      new webpack.ContextReplacementPlugin(/(ansi-color|handlebars-helpers|create-frame)/, /^$/),
+      new webpack.optimize.ModuleConcatenationPlugin()
     );
   } else {
     plugins.push(
@@ -81,18 +83,17 @@ module.exports = function (env) {
     module: {
       rules: [
 
-        // required for react jsx and es6
         {
           test: /(handlebars-helper|is-descriptor|create-frame)/,
           use: [
             {loader: 'unlazy-loader'},
           ]
         },
+        // required for react jsx and es6
         {
           test: /\.js?$/,
           exclude: /(node_modules|bower_components)/,
           use: [
-            {loader: 'unlazy-loader'}, //For handlebars-helper
             {loader: 'babel-loader'}
           ]
         },
@@ -125,7 +126,7 @@ module.exports = function (env) {
     },
     resolve: {
       alias: {
-        'handlebars' : 'handlebars/dist/handlebars.js'
+        'handlebars': 'handlebars/dist/handlebars.js'
       },
       modules: [
         'src/js',

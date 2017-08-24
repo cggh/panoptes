@@ -1,4 +1,4 @@
-import _debounce from 'lodash/debounce';
+import _debounce from 'lodash.debounce';
 import createHistory from 'history/createBrowserHistory';
 const history = createHistory();
 
@@ -25,7 +25,7 @@ import InitialConfig from 'panoptes/InitialConfig';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import Perf from 'react-addons-perf';
-import _filter from 'lodash/filter';
+import _filter from 'lodash.filter';
 
 if (process.env.NODE_ENV !== 'production') { //eslint-disable-line no-undef
   window.Perf = Perf;

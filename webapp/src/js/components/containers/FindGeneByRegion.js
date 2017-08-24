@@ -6,7 +6,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 // Lodash
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 
 // Panoptes
 import RegionGenesList from 'panoptes/RegionGenesList';

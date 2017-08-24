@@ -4,7 +4,7 @@ import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import LRUCache from 'util/LRUCache';
 import Q from 'q';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 import handlebarsHelpers from 'handlebars-helpers';
 
 const customHandlebars = ({dataset, handlebars}) => {

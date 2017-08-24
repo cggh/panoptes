@@ -4,9 +4,9 @@ import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
 
 // Lodash
-import _map from 'lodash/map';
-import _reduce from 'lodash/reduce';
-import _pickBy from 'lodash/pickBy';
+import _map from 'lodash.map';
+import _reduce from 'lodash.reduce';
+import _pickBy from 'lodash.pickby';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';

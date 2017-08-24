@@ -7,10 +7,10 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-import _map from 'lodash/map';
-import _isEqual from 'lodash/isEqual';
-import _transform from 'lodash/transform';
-import _filter from 'lodash/filter';
+import _map from 'lodash.map';
+import _isEqual from 'lodash.isequal';
+import _transform from 'lodash.transform';
+import _filter from 'lodash.filter';
 
 import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet, combineBlocks} from 'util/PropertyRegionCache';
@@ -25,7 +25,7 @@ import PropertyCell from 'panoptes/PropertyCell';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FilterButton from 'panoptes/FilterButton';
 import {propertyColour} from 'util/Colours';
-import _forEach from 'lodash/forEach';
+import _forEach from 'lodash.foreach';
 
 const HEIGHT = 50;
 

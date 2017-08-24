@@ -1,6 +1,6 @@
 import React from 'react';
 import Tooltip from 'rc-tooltip';
-import _forEach from 'lodash/forEach';
+import _forEach from 'lodash.foreach';
 import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
 
 import ConfigMixin from 'mixins/ConfigMixin';

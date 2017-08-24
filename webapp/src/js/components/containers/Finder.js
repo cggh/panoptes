@@ -11,7 +11,7 @@ import {List, ListItem} from 'material-ui/List';
 import Icon from 'ui/Icon';
 
 // lodash
-import _forEach from 'lodash/forEach';
+import _forEach from 'lodash.foreach';
 
 import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';

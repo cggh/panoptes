@@ -3,11 +3,11 @@ import classNames from 'classnames';
 import Color from 'color';
 
 // Lodash
-import _throttle from 'lodash/throttle';
-import _cloneDeep from 'lodash/cloneDeep';
-import _some from 'lodash/some';
-import _forEach from 'lodash/forEach';
-import _filter from 'lodash/filter';
+import _throttle from 'lodash.throttle';
+import _cloneDeep from 'lodash.clonedeep';
+import _some from 'lodash.some';
+import _forEach from 'lodash.foreach';
+import _filter from 'lodash.filter';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';

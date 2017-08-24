@@ -26,7 +26,7 @@ import Loading from 'ui/Loading';
 import RaisedButton from 'material-ui/RaisedButton';
 import Icon from 'ui/Icon';
 
-import _forEach from 'lodash/forEach';
+import _forEach from 'lodash.foreach';
 
 import 'genomebrowser.scss';
 

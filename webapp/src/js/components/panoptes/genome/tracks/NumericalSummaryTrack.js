@@ -1,14 +1,14 @@
 import React from 'react';
 import Color from 'color';
 
-import _min from 'lodash/min';
-import _max from 'lodash/max';
-import _sum from 'lodash/sum';
-import _sumBy from 'lodash/sumBy';
-import _debounce from 'lodash/debounce';
-import _sortedIndex from 'lodash/sortedIndex';
-import _sortedLastIndex from 'lodash/sortedLastIndex';
-import _isFinite from 'lodash/isFinite';
+import _min from 'lodash.min';
+import _max from 'lodash.max';
+import _sum from 'lodash.sum';
+import _sumBy from 'lodash.sumby';
+import _debounce from 'lodash.debounce';
+import _sortedIndex from 'lodash.sortedindex';
+import _sortedLastIndex from 'lodash.sortedlastindex';
+import _isFinite from 'lodash.isfinite';
 
 import {format} from 'd3-format';
 

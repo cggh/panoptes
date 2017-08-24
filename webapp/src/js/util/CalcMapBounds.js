@@ -1,6 +1,6 @@
 // Lodash
-import _maxBy from 'lodash/maxBy';
-import _minBy from 'lodash/minBy';
+import _maxBy from 'lodash.maxby';
+import _minBy from 'lodash.minby';
 
 function calcMapBounds(markers) {
   let L = window.L;

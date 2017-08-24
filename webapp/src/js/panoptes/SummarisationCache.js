@@ -1,10 +1,10 @@
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
-import {assertRequired} from 'util/Assert';
-import _map from 'lodash/map';
-import _transform from 'lodash/transform';
-import _reduce from 'lodash/reduce';
-import _forEach from 'lodash/forEach';
+import assertRequired from 'util/Assert';
+import _map from 'lodash.map';
+import _transform from 'lodash.transform';
+import _reduce from 'lodash.reduce';
+import _forEach from 'lodash.foreach';
 import SQL from 'panoptes/SQL';
 
 const FETCH_SIZE = 10000;

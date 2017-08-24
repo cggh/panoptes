@@ -1,5 +1,5 @@
 import React from 'react';
-import _isEmpty from 'lodash/isEmpty';
+import _isEmpty from 'lodash.isempty';
 import SQL from 'panoptes/SQL';
 import withAPIData from 'hoc/withAPIData';
 import LegendElement from 'panoptes/LegendElement';

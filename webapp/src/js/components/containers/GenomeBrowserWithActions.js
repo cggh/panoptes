@@ -6,13 +6,13 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import serialiseComponent from 'util/serialiseComponent';
 
-import _map from 'lodash/map';
-import _forEach from 'lodash/forEach';
-import _filter from 'lodash/filter';
-import _isNumber from 'lodash/isNumber';
-import _head from 'lodash/head';
-import _keys from 'lodash/keys';
-import _values from 'lodash/values';
+import _map from 'lodash.map';
+import _forEach from 'lodash.foreach';
+import _filter from 'lodash.filter';
+import _isNumber from 'lodash.isnumber';
+import _head from 'lodash.head';
+import _keys from 'lodash.keys';
+import _values from 'lodash.values';
 
 import Sidebar from 'ui/Sidebar';
 import Divider from 'material-ui/Divider';

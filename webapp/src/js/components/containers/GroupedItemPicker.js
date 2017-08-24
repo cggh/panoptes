@@ -6,15 +6,15 @@ import Highlight from 'react-highlighter';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {List, ListItem} from 'material-ui/List';
-import _map from 'lodash/map';
-import _includes from 'lodash/includes';
-import _intersection from 'lodash/intersection';
-import _union from 'lodash/union';
-import _without from 'lodash/without';
-import _forEach from 'lodash/forEach';
-import _sumBy from 'lodash/sumBy';
-import _filter from 'lodash/filter';
-import _difference from 'lodash/difference';
+import _map from 'lodash.map';
+import _includes from 'lodash.includes';
+import _intersection from 'lodash.intersection';
+import _union from 'lodash.union';
+import _without from 'lodash.without';
+import _forEach from 'lodash.foreach';
+import _sumBy from 'lodash.sumby';
+import _filter from 'lodash.filter';
+import _difference from 'lodash.difference';
 import Icon from 'ui/Icon';
 
 

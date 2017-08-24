@@ -1,12 +1,12 @@
 import React from 'react';
 import Immutable from 'immutable';
 
-import _isFinite from 'lodash/isFinite';
-import _forEach from 'lodash/forEach';
-import _min from 'lodash/min';
-import _max from 'lodash/max';
-import _map from 'lodash/map';
-import _some from 'lodash/some';
+import _isFinite from 'lodash.isfinite';
+import _forEach from 'lodash.foreach';
+import _min from 'lodash.min';
+import _max from 'lodash.max';
+import _map from 'lodash.map';
+import _some from 'lodash.some';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -25,7 +25,7 @@ import SQL from 'panoptes/SQL';
 // import DataTableWithActions from 'containers/DataTableWithActions';
 import {categoryColours} from 'util/Colours';
 import LegendElement from 'panoptes/LegendElement';
-import _filter from 'lodash/filter';
+import _filter from 'lodash.filter';
 import QueryString from 'panoptes/QueryString';
 import FilterButton from 'panoptes/FilterButton';
 import PropertyHeader from 'panoptes/PropertyHeader';

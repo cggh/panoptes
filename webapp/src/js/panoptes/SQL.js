@@ -1,6 +1,6 @@
-import _cloneDeep from 'lodash/cloneDeep';
-import _filter from 'lodash/filter';
-import _assign from 'lodash/assign';
+import _cloneDeep from 'lodash.clonedeep';
+import _filter from 'lodash.filter';
+import _assign from 'lodash.assign';
 
 let SQL = {};
 

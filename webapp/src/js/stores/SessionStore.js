@@ -4,8 +4,8 @@ import Immutable from 'immutable';
 import uid from 'uid';
 import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
-import _isFunction from 'lodash/isFunction';
-import _isEqual from 'lodash/isEqual';
+import _isFunction from 'lodash.isfunction';
+import _isEqual from 'lodash.isequal';
 
 const EMPTY_TAB = 'containers/EmptyTab';
 const START_TAB = 'containers/StartTab';

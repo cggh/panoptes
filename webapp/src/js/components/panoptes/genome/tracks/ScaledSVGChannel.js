@@ -1,6 +1,6 @@
 import React from 'react';
 import {scale} from 'd3-scale';
-import _isFinite from 'lodash/isFinite';
+import _isFinite from 'lodash.isfinite';
 
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 

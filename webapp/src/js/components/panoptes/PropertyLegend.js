@@ -3,7 +3,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import LegendElement from 'panoptes/LegendElement';
 import {propertyColour, scaleColour} from 'util/Colours';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 import FluxMixin from 'mixins/FluxMixin';
 
 let PropertyLegend = React.createClass({

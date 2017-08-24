@@ -1,4 +1,4 @@
-import _each from 'lodash/forEach';
+import _each from 'lodash.foreach';
 
 let StoreWatchMixin = function() {
   let storeNames = Array.prototype.slice.call(arguments);

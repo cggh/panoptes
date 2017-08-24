@@ -3,15 +3,15 @@ import Fluxxor from 'fluxxor';
 import Constants from '../constants/Constants';
 const APIConst = Constants.API;
 
-import _forEach from 'lodash/forEach';
+import _forEach from 'lodash.foreach';
 import SQL from 'panoptes/SQL';
-import _values from 'lodash/values';
-import _each from 'lodash/each';
-import _filter from 'lodash/filter';
-import _map from 'lodash/map';
-import _sortBy from 'lodash/sortBy';
-import _keys from 'lodash/keys';
-import _cloneDeep from 'lodash/cloneDeep';
+import _values from 'lodash.values';
+import _each from 'lodash.foreach';
+import _filter from 'lodash.filter';
+import _map from 'lodash.map';
+import _sortBy from 'lodash.sortby';
+import _keys from 'lodash.keys';
+import _cloneDeep from 'lodash.clonedeep';
 
 const ConfigStore = Fluxxor.createStore({
 

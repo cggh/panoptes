@@ -8,12 +8,12 @@ import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import PopupButton from 'panoptes/PopupButton';
 import ExternalLinkButton from 'panoptes/ExternalLinkButton';
-import _forEach from 'lodash/forEach';
+import _forEach from 'lodash.foreach';
 import ErrorReport from 'panoptes/ErrorReporter';
 import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
 import TreeWithActions from 'containers/TreeWithActions';
 import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChannel';
-import _map from 'lodash/map';
+import _map from 'lodash.map';
 
 let DataItemActions = React.createClass({
   mixins: [
