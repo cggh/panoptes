@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {Popup as LeafletPopup} from 'react-leaflet';
 import filterChildren from 'util/filterChildren';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let MapPopup = React.createClass({
+let MapPopup = createReactClass({
+  displayName: 'MapPopup',
 
   mixins: [
     FluxMixin
@@ -19,11 +21,13 @@ let MapPopup = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     children: PropTypes.node,
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -44,8 +48,7 @@ let MapPopup = React.createClass({
       />
     );
 
-  }
-
+  },
 });
 
 export default MapPopup;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import FluxMixin from 'mixins/FluxMixin';
 import _isEmpty from 'lodash.isempty';
 import FeatureGroup from 'Map/FeatureGroup';
@@ -12,7 +13,8 @@ import withAPIData from 'hoc/withAPIData';
 
 const DEFAULT_GEOJSON_FILL_COLOUR = '#3d8bd5';
 
-let TableGeoJSONsLayer = React.createClass({
+let TableGeoJSONsLayer = createReactClass({
+  displayName: 'TableGeoJSONsLayer',
 
   mixins: [
     FluxMixin
@@ -26,6 +28,7 @@ let TableGeoJSONsLayer = React.createClass({
     map: PropTypes.object,
     changeLayerStatus: PropTypes.func
   },
+
   propTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object,
@@ -39,6 +42,7 @@ let TableGeoJSONsLayer = React.createClass({
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -151,9 +155,7 @@ let TableGeoJSONsLayer = React.createClass({
     );
 
 
-  }
-
-
+  },
 });
 
 

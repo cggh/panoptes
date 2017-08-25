@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import classnames from 'classnames';
 import Icon from 'ui/Icon';
 
 
-let ChannelWithConfigDrawer = React.createClass({
+let ChannelWithConfigDrawer = createReactClass({
+  displayName: 'ChannelWithConfigDrawer',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: ['onClose']
@@ -97,7 +100,7 @@ let ChannelWithConfigDrawer = React.createClass({
         </div>
       </div>
     );
-  }
+  },
 });
 
 export default ChannelWithConfigDrawer;

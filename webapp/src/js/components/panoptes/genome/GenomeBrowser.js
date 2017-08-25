@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import offset from 'bloody-offset';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -33,7 +34,9 @@ const MIN_WIDTH = 5;
 const FALLBACK_MAXIMUM = 1000000000;
 const CONTROLS_HEIGHT = 33;
 
-let GenomeBrowser = React.createClass({
+let GenomeBrowser = createReactClass({
+  displayName: 'GenomeBrowser',
+
   mixins: [
     PureRenderWithRedirectedProps({redirect: ['setProps']}),
     FluxMixin,
@@ -115,7 +118,6 @@ let GenomeBrowser = React.createClass({
     this.actualEnd = this.props.end;
   },
 
-
   scaleClamp(start, end, fracPos) {
     let {chromosome} = this.props;
     chromosome = chromosome || this.defaultChrom;
@@ -193,11 +195,13 @@ let GenomeBrowser = React.createClass({
     e.stopPropagation();
     e.preventDefault();
   },
+
   handleDoubleTap(e) {
     if (!this.isEventInPanningArea(e))
       return;
     this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.rootHammer)).left, -100); //eslint-disable-line react/no-find-dom-node
   },
+
   handlePan(e) {
     if (!this.isEventInPanningArea(e))
       return;
@@ -384,7 +388,7 @@ let GenomeBrowser = React.createClass({
         </div>
       </DetectResize>
     );
-  }
+  },
 });
 
 export default GenomeBrowser;

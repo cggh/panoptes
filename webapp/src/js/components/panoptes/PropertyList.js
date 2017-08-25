@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -8,7 +10,8 @@ import FluxMixin from 'mixins/FluxMixin';
 // Panoptes components
 import PropertyListItem from 'panoptes/PropertyListItem';
 
-let PropertyList = React.createClass({
+let PropertyList = createReactClass({
+  displayName: 'PropertyList',
 
   mixins: [
     PureRenderMixin,
@@ -44,8 +47,7 @@ let PropertyList = React.createClass({
     );
 
 
-  }
-
+  },
 });
 
 export default PropertyList;

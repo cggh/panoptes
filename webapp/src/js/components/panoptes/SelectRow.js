@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import withAPIData from 'hoc/withAPIData';
 import _isUndefined from 'lodash.isundefined';
 import templateFieldsUsed from 'util/templateFieldsUsed';
@@ -16,12 +18,12 @@ import DataItemViews from 'panoptes/DataItemViews';
 import SQL from 'panoptes/SQL';
 import resolveJoins from 'panoptes/resolveJoins';
 
-let SelectRow = React.createClass({
+let SelectRow = createReactClass({
+  displayName: 'SelectRow',
 
   mixins: [
     FluxMixin,
   ],
-
 
   propTypes: {
     query: PropTypes.string,
@@ -64,7 +66,7 @@ let SelectRow = React.createClass({
           }/>)}
       </SelectField>;
     }
-  }
+  },
 });
 
 SelectRow = withAPIData(SelectRow, ({config, props}) => {

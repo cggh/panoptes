@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
 import {treeTypes} from 'phylocanvas';
 import titleCase from 'title-case';
@@ -24,7 +25,9 @@ import PropertyLegend from 'panoptes/PropertyLegend';
 
 import 'tree.scss';
 
-let TreeWithActions = React.createClass({
+let TreeWithActions = createReactClass({
+  displayName: 'TreeWithActions',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -213,7 +216,7 @@ let TreeWithActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
 export default TreeWithActions;

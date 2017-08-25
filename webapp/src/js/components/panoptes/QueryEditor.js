@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -19,10 +20,10 @@ import _clone from 'lodash.clone';
 import _find from 'lodash.find';
 import _map from 'lodash.map';
 
-let Component = React.createClass({
-  propTypes: {
+class Component extends React.Component {
+  static propTypes = {
     component: PropTypes.object.isRequired
-  },
+  };
 
   render() {
     let {component} = this.props;
@@ -33,12 +34,12 @@ let Component = React.createClass({
     else
       return <Criterion {...this.props}/>;
   }
-});
+}
 
-let And = React.createClass({
-  propTypes: {
+class And extends React.Component {
+  static propTypes = {
     component: PropTypes.object.isRequired
-  },
+  };
 
   render() {
     let {component, ...other} = this.props;
@@ -48,12 +49,12 @@ let And = React.createClass({
       </div>
     );
   }
-});
+}
 
-let Or = React.createClass({
-  propTypes: {
+class Or extends React.Component {
+  static propTypes = {
     component: PropTypes.object.isRequired
-  },
+  };
 
   render() {
     let {component, ...other} = this.props;
@@ -71,9 +72,11 @@ let Or = React.createClass({
       </div>
     );
   }
-});
+}
 
-let Criterion = React.createClass({
+let Criterion = createReactClass({
+  displayName: 'Criterion',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -350,7 +353,6 @@ let Criterion = React.createClass({
 
     onChange();
   },
-
 
   handleValueEdit(payload) {
 
@@ -641,24 +643,24 @@ let Criterion = React.createClass({
         </div>
       </Paper>
     );
-  }
+  },
 });
 
 
-let QueryEditor = React.createClass({
-  propTypes: {
+class QueryEditor extends React.Component {
+  static propTypes = {
     table: PropTypes.string.isRequired,
     query: PropTypes.string.isRequired,
     onChange: PropTypes.func,
     className: PropTypes.string
-  },
+  };
 
-  handleChange(newQuery) {
+  handleChange = (newQuery) => {
     if (this.props.onChange) {
       newQuery = SQL.WhereClause.encode(newQuery);
       this.props.onChange(newQuery);
     }
-  },
+  };
 
   render() {
     let {query, table, className} = this.props;
@@ -677,7 +679,6 @@ let QueryEditor = React.createClass({
       </div>
     );
   }
-
-});
+}
 
 export default QueryEditor;

@@ -6,22 +6,22 @@ import withAPIData from 'hoc/withAPIData';
 import LegendElement from 'panoptes/LegendElement';
 import {propertyColour} from 'util/Colours';
 
-let ColourPropertyLegend = React.createClass({
+class ColourPropertyLegend extends React.Component {
 
-  propTypes: {
+  static displayName = "ColourPropertyLegend";
+
+  static propTypes = {
     table: PropTypes.string.isRequired,
     labelProperty: PropTypes.string,
     maxLegendItems: PropTypes.number,
     colourProperty: PropTypes.string.isRequired,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      query: SQL.nullQuery
-    };
-  },
+  static defaultProps = {
+    query: SQL.nullQuery
+  };
 
   render() {
     let {table, labelProperty, maxLegendItems, colourProperty, config, data} = this.props;
@@ -65,7 +65,7 @@ let ColourPropertyLegend = React.createClass({
       }
     </div>;
   }
-});
+}
 
 ColourPropertyLegend = withAPIData(ColourPropertyLegend, ({config, props}) => {
 

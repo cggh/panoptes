@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import Formatter from 'panoptes/Formatter';
 
-let GenotypesRowHeader = React.createClass({
+let GenotypesRowHeader = createReactClass({
+  displayName: 'GenotypesRowHeader',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -126,7 +129,7 @@ let GenotypesRowHeader = React.createClass({
               width={width}
               height={height}/>
     </div>;
-  }
+  },
 });
 
 export default GenotypesRowHeader;

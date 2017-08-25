@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import _map from 'lodash.map';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -8,12 +10,12 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 import _find from 'lodash.find';
 
-let SelectComponent = React.createClass({
+let SelectComponent = createReactClass({
+  displayName: 'SelectComponent',
 
   mixins: [
     FluxMixin,
   ],
-
 
   propTypes: {
     hintText: PropTypes.string,
@@ -37,7 +39,7 @@ let SelectComponent = React.createClass({
         {_map(children, (row) =>
           <MenuItem value={row} primaryText={row.props.label}/>)}
       </SelectField>;
-  }
+  },
 });
 
 export default SelectComponent;

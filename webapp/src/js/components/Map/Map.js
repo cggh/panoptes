@@ -1,6 +1,7 @@
 import {Map as LeafletMap} from 'react-leaflet';
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import displayName from 'react-display-name';
 import 'leaflet-loading/src/Control.Loading.js';
 
@@ -82,7 +83,8 @@ const ALLOWED_CHILDREN = [
 */
 
 
-let Map = React.createClass({
+let Map = createReactClass({
+  displayName: 'Map',
 
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
@@ -94,6 +96,7 @@ let Map = React.createClass({
     title: PropTypes.string,
     zoom: PropTypes.number
   },
+
   childContextTypes: {
     crs: PropTypes.object,
     changeLayerStatus: PropTypes.func
@@ -105,6 +108,7 @@ let Map = React.createClass({
       changeLayerStatus: this.handleChangeLayerStatus
     };
   },
+
   getDefaultProps() {
     // NB: Don't define a center or zoom here,
     // because render() relies on undefined to indicate that they have not already been set in the session (then decide a default).
@@ -113,6 +117,7 @@ let Map = React.createClass({
       zoom: undefined
     };
   },
+
   getInitialState() {
     // NB: undefined is different to null in that bounds={undefined} will not be regarded as a specified (invalid) prop.
     return {
@@ -162,11 +167,13 @@ let Map = React.createClass({
     this.setState({loadStatus});
 
   },
+
   handleDetectResize() {
     if (this.map !== null) {
       this.map.leafletElement.invalidateSize();
     }
   },
+
   handleMapMoveEnd(e) { // e is not being used
     // NB: this event fires whenever the map's bounds, center or zoom change.
 
@@ -372,8 +379,7 @@ let Map = React.createClass({
       </DetectResize>
     );
 
-  }
-
+  },
 });
 
 export default Map;

@@ -43,27 +43,25 @@ let forceCrossLink = function(links) {
   return force;
 };
 
-let GeoLayouter = React.createClass({
-  propTypes: {
+class GeoLayouter extends React.Component {
+  static propTypes = {
     nodes: PropTypes.array.isRequired,
     children: PropTypes.func.isRequired
-  },
+  };
+
+  static defaultProps = {
+    nodes: []
+  };
+
+  static contextTypes = {
+    map: PropTypes.object,
+  };
 
   shouldComponentUpdate() {
     return false;
-  },
+  }
 
-  getDefaultProps() {
-    return {
-      nodes: []
-    };
-  },
-
-  contextTypes: {
-    map: PropTypes.object,
-  },
-
-  updateNodes(nodes) {
+  updateNodes = (nodes) => {
     const {map} = this.context;
     //Work out which nodes we are adding, removing and updating by key
     let updatedRenderNodesByKey = {};
@@ -122,7 +120,8 @@ let GeoLayouter = React.createClass({
         this.sim.tick()
       }
     }
-  },
+  };
+
   // Lifecycle methods
   componentWillMount() {
     this.renderNodesByKey = {}; //Moving nodes that get rendered
@@ -138,20 +137,20 @@ let GeoLayouter = React.createClass({
     // On every tick event triggered by d3's layout force, this.handleTick will be called.
     // The (x, y) of every force-applied node will be updated (potentially) on every tick.
     this.sim.on('tick', this.handleTick);
-  },
+  }
 
   componentWillUnmount() {
     this.sim.stop();
-  },
+  }
 
   componentWillReceiveProps(nextProps) {
     this.updateNodes(nextProps.nodes);
-  },
+  }
 
   // Event handlers
-  handleTick() {
+  handleTick = () => {
     this.forceUpdate();
-  },
+  };
 
   render() {
     // NB: this.forceUpdate(), which is called by this.handleTick(), causes a re-render,
@@ -167,6 +166,6 @@ let GeoLayouter = React.createClass({
 
     return this.props.children(this.renderNodes);
   }
-});
+}
 
 export default GeoLayouter;

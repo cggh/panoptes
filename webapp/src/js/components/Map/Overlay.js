@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import {LayersControl as LeafletLayersControl} from 'react-leaflet';
 
 // Mixins
@@ -19,7 +21,8 @@ const ALLOWED_CHILDREN = [
   'TileLayer'
 ];
 
-let Overlay = React.createClass({
+let Overlay = createReactClass({
+  displayName: 'Overlay',
 
   mixins: [
     FluxMixin
@@ -32,6 +35,7 @@ let Overlay = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     addOverlay: PropTypes.func,
     checked: PropTypes.bool,
@@ -42,6 +46,7 @@ let Overlay = React.createClass({
     removeLayer: PropTypes.func,
     removeLayerControl: PropTypes.func
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -70,8 +75,7 @@ let Overlay = React.createClass({
 
     );
 
-  }
-
+  },
 });
 
 export default Overlay;

@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
 
-let SidebarHeader = React.createClass({
+let SidebarHeader = createReactClass({
+  displayName: 'SidebarHeader',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -26,7 +28,7 @@ let SidebarHeader = React.createClass({
 
 
     );
-  }
+  },
 });
 
 export default SidebarHeader;

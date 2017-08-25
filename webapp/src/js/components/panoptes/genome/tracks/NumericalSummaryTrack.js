@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Color from 'color';
 
 import _min from 'lodash.min';
@@ -27,7 +28,9 @@ import SQL from 'panoptes/SQL';
 
 const DRAW_POINTS_THRESHOLD = 2000;
 
-let NumericalSummaryTrack = React.createClass({
+let NumericalSummaryTrack = createReactClass({
+  displayName: 'NumericalSummaryTrack',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -78,6 +81,7 @@ let NumericalSummaryTrack = React.createClass({
     this.pointsBlocks = [];
     this.debouncedYScale = _debounce(this.calculateYScale, 200);
   },
+
   componentWillUnmount() {
     this.props.onYLimitChange({dataYMin: null, dataYMax: null});
   },
@@ -453,13 +457,16 @@ let NumericalSummaryTrack = React.createClass({
     let {nearestIndex, nearestClickIndex} = this.xyToIndex(x, y);
     return this.setHover({nearestIndex, nearestClickIndex});
   },
+
   handleMouseOver(e) {
     return this.handleMouseMove(e);
   },
+
   handleMouseOut(e) {
     this.setState({hoverClick: false});
     return false;
   },
+
   handleClick(e) {
     if (this.state.hoverClick != null) {
       let [b, i] = this.state.hoverClick;
@@ -474,8 +481,7 @@ let NumericalSummaryTrack = React.createClass({
               width={width} height={height}
       />
     );
-  }
-
+  },
 });
 
 export default NumericalSummaryTrack;

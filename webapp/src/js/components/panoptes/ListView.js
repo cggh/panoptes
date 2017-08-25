@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOMServer from 'react-dom/server';
 import Highlight from 'react-highlighter';
 import _uniq from 'lodash.uniq';
@@ -27,7 +28,9 @@ import {List, ListItem} from 'material-ui/List';
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
-let ListView = React.createClass({
+let ListView = createReactClass({
+  displayName: 'ListView',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -60,7 +63,6 @@ let ListView = React.createClass({
       rowsCount: 0
     };
   },
-
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
@@ -192,8 +194,7 @@ let ListView = React.createClass({
         </div>
       );
     }
-  }
-
+  },
 });
 
 export default ListView;

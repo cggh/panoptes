@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -8,7 +9,9 @@ import MenuItem from 'material-ui/MenuItem';
 // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
 const NULL_VALUE = '__NULL__';
 
-let RandomSubsetSizeSelector = React.createClass({
+let RandomSubsetSizeSelector = createReactClass({
+  displayName: 'RandomSubsetSizeSelector',
+
   mixins: [
     PureRenderMixin
   ],
@@ -65,8 +68,7 @@ let RandomSubsetSizeSelector = React.createClass({
         {options}
       </SelectField>
     );
-  }
-
+  },
 });
 
 export default RandomSubsetSizeSelector;

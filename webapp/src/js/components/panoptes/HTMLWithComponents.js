@@ -23,13 +23,15 @@ function createStyleJsonFromString(styleString) {
   return jsonStyles;
 }
 
-let HTMLWithComponents = React.createClass({
+class HTMLWithComponents extends React.Component {
 
-  propTypes: {
+  static displayName = "HTMLWithComponents";
+
+  static propTypes = {
     className: PropTypes.string,
     children: PropTypes.string,
     replaceSelf: PropTypes.func
-  },
+  };
 
   componentWillMount() {
     let htmlToReactParser = new HtmlToReact.Parser(React, {
@@ -104,11 +106,11 @@ let HTMLWithComponents = React.createClass({
         markupString,
         isValidNode,
         processingInstructions);
-  },
+  }
 
   render() {
     return this.htmlToReact(`<div class="${this.props.className ? this.props.className : ''}">${this.props.children}</div>`);
   }
-});
+}
 
 export default HTMLWithComponents;

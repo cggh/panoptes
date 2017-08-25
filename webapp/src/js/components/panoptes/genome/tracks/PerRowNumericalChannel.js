@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {line, area} from 'd3-shape';
 import _isFinite from 'lodash.isfinite';
 import _map from 'lodash.map';
@@ -43,7 +44,9 @@ const INTERPOLATION_HAS_TENSION = {
   cardinal: true
 };
 
-let PerRowScaledSVGChannel = React.createClass({
+let PerRowScaledSVGChannel = createReactClass({
+  displayName: 'PerRowScaledSVGChannel',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -115,10 +118,12 @@ let PerRowScaledSVGChannel = React.createClass({
 
       </ScaledSVGChannel>
     );
-  }
+  },
 });
 
-let PerRowNumericalTrack = React.createClass({
+let PerRowNumericalTrack = createReactClass({
+  displayName: 'PerRowNumericalTrack',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -161,6 +166,7 @@ let PerRowNumericalTrack = React.createClass({
       columns: {}
     };
   },
+
   componentWillUnmount() {
     this.props.onYLimitChange({dataYMin: null, dataYMax: null});
   },
@@ -345,10 +351,12 @@ let PerRowNumericalTrack = React.createClass({
         {_map(lines, (line, primKey) => <path key={primKey} className="line" style={{stroke: colours[primKey]}} d={line} />)}
       </g>
     );
-  }
+  },
 });
 
-let PerRowNumericalTrackControls = React.createClass({
+let PerRowNumericalTrackControls = createReactClass({
+  displayName: 'PerRowNumericalTrackControls',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -457,8 +465,7 @@ let PerRowNumericalTrackControls = React.createClass({
 
       </div>
     );
-  }
-
+  },
 });
 
 

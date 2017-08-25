@@ -1,5 +1,7 @@
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -17,7 +19,8 @@ import 'rc-tooltip/assets/bootstrap.css';
 import TablePlot from 'TablePlot';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
-let PropertyHeader = React.createClass({
+let PropertyHeader = createReactClass({
+  displayName: 'PropertyHeader',
 
   mixins: [
     PureRenderMixin,
@@ -64,8 +67,7 @@ let PropertyHeader = React.createClass({
         {tooltip}
       </span>
     );
-  }
-
+  },
 });
 
 export default PropertyHeader;

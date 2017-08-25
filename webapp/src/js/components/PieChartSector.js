@@ -2,9 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {arc} from 'd3-shape';
 
-let PieChartSector = React.createClass({
+class PieChartSector extends React.Component {
 
-  propTypes: {
+  static displayName = "PieChartSector";
+
+  static propTypes = {
     outerRadius: PropTypes.number,
     innerRadius: PropTypes.number,
     fillColor: PropTypes.string,
@@ -12,16 +14,14 @@ let PieChartSector = React.createClass({
     title: PropTypes.string,
     onClick: PropTypes.func,
     className: PropTypes.string
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      outerRadius: 20,
-      innerRadius: 0
-    };
-  },
+  static defaultProps = {
+    outerRadius: 20,
+    innerRadius: 0
+  };
 
-  render: function() {
+  render() {
 
     let {outerRadius, innerRadius, fillColor, arcDescriptor, title, onClick, className} = this.props;
 
@@ -34,6 +34,6 @@ let PieChartSector = React.createClass({
       </g>
     );
   }
-});
+}
 
 export default PieChartSector;

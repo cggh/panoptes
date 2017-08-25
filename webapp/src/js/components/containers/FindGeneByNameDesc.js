@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 // Panoptes
@@ -10,7 +12,9 @@ import GeneSearchResultsList from 'panoptes/GeneSearchResultsList';
 import TextField from 'material-ui/TextField';
 
 
-let FindGeneByNameDesc = React.createClass({
+let FindGeneByNameDesc = createReactClass({
+  displayName: 'FindGeneByNameDesc',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -74,7 +78,7 @@ let FindGeneByNameDesc = React.createClass({
       </div>
     );
 
-  }
+  },
 });
 
 export default FindGeneByNameDesc;

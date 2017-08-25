@@ -1,13 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 import ViewList from 'panoptes/ViewList';
 import TableList from 'panoptes/TableList';
 
-let EmptyTab = React.createClass({
+let EmptyTab = createReactClass({
+  displayName: 'EmptyTab',
+
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -20,6 +24,7 @@ let EmptyTab = React.createClass({
   icon() {
     return 'folder-o';
   },
+
   title() {
     return 'New tab';
   },
@@ -32,7 +37,6 @@ let EmptyTab = React.createClass({
     }
   },
 
-
   render() {
     return (
       <div className="horizontal stack start-align wrap">
@@ -40,7 +44,7 @@ let EmptyTab = React.createClass({
         <TableList style={{width: '500px'}} onClick={this.handleClick} />
       </div>
     );
-  }
+  },
 });
 
 export default EmptyTab;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Highlight from 'react-highlighter';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -22,7 +23,8 @@ import Subheader from 'material-ui/Subheader';
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
-let GeneSearchResultsList = React.createClass({
+let GeneSearchResultsList = createReactClass({
+  displayName: 'GeneSearchResultsList',
 
   mixins: [
     PureRenderMixin,
@@ -163,9 +165,7 @@ let GeneSearchResultsList = React.createClass({
       </div>
     );
 
-  }
-
-
+  },
 });
 
 export default GeneSearchResultsList;

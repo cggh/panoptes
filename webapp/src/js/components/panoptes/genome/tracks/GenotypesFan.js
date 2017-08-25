@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import manualTween from 'util/manualTween';
 import _transform from 'lodash.transform';
@@ -8,7 +9,9 @@ import {hatchRect} from 'util/CanvasDrawing';
 
 const HAT_HEIGHT = 20;
 
-let GenotypesFan = React.createClass({
+let GenotypesFan = createReactClass({
+  displayName: 'GenotypesFan',
+
   mixins: [
     PureRenderMixin
   ],
@@ -165,7 +168,6 @@ let GenotypesFan = React.createClass({
     });
   },
 
-
   render() {
     let {width, height, top} = this.props;
     return <canvas ref="canvas"
@@ -173,7 +175,7 @@ let GenotypesFan = React.createClass({
                    style={{top: top+'px'}}
                    width={width}
                    height={height}/>;
-  }
+  },
 });
 
 export default GenotypesFan;

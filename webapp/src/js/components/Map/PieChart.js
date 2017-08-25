@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
@@ -10,7 +12,8 @@ import FeatureGroup from 'Map/FeatureGroup';
 import TileLayer from 'Map/TileLayer';
 import PieChartMarkersLayer from 'Map/PieChartMarkersLayer';
 
-let PieChartMap = React.createClass({
+let PieChartMap = createReactClass({
+  displayName: 'PieChartMap',
 
   mixins: [
     FluxMixin
@@ -78,8 +81,7 @@ let PieChartMap = React.createClass({
       </Map>
     );
 
-  }
-
+  },
 });
 
 export default PieChartMap;

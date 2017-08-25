@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-let ErrorTab = React.createClass({
+let ErrorTab = createReactClass({
+  displayName: 'ErrorTab',
+
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -17,6 +21,7 @@ let ErrorTab = React.createClass({
   icon() {
     return 'warning';
   },
+
   title() {
     return 'Error';
   },
@@ -27,7 +32,7 @@ let ErrorTab = React.createClass({
         <div className="error"> Error: {this.props.err} </div>
       </div>
     );
-  }
+  },
 });
 
 export default ErrorTab;

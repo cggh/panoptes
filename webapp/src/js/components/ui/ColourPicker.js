@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {BlockPicker} from 'react-color';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
-let ColourPicker = React.createClass({
+let ColourPicker = createReactClass({
+  displayName: 'ColourPicker',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -22,8 +24,7 @@ let ColourPicker = React.createClass({
             triangle="hide"
             onChange={(colour) => onPick(colour.hex)} />
     );
-  }
-
+  },
 });
 
 export default ColourPicker;

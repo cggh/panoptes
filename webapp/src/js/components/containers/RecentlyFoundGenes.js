@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _map from 'lodash.map';
 
 // Mixins
@@ -14,7 +15,9 @@ import Subheader from 'material-ui/Subheader';
 // UI
 import Icon from 'ui/Icon';
 
-let RecentlyFoundGenes = React.createClass({
+let RecentlyFoundGenes = createReactClass({
+  displayName: 'RecentlyFoundGenes',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -25,7 +28,6 @@ let RecentlyFoundGenes = React.createClass({
     onSelect: PropTypes.func,
     subheaderText: PropTypes.string
   },
-
 
   getStateFromFlux() {
     return {
@@ -73,7 +75,7 @@ let RecentlyFoundGenes = React.createClass({
       );
     }
     return foundGenesList;
-  }
+  },
 });
 
 export default RecentlyFoundGenes;

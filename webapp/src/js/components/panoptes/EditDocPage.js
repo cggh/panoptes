@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -21,7 +22,9 @@ import 'draft-js/dist/Draft.css'
 
 const decorator = new PrismDecorator({defaultSyntax: 'markup'});
 
-let EditDocPage = React.createClass({
+let EditDocPage = createReactClass({
+  displayName: 'EditDocPage',
+
   mixins: [
     ConfigMixin,
     FluxMixin,
@@ -44,6 +47,7 @@ let EditDocPage = React.createClass({
   icon() {
     return 'edit';
   },
+
   title() {
     return `Editing ${this.props.path}`;
   },
@@ -175,7 +179,7 @@ let EditDocPage = React.createClass({
         <Loading status={loadStatus}/>
       </div>
     </div>;
-  }
+  },
 });
 
 export default EditDocPage;

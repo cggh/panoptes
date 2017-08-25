@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import {scaleLinear} from 'd3-scale';
 
-let YScale = React.createClass({
+let YScale = createReactClass({
+  displayName: 'YScale',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -52,7 +54,7 @@ let YScale = React.createClass({
       }
     });
     ctx.stroke();
-  }
+  },
 });
 
 export default YScale;

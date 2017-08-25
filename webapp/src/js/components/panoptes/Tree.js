@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Phylocanvas from 'react-phylocanvas';
 import {treeTypes} from 'phylocanvas';
 
@@ -11,7 +12,9 @@ import DetectResize from 'utils/DetectResize';
 
 import 'tree.scss';
 
-let Tree = React.createClass({
+let Tree = createReactClass({
+  displayName: 'Tree',
+
   mixins: [
     PureRenderMixin
   ],
@@ -77,8 +80,7 @@ let Tree = React.createClass({
         />
       </DetectResize>
     );
-  }
-
+  },
 });
 
 export default Tree;

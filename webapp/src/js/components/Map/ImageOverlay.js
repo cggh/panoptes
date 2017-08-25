@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import {ImageOverlay as LeafletImageOverlay} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let ImageOverlay = React.createClass({
+let ImageOverlay = createReactClass({
+  displayName: 'ImageOverlay',
 
   mixins: [
     FluxMixin
@@ -19,6 +22,7 @@ let ImageOverlay = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     attribution: PropTypes.string,
     bounds: PropTypes.array,
@@ -27,6 +31,7 @@ let ImageOverlay = React.createClass({
     map: PropTypes.object,
     opacity: PropTypes.number
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -65,8 +70,7 @@ let ImageOverlay = React.createClass({
       />
     );
 
-  }
-
+  },
 });
 
 export default ImageOverlay;

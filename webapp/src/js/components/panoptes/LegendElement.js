@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ColourPicker from 'ui/ColourPicker';
 import FluxMixin from 'mixins/FluxMixin';
@@ -7,7 +8,9 @@ import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 import TooltipEllipsis from 'ui/TooltipEllipsis';
 
-let LegendElement = React.createClass({
+let LegendElement = createReactClass({
+  displayName: 'LegendElement',
+
   mixins: [
     FluxMixin,
     PureRenderMixin
@@ -53,7 +56,7 @@ let LegendElement = React.createClass({
         </TooltipEllipsis>
       </div>
     );
-  }
+  },
 });
 
 export default LegendElement;

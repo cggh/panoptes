@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
 import EditYAMLConfig from 'panoptes/EditYAMLConfig';
 import FlatButton from 'material-ui/FlatButton';
@@ -23,7 +24,8 @@ import Loading from 'ui/Loading';
 import DatasetImportStatusListView from 'DatasetImportStatus/ListView';
 import API from 'panoptes/API';
 
-let DatasetManagerActions = React.createClass({
+let DatasetManagerActions = createReactClass({
+  displayName: 'DatasetManagerActions',
 
   mixins: [
     PureRenderMixin,
@@ -117,7 +119,7 @@ let DatasetManagerActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
 export default DatasetManagerActions;

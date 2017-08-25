@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {Rectangle as LeafletRectangle} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let Rectangle = React.createClass({
+let Rectangle = createReactClass({
+  displayName: 'Rectangle',
 
   mixins: [
     FluxMixin
@@ -21,7 +23,7 @@ let Rectangle = React.createClass({
         bounds={this.props.bounds}
       />
     );
-  }
+  },
 });
 
 export default Rectangle;

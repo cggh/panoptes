@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {scaleLinear} from 'd3-scale';
 import {histogram} from 'd3-array';
 
@@ -10,7 +11,8 @@ import HistogramBin from 'HistogramBin';
 
 // Credit: https://github.com/english/react-d3-histogram
 
-let Histogram = React.createClass({
+let Histogram = createReactClass({
+  displayName: 'Histogram',
 
   mixins: [
     PureRenderMixin
@@ -83,8 +85,7 @@ let Histogram = React.createClass({
       </svg>
     );
 
-  }
-
+  },
 });
 
 export default Histogram;

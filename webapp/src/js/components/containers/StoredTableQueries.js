@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -19,7 +21,9 @@ import QueryString from 'panoptes/QueryString';
 import SQL from 'panoptes/SQL';
 
 
-let StoredTableQueries = React.createClass({
+let StoredTableQueries = createReactClass({
+  displayName: 'StoredTableQueries',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -152,7 +156,7 @@ let StoredTableQueries = React.createClass({
       </List>
     );
 
-  }
+  },
 });
 
 export default StoredTableQueries;

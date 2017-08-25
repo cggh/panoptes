@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -38,7 +39,8 @@ import SQL from 'panoptes/SQL';
 import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
 import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 
-let GenomeBrowserWithActions = React.createClass({
+let GenomeBrowserWithActions = createReactClass({
+  displayName: 'GenomeBrowserWithActions',
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
   propTypes: {
@@ -96,18 +98,21 @@ let GenomeBrowserWithActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
-let AddChannelMessage = React.createClass({
+let AddChannelMessage = createReactClass({
+  displayName: 'AddChannelMessage',
   mixins: [FluxMixin, ConfigMixin],
 
   shouldComponentUpdate() {
     return false;
   },
+
   setProps(u) {  //Redirect setProps so we never need to re-render
     this.props.setProps(u)
   },
+
   render() {
     return <div className="centering-container"> <div style={{backgroundColor: 'white'}}>
       <AddChannelsButton setProps={this.setProps}/>
@@ -116,11 +121,12 @@ let AddChannelMessage = React.createClass({
         : null
       }
     </div></div>;
-  }
+  },
 });
 
 
-let AddChannelsButton = React.createClass({
+let AddChannelsButton = createReactClass({
+  displayName: 'AddChannelsButton',
   mixins: [FluxMixin, ConfigMixin],
 
   shouldComponentUpdate() {
@@ -263,7 +269,6 @@ let AddChannelsButton = React.createClass({
     );
   },
 
-
   render() {
     const actions = this.getFlux().actions;
     return <FlatButton
@@ -281,12 +286,12 @@ let AddChannelsButton = React.createClass({
         />
       )}
     />
-  }
-
+  },
 });
 
 
-let SidebarContent = React.createClass({
+let SidebarContent = createReactClass({
+  displayName: 'SidebarContent',
   mixins: [FluxMixin, ConfigMixin],
 
   shouldComponentUpdate() {
@@ -406,7 +411,7 @@ let SidebarContent = React.createClass({
         }
       })}
     </div>;
-  }
+  },
 });
 
 

@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
 import RaisedButton from 'material-ui/RaisedButton';
 
 
-let ExternalLinkButton = React.createClass({
+let ExternalLinkButton = createReactClass({
+  displayName: 'ExternalLinkButton',
+
   mixins: [
     PureRenderMixin
   ],
@@ -30,8 +33,7 @@ let ExternalLinkButton = React.createClass({
       labelStyle={{textTransform: 'inherit'}}
       onClick={this.handleClick}
     />;
-  }
-
+  },
 });
 
 export default ExternalLinkButton;

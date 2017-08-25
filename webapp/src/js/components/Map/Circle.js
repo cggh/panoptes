@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {CircleMarker as LeafletCircle} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let Circle = React.createClass({
+let Circle = createReactClass({
+  displayName: 'Circle',
 
   mixins: [
     FluxMixin
@@ -25,7 +27,7 @@ let Circle = React.createClass({
         radius={radius}
       />
     );
-  }
+  },
 });
 
 export default Circle;

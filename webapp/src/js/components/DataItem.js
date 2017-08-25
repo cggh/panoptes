@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import filterChildren from 'util/filterChildren';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 
@@ -13,7 +14,8 @@ import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
 import DataItemActions from 'DataItemActions';
 
-let DataItem = React.createClass({
+let DataItem = createReactClass({
+  displayName: 'DataItem',
 
   mixins: [
     PureRenderMixin,
@@ -78,8 +80,7 @@ let DataItem = React.createClass({
       </div>
     );
 
-  }
-
+  },
 });
 
 export default DataItem;

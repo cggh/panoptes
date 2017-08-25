@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Sidebar from 'ui/Sidebar';
 import scrollbarSize from 'scrollbar-size';
 
@@ -37,7 +38,8 @@ import FilterButton from 'panoptes/FilterButton';
 import PivotTableWithActions from 'containers/PivotTableWithActions';
 import TablePlotActions from 'components/TablePlotActions';
 
-let DataTableWithActions = React.createClass({
+let DataTableWithActions = createReactClass({
+  displayName: 'DataTableWithActions',
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
   propTypes: {
@@ -491,7 +493,7 @@ let DataTableWithActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
 export default DataTableWithActions;

@@ -1,13 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 import 'geo-marker.scss';
 
-let GeoMarker = React.createClass({
+let GeoMarker = createReactClass({
+  displayName: 'GeoMarker',
 
   mixins: [
     PureRenderMixin,
@@ -44,8 +47,7 @@ let GeoMarker = React.createClass({
       </svg>
     );
 
-  }
-
+  },
 });
 
 export default GeoMarker;

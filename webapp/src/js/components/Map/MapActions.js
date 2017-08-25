@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
 
@@ -46,7 +48,9 @@ const NULL_BASE_TILE_LAYER = '— Default —';
 const NULL_MARKER_LAYER = '— None —';
 const NULL_OVERLAY_LAYER = '— None —';
 
-let MapActions = React.createClass({
+let MapActions = createReactClass({
+  displayName: 'MapActions',
+
   mixins: [
     ConfigMixin,
     FluxMixin,
@@ -111,6 +115,7 @@ let MapActions = React.createClass({
   handleQueryPick(query) {
     this.props.setProps({query});
   },
+
   handleChangeTable(table) {
 
     if (table === NULL_MARKER_LAYER) {
@@ -120,6 +125,7 @@ let MapActions = React.createClass({
     }
 
   },
+
   handleChangeBaseTileLayer(event, selectedIndex, selectedTileLayer) {
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
 
@@ -142,10 +148,12 @@ let MapActions = React.createClass({
     }
 
   },
+
   handleChangeMap(payload) {
     let {center, zoom} = payload;
     this.props.setProps({center, zoom});
   },
+
   handleChangeOverlayLayer(event, selectedIndex, selectedTileLayer) {
 
     if (selectedTileLayer === NULL_OVERLAY_LAYER) {
@@ -155,6 +163,7 @@ let MapActions = React.createClass({
     }
 
   },
+
   handleChangeMarkerColourProperty(markerColourProperty) {
     this.props.setProps({markerColourProperty});
   },
@@ -163,6 +172,7 @@ let MapActions = React.createClass({
   icon() {
     return 'globe';
   },
+
   title() {
     return this.props.title || 'Map Composer';
 
@@ -435,7 +445,7 @@ let MapActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
 export default MapActions;

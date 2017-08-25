@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Content from 'panoptes/Content';
 import filterChildren from 'util/filterChildren';
 
-let ToggleBox = React.createClass({
+let ToggleBox = createReactClass({
+  displayName: 'ToggleBox',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -23,7 +25,7 @@ let ToggleBox = React.createClass({
 
   getDefaultProps: function () {
     return { isHidden:true } ;
-  } ,
+  },
 
   getInitialState: function() {
       return {
@@ -64,8 +66,7 @@ let ToggleBox = React.createClass({
         </div>
   		</div>
   	) ;
-  }
-
+  },
 });
 
 export default ToggleBox;

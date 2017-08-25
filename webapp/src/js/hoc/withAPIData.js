@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import _isEqual from 'lodash.isequal';
 import _keys from 'lodash.keys';
@@ -14,7 +15,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import getDisplayName from 'react-display-name';
 
 let withAPIData = (WrappedComponent, APIArgsFromProps) => {
-  return React.createClass({
+  return createReactClass({
     mixins: [
       FluxMixin,
       ConfigMixin,

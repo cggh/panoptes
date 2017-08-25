@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import classNames from 'classnames';
 import Highlight from 'react-highlighter';
@@ -19,7 +20,9 @@ import _difference from 'lodash.difference';
 import Icon from 'ui/Icon';
 
 
-let GroupedItemPicker = React.createClass({
+let GroupedItemPicker = createReactClass({
+  displayName: 'GroupedItemPicker',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -52,6 +55,7 @@ let GroupedItemPicker = React.createClass({
   icon() {
     return 'check-square-o';
   },
+
   title() {
     return this.props.title;
   },
@@ -67,17 +71,21 @@ let GroupedItemPicker = React.createClass({
       this.setState({picked: this.state.picked.concat([propId])});
     }
   },
+
   handleAddAll(groupId) {
     let toAdd = _map(this.props.groups[groupId].properties, 'id');
     this.setState({picked: _union(this.state.picked, toAdd)});
   },
+
   handleRemove(propId) {
     this.setState({picked: _without(this.state.picked, propId)});
   },
+
   handleRemoveAll(groupId) {
     let toRemove = _map(this.props.groups[groupId].properties, 'id');
     this.setState({picked: _difference(this.state.picked, toRemove)});
   },
+
   handleSearchChange(event) {
     this.setState({'search': event.target.value});
   },
@@ -182,8 +190,7 @@ let GroupedItemPicker = React.createClass({
         </div>
       </div>
     );
-  }
-
+  },
 });
 
 export default GroupedItemPicker;

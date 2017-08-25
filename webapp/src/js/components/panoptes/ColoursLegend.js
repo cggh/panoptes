@@ -1,9 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import LegendElement from 'panoptes/LegendElement';
 
-let ColoursLegend = React.createClass({
+let ColoursLegend = createReactClass({
+  displayName: 'ColoursLegend',
+
   mixins: [
     PureRenderMixin
   ],
@@ -27,7 +30,7 @@ let ColoursLegend = React.createClass({
     : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
     }
     </div>;
-  }
+  },
 });
 
 export default ColoursLegend;

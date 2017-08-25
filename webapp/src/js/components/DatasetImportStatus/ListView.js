@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -21,7 +23,8 @@ import {List, ListItem} from 'material-ui/List';
 // Utils
 import RequestContext from 'util/RequestContext';
 
-let DatasetImportStatusListView = React.createClass({
+let DatasetImportStatusListView = createReactClass({
+  displayName: 'DatasetImportStatusListView',
 
   mixins: [
     PureRenderMixin,
@@ -124,8 +127,7 @@ let DatasetImportStatusListView = React.createClass({
         <Loading status={loadStatus}/>
       </div>
     );
-  }
-
+  },
 });
 
 export default DatasetImportStatusListView;

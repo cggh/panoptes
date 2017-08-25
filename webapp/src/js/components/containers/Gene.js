@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -31,7 +33,9 @@ import _forEach from 'lodash.foreach';
 
 import 'genomebrowser.scss';
 
-let Gene = React.createClass({
+let Gene = createReactClass({
+  displayName: 'Gene',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -69,7 +73,7 @@ let Gene = React.createClass({
     return 'Gene ' + this.props.geneId;
   },
 
-//Called by DataFetcherMixin
+  //Called by DataFetcherMixin
   fetchData(props, requestContext) {
     let {geneId} = props;
 
@@ -209,8 +213,7 @@ let Gene = React.createClass({
     </DetectResize>
 );
 
-  }
-
+  },
 });
 
 export default Gene;

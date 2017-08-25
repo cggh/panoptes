@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import tickWidth from 'panoptes/TickWidth.js';
 
 import {scaleLinear} from 'd3-scale';
 
 
-let Background = React.createClass({
+let Background = createReactClass({
+  displayName: 'Background',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -85,8 +87,7 @@ let Background = React.createClass({
       ctx.lineTo(x, height);
       ctx.stroke();
     }
-  }
-
+  },
 });
 
 export default Background;

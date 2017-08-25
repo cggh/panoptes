@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
 
@@ -42,7 +43,9 @@ const SCROLLBAR_HEIGHT = 15;
 
 const MEASURED_COLUMN_WIDTHS = {};
 
-let DataTableView = React.createClass({
+let DataTableView = createReactClass({
+  displayName: 'DataTableView',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -276,7 +279,6 @@ let DataTableView = React.createClass({
     return columnWidthPx;
   },
 
-
   render() {
     let {className, columns, order, table} = this.props;
     let {loadStatus, rows, width, height} = this.state;
@@ -386,8 +388,7 @@ let DataTableView = React.createClass({
         </div>
       );
     }
-  }
-
+  },
 });
 
 export default DataTableView;

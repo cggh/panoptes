@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
 
@@ -25,7 +26,8 @@ import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import DataItemViews from 'panoptes/DataItemViews';
 
-let ListWithActions = React.createClass({
+let ListWithActions = createReactClass({
+  displayName: 'ListWithActions',
 
   mixins: [
     PureRenderWithRedirectedProps({
@@ -167,7 +169,7 @@ let ListWithActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
 export default ListWithActions;

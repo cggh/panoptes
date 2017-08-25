@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import FileSaver from 'file-saver';
 import {Motion, spring} from 'react-motion';
 import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
@@ -42,7 +43,9 @@ import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
 import "genotypes.scss"
 const FAN_HEIGHT = 60;
 
-let GenotypesChannel = React.createClass({
+let GenotypesChannel = createReactClass({
+  displayName: 'GenotypesChannel',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -485,12 +488,15 @@ let GenotypesChannel = React.createClass({
     let {nearestPos, nearestClickIndex} = this.xyToIndex(x, y);
     this.setHover({nearestPos, nearestClickIndex});
   },
+
   handleMouseOver(e) {
     this.handleMouseMove(e);
   },
+
   handleMouseOut(e) {
     this.setState({hoverClick: false});
   },
+
   handleClick(e) {
     if (this.state.hoverClick != null) {
       this.getFlux().actions.panoptes.dataItemPopup({
@@ -499,7 +505,6 @@ let GenotypesChannel = React.createClass({
       });
     }
   },
-
 
   render() {
     let {columnQuery, rowQuery, width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, hoverPos} = this.props;
@@ -585,10 +590,12 @@ let GenotypesChannel = React.createClass({
           </Hammer>;
         }}</Motion>
       </ChannelWithConfigDrawer>);
-  }
+  },
 });
 
-const GenotypesControls = React.createClass({
+const GenotypesControls = createReactClass({
+  displayName: 'GenotypesControls',
+
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
@@ -817,10 +824,12 @@ const GenotypesControls = React.createClass({
 
       </div>
     );
-  }
+  },
 });
 
-const GenotypesLegend = React.createClass({
+const GenotypesLegend = createReactClass({
+  displayName: 'GenotypesLegend',
+
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
@@ -835,8 +844,7 @@ const GenotypesLegend = React.createClass({
     return (
       <div>Legend</div>
     );
-  }
-
+  },
 });
 
 export default GenotypesChannel;

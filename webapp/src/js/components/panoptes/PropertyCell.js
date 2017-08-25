@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import HtmlToReact from 'html-to-react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
@@ -18,7 +19,9 @@ const htmlToReactParser = new HtmlToReact.Parser(React, {
 });
 
 
-let PropertyCell = React.createClass({
+let PropertyCell = createReactClass({
+  displayName: 'PropertyCell',
+
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -87,8 +90,7 @@ let PropertyCell = React.createClass({
       <TooltipEllipsis className="label">{content}</TooltipEllipsis>
       {descriptionIcon}
     </span>;
-  }
-
+  },
 });
 
 export default PropertyCell;

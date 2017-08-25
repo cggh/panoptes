@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _isFinite from 'lodash.isfinite';
 import _map from 'lodash.map';
 import Hammer from 'react-hammerjs';
@@ -14,7 +15,9 @@ import {Motion, spring} from 'react-motion';
 const DEFAULT_SPRING = {stiffness:160, damping: 30};
 const NO_SPRING = {stiffness: 2000, damping: 80};
 
-let CanvasGroupChannel = React.createClass({
+let CanvasGroupChannel = createReactClass({
+  displayName: 'CanvasGroupChannel',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -170,7 +173,7 @@ let CanvasGroupChannel = React.createClass({
             }}
           </Motion>
       </ChannelWithConfigDrawer>);
-  }
+  },
 });
 
 

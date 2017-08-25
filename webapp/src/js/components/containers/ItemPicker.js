@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Highlight from 'react-highlighter';
 import Pluralise from 'ui/Pluralise';
@@ -15,7 +16,9 @@ import {List, ListItem} from 'material-ui/List';
 import Icon from 'ui/Icon';
 
 
-let ItemPicker = React.createClass({
+let ItemPicker = createReactClass({
+  displayName: 'ItemPicker',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -87,6 +90,7 @@ let ItemPicker = React.createClass({
   icon() {
     return this.props.icon;
   },
+
   title() {
     return this.props.title;
   },
@@ -98,20 +102,24 @@ let ItemPicker = React.createClass({
   handleAdd({groupId, itemId, payload, itemGroupId}) {
     this.setState({picked: this.state.picked.concat([{groupId, itemId, payload, itemGroupId}])});
   },
+
   handleRemove(index) {
     let picked = this.state.picked;
     picked.splice(index, 1);
     this.setState({picked: [].concat(picked)});
   },
+
   handleRemoveAll() {
     this.setState({picked: []});
   },
+
   handlePick() {
     const {groups} = this.props;
     this.props.onPick(_map(this.state.picked,
       (item) => item.payload ||
       (item.itemGroupId ? groups[item.groupId].itemGroups[item.itemGroupId].items[item.itemId].payload : groups[item.groupId].items[item.itemId].payload)));
   },
+
   handleSearchChange(event) {
     this.setState({'search': event.target.value});
   },
@@ -257,8 +265,7 @@ let ItemPicker = React.createClass({
         </div>
       </div>
     );
-  }
-
+  },
 });
 
 export default ItemPicker;

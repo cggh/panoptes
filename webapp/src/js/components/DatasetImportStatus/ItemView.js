@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -16,7 +18,8 @@ import LRUCache from 'util/LRUCache';
 // UI components
 import Loading from 'ui/Loading';
 
-let DatasetImportStatusItemView = React.createClass({
+let DatasetImportStatusItemView = createReactClass({
+  displayName: 'DatasetImportStatusItemView',
 
   mixins: [
     PureRenderMixin,
@@ -87,8 +90,7 @@ let DatasetImportStatusItemView = React.createClass({
       </div>
     );
 
-  }
-
+  },
 });
 
 export default DatasetImportStatusItemView;

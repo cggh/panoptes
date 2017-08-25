@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 import _isFunction from 'lodash.isfunction';
 
@@ -9,7 +10,9 @@ import _isFunction from 'lodash.isfunction';
 //   <GenomeBrowser table="variants"/>
 // </ComponentWrapper>
 
-let ComponentWrapper = React.createClass({
+let ComponentWrapper = createReactClass({
+  displayName: 'ComponentWrapper',
+
   propTypes: {
     children: PropTypes.element.isRequired
   },
@@ -38,8 +41,7 @@ let ComponentWrapper = React.createClass({
         }
       }
     );
-  }
-
+  },
 });
 
 export default ComponentWrapper;

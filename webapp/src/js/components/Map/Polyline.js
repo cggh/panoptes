@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {Polyline as LeafletPolyline} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let Polyline = React.createClass({
+let Polyline = createReactClass({
+  displayName: 'Polyline',
 
   mixins: [
     FluxMixin
@@ -21,7 +23,7 @@ let Polyline = React.createClass({
         {...this.props}
       />
     );
-  }
+  },
 });
 
 export default Polyline;

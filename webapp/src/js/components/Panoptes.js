@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from  'react';
+import createReactClass from 'create-react-class';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
 import {Map} from 'immutable';
@@ -62,7 +63,9 @@ const muiTheme = getMuiTheme({
   }
 });
 
-let Panoptes = React.createClass({
+let Panoptes = createReactClass({
+  displayName: 'Panoptes',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -159,10 +162,12 @@ let Panoptes = React.createClass({
         </MuiThemeProvider>
       </DetectResize>
     );
-  }
+  },
 });
 
-let Header = React.createClass({
+let Header = createReactClass({
+  displayName: 'Header',
+
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -232,7 +237,7 @@ let Header = React.createClass({
         />
       </div>
     );
-  }
+  },
 });
 
 export default Panoptes;

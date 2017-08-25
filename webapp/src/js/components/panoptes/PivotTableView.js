@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
 
@@ -43,7 +44,9 @@ function isNull(value) {
   return value === undefined || value === null || value === 'NULL' || value === '' || Number.isNaN(value) ? true : false;
 }
 
-let PivotTableView = React.createClass({
+let PivotTableView = createReactClass({
+  displayName: 'PivotTableView',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -529,7 +532,7 @@ let PivotTableView = React.createClass({
     );
     //
 
-  }
+  },
 });
 
 export default PivotTableView;

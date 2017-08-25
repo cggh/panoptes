@@ -2,6 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 
+import createReactClass from 'create-react-class';
+
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -12,7 +15,8 @@ import Icon from 'ui/Icon';
 // Material UI
 import RaisedButton from 'material-ui/RaisedButton';
 
-let Alert = React.createClass({
+let Alert = createReactClass({
+  displayName: 'Alert',
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
@@ -60,8 +64,7 @@ let Alert = React.createClass({
         </div>
       </div>
     );
-  }
-
+  },
 });
 
 export default Alert;

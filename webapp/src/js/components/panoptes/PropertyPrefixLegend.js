@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import LegendElement from 'panoptes/LegendElement';
 import {categoryColours} from 'util/Colours';
 
-let PropertyPrefixLegend = React.createClass({
+let PropertyPrefixLegend = createReactClass({
+  displayName: 'PropertyPrefixLegend',
+
   mixins: [
     PureRenderMixin,
     ConfigMixin
@@ -39,7 +42,7 @@ let PropertyPrefixLegend = React.createClass({
       : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
       }
     </div>;
-  }
+  },
 });
 
 export default PropertyPrefixLegend;

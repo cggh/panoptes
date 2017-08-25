@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import tickWidth from 'panoptes/TickWidth';
 import {drawText} from 'util/CanvasDrawing';
@@ -7,7 +8,8 @@ import {scaleLinear} from 'd3-scale';
 
 const HEIGHT = 40;
 
-let GenomeScale = React.createClass({
+let GenomeScale = createReactClass({
+  displayName: 'GenomeScale',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -90,7 +92,7 @@ let GenomeScale = React.createClass({
       ctx.stroke();
       drawText(ctx, hoverPos, x, 10);
     }
-  }
+  },
 });
 
 export default GenomeScale;

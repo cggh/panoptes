@@ -2,6 +2,8 @@ import {pie} from 'd3-shape';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -9,7 +11,8 @@ import FluxMixin from 'mixins/FluxMixin';
 // Panoptes components
 import PieChartSector from 'PieChartSector';
 
-let PieChart = React.createClass({
+let PieChart = createReactClass({
+  displayName: 'PieChart',
 
   mixins: [
     PureRenderMixin,
@@ -111,8 +114,7 @@ let PieChart = React.createClass({
       </svg>
     );
 
-  }
-
+  },
 });
 
 export default PieChart;
