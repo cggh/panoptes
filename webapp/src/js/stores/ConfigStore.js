@@ -1,4 +1,4 @@
-import Fluxxor from 'fluxxor';
+import {createStore} from 'fluxxor';
 
 import Constants from '../constants/Constants';
 const APIConst = Constants.API;
@@ -13,7 +13,7 @@ import _sortBy from 'lodash.sortby';
 import _keys from 'lodash.keys';
 import _cloneDeep from 'lodash.clonedeep';
 
-const ConfigStore = Fluxxor.createStore({
+const ConfigStore = createStore({
 
   initialize(initConfig) {
     this.state = this.addDerivedConfig(initConfig);

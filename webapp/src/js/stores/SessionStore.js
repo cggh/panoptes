@@ -1,5 +1,5 @@
 import React from 'react';
-import Fluxxor from 'fluxxor';
+import {createStore} from 'fluxxor';
 import Immutable from 'immutable';
 import uid from 'uid';
 import Constants from '../constants/Constants';
@@ -16,7 +16,7 @@ const MIN_POPUP_WIDTH_PIXELS = 200;
 const MIN_POPUP_HEIGHT_PIXELS = 150;
 const CASCADE_OFFSET_PIXELS = 20;
 
-let SessionStore = Fluxxor.createStore({
+let SessionStore = createStore({
 
   initialize(state) {
     this.state = Immutable.fromJS(state);

@@ -1,4 +1,4 @@
-import Fluxxor from 'fluxxor';
+import {createStore} from 'fluxxor';
 import Immutable from 'immutable';
 
 import Constants from '../constants/Constants';
@@ -6,7 +6,7 @@ import Constants from '../constants/Constants';
 const API = Constants.API;
 
 
-let PanoptesStore = Fluxxor.createStore({
+let PanoptesStore = createStore({
 
   initialize(init) {
     this.state = Immutable.fromJS(
