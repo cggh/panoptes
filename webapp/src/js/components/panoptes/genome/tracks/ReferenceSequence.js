@@ -275,7 +275,7 @@ let ReferenceSequence = createReactClass({
         height={HEIGHT}
         width={width}
         sideWidth={sideWidth}
-        sideComponent={<div className="side-name">Ref. Seq.</div>}
+        sideComponent={<Side />}
         legendComponent={<Legend getSeq={this.getSeq}/>}
       >
         <canvas ref="canvas" width={width - sideWidth} height={HEIGHT}/>
@@ -283,6 +283,12 @@ let ReferenceSequence = createReactClass({
     );
   },
 });
+
+class Side extends React.Component {
+  render() {
+    return <div className="side-name">Ref. Seq.</div>;
+  }
+}
 
 class Legend extends React.Component {
   state = {seq:''};
