@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import FileSaver from 'file-saver';
 import {Motion, spring} from 'react-motion';
@@ -94,30 +95,30 @@ let GenotypesChannel = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    name: React.PropTypes.string,
-    onClose: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired,
-    columnQuery: React.PropTypes.string,
-    rowQuery: React.PropTypes.string,
-    rowLabel: React.PropTypes.string,
-    rowSort: React.PropTypes.string,
-    rowHeight: React.PropTypes.number,
-    cellColour: React.PropTypes.string,
-    cellAlpha: React.PropTypes.string,
-    cellHeight: React.PropTypes.string,
-    pageSize: React.PropTypes.number,
-    page: React.PropTypes.number,
-    hoverPos: React.PropTypes.number,
-    onChangeHoverPos: React.PropTypes.func,
-    layoutGaps: React.PropTypes.bool,
-    onChangeLoadStatus: React.PropTypes.func,
-    rowRandomSubsetSize: React.PropTypes.number
+    setProps: PropTypes.func,
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    name: PropTypes.string,
+    onClose: PropTypes.func,
+    table: PropTypes.string.isRequired,
+    columnQuery: PropTypes.string,
+    rowQuery: PropTypes.string,
+    rowLabel: PropTypes.string,
+    rowSort: PropTypes.string,
+    rowHeight: PropTypes.number,
+    cellColour: PropTypes.string,
+    cellAlpha: PropTypes.string,
+    cellHeight: PropTypes.string,
+    pageSize: PropTypes.number,
+    page: PropTypes.number,
+    hoverPos: PropTypes.number,
+    onChangeHoverPos: PropTypes.func,
+    layoutGaps: PropTypes.bool,
+    onChangeLoadStatus: PropTypes.func,
+    rowRandomSubsetSize: PropTypes.number
   },
 
   getDefaultProps() {
@@ -611,20 +612,20 @@ const GenotypesControls = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    columnQuery: React.PropTypes.string,
-    rowQuery: React.PropTypes.string,
-    rowLabel: React.PropTypes.string,
-    rowSort: React.PropTypes.string,
-    rowHeight: React.PropTypes.number,
-    cellColour: React.PropTypes.string,
-    cellAlpha: React.PropTypes.string,
-    cellHeight: React.PropTypes.string,
-    pageSize: React.PropTypes.number,
-    page: React.PropTypes.number,
-    layoutGaps: React.PropTypes.bool,
-    getDataBlocks: React.PropTypes.func,
-    rowRandomSubsetSize: React.PropTypes.number
+    table: PropTypes.string.isRequired,
+    columnQuery: PropTypes.string,
+    rowQuery: PropTypes.string,
+    rowLabel: PropTypes.string,
+    rowSort: PropTypes.string,
+    rowHeight: PropTypes.number,
+    cellColour: PropTypes.string,
+    cellAlpha: PropTypes.string,
+    cellHeight: PropTypes.string,
+    pageSize: PropTypes.number,
+    page: PropTypes.number,
+    layoutGaps: PropTypes.bool,
+    getDataBlocks: PropTypes.func,
+    rowRandomSubsetSize: PropTypes.number
   },
 
   handleDownload() {

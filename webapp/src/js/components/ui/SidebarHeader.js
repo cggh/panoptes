@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
@@ -6,8 +7,8 @@ let SidebarHeader = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    icon: React.PropTypes.string.isRequired,
-    description: React.PropTypes.node
+    icon: PropTypes.string.isRequired,
+    description: PropTypes.node
   },
 
   render() {

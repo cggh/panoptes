@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 import Color from 'color';
 import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
@@ -56,20 +57,20 @@ let PerRowIndicatorChannel = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    name: React.PropTypes.string,
-    onClose: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string,
-    colourProperty: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func,
-    hoverPos: React.PropTypes.number,
-    onChangeHoverPos: React.PropTypes.func
+    setProps: PropTypes.func,
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    name: PropTypes.string,
+    onClose: PropTypes.func,
+    table: PropTypes.string.isRequired,
+    query: PropTypes.string,
+    colourProperty: PropTypes.string,
+    onChangeLoadStatus: PropTypes.func,
+    hoverPos: PropTypes.number,
+    onChangeHoverPos: PropTypes.func
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -489,9 +490,9 @@ const PerRowIndicatorControls = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string,
-    query: React.PropTypes.string,
-    colourProperty: React.PropTypes.string
+    table: PropTypes.string,
+    query: PropTypes.string,
+    colourProperty: PropTypes.string
   },
 
   handleQueryPick(query) {

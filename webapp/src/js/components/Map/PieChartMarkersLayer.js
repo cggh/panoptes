@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -34,28 +35,28 @@ let PieChartMarkersLayer = React.createClass({
   ],
 
   contextTypes: {
-    crs: React.PropTypes.object,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    changeLayerStatus: React.PropTypes.func
+    crs: PropTypes.object,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    changeLayerStatus: PropTypes.func
   },
   propTypes: {
-    defaultResidualFractionName: React.PropTypes.string,
-    defaultResidualSectorColor: React.PropTypes.string,
-    chartDataTable: React.PropTypes.string.isRequired,
-    componentColumns: React.PropTypes.array.isRequired,
-    primKey: React.PropTypes.string.isRequired,
-    locationDataTable: React.PropTypes.string.isRequired,
-    locationNameProperty: React.PropTypes.string,
-    locationSizeProperty: React.PropTypes.string,
-    residualFractionName: React.PropTypes.string,
-    residualSectorColor: React.PropTypes.string,
-    showLegend: React.PropTypes.bool,
-    disableOnClickMarker: React.PropTypes.bool,
-    maxLegendItems: React.PropTypes.number
+    defaultResidualFractionName: PropTypes.string,
+    defaultResidualSectorColor: PropTypes.string,
+    chartDataTable: PropTypes.string.isRequired,
+    componentColumns: PropTypes.array.isRequired,
+    primKey: PropTypes.string.isRequired,
+    locationDataTable: PropTypes.string.isRequired,
+    locationNameProperty: PropTypes.string,
+    locationSizeProperty: PropTypes.string,
+    residualFractionName: PropTypes.string,
+    residualSectorColor: PropTypes.string,
+    showLegend: PropTypes.bool,
+    disableOnClickMarker: PropTypes.bool,
+    maxLegendItems: PropTypes.number
   },
   childContextTypes: {
-    onClickMarker: React.PropTypes.func
+    onClickMarker: PropTypes.func
   },
 
   getChildContext() {

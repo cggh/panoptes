@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Sidebar from 'ui/Sidebar';
 import scrollbarSize from 'scrollbar-size';
@@ -40,18 +41,18 @@ let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    title: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string,
-    order: React.PropTypes.array,
-    columns: React.PropTypes.array,
-    columnWidths: React.PropTypes.object,
-    initialStartRowIndex: React.PropTypes.number,
-    sidebar: React.PropTypes.bool,
-    initialSearchFocus: React.PropTypes.bool,
-    searchText: React.PropTypes.string,
-    maxRowsPerPage: React.PropTypes.number
+    setProps: PropTypes.func,
+    title: PropTypes.string,
+    table: PropTypes.string.isRequired,
+    query: PropTypes.string,
+    order: PropTypes.array,
+    columns: PropTypes.array,
+    columnWidths: PropTypes.object,
+    initialStartRowIndex: PropTypes.number,
+    sidebar: PropTypes.bool,
+    initialSearchFocus: PropTypes.bool,
+    searchText: PropTypes.string,
+    maxRowsPerPage: PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one

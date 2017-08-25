@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import detectResize from 'util/DetectElementResize';
@@ -5,8 +6,8 @@ import detectResize from 'util/DetectElementResize';
 let DetectResize = React.createClass({
 
   propTypes: {
-    onResize: React.PropTypes.func,
-    children: React.PropTypes.element.isRequired
+    onResize: PropTypes.func,
+    children: PropTypes.element.isRequired
   },
 
   componentDidMount: function() {

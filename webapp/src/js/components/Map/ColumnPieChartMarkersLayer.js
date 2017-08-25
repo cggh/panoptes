@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -40,27 +41,27 @@ let ColumnPieChartMarkersLayer = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    crs: React.PropTypes.object,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    changeLayerStatus: React.PropTypes.func
+    crs: PropTypes.object,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    changeLayerStatus: PropTypes.func
   },
   propTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    primKey: React.PropTypes.string, // if not specified then all table records are used
-    query: React.PropTypes.string,
-    table: React.PropTypes.string,
-    markerSizeProperty: React.PropTypes.string,
-    prefix: React.PropTypes.string.isRequired,
-    showLegend: React.PropTypes.bool,
-    disableOnClickMarker: React.PropTypes.bool,
-    maxLegendItems: React.PropTypes.number
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    primKey: PropTypes.string, // if not specified then all table records are used
+    query: PropTypes.string,
+    table: PropTypes.string,
+    markerSizeProperty: PropTypes.string,
+    prefix: PropTypes.string.isRequired,
+    showLegend: PropTypes.bool,
+    disableOnClickMarker: PropTypes.bool,
+    maxLegendItems: PropTypes.number
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    onClickMarker: React.PropTypes.func
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    onClickMarker: PropTypes.func
   },
 
   getChildContext() {

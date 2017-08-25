@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {GeoJSON as LeafletGeoJSON} from 'react-leaflet';
 
@@ -11,10 +12,10 @@ let GeoJSON = React.createClass({
   ],
 
   propTypes: {
-    json: React.PropTypes.object.isRequired,
-    colour: React.PropTypes.string,
-    weight: React.PropTypes.number,
-    opacity: React.PropTypes.number
+    json: PropTypes.object.isRequired,
+    colour: PropTypes.string,
+    weight: PropTypes.number,
+    opacity: PropTypes.number
   },
 
   getDefaultProps() {

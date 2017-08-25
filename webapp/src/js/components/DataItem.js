@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import filterChildren from 'util/filterChildren';
 import ValidComponentChildren from 'util/ValidComponentChildren';
@@ -21,11 +22,11 @@ let DataItem = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired,
-    activeTab: React.PropTypes.string,
-    children: React.PropTypes.node
+    setProps: PropTypes.func,
+    table: PropTypes.string.isRequired,
+    primKey: PropTypes.string.isRequired,
+    activeTab: PropTypes.string,
+    children: PropTypes.node
   },
 
   getDefaultProps: function () {

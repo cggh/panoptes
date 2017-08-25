@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -25,8 +26,8 @@ let Finder = React.createClass({
   ],
 
   propTypes: {
-    icon: React.PropTypes.string,
-    title: React.PropTypes.string,
+    icon: PropTypes.string,
+    title: PropTypes.string,
   },
 
 

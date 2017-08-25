@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import _isArray from 'lodash.isarray';
@@ -11,7 +12,7 @@ let Anchor = React.createClass({
   ],
 
   propTypes: {
-    onClick: React.PropTypes.func,
+    onClick: PropTypes.func,
   },
 
   render() {

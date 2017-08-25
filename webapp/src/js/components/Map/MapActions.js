@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
@@ -55,17 +56,17 @@ let MapActions = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.object,
-    setProps: React.PropTypes.func,
-    query: React.PropTypes.string,
-    sidebar: React.PropTypes.bool,
-    baseTileLayer: React.PropTypes.string,
-    baseTileLayerProps: React.PropTypes.object,
-    markerColourProperty: React.PropTypes.string,
-    overlayLayer: React.PropTypes.string,
-    table: React.PropTypes.string,
-    title: React.PropTypes.string,
-    zoom: React.PropTypes.number
+    center: PropTypes.object,
+    setProps: PropTypes.func,
+    query: PropTypes.string,
+    sidebar: PropTypes.bool,
+    baseTileLayer: PropTypes.string,
+    baseTileLayerProps: PropTypes.object,
+    markerColourProperty: PropTypes.string,
+    overlayLayer: PropTypes.string,
+    table: PropTypes.string,
+    title: PropTypes.string,
+    zoom: PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one

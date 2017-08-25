@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Highlight from 'react-highlighter';
@@ -35,13 +36,13 @@ let ListView = React.createClass({
   ],
 
   propTypes: {
-    icon: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    selectedPrimKey: React.PropTypes.string,
-    onSelect: React.PropTypes.func.isRequired,
-    search: React.PropTypes.string,
-    autoSelectIfNoneSelected: React.PropTypes.bool,
-    onRowsCountChange: React.PropTypes.func
+    icon: PropTypes.string,
+    table: PropTypes.string.isRequired,
+    selectedPrimKey: PropTypes.string,
+    onSelect: PropTypes.func.isRequired,
+    search: PropTypes.string,
+    autoSelectIfNoneSelected: PropTypes.bool,
+    onRowsCountChange: PropTypes.func
   },
 
   getDefaultProps() {

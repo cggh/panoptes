@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -7,12 +8,12 @@ let TabPane = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    title: React.PropTypes.string,
-    active: React.PropTypes.bool, //Usually set by TabbedArea
-    replaceable: React.PropTypes.bool, //Usually set by TabbedArea
-    children: React.PropTypes.element,
-    className: React.PropTypes.string,
-    updateTitleIcon: React.PropTypes.func
+    title: PropTypes.string,
+    active: PropTypes.bool, //Usually set by TabbedArea
+    replaceable: PropTypes.bool, //Usually set by TabbedArea
+    children: PropTypes.element,
+    className: PropTypes.string,
+    updateTitleIcon: PropTypes.func
   },
 
   icon() {

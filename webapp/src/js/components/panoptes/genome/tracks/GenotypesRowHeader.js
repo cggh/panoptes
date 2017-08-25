@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -12,12 +13,12 @@ let GenotypesRowHeader = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string,
-    height: React.PropTypes.number,
-    width: React.PropTypes.number,
-    rowLabel: React.PropTypes.string,
-    rowHeight: React.PropTypes.number,
-    rowData: React.PropTypes.object
+    table: PropTypes.string,
+    height: PropTypes.number,
+    width: PropTypes.number,
+    rowLabel: PropTypes.string,
+    rowHeight: PropTypes.number,
+    rowData: PropTypes.object
   },
 
   componentDidMount() {

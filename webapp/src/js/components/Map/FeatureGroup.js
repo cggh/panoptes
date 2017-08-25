@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import {FeatureGroup as LeafletFeatureGroup} from 'react-leaflet';
@@ -33,17 +34,17 @@ let FeatureGroup = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
   propTypes: {
-    children: React.PropTypes.node,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    children: PropTypes.node,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
 
   getChildContext() {

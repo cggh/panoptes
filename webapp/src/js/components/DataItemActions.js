@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -24,8 +25,8 @@ let DataItemActions = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired
+    table: PropTypes.string.isRequired,
+    primKey: PropTypes.string.isRequired
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import LegendElement from 'panoptes/LegendElement';
@@ -8,8 +9,8 @@ let ColoursLegend = React.createClass({
   ],
 
   propTypes: {
-    colours: React.PropTypes.object.isRequired,
-    maxLegendItems: React.PropTypes.number
+    colours: PropTypes.object.isRequired,
+    maxLegendItems: PropTypes.number
   },
 
   render() {

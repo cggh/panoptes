@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -31,11 +32,11 @@ let RegionGenesList = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string.isRequired,
-    onSelectGene: React.PropTypes.func.isRequired,
-    startPosition: React.PropTypes.number.isRequired,
-    endPosition: React.PropTypes.number.isRequired,
-    icon: React.PropTypes.string
+    chromosome: PropTypes.string.isRequired,
+    onSelectGene: PropTypes.func.isRequired,
+    startPosition: PropTypes.number.isRequired,
+    endPosition: PropTypes.number.isRequired,
+    icon: PropTypes.string
   },
 
   getDefaultProps() {

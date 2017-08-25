@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -13,7 +14,7 @@ let CustomButton = React.createClass({
   ],
 
   propTypes: {
-    target: React.PropTypes.string,
+    target: PropTypes.string,
     children: function(props, propName, componentName) {
       // Only accept a single child, of the appropriate type
       let children = filterChildren(this, React.Children.toArray(props[propName]));

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _isFinite from 'lodash.isfinite';
 import _map from 'lodash.map';
@@ -27,24 +28,24 @@ let CanvasGroupChannel = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    autoYScale: React.PropTypes.bool,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    side: React.PropTypes.element,
-    controls: React.PropTypes.element,
-    legend: React.PropTypes.element,
-    onClose: React.PropTypes.func,
-    onTap: React.PropTypes.func,
-    onMouseOver: React.PropTypes.func,
-    onMouseOut: React.PropTypes.func,
-    onMouseMove: React.PropTypes.func,
-    children: React.PropTypes.node
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    sideWidth: PropTypes.number,
+    autoYScale: PropTypes.bool,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    side: PropTypes.element,
+    controls: PropTypes.element,
+    legend: PropTypes.element,
+    onClose: PropTypes.func,
+    onTap: PropTypes.func,
+    onMouseOver: PropTypes.func,
+    onMouseOut: PropTypes.func,
+    onMouseMove: PropTypes.func,
+    children: PropTypes.node
   },
 
   getDefaultProps() {

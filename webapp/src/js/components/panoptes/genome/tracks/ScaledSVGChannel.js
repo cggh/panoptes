@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {scale} from 'd3-scale';
 import _isFinite from 'lodash.isfinite';
@@ -22,22 +23,22 @@ let ScaledSVGChannel = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    autoYScale: React.PropTypes.bool,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    dataYMin: React.PropTypes.number,
-    dataYMax: React.PropTypes.number,
-    side: React.PropTypes.element,
-    controls: React.PropTypes.element,
-    legend: React.PropTypes.element,
-    onClose: React.PropTypes.func,
-    children: React.PropTypes.object
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    sideWidth: PropTypes.number,
+    autoYScale: PropTypes.bool,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    dataYMin: PropTypes.number,
+    dataYMax: PropTypes.number,
+    side: PropTypes.element,
+    controls: PropTypes.element,
+    legend: PropTypes.element,
+    onClose: PropTypes.func,
+    children: PropTypes.object
     //Note that there will be other props specific to each child channel
   },
 

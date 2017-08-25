@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 
@@ -15,10 +16,10 @@ let Alert = React.createClass({
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
-    message: React.PropTypes.string.isRequired,
-    title: React.PropTypes.string,
-    OKButtonLabel: React.PropTypes.string,
-    onOK: React.PropTypes.func
+    message: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    OKButtonLabel: PropTypes.string,
+    onOK: PropTypes.func
   },
 
   getDefaultProps() {

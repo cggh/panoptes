@@ -10,6 +10,8 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import TooltipEllipsis from 'ui/TooltipEllipsis';
 import Icon from 'ui/Icon';
 
+import PropTypes from 'prop-types';
+
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
 import TablePlot from 'TablePlot';
@@ -24,12 +26,12 @@ let PropertyHeader = React.createClass({
   ],
 
   propTypes: {
-    prefix: React.PropTypes.node,
-    table: React.PropTypes.string.isRequired,
-    propId: React.PropTypes.string.isRequired,
-    tooltipPlacement: React.PropTypes.string.isRequired,
-    tooltipTrigger: React.PropTypes.arrayOf(React.PropTypes.string),
-    onClick: React.PropTypes.func
+    prefix: PropTypes.node,
+    table: PropTypes.string.isRequired,
+    propId: PropTypes.string.isRequired,
+    tooltipPlacement: PropTypes.string.isRequired,
+    tooltipTrigger: PropTypes.arrayOf(PropTypes.string),
+    onClick: PropTypes.func
   },
 
   render: function() {

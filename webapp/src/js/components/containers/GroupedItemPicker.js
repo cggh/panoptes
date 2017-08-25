@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import classNames from 'classnames';
@@ -24,10 +25,10 @@ let GroupedItemPicker = React.createClass({
   ],
 
   propTypes: {
-    groups: React.PropTypes.objectOf(React.PropTypes.object),
-    initialPick: React.PropTypes.arrayOf(React.PropTypes.string),
-    onPick: React.PropTypes.func,
-    title: React.PropTypes.string
+    groups: PropTypes.objectOf(PropTypes.object),
+    initialPick: PropTypes.arrayOf(PropTypes.string),
+    onPick: PropTypes.func,
+    title: PropTypes.string
   },
 
   getDefaultProps() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -25,12 +26,12 @@ const PropertySelector = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string,
-    value: React.PropTypes.string,
-    filter: React.PropTypes.func,
-    onSelect: React.PropTypes.func,
-    label: React.PropTypes.string,
-    allowNull: React.PropTypes.bool
+    table: PropTypes.string,
+    value: PropTypes.string,
+    filter: PropTypes.func,
+    onSelect: PropTypes.func,
+    label: PropTypes.string,
+    allowNull: PropTypes.bool
   },
 
   getDefaultProps() {

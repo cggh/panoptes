@@ -3,6 +3,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ColourPicker from 'ui/ColourPicker';
 import FluxMixin from 'mixins/FluxMixin';
 import {colours} from 'util/Colours';
+import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 import TooltipEllipsis from 'ui/TooltipEllipsis';
 
@@ -13,9 +14,9 @@ let LegendElement = React.createClass({
   ],
 
   propTypes: {
-    name: React.PropTypes.string,
-    colour: React.PropTypes.string,
-    onPickColour: React.PropTypes.func
+    name: PropTypes.string,
+    colour: PropTypes.string,
+    onPickColour: PropTypes.func
   },
 
   handlePickColour(colour) {

@@ -1,4 +1,5 @@
 import {forceSimulation, forceLink, forceManyBody, forceCollide} from 'd3-force';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Lodash
@@ -44,8 +45,8 @@ let forceCrossLink = function(links) {
 
 let GeoLayouter = React.createClass({
   propTypes: {
-    nodes: React.PropTypes.array.isRequired,
-    children: React.PropTypes.func.isRequired
+    nodes: PropTypes.array.isRequired,
+    children: PropTypes.func.isRequired
   },
 
   shouldComponentUpdate() {
@@ -59,7 +60,7 @@ let GeoLayouter = React.createClass({
   },
 
   contextTypes: {
-    map: React.PropTypes.object,
+    map: PropTypes.object,
   },
 
   updateNodes(nodes) {

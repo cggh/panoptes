@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
@@ -12,11 +13,11 @@ let QueryResult = React.createClass({
   ],
 
   propTypes: {
-    query: React.PropTypes.string,
-    expression: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    formatNumber: React.PropTypes.string,
-    distinct: React.PropTypes.bool
+    query: PropTypes.string,
+    expression: PropTypes.string,
+    table: PropTypes.string.isRequired,
+    formatNumber: PropTypes.string,
+    distinct: PropTypes.bool
   },
 
   getDefaultProps() {

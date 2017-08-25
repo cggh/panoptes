@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Content from 'panoptes/Content';
@@ -7,7 +8,7 @@ let ToggleBox = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-  	isHidden: React.PropTypes.bool,
+  	isHidden: PropTypes.bool,
     children: function(props, propName, componentName) {
       // Only accept a single child, of the appropriate type
       let children = filterChildren(this, React.Children.toArray(props[propName]));

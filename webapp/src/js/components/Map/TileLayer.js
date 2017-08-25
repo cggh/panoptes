@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import {TileLayer as LeafletTileLayer} from 'react-leaflet';
@@ -15,28 +16,28 @@ let TileLayer = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
   propTypes: {
-    attribution: React.PropTypes.string,
-    bounds: React.PropTypes.array,
-    ext: React.PropTypes.string,
-    format: React.PropTypes.string,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    maxNativeZoom: React.PropTypes.number,
-    maxZoom: React.PropTypes.number,
-    minZoom: React.PropTypes.number,
-    opacity: React.PropTypes.number,
-    tms: React.PropTypes.bool,
-    url: React.PropTypes.string.isRequired,
-    variant: React.PropTypes.string,
-    zIndex: React.PropTypes.number,
+    attribution: PropTypes.string,
+    bounds: PropTypes.array,
+    ext: PropTypes.string,
+    format: PropTypes.string,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    maxNativeZoom: PropTypes.number,
+    maxZoom: PropTypes.number,
+    minZoom: PropTypes.number,
+    opacity: PropTypes.number,
+    tms: PropTypes.bool,
+    url: PropTypes.string.isRequired,
+    variant: PropTypes.string,
+    zIndex: PropTypes.number,
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
 
   getChildContext() {

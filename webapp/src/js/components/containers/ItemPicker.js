@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Highlight from 'react-highlighter';
@@ -20,46 +21,46 @@ let ItemPicker = React.createClass({
   ],
 
   propTypes: {
-    itemName: React.PropTypes.string,
-    groupName: React.PropTypes.string,
-    pickVerb: React.PropTypes.string,
-    initialSelection: React.PropTypes.arrayOf(
-      React.PropTypes.shape({
-        groupId: React.PropTypes.string.isRequired,
-        itemGroupId: React.PropTypes.string.isRequired,
-        itemId: React.PropTypes.string.isRequired,
-        payload: React.PropTypes.any
+    itemName: PropTypes.string,
+    groupName: PropTypes.string,
+    pickVerb: PropTypes.string,
+    initialSelection: PropTypes.arrayOf(
+      PropTypes.shape({
+        groupId: PropTypes.string.isRequired,
+        itemGroupId: PropTypes.string.isRequired,
+        itemId: PropTypes.string.isRequired,
+        payload: PropTypes.any
       })),
-    groups: React.PropTypes.objectOf(
-      React.PropTypes.shape({
-        name: React.PropTypes.string.isRequired,
-        icon: React.PropTypes.string,
-        items: React.PropTypes.objectOf(
-          React.PropTypes.shape({
-            name: React.PropTypes.string.isRequired,
-            icon: React.PropTypes.string,
-            description: React.PropTypes.string,
-            payload: React.PropTypes.any
+    groups: PropTypes.objectOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        icon: PropTypes.string,
+        items: PropTypes.objectOf(
+          PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            icon: PropTypes.string,
+            description: PropTypes.string,
+            payload: PropTypes.any
           })
         ),
-        itemGroups: React.PropTypes.objectOf(
-          React.PropTypes.shape({
-            name: React.PropTypes.string.isRequired,
-            icon: React.PropTypes.string,
-            items: React.PropTypes.objectOf(
-              React.PropTypes.shape({
-                name: React.PropTypes.string.isRequired,
-                icon: React.PropTypes.string,
-                description: React.PropTypes.string,
-                payload: React.PropTypes.any
+        itemGroups: PropTypes.objectOf(
+          PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            icon: PropTypes.string,
+            items: PropTypes.objectOf(
+              PropTypes.shape({
+                name: PropTypes.string.isRequired,
+                icon: PropTypes.string,
+                description: PropTypes.string,
+                payload: PropTypes.any
               })
             ),
           })
         )
       })),
-    onPick: React.PropTypes.func.isRequired,
-    icon: React.PropTypes.string,
-    title: React.PropTypes.string
+    onPick: PropTypes.func.isRequired,
+    icon: PropTypes.string,
+    title: PropTypes.string
   },
 
   getDefaultProps() {

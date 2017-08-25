@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import classNames from 'classnames';
@@ -14,14 +15,14 @@ let TabbedArea = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    activeTab: React.PropTypes.string,
-    unclosableTabs: React.PropTypes.object,
-    unreplaceableTabs: React.PropTypes.object,
-    onSwitch: React.PropTypes.func,
-    onClose: React.PropTypes.func,
-    onDragAway: React.PropTypes.func,
-    onAddTab: React.PropTypes.func,
-    children: React.PropTypes.node
+    activeTab: PropTypes.string,
+    unclosableTabs: PropTypes.object,
+    unreplaceableTabs: PropTypes.object,
+    onSwitch: PropTypes.func,
+    onClose: PropTypes.func,
+    onDragAway: PropTypes.func,
+    onAddTab: PropTypes.func,
+    children: PropTypes.node
 
   },
 

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Color from 'color';
 
@@ -46,23 +47,23 @@ let NumericalSummaryTrack = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    height: React.PropTypes.number,
-    width: React.PropTypes.number,
-    colour: React.PropTypes.string,
-    hideMinMax: React.PropTypes.bool,
-    autoYScale: React.PropTypes.bool,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    onYLimitChange: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired,
-    track: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func,
-    hoverPos: React.PropTypes.number,
-    onChangeHoverPos: React.PropTypes.func
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    height: PropTypes.number,
+    width: PropTypes.number,
+    colour: PropTypes.string,
+    hideMinMax: PropTypes.bool,
+    autoYScale: PropTypes.bool,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    onYLimitChange: PropTypes.func,
+    table: PropTypes.string.isRequired,
+    track: PropTypes.string.isRequired,
+    query: PropTypes.string,
+    onChangeLoadStatus: PropTypes.func,
+    hoverPos: PropTypes.number,
+    onChangeHoverPos: PropTypes.func
   },
 
   getInitialState() {

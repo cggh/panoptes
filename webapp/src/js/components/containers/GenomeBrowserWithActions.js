@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
@@ -41,13 +42,13 @@ let GenomeBrowserWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    title: React.PropTypes.string,
-    sidebar: React.PropTypes.bool,
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    childrenHash: React.PropTypes.number
+    setProps: PropTypes.func,
+    title: PropTypes.string,
+    sidebar: PropTypes.bool,
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    childrenHash: PropTypes.number
   },
 
   getDefaultProps() {

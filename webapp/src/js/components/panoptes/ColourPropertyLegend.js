@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _isEmpty from 'lodash.isempty';
 import SQL from 'panoptes/SQL';
@@ -8,12 +9,12 @@ import {propertyColour} from 'util/Colours';
 let ColourPropertyLegend = React.createClass({
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    labelProperty: React.PropTypes.string,
-    maxLegendItems: React.PropTypes.number,
-    colourProperty: React.PropTypes.string.isRequired,
-    config: React.PropTypes.object, // This will be provided via withAPIData
-    data: React.PropTypes.array // This will be provided via withAPIData
+    table: PropTypes.string.isRequired,
+    labelProperty: PropTypes.string,
+    maxLegendItems: PropTypes.number,
+    colourProperty: PropTypes.string.isRequired,
+    config: PropTypes.object, // This will be provided via withAPIData
+    data: PropTypes.array // This will be provided via withAPIData
   },
 
   getDefaultProps() {

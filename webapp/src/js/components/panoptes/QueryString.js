@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import SQL from 'panoptes/SQL';
 
@@ -14,9 +15,9 @@ let QueryString = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string.isRequired,
-    prefix: React.PropTypes.string
+    table: PropTypes.string.isRequired,
+    query: PropTypes.string.isRequired,
+    prefix: PropTypes.string
   },
 
   getDefaultProps() {

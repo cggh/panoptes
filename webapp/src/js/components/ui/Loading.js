@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
@@ -7,8 +8,8 @@ let Loading = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    status: React.PropTypes.string.isRequired,
-    children: React.PropTypes.any
+    status: PropTypes.string.isRequired,
+    children: PropTypes.any
   },
 
   render() {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 import _forEach from 'lodash.foreach';
 import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
@@ -42,15 +43,15 @@ let AnnotationChannel = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    name: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func,
-    onClose: React.PropTypes.func,
-    hoverPos: React.PropTypes.number
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    name: PropTypes.string,
+    onChangeLoadStatus: PropTypes.func,
+    onClose: PropTypes.func,
+    hoverPos: PropTypes.number
   },
 
   getInitialState() {

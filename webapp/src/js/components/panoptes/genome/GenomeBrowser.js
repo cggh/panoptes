@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import offset from 'bloody-offset';
@@ -40,13 +41,13 @@ let GenomeBrowser = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func.isRequired,
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    sideWidth: React.PropTypes.number.isRequired,
-    children: React.PropTypes.node,
-    childrenHash: React.PropTypes.number
+    setProps: PropTypes.func.isRequired,
+    chromosome: PropTypes.string.isRequired,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    sideWidth: PropTypes.number.isRequired,
+    children: PropTypes.node,
+    childrenHash: PropTypes.number
   },
 
   getDefaultProps() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _some from 'lodash.some';
 import _filter from 'lodash.filter';
@@ -24,8 +25,8 @@ let ViewList = React.createClass({
   ],
 
   propTypes: {
-    style: React.PropTypes.object,
-    onClick: React.PropTypes.func
+    style: PropTypes.object,
+    onClick: PropTypes.func
   },
 
   handleOpen(e, component) {

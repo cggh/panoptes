@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import {ImageOverlay as LeafletImageOverlay} from 'react-leaflet';
@@ -15,20 +16,20 @@ let ImageOverlay = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
   propTypes: {
-    attribution: React.PropTypes.string,
-    bounds: React.PropTypes.array,
-    url: React.PropTypes.string,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    opacity: React.PropTypes.number
+    attribution: PropTypes.string,
+    bounds: PropTypes.array,
+    url: PropTypes.string,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    opacity: PropTypes.number
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
 
   getChildContext() {

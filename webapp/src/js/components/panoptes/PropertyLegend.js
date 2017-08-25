@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -14,12 +15,12 @@ let PropertyLegend = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string,
-    property: React.PropTypes.string,
-    knownValues: React.PropTypes.array,
-    min: React.PropTypes.number,
-    max: React.PropTypes.number,
-    maxLegendItems: React.PropTypes.number
+    table: PropTypes.string,
+    property: PropTypes.string,
+    knownValues: PropTypes.array,
+    min: PropTypes.number,
+    max: PropTypes.number,
+    maxLegendItems: PropTypes.number
   },
 
   render() {

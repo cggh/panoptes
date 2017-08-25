@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import repeatString from 'repeat-string';
 import chunkedMap from 'util/chunkedMap';
@@ -24,24 +25,24 @@ let GenotypesTable = React.createClass({
   ],
 
   contextTypes: {
-    muiTheme: React.PropTypes.object
+    muiTheme: PropTypes.object
   },
   propTypes: {
-    table: React.PropTypes.string,
-    genomicPositions: React.PropTypes.any,
-    colPositions: React.PropTypes.any,
-    blocks: React.PropTypes.array,
-    colWidth: React.PropTypes.number,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    rowHeight: React.PropTypes.number,
-    cellColour: React.PropTypes.string,
-    cellAlpha: React.PropTypes.string,
-    cellHeight: React.PropTypes.string,
-    layoutBlocks: React.PropTypes.array,
-    dataBlocks: React.PropTypes.array
+    table: PropTypes.string,
+    genomicPositions: PropTypes.any,
+    colPositions: PropTypes.any,
+    blocks: PropTypes.array,
+    colWidth: PropTypes.number,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    rowHeight: PropTypes.number,
+    cellColour: PropTypes.string,
+    cellAlpha: PropTypes.string,
+    cellHeight: PropTypes.string,
+    layoutBlocks: PropTypes.array,
+    dataBlocks: PropTypes.array
   },
 
   componentDidMount() {

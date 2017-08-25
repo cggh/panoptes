@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -12,8 +13,8 @@ let ItemLink = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string,
-    primKey: React.PropTypes.string
+    table: PropTypes.string,
+    primKey: PropTypes.string
   },
 
   handleClick(e) {

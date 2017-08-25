@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -29,7 +30,7 @@ let DatasetImportStatusListView = React.createClass({
   ],
 
   propTypes: {
-    refreshMilliseconds: React.PropTypes.number,
+    refreshMilliseconds: PropTypes.number,
   },
 
   getInitialState() {

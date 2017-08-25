@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixin
@@ -16,14 +17,14 @@ let ConfirmButton = React.createClass({
   ],
 
   propTypes: {
-    label: React.PropTypes.string,
-    message: React.PropTypes.string,
-    onConfirm: React.PropTypes.func,
-    onCancel: React.PropTypes.func,
-    confirmButtonLabel: React.PropTypes.string,
-    cancelButtonLabel: React.PropTypes.string,
-    primary: React.PropTypes.bool,
-    icon: React.PropTypes.element
+    label: PropTypes.string,
+    message: PropTypes.string,
+    onConfirm: PropTypes.func,
+    onCancel: PropTypes.func,
+    confirmButtonLabel: PropTypes.string,
+    cancelButtonLabel: PropTypes.string,
+    primary: PropTypes.bool,
+    icon: PropTypes.element
   },
 
   handleClick(e) {

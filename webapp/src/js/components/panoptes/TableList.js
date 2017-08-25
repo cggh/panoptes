@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _map from 'lodash.map';
 
@@ -20,8 +21,8 @@ let TableList = React.createClass({
   ],
 
   propTypes: {
-    style: React.PropTypes.object,
-    onClick: React.PropTypes.func
+    style: PropTypes.object,
+    onClick: PropTypes.func
   },
 
   handleOpen(e, component) {

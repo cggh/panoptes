@@ -1,4 +1,5 @@
 import {Map as LeafletMap} from 'react-leaflet';
+import PropTypes from 'prop-types';
 import React from 'react';
 import displayName from 'react-display-name';
 import 'leaflet-loading/src/Control.Loading.js';
@@ -86,16 +87,16 @@ let Map = React.createClass({
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
   propTypes: {
-    center: React.PropTypes.object,
-    children: React.PropTypes.node,
-    setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when component is in templates
-    onChange: React.PropTypes.func,
-    title: React.PropTypes.string,
-    zoom: React.PropTypes.number
+    center: PropTypes.object,
+    children: PropTypes.node,
+    setProps: PropTypes.func, // NB: session will not record {center, zoom} when component is in templates
+    onChange: PropTypes.func,
+    title: PropTypes.string,
+    zoom: PropTypes.number
   },
   childContextTypes: {
-    crs: React.PropTypes.object,
-    changeLayerStatus: React.PropTypes.func
+    crs: PropTypes.object,
+    changeLayerStatus: PropTypes.func
   },
 
   getChildContext() {

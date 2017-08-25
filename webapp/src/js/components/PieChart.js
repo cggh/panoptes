@@ -1,4 +1,5 @@
 import {pie} from 'd3-shape';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -16,17 +17,17 @@ let PieChart = React.createClass({
   ],
 
   propTypes: {
-    chartData: React.PropTypes.array,
-    map: React.PropTypes.object,
-    lat: React.PropTypes.number,
-    lng: React.PropTypes.number,
-    name: React.PropTypes.string,
-    originalLat: React.PropTypes.number,
-    originalLng: React.PropTypes.number,
-    radius: React.PropTypes.number,
-    hideValues: React.PropTypes.bool,
-    faceText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
-    isHighlighted: React.PropTypes.bool
+    chartData: PropTypes.array,
+    map: PropTypes.object,
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+    name: PropTypes.string,
+    originalLat: PropTypes.number,
+    originalLng: PropTypes.number,
+    radius: PropTypes.number,
+    hideValues: PropTypes.bool,
+    faceText: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    isHighlighted: PropTypes.bool
   },
 
   getDefaultProps() {

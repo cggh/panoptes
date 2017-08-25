@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
@@ -10,8 +11,8 @@ let ExternalLinkButton = React.createClass({
   ],
 
   propTypes: {
-    label: React.PropTypes.string,
-    urls: React.PropTypes.array
+    label: PropTypes.string,
+    urls: PropTypes.array
   },
 
   handleClick(e) {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import {scaleLinear} from 'd3-scale';
@@ -6,10 +7,10 @@ let YScale = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    min: React.PropTypes.number,
-    max: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number
+    min: PropTypes.number,
+    max: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number
   },
 
   componentDidMount() {

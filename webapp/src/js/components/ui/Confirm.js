@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 
@@ -16,12 +17,12 @@ let Confirm = React.createClass({
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
-    message: React.PropTypes.string.isRequired,
-    title: React.PropTypes.string,
-    onCancel: React.PropTypes.func,
-    onConfirm: React.PropTypes.func,
-    cancelButtonLabel: React.PropTypes.string,
-    confirmButtonLabel: React.PropTypes.string
+    message: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    onCancel: PropTypes.func,
+    onConfirm: PropTypes.func,
+    cancelButtonLabel: PropTypes.string,
+    confirmButtonLabel: PropTypes.string
   },
 
   getDefaultProps() {

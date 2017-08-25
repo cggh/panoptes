@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -21,7 +22,7 @@ let EditYAMLConfig = React.createClass({
   ],
 
   propTypes: {
-    path: React.PropTypes.string.isRequired
+    path: PropTypes.string.isRequired
   },
 
   getInitialState() {

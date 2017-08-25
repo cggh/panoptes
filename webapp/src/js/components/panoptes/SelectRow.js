@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import withAPIData from 'hoc/withAPIData';
@@ -23,9 +24,9 @@ let SelectRow = React.createClass({
 
 
   propTypes: {
-    query: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    queryTable: React.PropTypes.string
+    query: PropTypes.string,
+    table: PropTypes.string.isRequired,
+    queryTable: PropTypes.string
   },
 
   getDefaultProps() {

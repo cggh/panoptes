@@ -1,5 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
+import PropTypes from 'prop-types';
 import RAF from 'raf';
 import now from 'performance-now';
 import classnames from 'classnames';
@@ -11,8 +12,8 @@ let LoadingIndicator = React.createClass({
   ],
 
   propTypes: {
-    animate: React.PropTypes.bool,
-    width: React.PropTypes.number
+    animate: PropTypes.bool,
+    width: PropTypes.number
   },
 
   componentDidMount() {

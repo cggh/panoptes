@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 
@@ -20,7 +21,7 @@ import _map from 'lodash.map';
 
 let Component = React.createClass({
   propTypes: {
-    component: React.PropTypes.object.isRequired
+    component: PropTypes.object.isRequired
   },
 
   render() {
@@ -36,7 +37,7 @@ let Component = React.createClass({
 
 let And = React.createClass({
   propTypes: {
-    component: React.PropTypes.object.isRequired
+    component: PropTypes.object.isRequired
   },
 
   render() {
@@ -51,7 +52,7 @@ let And = React.createClass({
 
 let Or = React.createClass({
   propTypes: {
-    component: React.PropTypes.object.isRequired
+    component: PropTypes.object.isRequired
   },
 
   render() {
@@ -81,9 +82,9 @@ let Criterion = React.createClass({
   ],
 
   propTypes: {
-    component: React.PropTypes.object.isRequired,
-    onChange: React.PropTypes.func.isRequired,
-    table: React.PropTypes.string.isRequired
+    component: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    table: PropTypes.string.isRequired
   },
 
   componentWillMount() {
@@ -646,10 +647,10 @@ let Criterion = React.createClass({
 
 let QueryEditor = React.createClass({
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string.isRequired,
-    onChange: React.PropTypes.func,
-    className: React.PropTypes.string
+    table: PropTypes.string.isRequired,
+    query: PropTypes.string.isRequired,
+    onChange: PropTypes.func,
+    className: PropTypes.string
   },
 
   handleChange(newQuery) {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -14,10 +15,10 @@ let GeoMarker = React.createClass({
   ],
 
   propTypes: {
-    title: React.PropTypes.string,
-    radius: React.PropTypes.number,
-    onClick: React.PropTypes.func,
-    isHighlighted: React.PropTypes.bool
+    title: PropTypes.string,
+    radius: PropTypes.number,
+    onClick: PropTypes.func,
+    isHighlighted: PropTypes.bool
   },
 
   getDefaultProps() {

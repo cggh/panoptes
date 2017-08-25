@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import HtmlToReact from 'html-to-react';
 import ComponentRegistry from 'util/ComponentRegistry';
@@ -25,9 +26,9 @@ function createStyleJsonFromString(styleString) {
 let HTMLWithComponents = React.createClass({
 
   propTypes: {
-    className: React.PropTypes.string,
-    children: React.PropTypes.string,
-    replaceSelf: React.PropTypes.func
+    className: PropTypes.string,
+    children: PropTypes.string,
+    replaceSelf: PropTypes.func
   },
 
   componentWillMount() {
@@ -56,23 +57,23 @@ let HTMLWithComponents = React.createClass({
                 //Cast types for known props
               if (type.propTypes) {
                   switch (type.propTypes[key]) {
-                  case React.PropTypes.bool:
+                  case PropTypes.bool:
                     // If the attribute is specfied without a value, e.g. showLegend,
                     // then value will be an empty string here, which we will interpret as true.
                     // (Ordinarily, empty string values are interpreted as false in JavaScript.)
                     value = value == '' || value.toLowerCase() === 'true' || value.toLowerCase() === 'yes' || value.toLowerCase() === '1' ? true : false;
                     break;
-                  case React.PropTypes.bool.isRequired:
+                  case PropTypes.bool.isRequired:
                     value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
                     break;
-                  case React.PropTypes.number:
-                  case React.PropTypes.number.isRequired:
+                  case PropTypes.number:
+                  case PropTypes.number.isRequired:
                     value = Number(value);
                     break;
-                  case React.PropTypes.array:
-                  case React.PropTypes.array.isRequired:
-                  case React.PropTypes.object:
-                  case React.PropTypes.object.isRequired:
+                  case PropTypes.array:
+                  case PropTypes.array.isRequired:
+                  case PropTypes.object:
+                  case PropTypes.object.isRequired:
                     try {
                       value = JSON.parse(value);
                     } catch (e) {

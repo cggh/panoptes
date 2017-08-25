@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
@@ -12,15 +13,15 @@ let PercentMatching = React.createClass({
   ],
 
   propTypes: {
-    numQuery: React.PropTypes.string,
-    domQuery: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
+    numQuery: PropTypes.string,
+    domQuery: PropTypes.string,
+    table: PropTypes.string.isRequired,
   },
 
   getDefaultProps() {
     return {
       numquery: SQL.nullQuery,
-      domQuery: React.PropTypes.string,
+      domQuery: PropTypes.string,
     };
   },
 

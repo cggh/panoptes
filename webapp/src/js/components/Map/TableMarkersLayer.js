@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 
@@ -54,29 +55,29 @@ let TableMarkersLayer = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    crs: React.PropTypes.object,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    changeLayerStatus: React.PropTypes.func
+    crs: PropTypes.object,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    changeLayerStatus: PropTypes.func
   },
   propTypes: {
-    highlight: React.PropTypes.string,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    primKey: React.PropTypes.string, // if not specified then all table records are used
-    query: React.PropTypes.string,
-    table: React.PropTypes.string,
-    markerColourProperty: React.PropTypes.string,
-    showLegend: React.PropTypes.bool,
-    maxLegendItems: React.PropTypes.number,
-    disableOnClickMarker: React.PropTypes.bool,
-    clusterMarkers: React.PropTypes.bool,
-    children: React.PropTypes.node
+    highlight: PropTypes.string,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    primKey: PropTypes.string, // if not specified then all table records are used
+    query: PropTypes.string,
+    table: PropTypes.string,
+    markerColourProperty: PropTypes.string,
+    showLegend: PropTypes.bool,
+    maxLegendItems: PropTypes.number,
+    disableOnClickMarker: PropTypes.bool,
+    clusterMarkers: PropTypes.bool,
+    children: PropTypes.node
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    onClickMarker: React.PropTypes.func
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    onClickMarker: PropTypes.func
   },
 
   getChildContext() {

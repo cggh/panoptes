@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
@@ -7,8 +8,8 @@ let TooltipEllipsis = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    className: React.PropTypes.string,
-    children: React.PropTypes.any
+    className: PropTypes.string,
+    children: PropTypes.any
   },
 
   componentDidMount() {

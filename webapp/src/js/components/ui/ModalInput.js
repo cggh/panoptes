@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import TextField from 'material-ui/TextField';
@@ -10,12 +11,12 @@ let ModalInput = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    inputs: React.PropTypes.array.isRequired,
-    names: React.PropTypes.array.isRequired,
-    action: React.PropTypes.string.isRequired,
-    actionIcon: React.PropTypes.string,
-    onAction: React.PropTypes.func.isRequired,
-    onCancel: React.PropTypes.func.isRequired
+    inputs: PropTypes.array.isRequired,
+    names: PropTypes.array.isRequired,
+    action: PropTypes.string.isRequired,
+    actionIcon: PropTypes.string,
+    onAction: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired
   },
 
   render() {

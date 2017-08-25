@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -14,9 +15,9 @@ let TextButton = React.createClass({
   ],
 
   propTypes: {
-    label: React.PropTypes.string,
-    children: React.PropTypes.node,
-    target: React.PropTypes.string
+    label: PropTypes.string,
+    children: PropTypes.node,
+    target: PropTypes.string
   },
 
   getDefaultProps() {

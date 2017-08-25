@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import createPlotlyComponent from 'react-plotlyjs';
 import Plotly from 'plotly.js/dist/plotly-cartesian';
@@ -14,11 +15,11 @@ let Plot = React.createClass({
   ],
 
   propTypes: {
-    plotType: React.PropTypes.string,
-    dimensionData: React.PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {})),
-    dimensionMetadata: React.PropTypes.object,
-    title: React.PropTypes.string,
-    displayModeBar: React.PropTypes.bool
+    plotType: PropTypes.string,
+    dimensionData: PropTypes.shape(_reduce(allDimensions, (props, dim) => { props[dim] = PropTypes.array; return props; }, {})),
+    dimensionMetadata: PropTypes.object,
+    title: PropTypes.string,
+    displayModeBar: PropTypes.bool
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Phylocanvas from 'react-phylocanvas';
 import {treeTypes} from 'phylocanvas';
@@ -16,9 +17,9 @@ let Tree = React.createClass({
   ],
 
   propTypes: {
-    data: React.PropTypes.string,
-    metadata: React.PropTypes.object,
-    treeType: React.PropTypes.oneOf(_keys(treeTypes))
+    data: PropTypes.string,
+    metadata: PropTypes.object,
+    treeType: PropTypes.oneOf(_keys(treeTypes))
   },
 
   componentDidMount() {

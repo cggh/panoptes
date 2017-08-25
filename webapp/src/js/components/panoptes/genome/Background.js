@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import tickWidth from 'panoptes/TickWidth.js';
@@ -9,13 +10,13 @@ let Background = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    hoverPos: React.PropTypes.number,
-    onChangeHoverPos: React.PropTypes.func
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    sideWidth: PropTypes.number,
+    hoverPos: PropTypes.number,
+    onChangeHoverPos: PropTypes.func
   },
 
   componentDidMount() {

@@ -2,6 +2,7 @@ import _isFinite from 'lodash.isfinite';
 import _map from 'lodash.map';
 import _has from 'lodash.has';
 import classnames from 'classnames';
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -17,11 +18,11 @@ let Controls = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func.isRequired,
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    minWidth: React.PropTypes.number.isRequired,
+    setProps: PropTypes.func.isRequired,
+    chromosome: PropTypes.string.isRequired,
+    start: PropTypes.number.isRequired,
+    end: PropTypes.number.isRequired,
+    minWidth: PropTypes.number.isRequired,
   },
 
   componentWillMount() {
