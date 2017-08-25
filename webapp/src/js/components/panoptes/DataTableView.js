@@ -18,8 +18,8 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 import 'es6-shim'; //For IE11 as ES6 calls in fixed-data-table
-import {Table, Column} from 'fixed-data-table';
-import 'fixed-data-table/dist/fixed-data-table.css';
+import {Table, Column} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
 
 // Panoptes components
 import API from 'panoptes/API';
