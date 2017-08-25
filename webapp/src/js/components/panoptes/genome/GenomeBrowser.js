@@ -258,12 +258,12 @@ let GenomeBrowser = createReactClass({
   },
 
   convertXY(e) {
-    let rect = this.refs.mainArea.getBoundingClientRect();
+    let rect = this.mainArea.getBoundingClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top];
   },
 
   handleMouseMove(e) {
-    if(!e.hoverHandled) {
+    if(this.mainArea && !e.hoverHandled) {
       let [x, y] = this.convertXY(e);
       const {sideWidth, start, end} = this.props;
       let {width} = this.state;
@@ -323,7 +323,7 @@ let GenomeBrowser = createReactClass({
             onPinch={(e) => console.log('Pinch not implemented', e)}
             onWheel={this.handleMouseWheel}
           >
-            <div ref="mainArea" className="main-area">
+            <div ref={(node) => this.mainArea = node} className="main-area">
               <Motion ref="spring"
                       style={targetPos}
                       defaultStyle={initTargetPos}>
