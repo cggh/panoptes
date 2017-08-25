@@ -283,6 +283,7 @@ let AnnotationChannel = createReactClass({
   },
 
   handleClick(e) {
+    if (!this.refs.canvas) return;
     let [x, y] = this.convertXY(e);
     let gene = this.xyToGene(x, y);
     if (gene) {
@@ -304,12 +305,14 @@ let AnnotationChannel = createReactClass({
   },
 
   handleMouseMove(e) {
+    if (!this.refs.canvas) return;
     let [x, y] = this.convertXY(e);
     let id = this.xyToGene(x, y);
     this.setHover(id);
   },
 
   handleMouseOver(e) {
+    if (!this.refs.canvas) return;
     let [x, y] = this.convertXY(e);
     let id = this.xyToGene(x, y);
     this.setHover(id);
