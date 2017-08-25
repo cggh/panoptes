@@ -138,7 +138,7 @@
     "react-display-name": "^0.2.0",
     "react-dom": "^15.4.2",
     "react-draggable": "^3.0.1",
-    "react-hammerjs": "^0.5.0",
+    "react-hammerjs": "git+https://github.com/pista329/react-hammerjs.git",
     "react-highlighter": "^0.4.0",
     "react-hotkeys": "^0.10.0",
     "react-immutable-proptypes": "^2.1.0",
