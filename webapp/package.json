@@ -145,7 +145,7 @@
     "react-leaflet": "^1.1.0",
     "react-motion": "^0.5.0",
     "react-notification-system": "^0.2.11",
-    "react-phylocanvas": "0.0.3",
+    "react-phylocanvas": "0.0.4",
     "react-plotlyjs": "^0.4.0",
     "react-resizable": "^1.6.0",
     "react-sidebar": "^2.3.0",
