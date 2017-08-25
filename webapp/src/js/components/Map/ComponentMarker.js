@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import DivIcon from 'Map/DivIcon';
 
@@ -11,25 +12,25 @@ let ComponentMarker = React.createClass({
   ],
 
   contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
   propTypes: {
-    children: React.PropTypes.node,
-    onClick: React.PropTypes.func,
-    position: React.PropTypes.object,
-    title: React.PropTypes.string,
-    alt: React.PropTypes.string,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    opacity: React.PropTypes.number,
-    zIndexOffset: React.PropTypes.number,
-    fillColour: React.PropTypes.string,
-    iconColour: React.PropTypes.string
+    children: PropTypes.node,
+    onClick: PropTypes.func,
+    position: PropTypes.object,
+    title: PropTypes.string,
+    alt: PropTypes.string,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    opacity: PropTypes.number,
+    zIndexOffset: PropTypes.number,
+    fillColour: PropTypes.string,
+    iconColour: PropTypes.string
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
 
   getChildContext() {

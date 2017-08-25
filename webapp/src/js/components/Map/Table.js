@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -40,17 +41,17 @@ let TableMap = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.object,
-    customControls: React.PropTypes.array,
-    highlight: React.PropTypes.string,
-    markerColourProperty: React.PropTypes.string,
-    onChange: React.PropTypes.func,
-    primKey: React.PropTypes.string,
-    query: React.PropTypes.string,
-    setProps: React.PropTypes.func,
-    table: React.PropTypes.string,
-    title: React.PropTypes.string,
-    zoom: React.PropTypes.number,
+    center: PropTypes.object,
+    customControls: PropTypes.array,
+    highlight: PropTypes.string,
+    markerColourProperty: PropTypes.string,
+    onChange: PropTypes.func,
+    primKey: PropTypes.string,
+    query: PropTypes.string,
+    setProps: PropTypes.func,
+    table: PropTypes.string,
+    title: PropTypes.string,
+    zoom: PropTypes.number,
   },
 
   title() {

@@ -14,6 +14,7 @@ import LegendElement from 'panoptes/LegendElement';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import FlatButton from 'material-ui/FlatButton';
+import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 
 const HEIGHT = 26;
@@ -44,12 +45,12 @@ let ReferenceSequence = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    onChangeLoadStatus: React.PropTypes.func
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    onChangeLoadStatus: PropTypes.func
   },
 
   componentWillMount() {

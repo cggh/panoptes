@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import _filter from 'lodash.filter';
@@ -36,13 +37,13 @@ let TablePlot = React.createClass({
   // NB: For template API, TablePlot also supports individual dimension props.
   // E.g. either dimensionProperties={horizontal: 'chromosome'} or horizontal="chromosome"
   propTypes: {
-    plotType: React.PropTypes.string,
-    setProps: React.PropTypes.func,
-    table: React.PropTypes.string,
-    query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
-    randomSubsetSize: React.PropTypes.number,
-    displayModeBar: React.PropTypes.bool
+    plotType: PropTypes.string,
+    setProps: PropTypes.func,
+    table: PropTypes.string,
+    query: PropTypes.string,
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = PropTypes.string; return props; }, {}),
+    randomSubsetSize: PropTypes.number,
+    displayModeBar: PropTypes.bool
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one

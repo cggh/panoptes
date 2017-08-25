@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from  'react';
 import deserialiseComponent from 'util/deserialiseComponent';
 // Mixins
@@ -11,9 +12,9 @@ let SessionComponent = React.createClass({
   ],
 
   propTypes: {
-    compId: React.PropTypes.string,
-    updateTitleIcon: React.PropTypes.func,
-    replaceable: React.PropTypes.bool
+    compId: PropTypes.string,
+    updateTitleIcon: PropTypes.func,
+    replaceable: PropTypes.bool
   },
 
   shouldComponentUpdate(nextProps, nextState) {

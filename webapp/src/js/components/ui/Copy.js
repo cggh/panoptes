@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 
@@ -31,11 +32,11 @@ let Copy = React.createClass({
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
-    title: React.PropTypes.string,
-    introContent: React.PropTypes.string,
-    selectedContent: React.PropTypes.string.isRequired,
-    OKButtonLabel: React.PropTypes.string,
-    onOK: React.PropTypes.func
+    title: PropTypes.string,
+    introContent: PropTypes.string,
+    selectedContent: PropTypes.string.isRequired,
+    OKButtonLabel: PropTypes.string,
+    onOK: PropTypes.func
   },
 
   getDefaultProps() {

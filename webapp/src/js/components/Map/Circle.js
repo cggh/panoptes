@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {CircleMarker as LeafletCircle} from 'react-leaflet';
 
@@ -11,8 +12,8 @@ let Circle = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.object,
-    radius: React.PropTypes.number,
+    center: PropTypes.object,
+    radius: PropTypes.number,
   },
 
   render() {

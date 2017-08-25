@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 import Color from 'color';
@@ -50,20 +51,20 @@ let DataTableView = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string,
-    order: React.PropTypes.array,
-    startRowIndex: React.PropTypes.number,
-    columns: React.PropTypes.array,
-    columnWidths: React.PropTypes.object,
-    onColumnResize: React.PropTypes.func,
-    onOrderChange: React.PropTypes.func,
-    onShowableRowsCountChange: React.PropTypes.func,
-    onFetchedRowsCountChange: React.PropTypes.func,
-    onTotalRowsCountChange: React.PropTypes.func,
-    className: React.PropTypes.string,
-    maxRowsPerPage: React.PropTypes.number,
-    joins: React.PropTypes.array
+    table: PropTypes.string.isRequired,
+    query: PropTypes.string,
+    order: PropTypes.array,
+    startRowIndex: PropTypes.number,
+    columns: PropTypes.array,
+    columnWidths: PropTypes.object,
+    onColumnResize: PropTypes.func,
+    onOrderChange: PropTypes.func,
+    onShowableRowsCountChange: PropTypes.func,
+    onFetchedRowsCountChange: PropTypes.func,
+    onTotalRowsCountChange: PropTypes.func,
+    className: PropTypes.string,
+    maxRowsPerPage: PropTypes.number,
+    joins: PropTypes.array
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one

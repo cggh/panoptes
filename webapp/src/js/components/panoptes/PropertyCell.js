@@ -6,6 +6,7 @@ import Formatter from 'panoptes/Formatter';
 import Icon from 'ui/Icon';
 import FluxMixin from 'mixins/FluxMixin';
 import ItemLink from 'panoptes/ItemLink';
+import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 import TooltipEllipsis from 'ui/TooltipEllipsis';
 
@@ -24,12 +25,12 @@ let PropertyCell = React.createClass({
   ],
 
   propTypes: {
-    prop: React.PropTypes.object,
-    value: React.PropTypes.any,
-    noLinks: React.PropTypes.bool,
-    prefix: React.PropTypes.node,
-    onClick: React.PropTypes.func,
-    className: React.PropTypes.string
+    prop: PropTypes.object,
+    value: PropTypes.any,
+    noLinks: PropTypes.bool,
+    prefix: PropTypes.node,
+    onClick: PropTypes.func,
+    className: PropTypes.string
   },
 
   render() {

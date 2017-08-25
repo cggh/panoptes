@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -15,10 +16,10 @@ let FindGeneByNameDesc = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    title: React.PropTypes.string,
-    search: React.PropTypes.string,
-    onSelect: React.PropTypes.func
+    setProps: PropTypes.func,
+    title: PropTypes.string,
+    search: PropTypes.string,
+    onSelect: PropTypes.func
   },
 
   getDefaultProps() {

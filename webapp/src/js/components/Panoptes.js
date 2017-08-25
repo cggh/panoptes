@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from  'react';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
@@ -169,9 +170,9 @@ let Header = React.createClass({
   ],
 
   propTypes: {
-    dataset: React.PropTypes.string,
-    name: React.PropTypes.string,
-    logo: React.PropTypes.string
+    dataset: PropTypes.string,
+    name: PropTypes.string,
+    logo: PropTypes.string
   },
 
   handlePageLinkClick() {

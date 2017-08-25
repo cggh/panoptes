@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {line, area} from 'd3-shape';
 import _isFinite from 'lodash.isfinite';
@@ -55,23 +56,23 @@ let PerRowScaledSVGChannel = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    interpolation: React.PropTypes.string,
-    autoYScale: React.PropTypes.bool,
-    tension: React.PropTypes.number,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    query: React.PropTypes.string,
-    table: React.PropTypes.string,
-    channel: React.PropTypes.string,
-    name: React.PropTypes.string,
-    onClose: React.PropTypes.func,
-    colourProperty: React.PropTypes.string
+    setProps: PropTypes.func,
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    interpolation: PropTypes.string,
+    autoYScale: PropTypes.bool,
+    tension: PropTypes.number,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    query: PropTypes.string,
+    table: PropTypes.string,
+    channel: PropTypes.string,
+    name: PropTypes.string,
+    onClose: PropTypes.func,
+    colourProperty: PropTypes.string
   },
 
   getInitialState() {
@@ -126,24 +127,24 @@ let PerRowNumericalTrack = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    blockStart: React.PropTypes.number,
-    blockEnd: React.PropTypes.number,
-    blockPixelWidth: React.PropTypes.number,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    interpolation: React.PropTypes.string,
-    autoYScale: React.PropTypes.bool,
-    tension: React.PropTypes.number,
-    onYLimitChange: React.PropTypes.func,
-    onKnownLegendValuesChange: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired,
-    channel: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string.isRequired,
-    colourProperty: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func
+    chromosome: PropTypes.string,
+    blockStart: PropTypes.number,
+    blockEnd: PropTypes.number,
+    blockPixelWidth: PropTypes.number,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    interpolation: PropTypes.string,
+    autoYScale: PropTypes.bool,
+    tension: PropTypes.number,
+    onYLimitChange: PropTypes.func,
+    onKnownLegendValuesChange: PropTypes.func,
+    table: PropTypes.string.isRequired,
+    channel: PropTypes.string.isRequired,
+    query: PropTypes.string.isRequired,
+    colourProperty: PropTypes.string,
+    onChangeLoadStatus: PropTypes.func
   },
 
   getInitialState() {
@@ -367,14 +368,14 @@ let PerRowNumericalTrackControls = React.createClass({
   ],
 
   propTypes: {
-    interpolation: React.PropTypes.string,
-    autoYScale: React.PropTypes.bool,
-    tension: React.PropTypes.number,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    query: React.PropTypes.string,
-    table: React.PropTypes.string,
-    colourProperty: React.PropTypes.string
+    interpolation: PropTypes.string,
+    autoYScale: PropTypes.bool,
+    tension: PropTypes.number,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    query: PropTypes.string,
+    table: PropTypes.string,
+    colourProperty: PropTypes.string
   },
 
   handleQueryPick(query) {

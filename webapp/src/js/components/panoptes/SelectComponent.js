@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import _map from 'lodash.map';
@@ -15,9 +16,9 @@ let SelectComponent = React.createClass({
 
 
   propTypes: {
-    hintText: React.PropTypes.string,
-    children: React.PropTypes.node,
-    selectedIndex: React.PropTypes.string
+    hintText: PropTypes.string,
+    children: PropTypes.node,
+    selectedIndex: PropTypes.string
   },
 
   getDefaultProps() {

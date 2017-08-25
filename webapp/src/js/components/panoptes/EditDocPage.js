@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -37,7 +38,7 @@ let EditDocPage = React.createClass({
   },
 
   propTypes: {
-    path: React.PropTypes.string.isRequired
+    path: PropTypes.string.isRequired
   },
 
   icon() {

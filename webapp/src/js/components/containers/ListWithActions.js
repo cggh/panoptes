@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
@@ -35,13 +36,13 @@ let ListWithActions = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    title: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    selectedPrimKey: React.PropTypes.string,
-    sidebar: React.PropTypes.bool,
-    initialSearchFocus: React.PropTypes.bool,
-    search: React.PropTypes.string
+    setProps: PropTypes.func,
+    title: PropTypes.string,
+    table: PropTypes.string.isRequired,
+    selectedPrimKey: PropTypes.string,
+    sidebar: PropTypes.bool,
+    initialSearchFocus: PropTypes.bool,
+    search: PropTypes.string
   },
 
   getDefaultProps() {

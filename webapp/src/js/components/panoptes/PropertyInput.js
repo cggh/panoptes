@@ -1,11 +1,12 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 let PropertyInput = React.createClass({
 
   propTypes: {
-    onBlur: React.PropTypes.func,
-    onChange: React.PropTypes.func,
-    value: React.PropTypes.string
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    value: PropTypes.string
   },
 
   handleOnChange() {

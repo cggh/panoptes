@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {treeTypes} from 'phylocanvas';
 
@@ -27,11 +28,11 @@ let TreeContainer = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string,
-    tree: React.PropTypes.string,
-    treeType: React.PropTypes.oneOf(_keys(treeTypes)),
-    nodeColourProperty: React.PropTypes.string,
-    branchColourProperty: React.PropTypes.string
+    table: PropTypes.string,
+    tree: PropTypes.string,
+    treeType: PropTypes.oneOf(_keys(treeTypes)),
+    nodeColourProperty: PropTypes.string,
+    branchColourProperty: PropTypes.string
   },
 
   getInitialState() {

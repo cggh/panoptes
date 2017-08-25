@@ -1,7 +1,7 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
-const PropTypes = React.PropTypes;
 import _startsWith from 'lodash.startswith';
 
 const dynreq = require.context('../../../images', true);
@@ -18,10 +18,10 @@ let Icon = React.createClass({
     flip: PropTypes.oneOf(['horizontal', 'vertical']),
     fixedWidth: PropTypes.bool,
     spin: PropTypes.bool,
-    stack: React.PropTypes.oneOf(['1x', '2x']),
-    inverse: React.PropTypes.bool,
-    className: React.PropTypes.string,
-    children: React.PropTypes.element
+    stack: PropTypes.oneOf(['1x', '2x']),
+    inverse: PropTypes.bool,
+    className: PropTypes.string,
+    children: PropTypes.element
   },
 
   render() {

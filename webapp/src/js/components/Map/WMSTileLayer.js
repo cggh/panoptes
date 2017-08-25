@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import {WMSTileLayer as LeafletWMSTileLayer} from 'react-leaflet';
@@ -26,22 +27,22 @@ let WMSTileLayer = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
   propTypes: {
-    attribution: React.PropTypes.string,
-    format: React.PropTypes.string,
-    layerContainer: React.PropTypes.object,
-    layers: React.PropTypes.string, // Comma-separated list of WMS layers to show
-    map: React.PropTypes.object,
-    transparent: React.PropTypes.bool,
-    url: React.PropTypes.string.isRequired,
-    version: React.PropTypes.string
+    attribution: PropTypes.string,
+    format: PropTypes.string,
+    layerContainer: PropTypes.object,
+    layers: PropTypes.string, // Comma-separated list of WMS layers to show
+    map: PropTypes.object,
+    transparent: PropTypes.bool,
+    url: PropTypes.string.isRequired,
+    version: PropTypes.string
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
 
   getChildContext() {

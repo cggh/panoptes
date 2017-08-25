@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Rectangle as LeafletRectangle} from 'react-leaflet';
 
@@ -11,7 +12,7 @@ let Rectangle = React.createClass({
   ],
 
   propTypes: {
-    bounds: React.PropTypes.array
+    bounds: PropTypes.array
   },
 
   render() {

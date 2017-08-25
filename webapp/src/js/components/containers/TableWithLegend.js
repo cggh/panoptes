@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -9,12 +10,12 @@ let TableWithLegend = React.createClass({
   mixins: [FluxMixin, ConfigMixin],
 
   propTypes: {
-    table: React.PropTypes.string,
-    query: React.PropTypes.string,
-    order: React.PropTypes.array,
-    columns: React.PropTypes.array,
-    columnWidths: React.PropTypes.object,
-    children: React.PropTypes.node
+    table: PropTypes.string,
+    query: PropTypes.string,
+    order: PropTypes.array,
+    columns: PropTypes.array,
+    columnWidths: PropTypes.object,
+    children: PropTypes.node
   },
 
   getInitialState() {

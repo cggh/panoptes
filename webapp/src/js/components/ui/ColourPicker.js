@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {BlockPicker} from 'react-color';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -6,9 +7,9 @@ let ColourPicker = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    colour: React.PropTypes.string,
-    colours: React.PropTypes.array.isRequired,
-    onPick: React.PropTypes.func,
+    colour: PropTypes.string,
+    colours: PropTypes.array.isRequired,
+    onPick: PropTypes.func,
 
   },
 

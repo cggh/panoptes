@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -10,7 +11,7 @@ let ErrorTab = React.createClass({
   ],
 
   propTypes: {
-    err: React.PropTypes.string
+    err: PropTypes.string
   },
 
   icon() {

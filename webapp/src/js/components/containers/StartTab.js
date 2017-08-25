@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -19,7 +20,7 @@ let StartTab = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func.isRequired
+    setProps: PropTypes.func.isRequired
   },
 
   icon() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
@@ -10,12 +11,12 @@ let HistogramBin = React.createClass({
   ],
 
   propTypes: {
-    x: React.PropTypes.number.isRequired,
-    y: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
-    height: React.PropTypes.number.isRequired,
-    title: React.PropTypes.string,
-    fill: React.PropTypes.string
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    title: PropTypes.string,
+    fill: PropTypes.string
   },
 
   getDefaultProps() {

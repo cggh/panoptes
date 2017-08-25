@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ItemTemplate from 'panoptes/ItemTemplate';
 
@@ -16,10 +17,10 @@ let Template = React.createClass({
   ],
 
   propTypes: {
-    title: React.PropTypes.string,
-    content: React.PropTypes.string,
-    table: React.PropTypes.string,
-    primKey: React.PropTypes.string
+    title: PropTypes.string,
+    content: PropTypes.string,
+    table: PropTypes.string,
+    primKey: PropTypes.string
   },
 
 

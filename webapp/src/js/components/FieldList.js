@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _cloneDeep from 'lodash.clonedeep';
 
@@ -29,11 +30,11 @@ let FieldList = React.createClass({
   ],
 
   propTypes: {
-    title: React.PropTypes.string,
-    table: React.PropTypes.string,
-    primKey: React.PropTypes.string,
-    fields: React.PropTypes.array,
-    className: React.PropTypes.string
+    title: PropTypes.string,
+    table: PropTypes.string,
+    primKey: PropTypes.string,
+    fields: PropTypes.array,
+    className: PropTypes.string
   },
 
   getInitialState() {

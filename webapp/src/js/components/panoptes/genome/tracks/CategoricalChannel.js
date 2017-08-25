@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _isFinite from 'lodash.isfinite';
 import _debounce from 'lodash.debounce';
@@ -42,21 +43,21 @@ let CategoricalChannel = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    autoYScale: React.PropTypes.bool,
-    fractional: React.PropTypes.bool,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    onClose: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired,
-    track: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string
+    setProps: PropTypes.func,
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    sideWidth: PropTypes.number,
+    autoYScale: PropTypes.bool,
+    fractional: PropTypes.bool,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    onClose: PropTypes.func,
+    table: PropTypes.string.isRequired,
+    track: PropTypes.string.isRequired,
+    query: PropTypes.string
   },
 
   getInitialState() {
@@ -110,21 +111,21 @@ let CategoricalTrack = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    autoYScale: React.PropTypes.bool,
-    fractional: React.PropTypes.bool,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    table: React.PropTypes.string.isRequired,
-    track: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string,
-    onChangeKnownValues: React.PropTypes.func,
-    onChangeLoadStatus: React.PropTypes.func,
-    onYLimitChange: React.PropTypes.func
+    chromosome: PropTypes.string,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    autoYScale: PropTypes.bool,
+    fractional: PropTypes.bool,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    table: PropTypes.string.isRequired,
+    track: PropTypes.string.isRequired,
+    query: PropTypes.string,
+    onChangeKnownValues: PropTypes.func,
+    onChangeLoadStatus: PropTypes.func,
+    onYLimitChange: PropTypes.func
   },
 
   componentWillMount() {
@@ -373,12 +374,12 @@ let CategoricalTrackControls = React.createClass({
   ],
 
   propTypes: {
-    autoYScale: React.PropTypes.bool,
-    fractional: React.PropTypes.bool,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    query: React.PropTypes.string,
-    table: React.PropTypes.string
+    autoYScale: PropTypes.bool,
+    fractional: PropTypes.bool,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    query: PropTypes.string,
+    table: PropTypes.string
   },
 
   handleQueryPick(query) {

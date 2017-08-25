@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -20,11 +21,11 @@ let SelectFieldWithNativeFallback = React.createClass({
   ],
 
   propTypes: {
-    value: React.PropTypes.string,
-    autoWidth: React.PropTypes.bool,
-    floatingLabelText: React.PropTypes.string,
-    onChange: React.PropTypes.func,
-    options: React.PropTypes.array,
+    value: PropTypes.string,
+    autoWidth: PropTypes.bool,
+    floatingLabelText: PropTypes.string,
+    onChange: PropTypes.func,
+    options: PropTypes.array,
   },
 
   render() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _map from 'lodash.map';
 
@@ -28,10 +29,10 @@ let Overview = React.createClass({
   ],
 
   propTypes: {
-    title: React.PropTypes.string,
-    table: React.PropTypes.string,
-    primKey: React.PropTypes.string,
-    className: React.PropTypes.string
+    title: PropTypes.string,
+    table: PropTypes.string,
+    primKey: PropTypes.string,
+    className: PropTypes.string
   },
 
   getInitialState() {

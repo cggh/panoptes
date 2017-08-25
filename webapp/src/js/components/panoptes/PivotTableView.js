@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 import Color from 'color';
@@ -59,18 +60,18 @@ let PivotTableView = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string,
-    columnSortOrder: React.PropTypes.array,
-    rowSortOrder: React.PropTypes.array,
-    onOrderChange: React.PropTypes.func,
-    columnProperty: React.PropTypes.string,
-    rowProperty: React.PropTypes.string,
-    className: React.PropTypes.string,
-    style: React.PropTypes.object,
-    height: React.PropTypes.string,
-    display: React.PropTypes.string,
-    hasClickableCells: React.PropTypes.bool
+    table: PropTypes.string.isRequired,
+    query: PropTypes.string,
+    columnSortOrder: PropTypes.array,
+    rowSortOrder: PropTypes.array,
+    onOrderChange: PropTypes.func,
+    columnProperty: PropTypes.string,
+    rowProperty: PropTypes.string,
+    className: PropTypes.string,
+    style: PropTypes.object,
+    height: PropTypes.string,
+    display: PropTypes.string,
+    hasClickableCells: PropTypes.bool
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one

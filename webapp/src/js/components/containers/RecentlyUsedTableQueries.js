@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -24,9 +25,9 @@ let RecentlyUsedTableQueries = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string,
-    onClick: React.PropTypes.func,
-    onDoubleClick: React.PropTypes.func
+    table: PropTypes.string,
+    onClick: PropTypes.func,
+    onDoubleClick: PropTypes.func
   },
 
   getStateFromFlux() {

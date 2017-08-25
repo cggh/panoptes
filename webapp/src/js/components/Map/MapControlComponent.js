@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {MapControl} from 'react-leaflet';
@@ -5,9 +6,9 @@ import {control, DomUtil} from 'leaflet';
 
 export default class MapControlComponent extends MapControl {
   static propTypes = {
-    className: React.PropTypes.string,
-    position: React.PropTypes.string,
-    children: React.PropTypes.node,
+    className: PropTypes.string,
+    position: PropTypes.string,
+    children: PropTypes.node,
   };
 
   createLeafletElement({children, position, className}) {
@@ -25,8 +26,8 @@ export default class MapControlComponent extends MapControl {
 }
 
 MapControlComponent.contextTypes = {
-  flux: React.PropTypes.object,
-  map: React.PropTypes.object
+  flux: PropTypes.object,
+  map: PropTypes.object
 };
 
 MapControlComponent.displayName = 'MapControlComponent';

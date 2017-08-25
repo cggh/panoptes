@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FlatButton from 'material-ui/FlatButton';
@@ -13,10 +14,10 @@ let FilterButton = React.createClass({
   ],
 
   propTypes: {
-    query: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    onPick: React.PropTypes.func.isRequired,
-    name: React.PropTypes.string
+    query: PropTypes.string,
+    table: PropTypes.string.isRequired,
+    onPick: PropTypes.func.isRequired,
+    name: PropTypes.string
   },
 
   getDefaultProps() {

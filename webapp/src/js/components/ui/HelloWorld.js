@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
@@ -5,7 +6,7 @@ let HelloWorld = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    msg: React.PropTypes.string.isRequired
+    msg: PropTypes.string.isRequired
   },
 
   render() {

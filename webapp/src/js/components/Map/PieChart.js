@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -16,17 +17,17 @@ let PieChartMap = React.createClass({
   ],
 
   propTypes: { // NB: componentColumns is not easy enough to supply via template
-    chartDataTable: React.PropTypes.string,
-    center: React.PropTypes.object,
-    componentColumns: React.PropTypes.array,
-    setProps: React.PropTypes.func,
-    locationDataTable: React.PropTypes.string,
-    locationNameProperty: React.PropTypes.string,
-    locationSizeProperty: React.PropTypes.string,
-    primKey: React.PropTypes.string,
-    table: React.PropTypes.string,
-    title: React.PropTypes.string,
-    zoom: React.PropTypes.number
+    chartDataTable: PropTypes.string,
+    center: PropTypes.object,
+    componentColumns: PropTypes.array,
+    setProps: PropTypes.func,
+    locationDataTable: PropTypes.string,
+    locationNameProperty: PropTypes.string,
+    locationSizeProperty: PropTypes.string,
+    primKey: PropTypes.string,
+    table: PropTypes.string,
+    title: PropTypes.string,
+    zoom: PropTypes.number
   },
 
   title() {

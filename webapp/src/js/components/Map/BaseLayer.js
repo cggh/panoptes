@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import {LayersControl as LeafletLayersControl} from 'react-leaflet';
@@ -22,22 +23,22 @@ let BaseLayer = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
   propTypes: {
-    addBaseLayer: React.PropTypes.func,
-    checked: React.PropTypes.bool,
-    children: React.PropTypes.node,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    name: React.PropTypes.string,
-    removeLayer: React.PropTypes.func, // Required when the BaseLayer is changed
-    removeLayerControl: React.PropTypes.func
+    addBaseLayer: PropTypes.func,
+    checked: PropTypes.bool,
+    children: PropTypes.node,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    name: PropTypes.string,
+    removeLayer: PropTypes.func, // Required when the BaseLayer is changed
+    removeLayerControl: PropTypes.func
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
 
   getChildContext() {

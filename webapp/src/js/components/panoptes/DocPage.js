@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
@@ -31,10 +32,10 @@ let DocPage = React.createClass({
   },
 
   propTypes: {
-    path: React.PropTypes.string,
-    replaceSelf: React.PropTypes.func,
-    updateTitleIcon: React.PropTypes.func,
-    replaceable: React.PropTypes.bool
+    path: PropTypes.string,
+    replaceSelf: PropTypes.func,
+    updateTitleIcon: PropTypes.func,
+    replaceable: PropTypes.bool
   },
 
   componentWillMount() {

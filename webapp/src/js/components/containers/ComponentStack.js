@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 let ComponentStack = React.createClass({
 
   propTypes: {
-    children: React.PropTypes.node,
-    title: React.PropTypes.string
+    children: PropTypes.node,
+    title: PropTypes.string
   },
 
   title() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -13,7 +14,7 @@ let EmptyTab = React.createClass({
   ],
 
   propTypes: {
-    replaceSelf: React.PropTypes.func
+    replaceSelf: PropTypes.func
   },
 
   icon() {

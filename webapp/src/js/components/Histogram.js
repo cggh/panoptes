@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {scaleLinear} from 'd3-scale';
 import {histogram} from 'd3-array';
@@ -16,20 +17,20 @@ let Histogram = React.createClass({
   ],
 
   propTypes: {
-    chartData: React.PropTypes.array,
-    top: React.PropTypes.number,
-    right: React.PropTypes.number,
-    bottom: React.PropTypes.number,
-    left: React.PropTypes.number,
-    width: React.PropTypes.number.isRequired,
-    height: React.PropTypes.number.isRequired,
-    unitNameSingle: React.PropTypes.string.isRequired,
-    unitNamePlural: React.PropTypes.string.isRequired,
-    valueName: React.PropTypes.string.isRequired,
-    colourScaleFunction: React.PropTypes.func,
-    minValue: React.PropTypes.number,
-    maxValue: React.PropTypes.number,
-    isHighlighted: React.PropTypes.bool
+    chartData: PropTypes.array,
+    top: PropTypes.number,
+    right: PropTypes.number,
+    bottom: PropTypes.number,
+    left: PropTypes.number,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    unitNameSingle: PropTypes.string.isRequired,
+    unitNamePlural: PropTypes.string.isRequired,
+    valueName: PropTypes.string.isRequired,
+    colourScaleFunction: PropTypes.func,
+    minValue: PropTypes.number,
+    maxValue: PropTypes.number,
+    isHighlighted: PropTypes.bool
   },
 
   render() {

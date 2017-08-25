@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Highlight from 'react-highlighter';
 // Mixins
@@ -31,10 +32,10 @@ let GeneSearchResultsList = React.createClass({
   ],
 
   propTypes: {
-    search: React.PropTypes.string.isRequired,
-    onSelectGene: React.PropTypes.func.isRequired,
-    maxMatches: React.PropTypes.number,
-    icon: React.PropTypes.string
+    search: PropTypes.string.isRequired,
+    onSelectGene: PropTypes.func.isRequired,
+    maxMatches: PropTypes.number,
+    icon: PropTypes.string
   },
 
   getDefaultProps() {

@@ -1,5 +1,6 @@
 import _isFinite from 'lodash.isfinite';
 import _debounce from 'lodash.debounce';
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import TextField from 'material-ui/TextField';
@@ -11,11 +12,11 @@ let NumericInput = React.createClass({
   ],
 
   propTypes: {
-    label: React.PropTypes.string,
-    value: React.PropTypes.number,
-    debounce: React.PropTypes.bool,
-    disabled: React.PropTypes.bool,
-    onChange: React.PropTypes.func.isRequired
+    label: PropTypes.string,
+    value: PropTypes.number,
+    debounce: PropTypes.bool,
+    disabled: PropTypes.bool,
+    onChange: PropTypes.func.isRequired
   },
 
   getDefaultProps() {

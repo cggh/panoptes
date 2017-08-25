@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import titleCase from 'title-case';
 import scrollbarSize from 'scrollbar-size';
@@ -41,14 +42,14 @@ let TablePlotActions = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    title: React.PropTypes.string,
-    sidebar: React.PropTypes.bool,
-    plotType: React.PropTypes.string,
-    table: React.PropTypes.string,
-    query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {}),
-    randomSubsetSize: React.PropTypes.number
+    setProps: PropTypes.func,
+    title: PropTypes.string,
+    sidebar: PropTypes.bool,
+    plotType: PropTypes.string,
+    table: PropTypes.string,
+    query: PropTypes.string,
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = PropTypes.string; return props; }, {}),
+    randomSubsetSize: PropTypes.number
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one

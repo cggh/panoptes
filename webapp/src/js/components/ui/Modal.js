@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import classNames from 'classnames';
@@ -10,10 +11,10 @@ let Modal = React.createClass({
   ],
 
   propTypes: {
-    visible: React.PropTypes.bool,
-    uncloseable: React.PropTypes.bool,
-    onClose: React.PropTypes.func,
-    children: React.PropTypes.element
+    visible: PropTypes.bool,
+    uncloseable: PropTypes.bool,
+    onClose: PropTypes.func,
+    children: PropTypes.element
   },
 
   getDefaultProps() {

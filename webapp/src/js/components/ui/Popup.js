@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Draggable from 'react-draggable';
 import {Resizable} from 'react-resizable';
@@ -20,18 +21,18 @@ let Popup = React.createClass({
   ],
 
   propTypes: {
-    className: React.PropTypes.string,
-    style: React.PropTypes.object,
-    initialX: React.PropTypes.number,
-    initialY: React.PropTypes.number,
-    initialWidth: React.PropTypes.number,
-    initialHeight: React.PropTypes.number,
-    onMoveStop: React.PropTypes.func,
-    onResizeStop: React.PropTypes.func,
-    onClose: React.PropTypes.func,
-    onMaximise: React.PropTypes.func,
-    onClick: React.PropTypes.func,
-    children: React.PropTypes.element,
+    className: PropTypes.string,
+    style: PropTypes.object,
+    initialX: PropTypes.number,
+    initialY: PropTypes.number,
+    initialWidth: PropTypes.number,
+    initialHeight: PropTypes.number,
+    onMoveStop: PropTypes.func,
+    onResizeStop: PropTypes.func,
+    onClose: PropTypes.func,
+    onMaximise: PropTypes.func,
+    onClick: PropTypes.func,
+    children: PropTypes.element,
   },
 
   getInitialState() {

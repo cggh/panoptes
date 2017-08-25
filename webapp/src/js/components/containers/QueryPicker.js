@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Sidebar from 'ui/Sidebar';
 import {HotKeys} from 'react-hotkeys'; // 0.9.0 needs {...}
@@ -34,10 +35,10 @@ let QueryPicker = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    onPick: React.PropTypes.func.isRequired,
-    initialQuery: React.PropTypes.string,
-    initialStoredFilterNameFocus: React.PropTypes.bool
+    table: PropTypes.string.isRequired,
+    onPick: PropTypes.func.isRequired,
+    initialQuery: PropTypes.string,
+    initialStoredFilterNameFocus: PropTypes.bool
   },
 
   getDefaultProps() {

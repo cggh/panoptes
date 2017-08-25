@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -26,14 +27,14 @@ let FindGeneByRegion = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    activeTab: React.PropTypes.string,
-    search: React.PropTypes.string,
-    chromosome: React.PropTypes.string,
-    startPosition: React.PropTypes.number,
-    endPosition: React.PropTypes.number,
-    chromosomeLength: React.PropTypes.number,
-    onSelect: React.PropTypes.func
+    setProps: PropTypes.func,
+    activeTab: PropTypes.string,
+    search: PropTypes.string,
+    chromosome: PropTypes.string,
+    startPosition: PropTypes.number,
+    endPosition: PropTypes.number,
+    chromosomeLength: PropTypes.number,
+    onSelect: PropTypes.func
   },
 
   getDefaultProps() {

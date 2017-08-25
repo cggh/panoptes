@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _map from 'lodash.map';
 
@@ -21,8 +22,8 @@ let RecentlyFoundGenes = React.createClass({
   ],
 
   propTypes: {
-    onSelect: React.PropTypes.func,
-    subheaderText: React.PropTypes.string
+    onSelect: PropTypes.func,
+    subheaderText: PropTypes.string
   },
 
 

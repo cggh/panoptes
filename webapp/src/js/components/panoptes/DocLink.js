@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import DocPage from 'panoptes/DocPage';
 
@@ -13,9 +14,9 @@ let DocLink = React.createClass({
   ],
 
   propTypes: {
-    children: React.PropTypes.node,
-    href: React.PropTypes.string,
-    replaceParent: React.PropTypes.func
+    children: PropTypes.node,
+    href: PropTypes.string,
+    replaceParent: PropTypes.func
   },
 
   handleClick(e) {

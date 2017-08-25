@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import manualTween from 'util/manualTween';
@@ -13,16 +14,16 @@ let GenotypesFan = React.createClass({
   ],
 
   propTypes: {
-    top: React.PropTypes.number,
-    genomicPositions: React.PropTypes.any,
-    colWidth: React.PropTypes.number,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    hoverPos: React.PropTypes.number,
-    layoutBlocks: React.PropTypes.array,
-    dataBlocks: React.PropTypes.array
+    top: PropTypes.number,
+    genomicPositions: PropTypes.any,
+    colWidth: PropTypes.number,
+    start: PropTypes.number,
+    end: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    hoverPos: PropTypes.number,
+    layoutBlocks: PropTypes.array,
+    dataBlocks: PropTypes.array
   },
 
   componentDidMount() {

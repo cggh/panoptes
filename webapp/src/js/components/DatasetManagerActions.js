@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import EditYAMLConfig from 'panoptes/EditYAMLConfig';
@@ -31,9 +32,9 @@ let DatasetManagerActions = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    title: React.PropTypes.string,
-    sidebar: React.PropTypes.bool
+    setProps: PropTypes.func,
+    title: PropTypes.string,
+    sidebar: PropTypes.bool
   },
 
   getDefaultProps() {

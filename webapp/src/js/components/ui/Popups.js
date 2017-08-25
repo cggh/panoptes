@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -6,7 +7,7 @@ let Popups = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    children: React.PropTypes.node
+    children: PropTypes.node
   },
 
   renderPopup(popup) {

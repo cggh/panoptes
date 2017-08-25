@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import SelectField from 'material-ui/SelectField';
@@ -13,9 +14,9 @@ let RandomSubsetSizeSelector = React.createClass({
   ],
 
   propTypes: {
-    label: React.PropTypes.string,
-    value: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]), // NB: need string to work around SelectField bug
-    onChange: React.PropTypes.func
+    label: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // NB: need string to work around SelectField bug
+    onChange: PropTypes.func
   },
 
   getDefaultProps() {

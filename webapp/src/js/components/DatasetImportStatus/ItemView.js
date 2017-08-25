@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -23,9 +24,9 @@ let DatasetImportStatusItemView = React.createClass({
   ],
 
   propTypes: {
-    logId: React.PropTypes.string.isRequired,
-    title: React.PropTypes.string,
-    icon: React.PropTypes.string
+    logId: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    icon: PropTypes.string
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Polyline as LeafletPolyline} from 'react-leaflet';
 
@@ -11,7 +12,7 @@ let Polyline = React.createClass({
   ],
 
   propTypes: {
-    positions: React.PropTypes.array,
+    positions: PropTypes.array,
   },
 
   render() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import customHandlebars from 'util/customHandlebars';
 import Handlebars from 'handlebars';
@@ -34,13 +35,13 @@ let ItemTemplate = React.createClass({
   ],
 
   propTypes: {
-    className: React.PropTypes.string,
-    innerClassName: React.PropTypes.string,
-    children: React.PropTypes.string.isRequired,
-    table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired,
-    immediate: React.PropTypes.bool,
-    data: React.PropTypes.any
+    className: PropTypes.string,
+    innerClassName: PropTypes.string,
+    children: PropTypes.string.isRequired,
+    table: PropTypes.string.isRequired,
+    primKey: PropTypes.string.isRequired,
+    immediate: PropTypes.bool,
+    data: PropTypes.any
   },
 
   componentWillMount() {

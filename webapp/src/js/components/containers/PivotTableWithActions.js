@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
@@ -29,16 +30,16 @@ let PivotTableWithActions = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func,
-    title: React.PropTypes.string,
-    sidebar: React.PropTypes.bool,
-    table: React.PropTypes.string,
-    query: React.PropTypes.string,
-    columnSortOrder: React.PropTypes.array,
-    rowSortOrder: React.PropTypes.array,
-    columnProperty: React.PropTypes.string,
-    rowProperty: React.PropTypes.string,
-    display: React.PropTypes.string
+    setProps: PropTypes.func,
+    title: PropTypes.string,
+    sidebar: PropTypes.bool,
+    table: PropTypes.string,
+    query: PropTypes.string,
+    columnSortOrder: PropTypes.array,
+    rowSortOrder: PropTypes.array,
+    columnProperty: PropTypes.string,
+    rowProperty: PropTypes.string,
+    display: PropTypes.string
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one

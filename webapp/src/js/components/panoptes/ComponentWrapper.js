@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import _isFunction from 'lodash.isfunction';
@@ -10,7 +11,7 @@ import _isFunction from 'lodash.isfunction';
 
 let ComponentWrapper = React.createClass({
   propTypes: {
-    children: React.PropTypes.element.isRequired
+    children: PropTypes.element.isRequired
   },
 
   componentWillMount() {

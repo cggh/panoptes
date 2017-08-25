@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _filter from 'lodash.filter';
 // Mixins
@@ -28,11 +29,11 @@ let PropertyGroup = React.createClass({
   ],
 
   propTypes: {
-    title: React.PropTypes.string,
-    table: React.PropTypes.string,
-    primKey: React.PropTypes.string,
-    propertyGroupId: React.PropTypes.string,
-    className: React.PropTypes.string
+    title: PropTypes.string,
+    table: PropTypes.string,
+    primKey: PropTypes.string,
+    propertyGroupId: PropTypes.string,
+    className: PropTypes.string
   },
 
   getInitialState() {

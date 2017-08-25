@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import FluxMixin from 'mixins/FluxMixin';
 import _isEmpty from 'lodash.isempty';
@@ -21,26 +22,26 @@ let TableGeoJSONsLayer = React.createClass({
   // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    changeLayerStatus: React.PropTypes.func
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    changeLayerStatus: PropTypes.func
   },
   propTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    query: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    colourProperty: React.PropTypes.string,
-    geoJsonProperty: React.PropTypes.string.isRequired,
-    labelProperty: React.PropTypes.string,
-    showLegend: React.PropTypes.bool,
-    maxLegendItems: React.PropTypes.number,
-    config: React.PropTypes.object, // This will be provided via withAPIData
-    data: React.PropTypes.array // This will be provided via withAPIData
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    query: PropTypes.string,
+    table: PropTypes.string.isRequired,
+    colourProperty: PropTypes.string,
+    geoJsonProperty: PropTypes.string.isRequired,
+    labelProperty: PropTypes.string,
+    showLegend: PropTypes.bool,
+    maxLegendItems: PropTypes.number,
+    config: PropTypes.object, // This will be provided via withAPIData
+    data: PropTypes.array // This will be provided via withAPIData
   },
   childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
   },
 
   getChildContext() {

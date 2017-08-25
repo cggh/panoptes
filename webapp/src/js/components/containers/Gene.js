@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -39,8 +40,8 @@ let Gene = React.createClass({
   ],
 
   propTypes: {
-    icon: React.PropTypes.string,
-    geneId: React.PropTypes.string.isRequired
+    icon: PropTypes.string,
+    geneId: PropTypes.string.isRequired
   },
 
   getDefaultProps() {

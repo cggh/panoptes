@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Mixins
@@ -18,11 +19,11 @@ let PropertyListItem = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string.isRequired,
-    propId: React.PropTypes.string.isRequired,
-    value: React.PropTypes.any,
-    tooltipPlacement: React.PropTypes.string.isRequired,
-    tooltipTrigger: React.PropTypes.arrayOf(React.PropTypes.string),
+    table: PropTypes.string.isRequired,
+    propId: PropTypes.string.isRequired,
+    value: PropTypes.any,
+    tooltipPlacement: PropTypes.string.isRequired,
+    tooltipTrigger: PropTypes.arrayOf(PropTypes.string),
   },
 
   render: function() {

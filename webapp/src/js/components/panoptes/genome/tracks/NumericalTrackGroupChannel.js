@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
@@ -49,13 +50,13 @@ let NumericalTrackGroupChannel = React.createClass({
   ],
 
   propTypes: {
-    table: React.PropTypes.string, //If specified limits choices in add/remove and enables query picking
-    query: React.PropTypes.string, //Only used if table specified
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    children: React.PropTypes.node,
-    setProps: React.PropTypes.func,
-    childrenHash: React.PropTypes.number  //Perf - passed down to Legend and Side
+    table: PropTypes.string, //If specified limits choices in add/remove and enables query picking
+    query: PropTypes.string, //Only used if table specified
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    children: PropTypes.node,
+    setProps: PropTypes.func,
+    childrenHash: PropTypes.number  //Perf - passed down to Legend and Side
   },
 
   getInitialState() {
@@ -282,14 +283,14 @@ let NumericalTrackGroupControls = React.createClass({
   ],
 
   propTypes: {
-    interpolation: React.PropTypes.string,
-    tension: React.PropTypes.number,
-    autoYScale: React.PropTypes.bool,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    setProps: React.PropTypes.func,
-    query: React.PropTypes.string,
-    children: React.PropTypes.node
+    interpolation: PropTypes.string,
+    tension: PropTypes.number,
+    autoYScale: PropTypes.bool,
+    yMin: PropTypes.number,
+    yMax: PropTypes.number,
+    setProps: PropTypes.func,
+    query: PropTypes.string,
+    children: PropTypes.node
   },
 
   trackGroups() {

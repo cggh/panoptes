@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import classnames from 'classnames';
@@ -12,14 +13,14 @@ let ChannelWithConfigDrawer = React.createClass({
   ],
 
   propTypes: {
-    height: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    sideComponent: React.PropTypes.element,
-    configComponent: React.PropTypes.element,
-    legendComponent: React.PropTypes.element,
-    onClose: React.PropTypes.func,
-    children: React.PropTypes.element
+    height: PropTypes.number,
+    width: PropTypes.number,
+    sideWidth: PropTypes.number,
+    sideComponent: PropTypes.element,
+    configComponent: PropTypes.element,
+    legendComponent: PropTypes.element,
+    onClose: PropTypes.func,
+    children: PropTypes.element
   },
 
   getInitialState() {
