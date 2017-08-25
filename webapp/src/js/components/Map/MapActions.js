@@ -1,8 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 
-import jsxToString from 'jsx-to-string';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
 
