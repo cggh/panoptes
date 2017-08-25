@@ -76,7 +76,6 @@
     "html-to-react": "git+https://github.com/benjeffery/html-to-react.git",
     "immutable": "^3.8.1",
     "javascript-detect-element-resize": "git+https://github.com/sdecima/javascript-detect-element-resize.git",
-    "jsx-to-string": "^1.0.2",
     "keymirror": "^0.1.1",
     "leaflet": "^1.0.3",
     "leaflet-loading": "git+https://github.com/benjeffery/Leaflet.loading.git",
