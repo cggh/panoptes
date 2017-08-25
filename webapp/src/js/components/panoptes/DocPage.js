@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
@@ -16,7 +17,9 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-let DocPage = React.createClass({
+let DocPage = createReactClass({
+  displayName: 'DocPage',
+
   mixins: [
     ConfigMixin,
     PureRenderMixin,
@@ -128,6 +131,7 @@ let DocPage = React.createClass({
   title() {
     return this.titleFromHTML;
   },
+
   icon() {
     return 'file-text-o';
   },
@@ -150,8 +154,7 @@ let DocPage = React.createClass({
         : null}
       <Loading status={loadStatus}/>
     </div>;
-  }
-
+  },
 });
 
 export default DocPage;

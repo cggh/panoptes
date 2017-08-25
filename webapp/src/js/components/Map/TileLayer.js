@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import {TileLayer as LeafletTileLayer} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let TileLayer = React.createClass({
+let TileLayer = createReactClass({
+  displayName: 'TileLayer',
 
   mixins: [
     FluxMixin
@@ -19,6 +22,7 @@ let TileLayer = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     attribution: PropTypes.string,
     bounds: PropTypes.array,
@@ -35,6 +39,7 @@ let TileLayer = React.createClass({
     variant: PropTypes.string,
     zIndex: PropTypes.number,
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -46,6 +51,7 @@ let TileLayer = React.createClass({
       map: this.props.map !== undefined ? this.props.map : this.context.map
     };
   },
+
   getDefaultProps() {
     return {
       attribution: '&copy <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -105,8 +111,7 @@ let TileLayer = React.createClass({
       />
     );
 
-  }
-
+  },
 });
 
 export default TileLayer;

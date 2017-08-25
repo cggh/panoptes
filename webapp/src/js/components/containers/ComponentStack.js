@@ -1,16 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-let ComponentStack = React.createClass({
-
-  propTypes: {
+class ComponentStack extends React.Component {
+  static propTypes = {
     children: PropTypes.node,
     title: PropTypes.string
-  },
+  };
 
-  title() {
+  title = () => {
     return this.props.title;
-  },
+  };
 
   render() {
     return (
@@ -20,7 +19,6 @@ let ComponentStack = React.createClass({
     );
 
   }
-
-});
+}
 
 export default ComponentStack;

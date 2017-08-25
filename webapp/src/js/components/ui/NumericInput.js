@@ -2,11 +2,14 @@ import _isFinite from 'lodash.isfinite';
 import _debounce from 'lodash.debounce';
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import TextField from 'material-ui/TextField';
 
 
-let NumericInput = React.createClass({
+let NumericInput = createReactClass({
+  displayName: 'NumericInput',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -81,7 +84,7 @@ let NumericInput = React.createClass({
           onChange={this.handleChange}
         />
     );
-  }
+  },
 });
 
 export default NumericInput;

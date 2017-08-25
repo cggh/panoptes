@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import SQL from 'panoptes/SQL';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -7,7 +8,9 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import queryToString from 'util/queryToString';
 
-let QueryString = React.createClass({
+let QueryString = createReactClass({
+  displayName: 'QueryString',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -33,7 +36,7 @@ let QueryString = React.createClass({
     return <span>
         {prefix + queryToString({properties, query})}
       </span>;
-  }
+  },
 });
 
 export default QueryString;

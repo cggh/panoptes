@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {GeoJSON as LeafletGeoJSON} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let GeoJSON = React.createClass({
+let GeoJSON = createReactClass({
+  displayName: 'GeoJSON',
 
   mixins: [
     FluxMixin
@@ -37,8 +39,7 @@ let GeoJSON = React.createClass({
 
     return (<LeafletGeoJSON data={json} style={style} />);
 
-  }
-
+  },
 });
 
 export default GeoJSON;

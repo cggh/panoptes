@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _map from 'lodash.map';
 
 // Mixins
@@ -19,7 +20,8 @@ import ErrorReport from 'panoptes/ErrorReporter';
 // UI components
 import Loading from 'ui/Loading';
 
-let Overview = React.createClass({
+let Overview = createReactClass({
+  displayName: 'Overview',
 
   mixins: [
     PureRenderMixin,
@@ -91,8 +93,7 @@ let Overview = React.createClass({
           <Loading status={loadStatus}/>
         </div>
     );
-  }
-
+  },
 });
 
 export default Overview;

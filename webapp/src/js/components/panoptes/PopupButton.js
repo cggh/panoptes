@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
@@ -7,7 +8,9 @@ import RaisedButton from 'material-ui/RaisedButton';
 import filterChildren from 'util/filterChildren';
 import _isArray from 'lodash.isarray';
 
-let PopupButton = React.createClass({
+let PopupButton = createReactClass({
+  displayName: 'PopupButton',
+
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -57,8 +60,7 @@ let PopupButton = React.createClass({
       labelStyle={{textTransform: 'inherit'}}
       onClick={this.handleClick}
     />;
-  }
-
+  },
 });
 
 export default PopupButton;

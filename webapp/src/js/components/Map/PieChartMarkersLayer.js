@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -26,7 +28,8 @@ import _map from 'lodash.map';
 import _forEach from 'lodash.foreach';
 import _sum from 'lodash.sum';
 
-let PieChartMarkersLayer = React.createClass({
+let PieChartMarkersLayer = createReactClass({
+  displayName: 'PieChartMarkersLayer',
 
   mixins: [
     FluxMixin,
@@ -40,6 +43,7 @@ let PieChartMarkersLayer = React.createClass({
     map: PropTypes.object,
     changeLayerStatus: PropTypes.func
   },
+
   propTypes: {
     defaultResidualFractionName: PropTypes.string,
     defaultResidualSectorColor: PropTypes.string,
@@ -55,6 +59,7 @@ let PieChartMarkersLayer = React.createClass({
     disableOnClickMarker: PropTypes.bool,
     maxLegendItems: PropTypes.number
   },
+
   childContextTypes: {
     onClickMarker: PropTypes.func
   },
@@ -64,6 +69,7 @@ let PieChartMarkersLayer = React.createClass({
       onClickMarker: this.handleClickMarker
     };
   },
+
   getDefaultProps() {
     return {
       defaultResidualFractionName: 'Other',
@@ -72,6 +78,7 @@ let PieChartMarkersLayer = React.createClass({
       disableOnClickMarker: false
     };
   },
+
   getInitialState() {
     return {
       markers: [],
@@ -342,8 +349,7 @@ let PieChartMarkersLayer = React.createClass({
       </FeatureGroup>
     );
 
-  }
-
+  },
 });
 
 export default PieChartMarkersLayer;

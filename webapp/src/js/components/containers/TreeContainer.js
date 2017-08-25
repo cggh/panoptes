@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {treeTypes} from 'phylocanvas';
 
 import _keys from 'lodash.keys';
@@ -19,7 +20,9 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import Loading from 'ui/Loading';
 import {propertyColour} from 'util/Colours';
 
-let TreeContainer = React.createClass({
+let TreeContainer = createReactClass({
+  displayName: 'TreeContainer',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -116,7 +119,6 @@ let TreeContainer = React.createClass({
     }
   },
 
-
   render() {
     const {data, loadStatus, metadata} = this.state;
 
@@ -131,8 +133,7 @@ let TreeContainer = React.createClass({
         : null}
         <Loading status={loadStatus}/>
       </div>);
-  }
-
+  },
 });
 
 export default TreeContainer;

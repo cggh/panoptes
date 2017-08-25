@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _filter from 'lodash.filter';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -19,7 +20,8 @@ import _map from 'lodash.map';
 // UI components
 import Loading from 'ui/Loading';
 
-let PropertyGroup = React.createClass({
+let PropertyGroup = createReactClass({
+  displayName: 'PropertyGroup',
 
   mixins: [
     PureRenderMixin,
@@ -93,8 +95,7 @@ let PropertyGroup = React.createClass({
           <Loading status={loadStatus}/>
         </div>
     );
-  }
-
+  },
 });
 
 export default PropertyGroup;

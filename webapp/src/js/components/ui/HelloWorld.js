@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
-let HelloWorld = React.createClass({
+let HelloWorld = createReactClass({
+  displayName: 'HelloWorld',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -16,8 +18,7 @@ let HelloWorld = React.createClass({
         Hello World! {msg}
       </div>
     );
-  }
-
+  },
 });
 
 export default HelloWorld;

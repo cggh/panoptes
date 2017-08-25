@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import TextField from 'material-ui/TextField';
 import _map from 'lodash.map';
@@ -7,7 +8,8 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Icon from 'ui/Icon';
 
-let ModalInput = React.createClass({
+let ModalInput = createReactClass({
+  displayName: 'ModalInput',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -51,8 +53,7 @@ let ModalInput = React.createClass({
         </div>
       </div>
     );
-  }
-
+  },
 });
 
 export default ModalInput;

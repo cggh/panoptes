@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -13,7 +15,8 @@ import MenuItem from 'material-ui/MenuItem';
 // TODO: move to app config?
 const MAX_SELECTFIELD_OPTIONS = 100;
 
-let SelectFieldWithNativeFallback = React.createClass({
+let SelectFieldWithNativeFallback = createReactClass({
+  displayName: 'SelectFieldWithNativeFallback',
 
   mixins: [
     PureRenderMixin,
@@ -217,8 +220,7 @@ let SelectFieldWithNativeFallback = React.createClass({
       );
     }
 
-  }
-
+  },
 });
 
 export default SelectFieldWithNativeFallback;

@@ -2,6 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 
+import createReactClass from 'create-react-class';
+
+
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -43,7 +46,8 @@ const ALLOWED_CHILDREN = [
   'svg'
 ];
 
-let TableMarkersLayer = React.createClass({
+let TableMarkersLayer = createReactClass({
+  displayName: 'TableMarkersLayer',
 
   mixins: [
     FluxMixin,
@@ -60,6 +64,7 @@ let TableMarkersLayer = React.createClass({
     map: PropTypes.object,
     changeLayerStatus: PropTypes.func
   },
+
   propTypes: {
     highlight: PropTypes.string,
     layerContainer: PropTypes.object,
@@ -74,6 +79,7 @@ let TableMarkersLayer = React.createClass({
     clusterMarkers: PropTypes.bool,
     children: PropTypes.node
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object,
@@ -111,6 +117,7 @@ let TableMarkersLayer = React.createClass({
     }
     this.getFlux().actions.panoptes.dataItemPopup({table, primKey, switchTo: !middleClick});
   },
+
   handleClickClusterMarker(e, payload) {
     let {table, originalLat, originalLng, latProperty, lngProperty} = payload;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
@@ -633,8 +640,7 @@ let TableMarkersLayer = React.createClass({
       return null;
     }
 
-  }
-
+  },
 });
 
 export default TableMarkersLayer;

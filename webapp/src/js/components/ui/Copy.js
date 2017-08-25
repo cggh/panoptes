@@ -2,6 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 
+import createReactClass from 'create-react-class';
+
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -28,7 +31,8 @@ function selectText(element) {
   }
 }
 
-let Copy = React.createClass({
+let Copy = createReactClass({
+  displayName: 'Copy',
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
@@ -84,8 +88,7 @@ let Copy = React.createClass({
         </div>
       </div>
     );
-  }
-
+  },
 });
 
 export default Copy;

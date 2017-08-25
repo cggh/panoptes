@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import PropTypes from 'prop-types';
 import RAF from 'raf';
@@ -6,7 +7,9 @@ import now from 'performance-now';
 import classnames from 'classnames';
 const HEIGHT = 20;
 
-let LoadingIndicator = React.createClass({
+let LoadingIndicator = createReactClass({
+  displayName: 'LoadingIndicator',
+
   mixins: [
     PureRenderMixin
   ],
@@ -96,7 +99,7 @@ let LoadingIndicator = React.createClass({
                    })}
                    width={this.props.width}
                    height={HEIGHT}/>;
-  }
+  },
 });
 
 export default LoadingIndicator;

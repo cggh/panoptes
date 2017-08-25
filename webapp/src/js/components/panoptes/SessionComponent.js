@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from  'react';
+import createReactClass from 'create-react-class';
 import deserialiseComponent from 'util/deserialiseComponent';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-let SessionComponent = React.createClass({
+let SessionComponent = createReactClass({
+  displayName: 'SessionComponent',
+
   mixins: [
     FluxMixin,
     StoreWatchMixin('SessionStore')
@@ -65,7 +68,7 @@ let SessionComponent = React.createClass({
       replaceSelf: actions.componentReplace,
       updateTitleIcon: this.updateTitleIcon
     }), {ref: 'child', replaceable});
-  }
+  },
 });
 
 export default SessionComponent;

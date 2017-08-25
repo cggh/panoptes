@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import 'tooltip-ellipsis.scss';
 
-let TooltipEllipsis = React.createClass({
+let TooltipEllipsis = createReactClass({
+  displayName: 'TooltipEllipsis',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -28,8 +30,7 @@ let TooltipEllipsis = React.createClass({
         {this.props.children}
       </span>
     );
-  }
-
+  },
 });
 
 export default TooltipEllipsis;

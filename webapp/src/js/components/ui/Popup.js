@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Draggable from 'react-draggable';
 import {Resizable} from 'react-resizable';
 import 'react-resizable/css/styles.css';
@@ -15,7 +16,9 @@ import _forEach from 'lodash.foreach';
 
 const TOPBAR_HEIGHT = 33; //Mirrors css variable
 
-let Popup = React.createClass({
+let Popup = createReactClass({
+  displayName: 'Popup',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -71,22 +74,26 @@ let Popup = React.createClass({
       child.title ? this.setState({title: child.title()}) : null;
     }
   },
+
   /*eslint-enable react/no-did-update-set-state*/
 
   handleResize(event, {element, size}) { //eslint-disable-line no-unused-vars
     this.setState(size);
   },
+
   handleResizeStop(event, {element, size}) { //eslint-disable-line no-unused-vars
     this.setState(size);
     if (this.props.onResizeStop)
       this.props.onResizeStop(size);
   },
+
   handleMoveStop(event, pos) {
     let {x, y} = pos;
     this.setState({x, y});
     if (this.props.onMoveStop)
       this.props.onMoveStop({x, y});
   },
+
   handleClose(event) {
     if (this.props.onClose) {
       event.preventDefault();
@@ -94,6 +101,7 @@ let Popup = React.createClass({
       this.props.onClose();
     }
   },
+
   handleMaximise(event) {
     if (this.props.onMaximise) {
       event.preventDefault();
@@ -101,6 +109,7 @@ let Popup = React.createClass({
       this.props.onMaximise();
     }
   },
+
   handleClick(event) {
     if (this.props.onClick)
       this.props.onClick(event);
@@ -141,8 +150,7 @@ let Popup = React.createClass({
         </Resizable>
       </Draggable>
     );
-  }
-
+  },
 });
 
 export default Popup;

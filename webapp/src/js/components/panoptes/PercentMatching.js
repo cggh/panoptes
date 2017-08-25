@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import SQL from 'panoptes/SQL';
@@ -7,7 +8,9 @@ import withAPIData from 'hoc/withAPIData';
 import {format, precisionFixed} from 'd3-format';
 import _isUndefined from 'lodash.isundefined';
 
-let PercentMatching = React.createClass({
+let PercentMatching = createReactClass({
+  displayName: 'PercentMatching',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -39,7 +42,7 @@ let PercentMatching = React.createClass({
       let f = format('.' + p + '%');
       return <span>{f(matching / all)}</span>;
     }
-  }
+  },
 });
 
 PercentMatching = withAPIData(PercentMatching, ({config, props}) => (

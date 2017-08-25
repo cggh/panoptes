@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import _assign from 'lodash.assign';
 
-let TabPane = React.createClass({
+let TabPane = createReactClass({
+  displayName: 'TabPane',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -26,6 +28,7 @@ let TabPane = React.createClass({
     }
     return null;
   },
+
   title() {
     if (this.child.title) {
       return this.child.title();
@@ -64,8 +67,7 @@ let TabPane = React.createClass({
         })}
       </div>
     );
-  }
-
+  },
 });
 
 export default TabPane;

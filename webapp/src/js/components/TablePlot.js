@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import _filter from 'lodash.filter';
 import _map from 'lodash.map';
 import _reduce from 'lodash.reduce';
@@ -23,7 +25,8 @@ import queryToString from 'util/queryToString';
 
 import 'plot.scss';
 
-let TablePlot = React.createClass({
+let TablePlot = createReactClass({
+  displayName: 'TablePlot',
 
   mixins: [
     PureRenderMixin,
@@ -174,7 +177,7 @@ let TablePlot = React.createClass({
         }
         <Loading status={this.state.loadStatus} />
       </div>);
-  }
+  },
 });
 
 export default TablePlot;

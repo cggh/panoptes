@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -18,7 +20,9 @@ import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';
 import FindGene from 'containers/FindGene';
 
-let Finder = React.createClass({
+let Finder = createReactClass({
+  displayName: 'Finder',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -30,7 +34,6 @@ let Finder = React.createClass({
     title: PropTypes.string,
   },
 
-
   getDefaultProps() {
     return {
       title: 'Find',
@@ -41,6 +44,7 @@ let Finder = React.createClass({
   icon() {
     return this.props.icon;
   },
+
   title() {
     return this.props.title;
   },
@@ -147,7 +151,7 @@ let Finder = React.createClass({
     }
 
     return finderContent;
-  }
+  },
 });
 
 export default Finder;

@@ -1,23 +1,25 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-let PropertyInput = React.createClass({
+class PropertyInput extends React.Component {
 
-  propTypes: {
+  static displayName = "PropertyInput";
+
+  static propTypes = {
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
     value: PropTypes.string
-  },
+  };
 
-  handleOnChange() {
+  handleOnChange = () => {
     this.props.onChange(this.value.value);
-  },
+  };
 
-  handleOnBlur() {
+  handleOnBlur = () => {
     this.props.onBlur(this.value.value);
-  },
+  };
 
-  render: function() {
+  render() {
 
     let {value} = this.props;
 
@@ -33,7 +35,6 @@ let PropertyInput = React.createClass({
       </span>
     );
   }
-
-});
+}
 
 export default PropertyInput;

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 import _forEach from 'lodash.foreach';
@@ -20,7 +21,9 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 
 const ROW_HEIGHT = 24;
 
-let AnnotationChannel = React.createClass({
+let AnnotationChannel = createReactClass({
+  displayName: 'AnnotationChannel',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -60,7 +63,6 @@ let AnnotationChannel = React.createClass({
       clickIndex: null
     };
   },
-
 
   componentWillMount() {
     this.data = null;
@@ -301,17 +303,18 @@ let AnnotationChannel = React.createClass({
     }
   },
 
-
   handleMouseMove(e) {
     let [x, y] = this.convertXY(e);
     let id = this.xyToGene(x, y);
     this.setHover(id);
   },
+
   handleMouseOver(e) {
     let [x, y] = this.convertXY(e);
     let id = this.xyToGene(x, y);
     this.setHover(id);
   },
+
   handleMouseOut(e) {
     this.setState({clickIndex: null})
   },
@@ -374,13 +377,13 @@ let AnnotationChannel = React.createClass({
         </div>
 
       </ChannelWithConfigDrawer>);
-  }
+  },
 });
 
-let Legend = React.createClass({
+class Legend extends React.Component {
   shouldComponentUpdate() {
     return false;
-  },
+  }
 
   render() {
     return <div className="legend">
@@ -402,7 +405,7 @@ let Legend = React.createClass({
       </div>
     </div>;
   }
-});
+}
 
 export default AnnotationChannel;
 

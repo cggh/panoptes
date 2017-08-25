@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -17,7 +19,9 @@ import RecentlyFoundGenes from 'containers/RecentlyFoundGenes';
 import Gene from 'containers/Gene';
 import ComponentStack from 'containers/ComponentStack';
 
-let FindGene = React.createClass({
+let FindGene = createReactClass({
+  displayName: 'FindGene',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -136,8 +140,7 @@ let FindGene = React.createClass({
       </TabbedArea>
     );
 
-  }
-
+  },
 });
 
 export default FindGene;

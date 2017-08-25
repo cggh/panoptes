@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import classNames from 'classnames';
 import _isEqual from 'lodash.isequal';
@@ -11,7 +12,8 @@ import filterChildren from 'util/filterChildren';
 import _assign from 'lodash.assign';
 import Immutable from 'immutable';
 
-let TabbedArea = React.createClass({
+let TabbedArea = createReactClass({
+  displayName: 'TabbedArea',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -45,7 +47,6 @@ let TabbedArea = React.createClass({
     this.componentDidUpdate();
   },
 
-
   /*eslint-disable react/no-did-update-set-state*/
   componentDidUpdate() {
     let icons = {};
@@ -60,6 +61,7 @@ let TabbedArea = React.createClass({
         titles: titles
       });
   },
+
   /*eslint-enable react/no-did-update-set-state*/
 
   handleClick(tabId, e) {
@@ -67,6 +69,7 @@ let TabbedArea = React.createClass({
       this.props.onSwitch(tabId);
     }
   },
+
   handleClose(tabId, event) {
     if (this.props.onClose) {
       event.preventDefault();
@@ -74,6 +77,7 @@ let TabbedArea = React.createClass({
       this.props.onClose(tabId);
     }
   },
+
   handleAddTab(event) {
     if (this.props.onAddTab) {
       event.preventDefault();
@@ -180,7 +184,7 @@ let TabbedArea = React.createClass({
         </div>
       </div>
     );
-  }
+  },
 });
 
 export default TabbedArea;

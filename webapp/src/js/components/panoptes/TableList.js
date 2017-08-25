@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _map from 'lodash.map';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -13,7 +14,9 @@ import FluxMixin from 'mixins/FluxMixin';
 import ListWithActions from 'containers/ListWithActions';
 import DataTableWithActions from 'containers/DataTableWithActions';
 
-let TableList = React.createClass({
+let TableList = createReactClass({
+  displayName: 'TableList',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -65,7 +68,7 @@ let TableList = React.createClass({
       </List>
 
     );
-  }
+  },
 });
 
 export default TableList;

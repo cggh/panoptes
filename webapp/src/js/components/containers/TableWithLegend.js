@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import SQL from 'panoptes/SQL';
 import DataTableView from 'panoptes/DataTableView';
 import {Card, CardText} from 'material-ui/Card';
 
-let TableWithLegend = React.createClass({
+let TableWithLegend = createReactClass({
+  displayName: 'TableWithLegend',
   mixins: [FluxMixin, ConfigMixin],
 
   propTypes: {
@@ -56,7 +58,7 @@ let TableWithLegend = React.createClass({
         </div>
       </div>
     );
-  }
+  },
 });
 
 export default TableWithLegend;

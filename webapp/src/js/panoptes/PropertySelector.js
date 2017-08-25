@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
@@ -10,7 +11,9 @@ import _each from 'lodash.foreach';
 import _filter from 'lodash.filter';
 
 
-const PropertySelector = React.createClass({
+const PropertySelector = createReactClass({
+  displayName: 'PropertySelector',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -71,7 +74,7 @@ const PropertySelector = React.createClass({
       {propertyMenu}
     </SelectField>
     );
-  }
+  },
 });
 
 export default PropertySelector;

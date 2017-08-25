@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Sidebar from 'ui/Sidebar';
 import {HotKeys} from 'react-hotkeys'; // 0.9.0 needs {...}
 import scrollbarSize from 'scrollbar-size';
@@ -27,7 +28,9 @@ import SQL from 'panoptes/SQL';
 import RecentlyUsedTableQueries from 'containers/RecentlyUsedTableQueries';
 import StoredTableQueries from 'containers/StoredTableQueries';
 
-let QueryPicker = React.createClass({
+let QueryPicker = createReactClass({
+  displayName: 'QueryPicker',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -65,6 +68,7 @@ let QueryPicker = React.createClass({
   icon() {
     return 'filter';
   },
+
   title() {
     return `Pick filter for ${this.tableConfig().namePlural}`;
   },
@@ -72,12 +76,14 @@ let QueryPicker = React.createClass({
   handleEnter() {
     this.handlePick();
   },
+
   handlePick() {
     this.props.onPick(this.state.query);
 
     // Add this query to the list of recently used queries for this table.
     this.getFlux().actions.session.tableQueryUsed(this.props.table, this.state.query);
   },
+
   handleQueryChange(newQuery) {
     this.setState({
       query: newQuery
@@ -237,8 +243,7 @@ let QueryPicker = React.createClass({
         </Sidebar>
       </div>
     );
-  }
-
+  },
 });
 
 export default QueryPicker;

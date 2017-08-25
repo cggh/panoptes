@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _cloneDeep from 'lodash.clonedeep';
 
 // Mixins
@@ -20,7 +21,8 @@ import ErrorReport from 'panoptes/ErrorReporter';
 // UI components
 import Loading from 'ui/Loading';
 
-let FieldList = React.createClass({
+let FieldList = createReactClass({
+  displayName: 'FieldList',
 
   mixins: [
     PureRenderMixin,
@@ -91,8 +93,7 @@ let FieldList = React.createClass({
           <Loading status={loadStatus}/>
         </div>
     );
-  }
-
+  },
 });
 
 export default FieldList;

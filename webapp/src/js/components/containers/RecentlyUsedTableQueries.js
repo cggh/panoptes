@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -17,7 +19,9 @@ import Icon from 'ui/Icon';
 import QueryString from 'panoptes/QueryString';
 
 
-let RecentlyUsedTableQueries = React.createClass({
+let RecentlyUsedTableQueries = createReactClass({
+  displayName: 'RecentlyUsedTableQueries',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -96,7 +100,7 @@ let RecentlyUsedTableQueries = React.createClass({
       );
     }
     return usedTableQueriesList;
-  }
+  },
 });
 
 export default RecentlyUsedTableQueries;

@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -29,7 +31,8 @@ import {categoryColours} from 'util/Colours';
 import MapControlComponent from 'Map/MapControlComponent';
 import PropertyPrefixLegend from 'panoptes/PropertyPrefixLegend';
 
-let ColumnPieChartMarkersLayer = React.createClass({
+let ColumnPieChartMarkersLayer = createReactClass({
+  displayName: 'ColumnPieChartMarkersLayer',
 
   mixins: [
     FluxMixin,
@@ -46,6 +49,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
     map: PropTypes.object,
     changeLayerStatus: PropTypes.func
   },
+
   propTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object,
@@ -58,6 +62,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
     disableOnClickMarker: PropTypes.bool,
     maxLegendItems: PropTypes.number
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object,
@@ -339,8 +344,7 @@ let ColumnPieChartMarkersLayer = React.createClass({
       );
     }
 
-  }
-
+  },
 });
 
 export default ColumnPieChartMarkersLayer;

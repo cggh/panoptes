@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
 import SelectField from 'material-ui/SelectField';
@@ -22,7 +23,9 @@ import FilterButton from 'panoptes/FilterButton';
 import SQL from 'panoptes/SQL';
 import QueryString from 'panoptes/QueryString';
 
-let PivotTableWithActions = React.createClass({
+let PivotTableWithActions = createReactClass({
+  displayName: 'PivotTableWithActions',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -145,7 +148,7 @@ let PivotTableWithActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
 export default PivotTableWithActions;

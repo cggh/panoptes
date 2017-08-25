@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import createPlotlyComponent from 'react-plotlyjs';
 import Plotly from 'plotly.js/dist/plotly-cartesian';
 const PlotlyComponent = createPlotlyComponent(Plotly);
@@ -9,7 +10,9 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 
-let Plot = React.createClass({
+let Plot = createReactClass({
+  displayName: 'Plot',
+
   mixins: [
     PureRenderMixin
   ],
@@ -84,8 +87,7 @@ let Plot = React.createClass({
         />
       </DetectResize>
     );
-  }
-
+  },
 });
 
 export default Plot;

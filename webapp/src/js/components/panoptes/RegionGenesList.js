@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -22,7 +24,8 @@ import Subheader from 'material-ui/Subheader';
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
-let RegionGenesList = React.createClass({
+let RegionGenesList = createReactClass({
+  displayName: 'RegionGenesList',
 
   mixins: [
     PureRenderMixin,
@@ -153,8 +156,7 @@ let RegionGenesList = React.createClass({
       </div>
     );
 
-  }
-
+  },
 });
 
 export default RegionGenesList;

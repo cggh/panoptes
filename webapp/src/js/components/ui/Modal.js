@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import classNames from 'classnames';
 import Icon from 'ui/Icon';
 import {HotKeys} from 'react-hotkeys'; // 0.9.0 needs {...}
 
-let Modal = React.createClass({
+let Modal = createReactClass({
+  displayName: 'Modal',
+
   mixins: [
     PureRenderMixin
   ],
@@ -44,6 +47,7 @@ let Modal = React.createClass({
       this.child.title ? this.setState({title: this.child.title()}) : null;
     }
   },
+
   /*eslint-enable react/no-did-update-set-state */
 
   handleClose(e) {
@@ -104,7 +108,7 @@ let Modal = React.createClass({
         </div>
       </HotKeys>
     );
-  }
+  },
 });
 
 export default Modal;

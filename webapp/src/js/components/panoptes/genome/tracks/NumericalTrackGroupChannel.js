@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
 import _isFinite from 'lodash.isfinite';
@@ -37,7 +38,9 @@ const ALLOWED_CHILDREN = [
 ];
 const colourFunc = categoryColours('__default__');
 
-let NumericalTrackGroupChannel = React.createClass({
+let NumericalTrackGroupChannel = createReactClass({
+  displayName: 'NumericalTrackGroupChannel',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -123,12 +126,15 @@ let NumericalTrackGroupChannel = React.createClass({
   handleTap(e) {
     _map(this.children, (child) => child.handleClick(e));
   },
+
   handleMouseOver(e) {
     this.setState({pointer: _some(_map(this.children, (child) => child.handleMouseOver(e)))});
   },
+
   handleMouseMove(e) {
     this.setState({pointer: _some(_map(this.children, (child) => child.handleMouseMove(e)))});
   },
+
   handleMouseOut(e) {
     this.setState({pointer: _some(_map(this.children, (child) => child.handleMouseOut(e)))});
   },
@@ -180,10 +186,12 @@ let NumericalTrackGroupChannel = React.createClass({
         {children}
       </CanvasGroupChannel>
     );
-  }
+  },
 });
 
-let Side = React.createClass({
+let Side = createReactClass({
+  displayName: 'Side',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -199,6 +207,7 @@ let Side = React.createClass({
       ]
     })
   ],
+
   render() {
     let {children, query, table} = this.props;
     children = React.Children.toArray(children);
@@ -229,11 +238,12 @@ let Side = React.createClass({
       <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural+':' : '')}</div>
       <div style={{marginLeft:"-13px"}}>{trackNames}</div>
     </div>;
-  }
-
+  },
 });
 
-let Legend = React.createClass({
+let Legend = createReactClass({
+  displayName: 'Legend',
+
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
@@ -260,11 +270,12 @@ let Legend = React.createClass({
           }
         />)}
     </div>
-  }
-
+  },
 });
 
-let NumericalTrackGroupControls = React.createClass({
+let NumericalTrackGroupControls = createReactClass({
+  displayName: 'NumericalTrackGroupControls',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -335,7 +346,6 @@ let NumericalTrackGroupControls = React.createClass({
     });
     return trackGroups;
   },
-
 
   handleTrackChange(tracks) {
     this.getFlux().actions.session.modalClose();
@@ -421,8 +431,7 @@ let NumericalTrackGroupControls = React.createClass({
 
       </div>
     );
-  }
-
+  },
 });
 
 

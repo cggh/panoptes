@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import {WMSTileLayer as LeafletWMSTileLayer} from 'react-leaflet';
 
 // Mixins
@@ -17,7 +19,8 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // TODO: Is crs passed on to WMSTileLayer automatically (from Map) via context?
 
-let WMSTileLayer = React.createClass({
+let WMSTileLayer = createReactClass({
+  displayName: 'WMSTileLayer',
 
   mixins: [
     FluxMixin
@@ -30,6 +33,7 @@ let WMSTileLayer = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     attribution: PropTypes.string,
     format: PropTypes.string,
@@ -40,6 +44,7 @@ let WMSTileLayer = React.createClass({
     url: PropTypes.string.isRequired,
     version: PropTypes.string
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -51,6 +56,7 @@ let WMSTileLayer = React.createClass({
       map: this.props.map !== undefined ? this.props.map : this.context.map
     };
   },
+
   getDefaultProps() {
     return {
       attribution: 'Weather data © 2012 IEM Nexrad',
@@ -77,8 +83,7 @@ let WMSTileLayer = React.createClass({
       />
     );
 
-  }
-
+  },
 });
 
 export default WMSTileLayer;

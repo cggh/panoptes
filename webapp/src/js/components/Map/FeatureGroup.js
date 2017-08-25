@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import {FeatureGroup as LeafletFeatureGroup} from 'react-leaflet';
 
 // Mixins
@@ -24,7 +26,8 @@ const ALLOWED_CHILDREN = [
   'GeoJSON'
 ];
 
-let FeatureGroup = React.createClass({
+let FeatureGroup = createReactClass({
+  displayName: 'FeatureGroup',
 
   mixins: [
     FluxMixin
@@ -37,11 +40,13 @@ let FeatureGroup = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     children: PropTypes.node,
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -63,8 +68,7 @@ let FeatureGroup = React.createClass({
         children={children}
       />
     );
-  }
-
+  },
 });
 
 export default FeatureGroup;

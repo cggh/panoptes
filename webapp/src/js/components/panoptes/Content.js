@@ -1,11 +1,13 @@
-import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import _isArray from 'lodash.isarray';
 import filterChildren from 'util/filterChildren';
 
 //Child of CustomButton, ToggleBox
 
-let Content = React.createClass({
+let Content = createReactClass({
+  displayName: 'Content',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -17,7 +19,7 @@ let Content = React.createClass({
       throw Error('Content can only have one child until https://github.com/facebook/react/issues/2127');
     }
     return children;
-  }
+  },
 });
 
 export default Content;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {scale} from 'd3-scale';
 import _isFinite from 'lodash.isfinite';
 
@@ -13,7 +14,9 @@ import {Motion, spring} from 'react-motion';
 
 import findBlocks from 'panoptes/FindBlocks';
 
-let ScaledSVGChannel = React.createClass({
+let ScaledSVGChannel = createReactClass({
+  displayName: 'ScaledSVGChannel',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -129,7 +132,7 @@ let ScaledSVGChannel = React.createClass({
           </Motion>
         </svg>
       </ChannelWithConfigDrawer>);
-  }
+  },
 });
 
 

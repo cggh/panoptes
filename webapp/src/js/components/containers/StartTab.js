@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -12,7 +14,9 @@ import TableList from 'panoptes/TableList';
 
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
-let StartTab = React.createClass({
+let StartTab = createReactClass({
+  displayName: 'StartTab',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -26,6 +30,7 @@ let StartTab = React.createClass({
   icon() {
     return 'home';
   },
+
   title() {
     return 'Start';
   },
@@ -42,7 +47,7 @@ let StartTab = React.createClass({
         </div>
       </div>
     );
-  }
+  },
 });
 
 export default StartTab;

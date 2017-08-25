@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import SQL from 'panoptes/SQL';
@@ -7,7 +8,9 @@ import withAPIData from 'hoc/withAPIData';
 import {format} from 'd3-format';
 import _isUndefined from 'lodash.isundefined';
 
-let QueryResult = React.createClass({
+let QueryResult = createReactClass({
+  displayName: 'QueryResult',
+
   mixins: [
     PureRenderMixin,
   ],
@@ -35,7 +38,7 @@ let QueryResult = React.createClass({
       data = data.result[0];
     }
     return <span>{data ? data : '...'}</span>;
-  }
+  },
 });
 
 QueryResult = withAPIData(QueryResult, ({config, props}) => (

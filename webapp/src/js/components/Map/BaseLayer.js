@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import {LayersControl as LeafletLayersControl} from 'react-leaflet';
 
 // Mixins
@@ -13,7 +15,8 @@ const ALLOWED_CHILDREN = [
   'FeatureGroup',
 ];
 
-let BaseLayer = React.createClass({
+let BaseLayer = createReactClass({
+  displayName: 'BaseLayer',
 
   mixins: [
     FluxMixin
@@ -26,6 +29,7 @@ let BaseLayer = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     addBaseLayer: PropTypes.func,
     checked: PropTypes.bool,
@@ -36,6 +40,7 @@ let BaseLayer = React.createClass({
     removeLayer: PropTypes.func, // Required when the BaseLayer is changed
     removeLayerControl: PropTypes.func
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -47,6 +52,7 @@ let BaseLayer = React.createClass({
       map: this.props.map !== undefined ? this.props.map : this.context.map
     };
   },
+
   getDefaultProps() {
     return {
       name: 'Base layer'
@@ -73,8 +79,7 @@ let BaseLayer = React.createClass({
       />
     );
 
-  }
-
+  },
 });
 
 export default BaseLayer;

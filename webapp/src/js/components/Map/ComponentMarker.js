@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import DivIcon from 'Map/DivIcon';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let ComponentMarker = React.createClass({
+let ComponentMarker = createReactClass({
+  displayName: 'ComponentMarker',
 
   mixins: [
     FluxMixin
@@ -15,6 +17,7 @@ let ComponentMarker = React.createClass({
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
+
   propTypes: {
     children: PropTypes.node,
     onClick: PropTypes.func,
@@ -28,6 +31,7 @@ let ComponentMarker = React.createClass({
     fillColour: PropTypes.string,
     iconColour: PropTypes.string
   },
+
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
@@ -107,8 +111,7 @@ let ComponentMarker = React.createClass({
       </DivIcon>
     );
 
-  }
-
+  },
 });
 
 export default ComponentMarker;

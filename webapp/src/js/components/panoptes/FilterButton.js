@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FlatButton from 'material-ui/FlatButton';
 import SQL from 'panoptes/SQL';
@@ -7,7 +8,9 @@ import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
 import QueryPicker from 'containers/QueryPicker';
 
-let FilterButton = React.createClass({
+let FilterButton = createReactClass({
+  displayName: 'FilterButton',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -57,8 +60,7 @@ let FilterButton = React.createClass({
       }
 
     </div>;
-  }
-
+  },
 });
 
 export default FilterButton;

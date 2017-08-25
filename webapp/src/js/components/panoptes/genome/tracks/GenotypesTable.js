@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import repeatString from 'repeat-string';
 import chunkedMap from 'util/chunkedMap';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -17,7 +18,9 @@ function colourToRGBA(colour, alpha) {
   return colour.replace(/\)/, ', ' + (alpha !== undefined ? alpha : 1) + ')').replace(/rgb/, 'rgba');
 }
 
-let GenotypesTable = React.createClass({
+let GenotypesTable = createReactClass({
+  displayName: 'GenotypesTable',
+
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -27,6 +30,7 @@ let GenotypesTable = React.createClass({
   contextTypes: {
     muiTheme: PropTypes.object
   },
+
   propTypes: {
     table: PropTypes.string,
     genomicPositions: PropTypes.any,
@@ -330,7 +334,7 @@ let GenotypesTable = React.createClass({
               width={width}
               height={height}/>
     </div>;
-  }
+  },
 });
 
 export default GenotypesTable;

@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-let ItemLink = React.createClass({
+let ItemLink = createReactClass({
+  displayName: 'ItemLink',
 
   mixins: [
     PureRenderMixin,
@@ -42,8 +45,7 @@ let ItemLink = React.createClass({
     } else {
       return <div style={{cursor:'pointer'}} onClick={(e) => this.handleClick(e)}>{children}</div>;
     }
-  }
-
+  },
 });
 
 export default ItemLink;

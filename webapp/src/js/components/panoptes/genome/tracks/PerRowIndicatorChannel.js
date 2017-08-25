@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 import Color from 'color';
@@ -30,7 +31,9 @@ import _forEach from 'lodash.foreach';
 
 const HEIGHT = 50;
 
-let PerRowIndicatorChannel = React.createClass({
+let PerRowIndicatorChannel = createReactClass({
+  displayName: 'PerRowIndicatorChannel',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -406,12 +409,15 @@ let PerRowIndicatorChannel = React.createClass({
     let {nearestIndex, nearestClickIndex} = this.xyToIndex(x, y);
     this.setHover({nearestIndex, nearestClickIndex});
   },
+
   handleMouseOver(e) {
     this.handleMouseMove(e);
   },
+
   handleMouseOut(e) {
     this.setState({hoverClick: false});
   },
+
   handleClick(e) {
     if (this.state.hoverClick != null) {
       this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[this.state.hoverClick]});
@@ -473,10 +479,12 @@ let PerRowIndicatorChannel = React.createClass({
             : null}</div>
 
       </ChannelWithConfigDrawer>);
-  }
+  },
 });
 
-const PerRowIndicatorControls = React.createClass({
+const PerRowIndicatorControls = createReactClass({
+  displayName: 'PerRowIndicatorControls',
+
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
@@ -525,8 +533,7 @@ const PerRowIndicatorControls = React.createClass({
         </div>
       </div>
     );
-  }
-
+  },
 });
 
 export default PerRowIndicatorChannel;

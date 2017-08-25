@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import _startsWith from 'lodash.startswith';
@@ -8,7 +9,8 @@ const dynreq = require.context('../../../images', true);
 const dynamicRequire = (path) => dynreq('./' + path);
 
 
-let Icon = React.createClass({
+let Icon = createReactClass({
+  displayName: 'Icon',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -70,7 +72,7 @@ let Icon = React.createClass({
       return <span {...props} className={classNames}><img className="bitmap" src={dynamicRequire(name.substring(7))} /></span>;
     else
       return <span {...props} className={classNames}> { this.props.children} </span>;
-  }
+  },
 });
 
 export default Icon;

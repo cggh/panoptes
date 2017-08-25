@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import titleCase from 'title-case';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
@@ -34,7 +35,9 @@ import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
 
 import 'plot.scss';
 
-let TablePlotActions = React.createClass({
+let TablePlotActions = createReactClass({
+  displayName: 'TablePlotActions',
+
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -182,7 +185,7 @@ let TablePlotActions = React.createClass({
         </div>
       </Sidebar>
     );
-  }
+  },
 });
 
 export default TablePlotActions;

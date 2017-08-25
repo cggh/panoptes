@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
@@ -8,7 +9,9 @@ import CustomButton from 'panoptes/CustomButton';
 import Anchor from 'panoptes/Anchor';
 import Content from 'panoptes/Content';
 
-let TextButton = React.createClass({
+let TextButton = createReactClass({
+  displayName: 'TextButton',
+
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -42,8 +45,7 @@ let TextButton = React.createClass({
       <Content>{children}</Content>
     </CustomButton>;
 
-  }
-
+  },
 });
 
 export default TextButton;

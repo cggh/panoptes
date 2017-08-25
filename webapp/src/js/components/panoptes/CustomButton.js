@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
@@ -7,7 +8,9 @@ import Anchor from 'panoptes/Anchor';
 import Content from 'panoptes/Content';
 import _isArray from 'lodash.isarray';
 
-let CustomButton = React.createClass({
+let CustomButton = createReactClass({
+  displayName: 'CustomButton',
+
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -61,7 +64,7 @@ let CustomButton = React.createClass({
 
     let [anchor, content] = children;
     return React.cloneElement(anchor, {onClick: this.handleClick})
-  }
+  },
 });
 
 export default CustomButton;

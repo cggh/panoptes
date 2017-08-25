@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 // Credit: https://github.com/english/react-d3-histogram
 
-let HistogramBin = React.createClass({
+let HistogramBin = createReactClass({
+  displayName: 'HistogramBin',
 
   mixins: [
     PureRenderMixin
@@ -37,8 +39,7 @@ let HistogramBin = React.createClass({
         <title>{title}</title>
       </rect>
     );
-  }
-
+  },
 });
 
 export default HistogramBin;

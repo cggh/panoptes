@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -14,7 +15,9 @@ import Icon from 'ui/Icon';
 
 // const decorator = new PrismDecorator({defaultSyntax: 'yaml'});
 
-let EditYAMLConfig = React.createClass({
+let EditYAMLConfig = createReactClass({
+  displayName: 'EditYAMLConfig',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -54,6 +57,7 @@ let EditYAMLConfig = React.createClass({
   icon() {
     return 'edit';
   },
+
   title() {
     return `Editing ${this.props.path} settings`;
   },
@@ -99,7 +103,7 @@ let EditYAMLConfig = React.createClass({
         </div>
       </div>
     </div>;
-  }
+  },
 });
 
 export default EditYAMLConfig;

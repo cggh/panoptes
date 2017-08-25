@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixin
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -10,7 +12,9 @@ import FlatButton from 'material-ui/FlatButton';
 
 import Confirm from 'ui/Confirm';
 
-let ConfirmButton = React.createClass({
+let ConfirmButton = createReactClass({
+  displayName: 'ConfirmButton',
+
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -42,8 +46,7 @@ let ConfirmButton = React.createClass({
                            onClick={this.handleClick}
                            icon={icon}
             />;
-  }
-
+  },
 });
 
 export default ConfirmButton;

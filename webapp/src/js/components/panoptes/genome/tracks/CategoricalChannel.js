@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _isFinite from 'lodash.isfinite';
 import _debounce from 'lodash.debounce';
 import _map from 'lodash.map';
@@ -30,7 +31,9 @@ import TooltipEllipsis from 'ui/TooltipEllipsis';
 import Checkbox from 'material-ui/Checkbox';
 
 
-let CategoricalChannel = React.createClass({
+let CategoricalChannel = createReactClass({
+  displayName: 'CategoricalChannel',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -93,11 +96,13 @@ let CategoricalChannel = React.createClass({
         <CategoricalTrack {...this.props} query={query} width={width - sideWidth} onChangeKnownValues={(knownValues) => this.setState({knownValues})}/>
       </CanvasGroupChannel>
     );
-  }
+  },
 });
 
 
-let CategoricalTrack = React.createClass({
+let CategoricalTrack = createReactClass({
+  displayName: 'CategoricalTrack',
+
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
@@ -356,10 +361,12 @@ let CategoricalTrack = React.createClass({
     return (
         <canvas className="categorical" ref="canvas" width={width} height={height}/>
     );
-  }
+  },
 });
 
-let CategoricalTrackControls = React.createClass({
+let CategoricalTrackControls = createReactClass({
+  displayName: 'CategoricalTrackControls',
+
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
@@ -446,11 +453,12 @@ let CategoricalTrackControls = React.createClass({
           </div>
       </div>
     );
-  }
-
+  },
 });
 
-let Side = React.createClass({
+let Side = createReactClass({
+  displayName: 'Side',
+
   mixins: [
     FluxMixin,
     ConfigMixin,
@@ -462,6 +470,7 @@ let Side = React.createClass({
       ],
     })
   ],
+
   render() {
     let {query, table, track} = this.props;
     return <div className="side-name">
@@ -473,8 +482,7 @@ let Side = React.createClass({
       </TooltipEllipsis>
         </div>
     </div>;
-  }
-
+  },
 });
 
 

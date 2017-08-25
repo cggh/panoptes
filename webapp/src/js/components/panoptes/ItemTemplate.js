@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import customHandlebars from 'util/customHandlebars';
 import Handlebars from 'handlebars';
 // Mixins
@@ -25,7 +26,8 @@ import Loading from 'ui/Loading';
 import 'template.scss';
 
 
-let ItemTemplate = React.createClass({
+let ItemTemplate = createReactClass({
+  displayName: 'ItemTemplate',
 
   mixins: [
     PureRenderMixin,
@@ -47,6 +49,7 @@ let ItemTemplate = React.createClass({
   componentWillMount() {
     this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
   },
+
   onConfigChange() {
     this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
   },
@@ -174,7 +177,7 @@ let ItemTemplate = React.createClass({
         <Loading status={loadStatus}/>
       </span>
     );
-  }
+  },
 });
 
 export default ItemTemplate;

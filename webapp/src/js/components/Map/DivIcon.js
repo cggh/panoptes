@@ -9,7 +9,7 @@ import {DivIcon as LeafletDivIcon, marker} from 'leaflet';
 import {MapLayer} from 'react-leaflet';
 
 export default class DivIcon extends MapLayer {
-  static displayName = 'DivIcon'
+  static displayName = 'DivIcon';
 
   static propTypes = {
     opacity: PropTypes.number,

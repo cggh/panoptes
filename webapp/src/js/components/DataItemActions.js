@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -16,7 +18,9 @@ import TreeWithActions from 'containers/TreeWithActions';
 import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChannel';
 import _map from 'lodash.map';
 
-let DataItemActions = React.createClass({
+let DataItemActions = createReactClass({
+  displayName: 'DataItemActions',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -65,7 +69,6 @@ let DataItemActions = React.createClass({
         throw error;
       });
   },
-
 
   render() {
     const {table, primKey} = this.props;
@@ -131,8 +134,7 @@ let DataItemActions = React.createClass({
       </div>
     );
 
-  }
-
+  },
 });
 
 export default DataItemActions;

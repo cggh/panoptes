@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import DocPage from 'panoptes/DocPage';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-let DocLink = React.createClass({
+let DocLink = createReactClass({
+  displayName: 'DocLink',
 
   mixins: [
     PureRenderMixin,
@@ -42,8 +44,7 @@ let DocLink = React.createClass({
         {this.props.children}
       </a>
     );
-  }
-
+  },
 });
 
 export default DocLink;

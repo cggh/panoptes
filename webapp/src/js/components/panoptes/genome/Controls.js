@@ -4,13 +4,16 @@ import _has from 'lodash.has';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 const FALLBACK_MAXIMUM = 214700000;
 
-let Controls = React.createClass({
+let Controls = createReactClass({
+  displayName: 'Controls',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -145,7 +148,7 @@ let Controls = React.createClass({
 
       </span>
     );
-  }
+  },
 });
 
 export default Controls;

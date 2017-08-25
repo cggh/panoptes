@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -33,7 +35,8 @@ import TableMarkersLayer from 'Map/TableMarkersLayer';
 
 */
 
-let TableMap = React.createClass({
+let TableMap = createReactClass({
+  displayName: 'TableMap',
 
   mixins: [
     ConfigMixin,
@@ -104,8 +107,7 @@ let TableMap = React.createClass({
       </Map>
     );
 
-  }
-
+  },
 });
 
 export default TableMap;

@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import 'loading.scss';
 
-let Loading = React.createClass({
+let Loading = createReactClass({
+  displayName: 'Loading',
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -51,8 +53,7 @@ let Loading = React.createClass({
       </div>
     );
 
-  }
-
+  },
 });
 
 export default Loading;

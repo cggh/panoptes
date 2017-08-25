@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import _some from 'lodash.some';
 import _filter from 'lodash.filter';
 
@@ -17,7 +18,9 @@ import TablePlotActions from 'TablePlotActions';
 import MapActions from 'Map/MapActions';
 import TreeWithActions from 'containers/TreeWithActions';
 
-let ViewList = React.createClass({
+let ViewList = createReactClass({
+  displayName: 'ViewList',
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -93,7 +96,7 @@ let ViewList = React.createClass({
                     onClick={hasTrees ? (e) => this.handleOpen(e, <TreeWithActions />) : () => null}/>
       </List>
     );
-  }
+  },
 });
 
 export default ViewList;

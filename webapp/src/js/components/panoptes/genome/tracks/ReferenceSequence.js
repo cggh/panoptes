@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -25,7 +26,9 @@ const SEQ_LOOKUP = {
   103: 'G'
 };
 
-let ReferenceSequence = React.createClass({
+let ReferenceSequence = createReactClass({
+  displayName: 'ReferenceSequence',
+
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -278,18 +281,15 @@ let ReferenceSequence = React.createClass({
         <canvas ref="canvas" width={width - sideWidth} height={HEIGHT}/>
       </ChannelWithConfigDrawer>
     );
-  }
-
+  },
 });
 
-let Legend = React.createClass({
+class Legend extends React.Component {
+  state = {seq:''};
+
   shouldComponentUpdate(nextProps, nextState) {
     return nextState.seq !== this.state.seq;
-  },
-
-  getInitialState() {
-    return {seq:''};
-  },
+  }
 
   render() {
     return <div className="legend">
@@ -316,6 +316,6 @@ let Legend = React.createClass({
 
     </div>;
   }
-});
+}
 
 export default ReferenceSequence;
