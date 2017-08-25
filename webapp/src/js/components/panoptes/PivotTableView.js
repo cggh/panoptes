@@ -520,7 +520,7 @@ let PivotTableView = createReactClass({
                       value={rowHeading === '__NULL__' ? null : rowHeading}/>}
                 </TableHeaderColumn>
                 {uniqueColumns.map((columnHeading) =>
-                  <TableRowColumn style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}>
+                  <TableRowColumn key={columnHeading} style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}>
                     {dataByColumnRow[columnHeading][rowHeading].displayValue.toLocaleString()}
                   </TableRowColumn>
                 )}
