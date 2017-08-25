@@ -53,7 +53,7 @@ let SelectRow = createReactClass({
         this.getFlux().actions.session.popupOpen(<DataItem primKey={v} table={table}>{views}</DataItem>);
       }}>
         {_map(data, (row) =>
-          <MenuItem value={row[tableConfig.primKey]} primaryText={
+          <MenuItem key={row[tableConfig.primKey]} value={row[tableConfig.primKey]} primaryText={
             <ItemTemplate
               table={table}
               primKey={row[tableConfig.primKey]}

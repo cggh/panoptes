@@ -37,7 +37,7 @@ let SelectComponent = createReactClass({
         this.getFlux().actions.session.popupOpen(filterChildren(this, React.Children.toArray(v.props.children)));
       }}>
         {_map(children, (row) =>
-          <MenuItem value={row} primaryText={row.props.label}/>)}
+          <MenuItem key={row} value={row} primaryText={row.props.label}/>)}
       </SelectField>;
   },
 });
