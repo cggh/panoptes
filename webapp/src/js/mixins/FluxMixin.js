@@ -1,6 +1,6 @@
-import Fluxxor from 'fluxxor';
+import {FluxMixin as FM}  from 'fluxxor';
 import React from 'react';
-let FluxMixin = Fluxxor.FluxMixin(React);
+let FluxMixin = FM(React);
 
 FluxMixin.componentWillMount = function() {
   //As in this app we use a single flux instance we can fix it on init

@@ -6,7 +6,7 @@ const history = createHistory();
 import React from 'react'; //eslint-disable-line no-unused-vars
 import ReactDOM from 'react-dom';
 
-import Fluxxor from 'fluxxor';
+import {Flux} from 'fluxxor';
 import Immutable from 'immutable';
 import Panoptes from 'components/Panoptes.js';
 import Loading from 'components/ui/Loading.js';
@@ -172,7 +172,7 @@ if (dataset) {
         api: APIActions
       };
 
-      let flux = new Fluxxor.Flux(stores, actions);
+      let flux = new Flux(stores, actions);
 
       flux.setDispatchInterceptor((action, dispatch) =>
         ReactDOM.unstable_batchedUpdates(() =>
