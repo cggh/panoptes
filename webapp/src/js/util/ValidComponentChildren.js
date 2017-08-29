@@ -11,5 +11,5 @@ function map(children, func, context) {
 
 
 export default {
-  map: map
+  map
 };

@@ -3,7 +3,7 @@ import _each from 'lodash.foreach';
 let StoreWatchMixin = function() {
   let storeNames = Array.prototype.slice.call(arguments);
   return {
-    componentDidMount: function() {
+    componentDidMount() {
       if (!this.props.flux && (!this.context || !this.context.flux)) {
         let namePart = this.constructor.displayName ? ` of ${this.constructor.displayName}` : '';
         throw new Error(`Could not find flux on this.props or this.context${namePart}`);
@@ -24,7 +24,7 @@ let StoreWatchMixin = function() {
       });
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount() {
       let flux = this.props.flux || this.context.flux;
       this.mounted = false;
       _each(storeNames, (store) => {
@@ -32,7 +32,7 @@ let StoreWatchMixin = function() {
       });
     },
 
-    getInitialState: function() {
+    getInitialState() {
       return this.getStateFromFlux();
     }
   };

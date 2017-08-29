@@ -267,7 +267,7 @@ let MapActions = createReactClass({
 
       let overlayLayerProps = {
         attribution: overlayLayerConfig.attribution,
-        bounds: bounds,
+        bounds,
         maxNativeZoom: overlayLayerConfig.maxNativeZoom,
         opacity: overlayLayerConfig.opacity
       };

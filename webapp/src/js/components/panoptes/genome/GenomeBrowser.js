@@ -185,7 +185,7 @@ let GenomeBrowser = createReactClass({
     start = pos - (newWidth * fracX);
     end = pos + (newWidth * (1 - fracX));
     [start, end] = this.scaleClamp(start, end, fracX);
-    this.props.setProps({start: start, end: end});
+    this.props.setProps({start, end});
   },
 
   handleMouseWheel(e) {
@@ -233,7 +233,7 @@ let GenomeBrowser = createReactClass({
       // });
       this.nextSpringConfig = NO_SPRING;
     }
-    this.props.setProps({start: start, end: end});
+    this.props.setProps({start, end});
   },
 
   handleChangeLoadStatus(status) {
@@ -336,12 +336,12 @@ let GenomeBrowser = createReactClass({
                   this.actualStart = start;
                   this.actualEnd = end;
                   let trackProps = {
-                    chromosome: chromosome,
-                    start: start,
-                    end: end,
-                    width: width,
-                    sideWidth: sideWidth,
-                    hoverPos: hoverPos,
+                    chromosome,
+                    start,
+                    end,
+                    width,
+                    sideWidth,
+                    hoverPos,
                     onChangeLoadStatus: this.handleChangeLoadStatus,
                     onChangeHoverPos: this.handleHover
                   };

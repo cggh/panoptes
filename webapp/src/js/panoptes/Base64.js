@@ -16,7 +16,7 @@ let Base64 = {
   _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=',
 
   // public method for encoding
-  encode: function(input) {
+  encode(input) {
     let output = '';
     let chr1, chr2, chr3, enc1, enc2, enc3, enc4;
     let i = 0;
@@ -50,7 +50,7 @@ let Base64 = {
   },
 
   // public method for decoding
-  decode: function(input) {
+  decode(input) {
     let output = '';
     let chr1, chr2, chr3;
     let enc1, enc2, enc3, enc4;
@@ -87,7 +87,7 @@ let Base64 = {
   },
 
   // private method for UTF-8 encoding
-  _utf8Encode: function(string) {
+  _utf8Encode(string) {
     string = string.replace(/\r\n/g, '\n');
     let utftext = '';
 
@@ -112,7 +112,7 @@ let Base64 = {
   },
 
   // private method for UTF-8 decoding
-  _utf8Decode: function(utftext) {
+  _utf8Decode(utftext) {
     let string = '';
     let i = 0;
     let c, c2, c3;

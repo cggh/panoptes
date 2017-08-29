@@ -49,7 +49,7 @@ let Copy = createReactClass({
       selectedContent: '',
       title: '',
       OKButtonLabel: 'OK',
-      onOK: function() {}
+      onOK() {}
     };
   },
 

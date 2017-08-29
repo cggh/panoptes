@@ -30,7 +30,7 @@ let Alert = createReactClass({
     return {
       message: '',
       OKButtonLabel: 'OK',
-      onOK: function() {}
+      onOK() {}
     };
   },
 

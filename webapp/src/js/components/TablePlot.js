@@ -95,7 +95,7 @@ let TablePlot = createReactClass({
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.id,
-        columns: columns,
+        columns,
         query: this.getDefinedQuery(query, table),
         transpose: false
       };

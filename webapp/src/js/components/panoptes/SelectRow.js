@@ -83,8 +83,8 @@ SelectRow = withAPIData(SelectRow, ({config, props}) => {
       args: resolveJoins({
         database: config.dataset,
         table: queryTable || table,
-        columns: columns,
-        query: query,
+        columns,
+        query,
         transpose: true,
         distinct: true
       }, config)

@@ -60,7 +60,7 @@ let DataItemActions = createReactClass({
       )
     )
       .then((data) => {
-        this.setState({data: data});
+        this.setState({data});
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)

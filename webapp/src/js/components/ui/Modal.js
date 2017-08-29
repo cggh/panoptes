@@ -22,7 +22,7 @@ let Modal = createReactClass({
 
   getDefaultProps() {
     return {
-      onClose: function() {
+      onClose() {
       },
       uncloseable: false,
       visible: true
@@ -67,7 +67,7 @@ let Modal = createReactClass({
     }
   },
 
-  render: function() {
+  render() {
     let {visible, uncloseable, children, onClose, ...other} = this.props;
     let {icon, title} = this.state;
 
@@ -75,7 +75,7 @@ let Modal = createReactClass({
       return null;
     let classes = {
       modal: true,
-      visible: visible
+      visible
     };
 
     let hotKeysKeyMap = {

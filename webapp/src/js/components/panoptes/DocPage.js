@@ -102,17 +102,17 @@ let DocPage = createReactClass({
     let inTitle = false;
     let title = 'Untitled';
     const parser = new htmlparser.Parser({
-      onopentag: function(tagname, attribs) {
+      onopentag(tagname, attribs) {
         if (tagname === 'title') {
           inTitle = true;
         }
       },
-      ontext: function(text) {
+      ontext(text) {
         if (inTitle) {
           title = text;
         }
       },
-      onclosetag: function(tagname) {
+      onclosetag(tagname) {
         if (tagname === 'title') {
           inTitle = false;
         }

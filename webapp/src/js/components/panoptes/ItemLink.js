@@ -26,7 +26,7 @@ let ItemLink = createReactClass({
     if (!middleClick) {
       e.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: table, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table, primKey: primKey.toString(), switchTo: !middleClick});
   },
 
   // TODO: primKey might need formatting (using panoptes/Formatter) but would need property.isBoolean, etc.

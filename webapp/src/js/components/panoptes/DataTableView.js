@@ -219,7 +219,7 @@ let DataTableView = createReactClass({
     this.setState({showableRowsCount: size.height ? Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) : 0});
   },
 
-  componentDidUpdate: function(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.props.onShowableRowsCountChange && prevState.showableRowsCount !== this.state.showableRowsCount) {
       this.forceFetch();
       this.props.onShowableRowsCountChange(this.state.showableRowsCount);
@@ -368,7 +368,7 @@ let DataTableView = createReactClass({
                             textAlign: alignment,
                             width: this.calcColumnWidthPx(column),
                             height: `${ROW_HEIGHT}px`,
-                            background: background
+                            background
                           }}>
                           <PropertyCell prop={columnData} value={cellData}/>
                         </div>

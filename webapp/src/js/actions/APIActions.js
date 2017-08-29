@@ -32,7 +32,7 @@ let APIActions = {
             autoDismiss: 0,
             action: {
               label: 'Open admin',
-              callback: function() {
+              callback() {
                 window.open('admin.html', '_blank'); // FIXME: Cannot GET /admin.html
               }
             }

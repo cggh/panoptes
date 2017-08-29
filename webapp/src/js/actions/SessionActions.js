@@ -80,8 +80,8 @@ let SessionActions = {
   },
   tableQueryUsed(table, query) {
     this.dispatch(SESSION.TABLE_QUERY_USED, {
-      table: table,
-      query: query
+      table,
+      query
     });
   },
   appResize() {

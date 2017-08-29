@@ -142,7 +142,7 @@ let NumericalSummaryTrack = createReactClass({
       let APIargs = {
         database: this.config.dataset,
         table,
-        columns: columns,
+        columns,
         query: SQL.WhereClause.encode(query),
         groupBy: ['window'],
         orderBy: [['asc', 'window']],

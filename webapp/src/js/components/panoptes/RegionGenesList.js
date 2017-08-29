@@ -66,9 +66,9 @@ let RegionGenesList = createReactClass({
 
     let APIargs = {
       database: this.config.dataset,
-      chromosome: chromosome,
-      startPosition: startPosition,
-      endPosition: endPosition
+      chromosome,
+      startPosition,
+      endPosition
     };
 
     requestContext.request((componentCancellation) =>

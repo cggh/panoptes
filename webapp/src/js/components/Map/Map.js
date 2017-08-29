@@ -240,12 +240,12 @@ let Map = createReactClass({
     // NB: if bounds is undefined then it will not be regarded as a prop (and therefore not an invalid prop).
     let commonMapProps = {
       bounds: center && (zoom !== undefined) ? undefined : bounds,
-      center: center,
+      center,
       loadingControl: true,
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: {height: '100%'},
       ref: (ref) => this.map = ref,
-      zoom: zoom,
+      zoom,
       zoomAnimation: false
     };
 

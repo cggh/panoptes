@@ -29,7 +29,7 @@ let PropertyList = createReactClass({
     className: PropTypes.string
   },
 
-  render: function() {
+  render() {
 
     let {propertiesData, className, table} = this.props;
 

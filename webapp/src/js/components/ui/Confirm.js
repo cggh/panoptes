@@ -34,8 +34,8 @@ let Confirm = createReactClass({
       message: 'Are you sure?',
       cancelButtonLabel: 'Cancel',
       confirmButtonLabel: 'Confirm',
-      onCancel: function() {},
-      onConfirm: function() {}
+      onCancel() {},
+      onConfirm() {}
     };
   },
 

@@ -81,7 +81,7 @@ let ListView = createReactClass({
       database: this.config.dataset,
       table: tableConfig.id,
       orderBy: [['asc', this.config.tablesById[table].primKey]],
-      columns: columns,
+      columns,
       start: 0,
       transpose: true
     };
@@ -125,7 +125,7 @@ let ListView = createReactClass({
     this.props.onSelect(primKey);
   },
 
-  componentDidUpdate: function(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.props.onRowsCountChange && prevState.rowsCount !== this.state.rowsCount) {
       this.props.onRowsCountChange(this.state.rowsCount);
     }

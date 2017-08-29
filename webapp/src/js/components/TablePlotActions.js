@@ -76,7 +76,7 @@ let TablePlotActions = createReactClass({
   },
 
   handleQueryPick(query) {
-    this.props.setProps({query: query});
+    this.props.setProps({query});
   },
 
   handleChangeTable(table) {

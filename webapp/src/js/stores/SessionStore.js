@@ -122,7 +122,7 @@ let SessionStore = createStore({
       this.state = this.state.updateIn(['popups', 'components'], (list) => list.push(compId));
     }
     if (switchTo) {
-      this.popupFocus({compId: compId});
+      this.popupFocus({compId});
     }
 
     if (!this.state.getIn(['popups', 'state', compId])) {
@@ -251,7 +251,7 @@ let SessionStore = createStore({
   tableQueryUsed({table, query}) {
     // Remove the query from the list, if it already exists.
     // Put the query at the top of the list.
-    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => (!(usedTableQuery.get('table') === table && usedTableQuery.get('query') === query))).unshift(Immutable.fromJS({table: table, query: query})));
+    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => (!(usedTableQuery.get('table') === table && usedTableQuery.get('query') === query))).unshift(Immutable.fromJS({table, query})));
 
   },
 

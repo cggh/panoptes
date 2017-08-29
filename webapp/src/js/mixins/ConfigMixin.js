@@ -3,7 +3,7 @@
 //Note that this mixin requires that FluxMixin also be used, unless flux is passed as a prop.
 
 let ConfigMixin = {
-  componentWillMount: function() {
+  componentWillMount() {
     if (!this.props.flux && (!this.context || !this.context.flux)) {
       let namePart = this.constructor.displayName ? ` of ${this.constructor.displayName}` : '';
       throw new Error(`Could not find flux on this.props or this.context${namePart}`);
@@ -34,12 +34,12 @@ let ConfigMixin = {
 
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     let flux = this.props.flux || (this.context && this.context.flux);
     flux.store('ConfigStore').removeListener('change', this._setConfigFromFlux);
   },
 
-  _setConfigFromFlux: function() {
+  _setConfigFromFlux() {
     let flux = this.props.flux || (this.context && this.context.flux);
     this.config = flux.store('ConfigStore').getState();
     if (this.onConfigChange) this.onConfigChange();

@@ -79,7 +79,7 @@ let DatasetImportStatusItemView = createReactClass({
       });
   },
 
-  render: function() {
+  render() {
 
     let {loadStatus, logContent} = this.state;
 

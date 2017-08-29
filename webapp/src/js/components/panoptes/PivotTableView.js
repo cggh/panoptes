@@ -148,7 +148,7 @@ let PivotTableView = createReactClass({
     let queryAPIargs = {
       database: this.config.dataset,
       table: this.config.tablesById[table].id,
-      columns: columns,
+      columns,
       query: this.getDefinedQuery(query, table),
       orderBy: order,
       groupBy,
@@ -467,13 +467,14 @@ let PivotTableView = createReactClass({
                       })}
                       style={{
                         // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
-                        background: background
+                        background
                       }}
                       onClick={() => this.handleOrderChange('column', columnHeading)}
                       prefix={icon}
                       prop={colPropConfig}
                       value={columnHeading === '__NULL__' ? null : columnHeading}/>}
-                </TableHeaderColumn>);
+                </TableHeaderColumn>
+              );
             })}
           </TableRow>
         </TableHeader>
@@ -512,7 +513,7 @@ let PivotTableView = createReactClass({
                       })}
                       style={{
                         // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
-                        background: background
+                        background
                       }}
                       onClick={() => this.handleOrderChange('row', rowHeading)}
                       prefix={icon}
