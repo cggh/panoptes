@@ -52,9 +52,9 @@ let PieChart = createReactClass({
 
     for (let i = 0, len = chartData.length; i < len; i++) {
 
-      let title = (name === '' ? '' : name + '\n') + chartData[i].name + ': ' + chartData[i].value;
+      let title = `${(name === '' ? '' : `${name}\n`) + chartData[i].name}: ${chartData[i].value}`;
       if (hideValues) {
-        title = (name === '' ? '' : name + '\n') + chartData[i].name;
+        title = (name === '' ? '' : `${name}\n`) + chartData[i].name;
       }
 
       sectorsData.push({color: chartData[i].color, title});

@@ -379,12 +379,12 @@ let DataTableWithActions = createReactClass({
         <span>
           <Icon className="pointer icon"
             name="fast-backward"
-            title={'First ' + pageSizeInRows + ' rows'}
+            title={`First ${pageSizeInRows} rows`}
             onClick={this.handleFirstPage}
           />
           <Icon className="pointer icon"
             name="step-backward"
-            title={'Previous ' + pageSizeInRows + ' rows'}
+            title={`Previous ${pageSizeInRows} rows`}
             onClick={this.handlePreviousPage}
           />
         </span>
@@ -395,11 +395,11 @@ let DataTableWithActions = createReactClass({
         <span>
           <Icon className="pointer icon disabled"
             name="fast-backward"
-            title={'Showing first ' + fetchedRowsCount + ' rows'}
+            title={`Showing first ${fetchedRowsCount} rows`}
           />
           <Icon className="pointer icon disabled"
             name="step-backward"
-            title={'Showing first ' + fetchedRowsCount + ' rows'}
+            title={`Showing first ${fetchedRowsCount} rows`}
           />
         </span>
       );
@@ -429,12 +429,12 @@ let DataTableWithActions = createReactClass({
         <span>
           <Icon className="pointer icon"
             name="step-forward"
-            title={'Next ' + pageSizeInRows + ' rows'}
+            title={`Next ${pageSizeInRows} rows`}
             onClick={this.handleNextPage}
           />
           <Icon className="pointer icon"
             name="fast-forward"
-            title={'Last ' + pageSizeInRows + ' rows'}
+            title={`Last ${pageSizeInRows} rows`}
             onClick={this.handleLastPage}
           />
         </span>
@@ -445,11 +445,11 @@ let DataTableWithActions = createReactClass({
         <span>
           <Icon className="pointer icon disabled"
             name="step-forward"
-            title={'Showing last ' + fetchedRowsCount + ' rows'}
+            title={`Showing last ${fetchedRowsCount} rows`}
           />
           <Icon className="pointer icon disabled"
             name="fast-forward"
-            title={'Showing last ' + pageSizeInRows + ' rows'}
+            title={`Showing last ${pageSizeInRows} rows`}
           />
         </span>
       );

@@ -76,7 +76,7 @@ let DocPage = createReactClass({
     const {dataset} = this.config;
     requestContext.request((componentCancellation) =>
       LRUCache.get(
-        'staticContent' + path,
+        `staticContent${path}`,
         (cacheCancellation) =>
           API.staticContent({cancellation: cacheCancellation, url: `/panoptes/Docs/${dataset}/${path}`}),
         componentCancellation

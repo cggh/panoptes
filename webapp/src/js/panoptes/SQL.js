@@ -229,7 +229,7 @@ SQL.WhereClause.getFieldComparisonOperatorInfo = function(ID) {
     if (op.ID == ID)
       return op;
   }
-  throw Error('Invalid field comparison operator id ' + ID);
+  throw Error(`Invalid field comparison operator id ${ID}`);
 };
 
 //Returns a list of all field operators that are compatible with an SQL column data type (as defined in SQL.DataTypes)
@@ -254,7 +254,7 @@ SQL.WhereClause.CompareFixed = function(icolname, icomptype, ivalue) {
     if (SQL.WhereClause._fieldComparisonOperators[opnr].ID == icomptype)
       fnd = true;
   if (!fnd)
-    throw Error('Invalid comparison where clause statement: ' + icomptype);
+    throw Error(`Invalid comparison where clause statement: ${icomptype}`);
   that.whcClass = 'comparefixed';
   that.isCompound = false;
   that.ColName = icolname;
@@ -264,7 +264,7 @@ SQL.WhereClause.CompareFixed = function(icolname, icomptype, ivalue) {
   that.toQueryDisplayString = function(queryData) {
     let displayValue = queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValue);
     if (displayValue === '') displayValue = '""';
-    return queryData.fieldInfoMap[that.ColName].name + ' ' + that.type + ' ' + displayValue;
+    return `${queryData.fieldInfoMap[that.ColName].name} ${that.type} ${displayValue}`;
   };
 
   return that;
@@ -284,7 +284,7 @@ SQL.WhereClause.CompareBetween = function(icolname, ivalueMin, ivalueMax) {
   that.type = 'between';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' between ' + queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValueMin) + ' and ' + queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValueMax);
+    return `${queryData.fieldInfoMap[that.ColName].name} between ${queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValueMin)} and ${queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValueMax)}`;
   };
 
   return that;
@@ -306,7 +306,7 @@ SQL.WhereClause.EqualsField = function() {
   that.type = '=FIELD';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' = ' + queryData.fieldInfoMap[that.ColName2].name;
+    return `${queryData.fieldInfoMap[that.ColName].name} = ${queryData.fieldInfoMap[that.ColName2].name}`;
   };
 
   return that;
@@ -328,7 +328,7 @@ SQL.WhereClause.DiffersField = function() {
   that.type = '<>FIELD';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' <> ' + queryData.fieldInfoMap[that.ColName2].name;
+    return `${queryData.fieldInfoMap[that.ColName].name} <> ${queryData.fieldInfoMap[that.ColName2].name}`;
   };
 
   return that;
@@ -355,7 +355,7 @@ SQL.WhereClause.CompareField = function(icomptype) {
   that.Offset = 0.0;
 
   that.toQueryDisplayString = function(queryData, level) {
-    let str = queryData.fieldInfoMap[that.ColName].name + ' ' + that.type[0] + ' ';
+    let str = `${queryData.fieldInfoMap[that.ColName].name} ${that.type[0]} `;
     if (Math.abs(that.Factor - 1) > 1.0e-9) {
       let factorStr;
       if (that.Factor == 0)
@@ -365,14 +365,14 @@ SQL.WhereClause.CompareField = function(icomptype) {
         let decimCount = Math.max(0, Math.round(4 - Math.log(Math.abs(factorVal)) / Math.LN10));
         factorStr = factorVal.toFixed(decimCount);
       }
-      str += factorStr + 'x';
+      str += `${factorStr}x`;
     }
     str += queryData.fieldInfoMap[that.ColName2].name;
     let offsetStr = queryData.fieldInfoMap[that.ColName].toDisplayString(Math.abs(that.Offset));
     if (that.Offset > 0)
-      str += '+' + offsetStr;
+      str += `+${offsetStr}`;
     if (that.Offset < 0)
-      str += '-' + offsetStr;
+      str += `-${offsetStr}`;
     return str;
   };
 
@@ -396,7 +396,7 @@ SQL.WhereClause.IsPresent = function(colName) {
   that.type = 'ISPRESENT';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' is present';
+    return `${queryData.fieldInfoMap[that.ColName].name} is present`;
   };
   return that;
 };
@@ -415,7 +415,7 @@ SQL.WhereClause.IsAbsent = function() {
   that.type = 'ISABSENT';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' is absent';
+    return `${queryData.fieldInfoMap[that.ColName].name} is absent`;
   };
   return that;
 };
@@ -434,7 +434,7 @@ SQL.WhereClause.IsNotEmptyStr = function() {
   that.type = 'ISNOTEMPTYSTR';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' is present';
+    return `${queryData.fieldInfoMap[that.ColName].name} is present`;
   };
   return that;
 };
@@ -453,7 +453,7 @@ SQL.WhereClause.IsEmptyStr = function() {
   that.type = 'ISEMPTYSTR';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' is absent';
+    return `${queryData.fieldInfoMap[that.ColName].name} is absent`;
   };
   return that;
 };
@@ -478,7 +478,7 @@ SQL.WhereClause.InSubset = function() {
     let subsetName = '[Unknown]';
     if (queryData.subsetMap[this.Subset])
       subsetName = queryData.subsetMap[this.Subset].name;
-    return 'in subset "' + subsetName + '"';
+    return `in subset "${subsetName}"`;
   };
   return that;
 };
@@ -501,7 +501,7 @@ SQL.WhereClause.NoteContains = function() {
   that.NoteText = '';
 
   that.toQueryDisplayString = function(queryData, level) {
-    return 'has note containing "' + this.NoteText + '"';
+    return `has note containing "${this.NoteText}"`;
   };
   return that;
 };
@@ -550,7 +550,7 @@ SQL.WhereClause.whcClassGenerator['compound'] = function(args) {
 };
 SQL.WhereClause.Compound = function(icompoundtype, components) {
   if ((icompoundtype != 'AND') && (icompoundtype != 'OR'))
-    throw Error('Invalid compound where clause statement: ' + icompoundtype);
+    throw Error(`Invalid compound where clause statement: ${icompoundtype}`);
   let that = {};
   that.whcClass = 'compound';
   that.isCompound = true;
@@ -584,13 +584,13 @@ SQL.WhereClause.Compound = function(icompoundtype, components) {
     that.components.forEach((comp, idx) =>
       compstrs.push(comp.toQueryDisplayString(queryData, level + 1))
     );
-    let joinstr = ' ' + that.type + ' ';
+    let joinstr = ` ${that.type} `;
     //Taken out as we don't put HTML in query strings anymore with React
     //if (level == 0)
     //  joinstr = ' <b>' + that.type + '</b> ';
     let str = compstrs.join(joinstr);
-    if (level == 1) str = '[' + str + ']';
-    if (level > 1) str = '(' + str + ')';
+    if (level == 1) str = `[${str}]`;
+    if (level > 1) str = `(${str})`;
     return str;
   };
 

@@ -26,7 +26,7 @@ let TooltipEllipsis = createReactClass({
 
   render() {
     return (
-      <span className={this.props.className + ' tooltip-ellipsis'} ref={(node) => this.element = node}>
+      <span className={`${this.props.className} tooltip-ellipsis`} ref={(node) => this.element = node}>
         {this.props.children}
       </span>
     );

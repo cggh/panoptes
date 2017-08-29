@@ -33,8 +33,8 @@ if (!attachEvent) {
       expandChild = expand.firstElementChild;
     contract.scrollLeft = contract.scrollWidth;
     contract.scrollTop = contract.scrollHeight;
-    expandChild.style.width = expand.offsetWidth + 1 + 'px';
-    expandChild.style.height = expand.offsetHeight + 1 + 'px';
+    expandChild.style.width = `${expand.offsetWidth + 1}px`;
+    expandChild.style.height = `${expand.offsetHeight + 1}px`;
     expand.scrollLeft = expand.scrollWidth;
     expand.scrollTop = expand.scrollHeight;
   };
@@ -73,10 +73,10 @@ if (!attachEvent) {
 
     if ( animation === false ) {
       for ( var i = 0; i < domPrefixes.length; i++ ) {
-        if ( elm.style[ domPrefixes[i] + 'AnimationName' ] !== undefined ) {
+        if ( elm.style[ `${domPrefixes[i]}AnimationName` ] !== undefined ) {
           pfx = domPrefixes[ i ];
-          animationstring = pfx + 'Animation';
-          keyframeprefix = '-' + pfx.toLowerCase() + '-';
+          animationstring = `${pfx}Animation`;
+          keyframeprefix = `-${pfx.toLowerCase()}-`;
           animationstartevent = startEvents[ i ];
           animation = true;
           break;
@@ -86,16 +86,14 @@ if (!attachEvent) {
   }
 
   var animationName = 'resizeanim';
-  var animationKeyframes = '@' + keyframeprefix + 'keyframes ' + animationName + ' { from { opacity: 0; } to { opacity: 0; } } ';
-  var animationStyle = keyframeprefix + 'animation: 1ms ' + animationName + '; ';
+  var animationKeyframes = `@${keyframeprefix}keyframes ${animationName} { from { opacity: 0; } to { opacity: 0; } } `;
+  var animationStyle = `${keyframeprefix}animation: 1ms ${animationName}; `;
 }
 
 function createStyles() {
   if (!stylesCreated) {
     //opacity:0 works around a chrome bug https://code.google.com/p/chromium/issues/detail?id=286360
-    var css = (animationKeyframes ? animationKeyframes : '') +
-        '.resize-triggers { ' + (animationStyle ? animationStyle : '') + 'visibility: hidden; opacity: 0; } ' +
-        '.resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
+    var css = `${animationKeyframes ? animationKeyframes : ''}.resize-triggers { ${animationStyle ? animationStyle : ''}visibility: hidden; opacity: 0; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }`,
       head = document.head || document.getElementsByTagName('head')[0],
       style = document.createElement('style');
 
@@ -120,8 +118,7 @@ let addResizeListener = function(element, fn) {
       element.__resizeLast__ = {};
       element.__resizeListeners__ = [];
       (element.__resizeTriggers__ = document.createElement('div')).className = 'resize-triggers';
-      element.__resizeTriggers__.innerHTML = '<div class="expand-trigger"><div></div></div>' +
-        '<div class="contract-trigger"></div>';
+      element.__resizeTriggers__.innerHTML = '<div class="expand-trigger"><div></div></div><div class="contract-trigger"></div>';
       element.appendChild(element.__resizeTriggers__);
       polyfill.resetTriggers(element);
       element.addEventListener('scroll', polyfill.scrollListener, true);

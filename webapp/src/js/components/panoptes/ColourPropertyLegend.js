@@ -47,7 +47,7 @@ class ColourPropertyLegend extends React.Component {
       let label = data[i][labelProperty];
       let colour = data[i][colourProperty];
 
-      let legendElement = <LegendElement key={'LegendElement_' + i} name={label !== null ? label : 'NULL'} colour={colourFunc(colour)} />;
+      let legendElement = <LegendElement key={`LegendElement_${i}`} name={label !== null ? label : 'NULL'} colour={colourFunc(colour)} />;
 
       legendElements.push(legendElement);
 

@@ -12,7 +12,7 @@
  *************************************************************************************************************************************/
 
 function checkIsNumber(value) {
-  if (typeof value != 'number') throw Error('Expected number got' + (typeof value));
+  if (typeof value != 'number') throw Error(`Expected number got${typeof value}`);
 }
 
 let DataDecoders = {};
@@ -141,7 +141,7 @@ DataDecoders.ValueListDecoder = function() {
       let vals = data['Data'].split('~');
       return vals;
     }
-    throw Error('Unknown value list encoding: ' + data['Encoding']);
+    throw Error(`Unknown value list encoding: ${data['Encoding']}`);
   };
 
   return that;
@@ -333,7 +333,7 @@ DataDecoders.Encoder.Create = function(info) {
     return DataDecoders.Encoder.BooleanListB64(info);
   if (info['ID'] == 'MultiCatCount')
     return DataDecoders.Encoder.MultiCatCount(info);
-  throw Error('Invalid encoder id ' + info['ID']);
+  throw Error(`Invalid encoder id ${info['ID']}`);
 };
 
 

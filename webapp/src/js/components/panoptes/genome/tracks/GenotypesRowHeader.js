@@ -49,7 +49,7 @@ let GenotypesRowHeader = createReactClass({
 
     const showIndividualLines = rowHeight > 10;
     const fontSize = Math.min(14, rowHeight - 1);
-    ctx.font = '' + (fontSize) + 'px Roboto';
+    ctx.font = `${fontSize}px Roboto`;
     ctx.fillStyle = 'rgb(0,0,0)';
     ctx.strokeStyle = 'rgba(0,0,0,0.2)';
     ctx.lineWidth = 1;
@@ -81,7 +81,7 @@ let GenotypesRowHeader = createReactClass({
         bottomLineDrawn = true;
         if (yposBottom > yposTop + 5) {
           let fontSize = Math.min(12, yposBottom - yposTop - 1);
-          ctx.font = '' + (fontSize) + 'px Roboto';
+          ctx.font = `${fontSize}px Roboto`;
           let textYPos = (yposBottom + yposTop) / 2 - 1 + fontSize / 2;
           ctx.fillText(labelName, 2, textYPos);
         }

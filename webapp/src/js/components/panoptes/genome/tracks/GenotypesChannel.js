@@ -322,8 +322,8 @@ let GenotypesChannel = createReactClass({
 
   calculatedDerivedProperties(block) {
     let config = this.config.twoDTablesById[this.props.table].showInGenomeBrowser;
-    if (config.call && block['2D_' + config.call]) {
-      let callMatrix = block['2D_' + config.call];
+    if (config.call && block[`2D_${config.call}`]) {
+      let callMatrix = block[`2D_${config.call}`];
       let callMatrixArray = callMatrix.array;
       let ploidy = callMatrix.shape[2] || 1;
       let callSummaryMatrix = new Int8Array(callMatrixArray.length / ploidy);
@@ -356,8 +356,8 @@ let GenotypesChannel = createReactClass({
       };
       block['2D__call'] = callSummaryMatrix;
     }
-    if (config.alleleDepth && block['2D_' + config.alleleDepth]) {
-      let depthMatrix = block['2D_' + config.alleleDepth];
+    if (config.alleleDepth && block[`2D_${config.alleleDepth}`]) {
+      let depthMatrix = block[`2D_${config.alleleDepth}`];
       let depthMatrixArray = depthMatrix.array;
       let arity = depthMatrix.shape[2] || 1;
       let fractionalMatrix = new Uint8ClampedArray(depthMatrixArray.length / arity);
@@ -547,49 +547,52 @@ let GenotypesChannel = createReactClass({
         <Motion style={colWidthSpring} defaultStyle={initColWidthSpring}>
           {(interpolated) => {
             let {colWidth} = interpolated;
-            return <Hammer onTap={this.handleClick}>
-              <div
-                ref={(node) => this.container = node}
-                className="genotypes-channel"
-                style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
-                onMouseOver={this.handleMouseOver}
-                onMouseMove={this.handleMouseMove}
-                onMouseOut={this.handleMouseOut}
-              >
-                <div style={{height: FAN_HEIGHT + 'px'}} />
-                <GenotypesTable
-                  table={table}
-                  rowData={rowData}
-                  dataBlocks={dataBlocks}
-                  layoutBlocks={layoutBlocks}
-                  width={width - sideWidth}
-                  height={rowHeight * numRows}
-                  start={start}
-                  end={end}
-                  colWidth={colWidth}
-                  cellColour={cellColour}
-                  cellAlpha={cellAlpha}
-                  cellHeight={cellHeight}
-                  rowHeight={rowHeight}
-                  hoverPos={hoverPos}
-                />
-                <GenotypesFan
-                  top={Math.min(rowHeight * numRows,
-                    Math.max(0, visibleTop))}
-                  genomicPositions={genomicPositions}
-                  layoutBlocks={layoutBlocks}
-                  dataBlocks={dataBlocks}
-                  width={width - sideWidth}
-                  height={FAN_HEIGHT}
-                  start={start}
-                  end={end}
-                  colWidth={colWidth}
-                  hoverPos={hoverPos}
-                />
-              </div>
-            </Hammer>;
+            return (
+              <Hammer onTap={this.handleClick}>
+                <div
+                  ref={(node) => this.container = node}
+                  className="genotypes-channel"
+                  style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
+                  onMouseOver={this.handleMouseOver}
+                  onMouseMove={this.handleMouseMove}
+                  onMouseOut={this.handleMouseOut}
+                >
+                  <div style={{height: `${FAN_HEIGHT}px`}} />
+                  <GenotypesTable
+                    table={table}
+                    rowData={rowData}
+                    dataBlocks={dataBlocks}
+                    layoutBlocks={layoutBlocks}
+                    width={width - sideWidth}
+                    height={rowHeight * numRows}
+                    start={start}
+                    end={end}
+                    colWidth={colWidth}
+                    cellColour={cellColour}
+                    cellAlpha={cellAlpha}
+                    cellHeight={cellHeight}
+                    rowHeight={rowHeight}
+                    hoverPos={hoverPos}
+                  />
+                  <GenotypesFan
+                    top={Math.min(rowHeight * numRows,
+                      Math.max(0, visibleTop))}
+                    genomicPositions={genomicPositions}
+                    layoutBlocks={layoutBlocks}
+                    dataBlocks={dataBlocks}
+                    width={width - sideWidth}
+                    height={FAN_HEIGHT}
+                    start={start}
+                    end={end}
+                    colWidth={colWidth}
+                    hoverPos={hoverPos}
+                  />
+                </div>
+              </Hammer>
+            );
           }}</Motion>
-      </ChannelWithConfigDrawer>);
+      </ChannelWithConfigDrawer>
+    );
   },
 });
 
@@ -650,7 +653,7 @@ const GenotypesControls = createReactClass({
     });
 
     let data = '';
-    data += '#Dataset: ' + this.config.dataset + '\r\n';
+    data += `#Dataset: ${this.config.dataset}\r\n`;
     data += `#Table: ${tableConfig.namePlural}${(cellColour == 'call' ? ' Calls' : ' Allele Depths')}\r\n`;
     data += `#${columnTableConfig.capNamePlural} filter: ${columnQueryAsString}\r\n`;
     data += `#${rowTableConfig.capNamePlural} filter: ${rowQueryAsString}\r\n`;
@@ -672,7 +675,7 @@ const GenotypesControls = createReactClass({
 
     const rowPrimaryKey = dataBlocks[0][`row_${rowTableConfig.primKey}`].array;
     for (var i = 0; i < rowPrimaryKey.length; i++)
-      data += rowPrimaryKey[i] + '\t';
+      data += `${rowPrimaryKey[i]}\t`;
     data += '\r\n';
 
     for (let b = 0; b < dataBlocks.length; ++b) {
@@ -685,7 +688,7 @@ const GenotypesControls = createReactClass({
       let positions = block[`col_${columnTableConfig.position}`].array;
       for (i = 0; i < positions.length; i++) {
         if (positions[i] >= start && positions[i] <= end) {
-          data += positions[i] + '\t';
+          data += `${positions[i]}\t`;
           for (let j = 0; j < rowPrimaryKey.length; j++) {
             for (let k = 0; k < ploidy; k++) {
               data += propArray[(i * numRows * ploidy) + (j * ploidy) + k];
@@ -701,11 +704,7 @@ const GenotypesControls = createReactClass({
 
     let blob = new Blob([data], {type: 'text/plain'});
     FileSaver.saveAs(blob,
-      this.config.dataset + '-' +
-      (cellColour == 'call' ? 'Calls' : ' Allele Depths') + '-' +
-      tableConfig.tableNamePlural + '-' +
-      chromosome + '_' +
-      Math.floor(start) + '-' + Math.ceil(end) + '.txt');
+      `${this.config.dataset}-${cellColour == 'call' ? 'Calls' : ' Allele Depths'}-${tableConfig.tableNamePlural}-${chromosome}_${Math.floor(start)}-${Math.ceil(end)}.txt`);
   },
 
   handleChangeRandomSubsetSize(rowRandomSubsetSize) {

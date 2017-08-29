@@ -39,7 +39,7 @@ let PercentMatching = createReactClass({
       return <span>div/0!</span>;
     } else {
       let p = Math.max(0, precisionFixed(0.05) - 2);
-      let f = format('.' + p + '%');
+      let f = format(`.${p}%`);
       return <span>{f(matching / all)}</span>;
     }
   },

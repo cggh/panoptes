@@ -71,7 +71,7 @@ if (providers !== undefined) {
         if (typeof variantConfig === 'string') {
           variant = variantConfig;
         }
-        let layerId = providerName + '.' + variantKeyName;
+        let layerId = `${providerName}.${variantKeyName}`;
         let {attribution, ext, format, maxZoom, minZoom} = options;
         if (attribution) {
           attribution = attributionReplacer(attribution);
@@ -79,7 +79,7 @@ if (providers !== undefined) {
         url = options.url || url; //Use url from top level if variant doesn't have it
 
         if (url === undefined) {
-          console.warn('URL could not be determined for map tile layer: ' + layerId);
+          console.warn(`URL could not be determined for map tile layer: ${layerId}`);
           continue;
         }
 

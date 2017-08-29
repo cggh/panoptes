@@ -234,10 +234,12 @@ let Side = createReactClass({
         <div>+ <a onClick={this.redirectedProps.onLegendToggle}>{n - 2} more</a></div>
       );
     }
-    return <div className="side-name">
-      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural + ':' : '')}</div>
-      <div style={{marginLeft: '-13px'}}>{trackNames}</div>
-    </div>;
+    return (
+      <div className="side-name">
+        <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? `${this.tableConfig().capNamePlural}:` : '')}</div>
+        <div style={{marginLeft: '-13px'}}>{trackNames}</div>
+      </div>
+    );
   },
 });
 

@@ -6,7 +6,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import _startsWith from 'lodash.startswith';
 
 const dynreq = require.context('../../../images', true);
-const dynamicRequire = (path) => dynreq('./' + path);
+const dynamicRequire = (path) => dynreq(`./${path}`);
 
 
 let Icon = createReactClass({

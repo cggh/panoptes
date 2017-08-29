@@ -169,7 +169,7 @@ let PieChartMarkersLayer = createReactClass({
       (componentCancellation) =>
         Promise.all([
           LRUCache.get(
-            'query' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+            `query${JSON.stringify(locationAPIargs)}`, (cacheCancellation) =>
               API.query({
                 cancellation: cacheCancellation,
                 ...locationAPIargs
@@ -177,7 +177,7 @@ let PieChartMarkersLayer = createReactClass({
             componentCancellation
           ),
           LRUCache.get(
-            'fetchSingleRecord' + JSON.stringify(chartAPIargs), (cacheCancellation) =>
+            `fetchSingleRecord${JSON.stringify(chartAPIargs)}`, (cacheCancellation) =>
               API.fetchSingleRecord({
                 cancellation: cacheCancellation,
                 ...chartAPIargs

@@ -148,7 +148,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
 
     if (markerSizeProperty !== undefined) {
       if (tableConfig.propertiesById[markerSizeProperty] === undefined) {
-        console.error('The specified markerSizeProperty ' + markerSizeProperty + ' was not found in the table ' + table);
+        console.error(`The specified markerSizeProperty ${markerSizeProperty} was not found in the table ${table}`);
       } else {
         locationColumns.push(markerSizeProperty);
       }
@@ -167,7 +167,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
         };
 
         return LRUCache.get(
-          'query' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+          `query${JSON.stringify(locationAPIargs)}`, (cacheCancellation) =>
             API.query({
               cancellation: cacheCancellation,
               ...locationAPIargs
@@ -200,7 +200,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
             chartDataTable: table,
             key: locationDataPrimKey,
             primKey: locationDataPrimKey,
-            name: locationTableConfig.propertiesById[locationPrimKeyProperty].name + ': ' + locationDataPrimKey,
+            name: `${locationTableConfig.propertiesById[locationPrimKeyProperty].name}: ${locationDataPrimKey}`,
             chartData: [],
             table,
             lat,
@@ -217,7 +217,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
             let value = data[i][propertyWithPrefix];
 
             let pieChartSector = {
-              name: locationTableConfig.propertiesById[propertyWithPrefix].name + ': ' + value,
+              name: `${locationTableConfig.propertiesById[propertyWithPrefix].name}: ${value}`,
               value,
               color: colourFunction(propertyWithPrefix)
             };
@@ -316,7 +316,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
 
                         return (
                           <ComponentMarker
-                            key={'ComponentMarker_' + i}
+                            key={`ComponentMarker_${i}`}
                             position={{lat: marker.lat, lng: marker.lng}}
                             onClick={!disableOnClickMarker ? (e) => this.handleClickClusterMarker(e, marker.primKey) : undefined}
                             zIndexOffset={0}
@@ -331,7 +331,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
                         (marker, i) =>
                           <Polyline
                             className="panoptes-table-markers-layer-polyline"
-                            key={'Polyline_' + i}
+                            key={`Polyline_${i}`}
                             positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
                           />
                       )

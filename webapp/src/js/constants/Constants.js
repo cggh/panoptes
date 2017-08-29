@@ -3,7 +3,7 @@ import _forOwn from 'lodash.forown';
 
 function nameSpace(namespace, obj) {
   let res = {};
-  _forOwn(obj, (key, val) => res[key] = namespace + '_' + val);
+  _forOwn(obj, (key, val) => res[key] = `${namespace}_${val}`);
   return res;
 }
 

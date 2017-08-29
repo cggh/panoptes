@@ -4,16 +4,16 @@ export default function resolveJoins(queryAPIargs, config) {
     for (let i = 0; i < queryAPIargs.joins.length; i++) {
       let join = queryAPIargs.joins[i];
       if (join.column.indexOf('.') === -1) {
-        join.column = queryAPIargs.table + '.' + join.column;
+        join.column = `${queryAPIargs.table}.${join.column}`;
       }
       if (join.foreignColumn.indexOf('.') === -1) {
-        join.foreignColumn = join.foreignTable + '.' + join.foreignColumn;
+        join.foreignColumn = `${join.foreignTable}.${join.foreignColumn}`;
       }
     }
     // Assume that unqualified columns in the list belong to queryAPIargs.table
     for (let i = 0; i < queryAPIargs.columns.length; i++) {
       if (queryAPIargs.columns[i].indexOf('.') === -1) {
-        queryAPIargs.columns[i] = queryAPIargs.table + '.' + queryAPIargs.columns[i];
+        queryAPIargs.columns[i] = `${queryAPIargs.table}.${queryAPIargs.columns[i]}`;
       }
     }
   } else {
@@ -39,8 +39,8 @@ export default function resolveJoins(queryAPIargs, config) {
           let join = {};
           join.type = '';
           join.foreignTable = relation.tableId;
-          join.foreignColumn = relation.tableId + '.' + relation.parentTable.primKey;
-          join.column = queryAPIargs.table + '.' + relation.childPropId;
+          join.foreignColumn = `${relation.tableId}.${relation.parentTable.primKey}`;
+          join.column = `${queryAPIargs.table}.${relation.childPropId}`;
           queryAPIargs.joins.push(join);
           foreignTables.push(tableId);
         }

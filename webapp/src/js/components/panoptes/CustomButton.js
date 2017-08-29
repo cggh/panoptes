@@ -23,8 +23,7 @@ let CustomButton = createReactClass({
       let children = filterChildren(this, React.Children.toArray(props[propName]));
       if (children.length < 2 || !(children[0].type === Anchor && children[1].type === Content))
         return new Error(
-          '`' + componentName + '` ' +
-          'should have two children: one Anchor followed by one Content'
+          `${componentName} should have two children: one Anchor followed by one Content`
         );
     }
   },

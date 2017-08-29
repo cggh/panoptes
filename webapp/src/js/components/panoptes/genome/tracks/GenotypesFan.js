@@ -170,11 +170,13 @@ let GenotypesFan = createReactClass({
 
   render() {
     let {width, height, top} = this.props;
-    return <canvas ref="canvas"
-      className="genotypes-header"
-      style={{top: top + 'px'}}
-      width={width}
-      height={height}/>;
+    return (
+      <canvas ref="canvas"
+        className="genotypes-header"
+        style={{top: `${top}px`}}
+        width={width}
+        height={height}/>
+    );
   },
 });
 

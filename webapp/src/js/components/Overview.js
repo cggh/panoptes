@@ -58,7 +58,7 @@ let Overview = createReactClass({
 
     requestContext.request((componentCancellation) =>
       LRUCache.get(
-        'fetchSingleRecord' + JSON.stringify(APIargs),
+        `fetchSingleRecord${JSON.stringify(APIargs)}`,
         (cacheCancellation) =>
           API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
         componentCancellation

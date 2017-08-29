@@ -58,7 +58,7 @@ let TileLayer = createReactClass({
       ext: 'png',
       maxZoom: 17,
       minZoom: 0,
-      url: location.protocol + '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      url: `${location.protocol}//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`
     };
   },
 

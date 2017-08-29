@@ -127,7 +127,7 @@ let ItemPicker = createReactClass({
   convertItemTolistItem(item, itemId, search, groupId, itemGroupId) {
     let {name, description, icon, payload} = item;
     // Exclude this ListItem if this item's name and description doesn't contain the search text.
-    return (name + '#' + (description || '')).toLowerCase().indexOf(search.toLowerCase()) !== -1 ?
+    return (`${name}#${description || ''}`).toLowerCase().indexOf(search.toLowerCase()) !== -1 ?
       (
         <ListItem
           key={itemId}
