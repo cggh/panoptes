@@ -299,7 +299,7 @@ const ConfigStore = createStore({
       prop.description = prop.description || '';
       prop.showBar = prop.showBar || (prop.barWidth > 0);
       prop.showByDefault = 'tableDefaultVisible' in prop ? prop.tableDefaultVisible :
-      prop.isPrimKey ||
+        prop.isPrimKey ||
       prop.id == table.chromosome ||
       prop.id == table.position ||
       false;

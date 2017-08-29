@@ -114,20 +114,20 @@ let GenotypesTable = createReactClass({
           let {genotypeRefColor, genotypeAltColor, genotypeHetColor, genotypeNoCallColor} = this.context.muiTheme.palette;
           if (cellColour === 'call') {
             switch (colArray[index]) {
-              case 0:  //REF
-                ctx.fillStyle = colourToRGBA(genotypeRefColor, alpha);
-                break;
-              case 1:  //ALT
-                ctx.fillStyle = colourToRGBA(genotypeAltColor, alpha);
-                break;
-              case 2:  //HET
-                ctx.fillStyle = colourToRGBA(genotypeHetColor, alpha);
-                break;
-              default: //NO CALL
-                height = 0.2;
-                alpha = 0.2;
-                ctx.fillStyle = genotypeNoCallColor;
-                break;
+            case 0:  //REF
+              ctx.fillStyle = colourToRGBA(genotypeRefColor, alpha);
+              break;
+            case 1:  //ALT
+              ctx.fillStyle = colourToRGBA(genotypeAltColor, alpha);
+              break;
+            case 2:  //HET
+              ctx.fillStyle = colourToRGBA(genotypeHetColor, alpha);
+              break;
+            default: //NO CALL
+              height = 0.2;
+              alpha = 0.2;
+              ctx.fillStyle = genotypeNoCallColor;
+              break;
             }
           } else if (cellColour === 'fraction') {
             const fraction = colArray[index];
@@ -248,7 +248,7 @@ let GenotypesTable = createReactClass({
       ctx.fillStyle = 'rgb(40,40,40)';
       for (let i = 0; i < sourceWidth; ++i) {
         for (let j = 0; j < numRows; ++j) {
-          const sourceIndex = ((i+sourceStart) * numRows) + j;
+          const sourceIndex = ((i + sourceStart) * numRows) + j;
           let text = '';
           for (let k = sourceIndex * arity, kEnd = (sourceIndex * arity) + arity; k < kEnd; ++k) {
             text += textArray[k];
@@ -296,13 +296,13 @@ let GenotypesTable = createReactClass({
       for (let i = 0; i < sourceWidth; ++i) {
         let pos = block[`col_${this.config.tablesById[config.columnDataTable].position}`].array[i + sourceStart];
         if (pos == hoverPos) {
-          const x = ((colStart + i) * pixColWidth) + ((pixColWidth - drawPixColWidth)/2);
+          const x = ((colStart + i) * pixColWidth) + ((pixColWidth - drawPixColWidth) / 2);
           const x2 = x + drawPixColWidth;
-          ctx.fillStyle='black';
+          ctx.fillStyle = 'black';
           ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, height);
-          if ((x2-x) > 1) {
+          if ((x2 - x) > 1) {
             ctx.moveTo(x2, 0);
             ctx.lineTo(x2, height);
           }
@@ -318,21 +318,21 @@ let GenotypesTable = createReactClass({
     if (!layoutBlocks || !dataBlocks) {
       return <div>
         <canvas ref="gridCanvas"
-                width={width}
-                height={height}/>
+          width={width}
+          height={height}/>
         <canvas ref="overlayCanvas"
-                width={width}
-                height={height}/>
+          width={width}
+          height={height}/>
       </div>;
     }
 
     return <div className="genotypes-table">
       <canvas ref="gridCanvas"
-              width={width}
-              height={height}/>
+        width={width}
+        height={height}/>
       <canvas ref="overlayCanvas"
-              width={width}
-              height={height}/>
+        width={width}
+        height={height}/>
     </div>;
   },
 });

@@ -43,12 +43,12 @@ let LegendElement = createReactClass({
     return (
       <div className="legend-element" key={name}>
         <Tooltip placement={'bottom'}
-                 trigger={'click'}
-                 overlay={<ColourPicker
-                   colour={colour}
-                   colours={colours}
-                   onPick={this.handlePickColour}
-                   />}>
+          trigger={'click'}
+          overlay={<ColourPicker
+            colour={colour}
+            colours={colours}
+            onPick={this.handlePickColour}
+          />}>
           <i className="fa fa-square" style={{color: colour, cursor: (onPickColour ? 'pointer' : 'inherit')}}/>
         </Tooltip>
         <TooltipEllipsis className="label">

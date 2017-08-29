@@ -241,7 +241,7 @@ let AnnotationChannel = createReactClass({
       ctx.strokeRect(x1, (rows[hoverIndex] * ROW_HEIGHT) + 16, Math.max(0.125, x2 - x1), 10);   //Outline
       let text = names[hoverIndex];
       if (text) {
-        text += ', ' + ids[hoverIndex]
+        text += ', ' + ids[hoverIndex];
       } else {
         text = ids[hoverIndex];
       }
@@ -274,7 +274,7 @@ let AnnotationChannel = createReactClass({
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
         if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < 5 + ((rows[i] + 1) * ROW_HEIGHT)) {
-          return ids[i]
+          return ids[i];
         }
       }
     }
@@ -319,7 +319,7 @@ let AnnotationChannel = createReactClass({
   },
 
   handleMouseOut(e) {
-    this.setState({clickIndex: null})
+    this.setState({clickIndex: null});
   },
 
   render() {
@@ -359,8 +359,8 @@ let AnnotationChannel = createReactClass({
         sideComponent={
           <div className="side-name">
             <span>{name || 'Genes'}</span>
-            </div>
-            }
+          </div>
+        }
         configComponent={null}
         legendComponent={<Legend/>}
         onClose={null}
@@ -368,12 +368,12 @@ let AnnotationChannel = createReactClass({
         <div className="canvas-container">
           <Hammer onTap={this.handleClick}>
             <canvas ref="canvas"
-                    style={{cursor: clickIndex !== null ? 'pointer' : 'inherit'}}
-                    width={width} height={height}
-                    onClick={this.handleClick}
-                    onMouseOver={this.handleMouseOver}
-                    onMouseMove={this.handleMouseMove}
-                    onMouseOut={this.handleMouseOut}
+              style={{cursor: clickIndex !== null ? 'pointer' : 'inherit'}}
+              width={width} height={height}
+              onClick={this.handleClick}
+              onMouseOver={this.handleMouseOver}
+              onMouseMove={this.handleMouseMove}
+              onMouseOut={this.handleMouseOut}
             />
           </Hammer>
           {hovers}

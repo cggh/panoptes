@@ -367,7 +367,7 @@ let Criterion = createReactClass({
       return (
         <div className="criterion">
           <RaisedButton label="Add Criterion"
-                        onClick={this.handleReplaceTrivial}/>
+            onClick={this.handleReplaceTrivial}/>
         </div>
       );
 
@@ -391,8 +391,8 @@ let Criterion = createReactClass({
               let {id, disabled, name} = property;
               return (
                 <option key={id}
-                        value={id}
-                        disabled={disabled}>
+                  value={id}
+                  disabled={disabled}>
                   {name}
                 </option>
               );
@@ -416,7 +416,7 @@ let Criterion = createReactClass({
             let {ID, name} = operator;
             return (
               <option key={ID}
-                      value={ID}>
+                value={ID}>
                 {name}
               </option>
             );
@@ -428,30 +428,30 @@ let Criterion = createReactClass({
 
     let otherColumnSelect = () =>
       <select className="field" value={component.ColName2} onChange={(event) => this.handleValueChange({input: 'otherColumn', value: event.target.value})}>
-          {_map(groups, (group) => {
-            if (group.id === 'other') return null;
-            const dataTypeColName1 = property.dataType;
-            return (
-              <optgroup key={group.id} label={group.name}>
-                {group.visibleProperties.map((property) => {
-                  let {id, disabled, name, dataType} = property;
-                  if (dataTypeColName1 !== 'Text' && dataType === 'Text') {
-                    return null;
-                  }
-                  return (
-                    <option key={id}
-                            value={id}
-                            disabled={disabled}>
-                      {name}
-                    </option>
-                  );
-                })
+        {_map(groups, (group) => {
+          if (group.id === 'other') return null;
+          const dataTypeColName1 = property.dataType;
+          return (
+            <optgroup key={group.id} label={group.name}>
+              {group.visibleProperties.map((property) => {
+                let {id, disabled, name, dataType} = property;
+                if (dataTypeColName1 !== 'Text' && dataType === 'Text') {
+                  return null;
                 }
-              </optgroup>
-            );
-          }
-          )}
-        </select>;
+                return (
+                  <option key={id}
+                    value={id}
+                    disabled={disabled}>
+                    {name}
+                  </option>
+                );
+              })
+              }
+            </optgroup>
+          );
+        }
+        )}
+      </select>;
 
     let fields = null;
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
@@ -467,8 +467,8 @@ let Criterion = createReactClass({
               className="field"
               value={
                 component.CompValue !== undefined ?
-                Formatter(property, component.CompValue)
-                : Formatter(property, this.state.CompValue)
+                  Formatter(property, component.CompValue)
+                  : Formatter(property, this.state.CompValue)
               }
               onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
             >
@@ -490,8 +490,8 @@ let Criterion = createReactClass({
               className="field"
               value={
                 component.CompValue !== undefined ?
-                Formatter(property, component.CompValue)
-                : Formatter(property, this.state.CompValue)
+                  Formatter(property, component.CompValue)
+                  : Formatter(property, this.state.CompValue)
               }
               onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
             >
@@ -524,8 +524,8 @@ let Criterion = createReactClass({
             <PropertyInput
               value={
                 component.CompValue !== undefined ?
-                Formatter(property, component.CompValue)
-                : Formatter(property, this.state.CompValue)
+                  Formatter(property, component.CompValue)
+                  : Formatter(property, this.state.CompValue)
               }
               onChange={(value) => this.handleValueEdit({input: 'value', value})}
               onBlur={this.handleValueChange}
@@ -536,25 +536,25 @@ let Criterion = createReactClass({
     } else if (currentOperator.fieldType === 'minMax') {
       fields = (
         <div className="fields">
-             <PropertyInput
-               value={
-                 component.CompValueMin !== undefined ?
-                 Formatter(property, component.CompValueMin)
-                 : Formatter(property, this.state.CompValueMin)
-               }
-               onChange={(value) => this.handleValueEdit({input: 'min', value})}
-               onBlur={this.handleValueChange}
-             />
+          <PropertyInput
+            value={
+              component.CompValueMin !== undefined ?
+                Formatter(property, component.CompValueMin)
+                : Formatter(property, this.state.CompValueMin)
+            }
+            onChange={(value) => this.handleValueEdit({input: 'min', value})}
+            onBlur={this.handleValueChange}
+          />
           <div>and</div>
-            <PropertyInput
-              value={
-                component.CompValueMax !== undefined ?
+          <PropertyInput
+            value={
+              component.CompValueMax !== undefined ?
                 Formatter(property, component.CompValueMax)
                 : Formatter(property, this.state.CompValueMax)
-              }
-              onChange={(value) => this.handleValueEdit({input: 'max', value})}
-              onBlur={this.handleValueChange}
-            />
+            }
+            onChange={(value) => this.handleValueEdit({input: 'max', value})}
+            onBlur={this.handleValueChange}
+          />
         </div>
       );
     } else if (currentOperator.fieldType === 'otherColumn') {
@@ -573,8 +573,8 @@ let Criterion = createReactClass({
             className="field"
             value={
               component.Factor !== undefined ?
-              Formatter(property, component.Factor)
-              : Formatter(property, this.state.Factor)
+                Formatter(property, component.Factor)
+                : Formatter(property, this.state.Factor)
             }
             onChange={(value) => this.handleValueChange({input: 'scale', value})}
           />
@@ -583,8 +583,8 @@ let Criterion = createReactClass({
             className="field"
             value={
               component.Offset !== undefined ?
-              Formatter(property, component.Offset)
-              : Formatter(property, this.state.Offset)
+                Formatter(property, component.Offset)
+                : Formatter(property, this.state.Offset)
             }
             onChange={(value) => this.handleValueChange({input: 'offset', value})}
           />
@@ -599,7 +599,7 @@ let Criterion = createReactClass({
               let {id, name} = subset;
               return (
                 <option key={id}
-                        value={id}>
+                  value={id}>
                   {name}
                 </option>
               );

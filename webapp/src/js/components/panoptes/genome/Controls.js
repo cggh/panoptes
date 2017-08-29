@@ -102,10 +102,10 @@ let Controls = createReactClass({
           <span>
             <select ref="chromosome" value={chromosome} onChange={this.handleChromChange}>
               {_map(this.config.chromosomes, (length, name) =>
-                  <option key={name}
-                          value={name}>
-                    {name}
-                  </option>
+                <option key={name}
+                  value={name}>
+                  {name}
+                </option>
               )}
             </select>
           </span>
@@ -114,36 +114,36 @@ let Controls = createReactClass({
           <span> Region: </span>
           <span>
             <input className={classnames({wide: true, invalid: !regionValid})}
-                   ref="region"
-                   type="text"
-                   spellCheck="false"
-                   value={regionText}
-                   min={minWidth}
-                   max={max}
-                   onChange={this.handleRegionChange}/>
+              ref="region"
+              type="text"
+              spellCheck="false"
+              value={regionText}
+              min={minWidth}
+              max={max}
+              onChange={this.handleRegionChange}/>
           </span>
         </span>
         <span className="block">
           <span> Midpoint: </span>
           <span>
             <input ref="midpoint"
-                    type="number"
-                    min={0}
-                    max={max}
-                    value={parseInt(midpoint)}
-                    onChange={this.handleRangeChange}/>
+              type="number"
+              min={0}
+              max={max}
+              value={parseInt(midpoint)}
+              onChange={this.handleRangeChange}/>
           </span>
         </span>
         <span className="block">
           <span> Width: </span>
           <span>
-             <input ref="width"
-                    type="number"
-                    value={parseInt(width)}
-                    min={minWidth}
-                    max={max}
-                    onChange={this.handleRangeChange}/>
-           </span>
+            <input ref="width"
+              type="number"
+              value={parseInt(width)}
+              min={minWidth}
+              max={max}
+              onChange={this.handleRangeChange}/>
+          </span>
         </span>
 
       </span>

@@ -64,7 +64,7 @@ function getDatasetAndStateUID(location) {
   }
 }
 
-Promise.prototype.done = function (onFulfilled, onRejected) {
+Promise.prototype.done = function(onFulfilled, onRejected) {
   this.then(onFulfilled, onRejected)
     .catch((e) => {
       setTimeout(() => {
@@ -191,11 +191,10 @@ if (dataset) {
       let errJson = null;
       try {
         errJson = JSON.parse(err.responseText);
-      }
-      catch(err) {}
+      } catch (err) {}
       let render = <Loading status="error">
-            {err.responseText || err.message || 'Error'}
-          </Loading>;
+        {err.responseText || err.message || 'Error'}
+      </Loading>;
       if (errJson && err.status == 403) {
         render = <div>
           <Loading status="custom">

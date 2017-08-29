@@ -14,71 +14,68 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import getDisplayName from 'react-display-name';
 
-let withAPIData = (WrappedComponent, APIArgsFromProps) => {
-  return createReactClass({
-    mixins: [
-      FluxMixin,
-      ConfigMixin,
-      DataFetcherMixin()
-    ],
+let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
+  mixins: [
+    FluxMixin,
+    ConfigMixin,
+    DataFetcherMixin()
+  ],
 
-    propTypes: WrappedComponent.propTypes,
-    displayName: getDisplayName(WrappedComponent.displayName),
+  propTypes: WrappedComponent.propTypes,
+  displayName: getDisplayName(WrappedComponent.displayName),
 
-    getInitialState() {
-      return {
-        loadStatus: 'loading'
-      };
-    },
+  getInitialState() {
+    return {
+      loadStatus: 'loading'
+    };
+  },
 
-    getDefaultProps() {
-      return WrappedComponent.getDefaultProps ? WrappedComponent.getDefaultProps() : {};
-    },
+  getDefaultProps() {
+    return WrappedComponent.getDefaultProps ? WrappedComponent.getDefaultProps() : {};
+  },
 
-    componentDidMount() {
-      this.lastAPIArgs = null;
-    },
+  componentDidMount() {
+    this.lastAPIArgs = null;
+  },
 
-    icon() {
-      return WrappedComponent.icon ? WrappedComponent.icon() : '';
-    },
+  icon() {
+    return WrappedComponent.icon ? WrappedComponent.icon() : '';
+  },
 
-    title() {
-      return WrappedComponent.title ? WrappedComponent.title() : '';
-    },
+  title() {
+    return WrappedComponent.title ? WrappedComponent.title() : '';
+  },
 
-    fetchData(props, requestContext) {
-      let APIArgSet = APIArgsFromProps({config: this.config, props});
-      if (_isEqual(this.lastAPIArgs, APIArgSet)) return;
-      const keys = _keys(APIArgSet);
-      const values = _values(APIArgSet);
-      requestContext.request((componentCancellation) =>
-        Promise.all(_map(values, ({method, args}) => LRUCache.get(
-          method + JSON.stringify(args),
-          (cacheCancellation) =>
-            API[method]({cancellation: cacheCancellation, ...args}),
-          componentCancellation
-        )))
-      ).then((data) => {
-        const result = {};
-        _forEach(_zip(keys, data), ([key, value]) => result[key] = value);
-        this.setState({
-          loadStatus: 'loaded',
-          ...result,
-        });
-      })
-        .catch(API.filterAborted)
-        .catch(LRUCache.filterCancelled)
-        .catch((xhr) => {
-          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-          this.setState({loadStatus: 'error', data: null});
-        });
-    },
-    render()
-    {
-      return <WrappedComponent {...this.state} {...this.props} config={this.config}/>;
-    }
-  });
-};
+  fetchData(props, requestContext) {
+    let APIArgSet = APIArgsFromProps({config: this.config, props});
+    if (_isEqual(this.lastAPIArgs, APIArgSet)) return;
+    const keys = _keys(APIArgSet);
+    const values = _values(APIArgSet);
+    requestContext.request((componentCancellation) =>
+      Promise.all(_map(values, ({method, args}) => LRUCache.get(
+        method + JSON.stringify(args),
+        (cacheCancellation) =>
+          API[method]({cancellation: cacheCancellation, ...args}),
+        componentCancellation
+      )))
+    ).then((data) => {
+      const result = {};
+      _forEach(_zip(keys, data), ([key, value]) => result[key] = value);
+      this.setState({
+        loadStatus: 'loaded',
+        ...result,
+      });
+    })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((xhr) => {
+        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+        this.setState({loadStatus: 'error', data: null});
+      });
+  },
+  render() {
+    return <WrappedComponent {...this.state} {...this.props} config={this.config}/>;
+  }
+});
 
 export default withAPIData;

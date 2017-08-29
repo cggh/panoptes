@@ -33,12 +33,12 @@ let SelectComponent = createReactClass({
     let {selectedIndex, hintText, children} = this.props;
     children = filterChildren(this, React.Children.toArray(children), ['option']);
     let selectedValue = _find(children, (child) => child.props.index === selectedIndex);
-    return <SelectField hintText={hintText} value={selectedIndex ? selectedValue : null} onChange={(e,k,v) => {
-        this.getFlux().actions.session.popupOpen(filterChildren(this, React.Children.toArray(v.props.children)));
-      }}>
-        {_map(children, (row) =>
-          <MenuItem key={row} value={row} primaryText={row.props.label}/>)}
-      </SelectField>;
+    return <SelectField hintText={hintText} value={selectedIndex ? selectedValue : null} onChange={(e, k, v) => {
+      this.getFlux().actions.session.popupOpen(filterChildren(this, React.Children.toArray(v.props.children)));
+    }}>
+      {_map(children, (row) =>
+        <MenuItem key={row} value={row} primaryText={row.props.label}/>)}
+    </SelectField>;
   },
 });
 

@@ -72,26 +72,26 @@ let RegionGenesList = createReactClass({
     };
 
     requestContext.request((componentCancellation) =>
-          LRUCache.get(
-            'findGenesInRegion' + JSON.stringify(APIargs),
-            (cacheCancellation) =>
-              API.findGenesInRegion({cancellation: cacheCancellation, ...APIargs}),
-            componentCancellation
-          )
-        )
-        .then((data) => {
-          this.setState({
-            loadStatus: 'loaded',
-            regionGenesData: data
-          });
-
-        })
-        .catch(API.filterAborted)
-        .catch(LRUCache.filterCancelled)
-        .catch((xhr) => {
-          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-          this.setState({loadStatus: 'error'});
+      LRUCache.get(
+        'findGenesInRegion' + JSON.stringify(APIargs),
+        (cacheCancellation) =>
+          API.findGenesInRegion({cancellation: cacheCancellation, ...APIargs}),
+        componentCancellation
+      )
+    )
+      .then((data) => {
+        this.setState({
+          loadStatus: 'loaded',
+          regionGenesData: data
         });
+
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((xhr) => {
+        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+        this.setState({loadStatus: 'error'});
+      });
   },
 
   handleSelectGene(e, geneId) {
@@ -125,21 +125,21 @@ let RegionGenesList = createReactClass({
 
       listItems.push(
         <ListItem key={regionGenesData[i].fid}
-                  primaryText={
-                    <div>
-                          <span>{regionGenesData[i].fname}</span>
-                          <span> between </span>
-                          <span>{regionGenesData[i].fstart} and {regionGenesData[i].fstop}</span>
-                    </div>
-                  }
-                  secondaryText={
-                    <div>
-                          {regionGenesData[i].descr.split(';').join('; ').split(',').join(', ')}
-                    </div>
-                  }
-                  secondaryTextLines={2}
-                  onClick={(e) => this.handleSelectGene(e, regionGenesData[i].fid, regionGenesData[i].descr.split(';').join('; ').split(',').join(', '))}
-                  leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+          primaryText={
+            <div>
+              <span>{regionGenesData[i].fname}</span>
+              <span> between </span>
+              <span>{regionGenesData[i].fstart} and {regionGenesData[i].fstop}</span>
+            </div>
+          }
+          secondaryText={
+            <div>
+              {regionGenesData[i].descr.split(';').join('; ').split(',').join(', ')}
+            </div>
+          }
+          secondaryTextLines={2}
+          onClick={(e) => this.handleSelectGene(e, regionGenesData[i].fid, regionGenesData[i].descr.split(';').join('; ').split(',').join(', '))}
+          leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
         />
       );
 

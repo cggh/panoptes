@@ -21,14 +21,14 @@ let ColoursLegend = createReactClass({
 
     let legendElements = Object.keys(colours).sort().map(
       (colour) =>
-      <LegendElement key={colour} name={colours[colour].name} colour={colour} />
+        <LegendElement key={colour} name={colours[colour].name} colour={colour} />
     );
 
     return <div className="legend">
-    {maxLegendItems === undefined || (maxLegendItems !== undefined && legendElements.length < maxLegendItems) ?
-      legendElements
-    : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
-    }
+      {maxLegendItems === undefined || (maxLegendItems !== undefined && legendElements.length < maxLegendItems) ?
+        legendElements
+        : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
+      }
     </div>;
   },
 });

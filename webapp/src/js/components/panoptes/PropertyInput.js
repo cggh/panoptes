@@ -3,7 +3,7 @@ import React from 'react';
 
 class PropertyInput extends React.Component {
 
-  static displayName = "PropertyInput";
+  static displayName = 'PropertyInput';
 
   static propTypes = {
     onBlur: PropTypes.func,
@@ -11,12 +11,12 @@ class PropertyInput extends React.Component {
     value: PropTypes.string
   };
 
-  handleOnChange = () => {
-    this.props.onChange(this.value.value);
-  };
-
   handleOnBlur = () => {
     this.props.onBlur(this.value.value);
+  };
+
+  handleOnChange = () => {
+    this.props.onChange(this.value.value);
   };
 
   render() {

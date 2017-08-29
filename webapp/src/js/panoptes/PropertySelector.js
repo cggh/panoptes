@@ -67,12 +67,12 @@ const PropertySelector = createReactClass({
     }
 
     return (
-    <SelectField value={value === '__NULL__' ? undefined : value}
-                 autoWidth={true}
-                 floatingLabelText={label}
-                 onChange={(e, i, v) => this.redirectedProps.onSelect(v === '__NULL__' ? null : v)}>
-      {propertyMenu}
-    </SelectField>
+      <SelectField value={value === '__NULL__' ? undefined : value}
+        autoWidth={true}
+        floatingLabelText={label}
+        onChange={(e, i, v) => this.redirectedProps.onSelect(v === '__NULL__' ? null : v)}>
+        {propertyMenu}
+      </SelectField>
     );
   },
 });

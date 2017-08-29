@@ -96,10 +96,10 @@ let GenotypesRowHeader = createReactClass({
       let yPos = (i + 1) * (rowHeight);
       const label = Formatter(rowConfig.propertiesById[rowLabel], labelArray[i]);
       if (showIndividualLines) {
-          // if (fncIsRowSelected(key))
-          //   ctx.fillStyle = 'rgb(255,80,80)';
-          // else
-          //   ctx.fillStyle = 'rgb(255,255,255)';
+        // if (fncIsRowSelected(key))
+        //   ctx.fillStyle = 'rgb(255,80,80)';
+        // else
+        //   ctx.fillStyle = 'rgb(255,255,255)';
         ctx.beginPath();
         ctx.rect(1.5, yPos - rowHeight + 2.5, 10, rowHeight - 4);
         ctx.fill();
@@ -126,8 +126,8 @@ let GenotypesRowHeader = createReactClass({
       <div className="side-name">{config.namePlural}</div>
       <div className="row-label">{rowConfig.propertiesById[rowLabel].name}</div>
       <canvas ref="canvas"
-              width={width}
-              height={height}/>
+        width={width}
+        height={height}/>
     </div>;
   },
 });

@@ -100,13 +100,13 @@ let PerRowIndicatorChannel = createReactClass({
 
   componentWillReceiveProps({hoverPos}) {
     let positions = this.positions;
-    for(let i = 0, n = positions.length; i < n; i++) {
+    for (let i = 0, n = positions.length; i < n; i++) {
       if (positions[i] == hoverPos) {
         this.setState({hoverIndex: i});
         return;
       }
     }
-    this.setState({hoverIndex: null})
+    this.setState({hoverIndex: null});
   },
 
   componentDidMount() {
@@ -370,8 +370,8 @@ let PerRowIndicatorChannel = createReactClass({
     for (let i = 0, l = numPositions; i < l; ++i) {
       const psx = scaleFactor * (positions[i] - start);
       if (Math.abs(x - psx) < nearest) {
-          nearest = Math.abs(x - psx);
-          nearestIndex = i;
+        nearest = Math.abs(x - psx);
+        nearestIndex = i;
       }
       if (y > psy  && y < psy + 15) {
         if (triangleMode) {
@@ -446,7 +446,7 @@ let PerRowIndicatorChannel = createReactClass({
         }
         //Override component update to get latest in case of skipped render
         configComponent={<PerRowIndicatorControls {...this.props} query={this.getDefinedQuery()}
-                                                  setProps={this.redirectedProps.setProps}/>}
+          setProps={this.redirectedProps.setProps}/>}
         legendComponent={colourProperty ?
           <PropertyLegend table={table} property={colourProperty} knownValues={knownValues}/> : null}
         onClose={this.redirectedProps.onClose}
@@ -454,27 +454,27 @@ let PerRowIndicatorChannel = createReactClass({
         <div className="canvas-container">
           <Hammer onTap={this.handleClick}>
             <canvas ref="canvas"
-                  style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
-                  width={width} height={HEIGHT}
-                  onMouseOver={this.handleMouseOver}
-                  onMouseMove={this.handleMouseMove}
-                  onMouseOut={this.handleMouseOut}
+              style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
+              width={width} height={HEIGHT}
+              onMouseOver={this.handleMouseOver}
+              onMouseMove={this.handleMouseMove}
+              onMouseOut={this.handleMouseOut}
             />
           </Hammer>
           {hoverPx !== null && hoverPx > 0 && hoverPx < width ?
             <Tooltip placement={'right'}
-                     overlayStyle={{pointerEvents:'none'}}
-                     visible={true}
-                     overlay={<div>
-                              <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hoverId}/></div>
-                              <table><tbody>
-                              {_map(config.previewProperties, (prop) =>
-                                <tr key={prop}><td style={{paddingRight: '5px'}}>{config.propertiesById[prop].name}:</td><td><PropertyCell noLinks prop={config.propertiesById[prop]} value={this.previewData[prop][hoverIndex]} /></td></tr>)
-                              }
-                              </tbody></table>
-                            </div>}>
+              overlayStyle={{pointerEvents: 'none'}}
+              visible={true}
+              overlay={<div>
+                <div><PropertyCell noLinks prop={config.propertiesById[config.primKey]} value={hoverId}/></div>
+                <table><tbody>
+                  {_map(config.previewProperties, (prop) =>
+                    <tr key={prop}><td style={{paddingRight: '5px'}}>{config.propertiesById[prop].name}:</td><td><PropertyCell noLinks prop={config.propertiesById[prop]} value={this.previewData[prop][hoverIndex]} /></td></tr>)
+                  }
+                </tbody></table>
+              </div>}>
               <div
-                style={{pointerEvents:'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPx-6}px`, height: '12px', width: '12px'}}/>
+                style={{pointerEvents: 'none', position: 'absolute', top: `${(HEIGHT / 2) - 6}px`, left: `${hoverPx - 6}px`, height: '12px', width: '12px'}}/>
             </Tooltip>
             : null}</div>
 

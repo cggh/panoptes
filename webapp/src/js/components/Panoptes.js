@@ -111,19 +111,19 @@ let Panoptes = createReactClass({
               <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
               <div className="body">
                 <TabbedArea activeTab={tabs.get('selectedTab')}
-                            unclosableTabs={tabs.get('unclosableTabs')}
-                            unreplaceableTabs={tabs.get('unreplaceableTabs')}
-                            onSwitch={actions.tabSwitch}
-                            onClose={actions.tabClose}
-                            onAddTab={actions.tabOpen}
-                            onDragAway={actions.tabPopOut}
+                  unclosableTabs={tabs.get('unclosableTabs')}
+                  unreplaceableTabs={tabs.get('unreplaceableTabs')}
+                  onSwitch={actions.tabSwitch}
+                  onClose={actions.tabClose}
+                  onAddTab={actions.tabOpen}
+                  onDragAway={actions.tabPopOut}
                 >
                   {tabs.get('components').map((compId) =>
-                      <TabPane
-                        compId={compId}
-                        key={compId}>
-                        <SessionComponent compId={compId} />
-                      </TabPane>
+                    <TabPane
+                      compId={compId}
+                      key={compId}>
+                      <SessionComponent compId={compId} />
+                    </TabPane>
                   ).toArray()}
                 </TabbedArea>
               </div>
@@ -152,7 +152,7 @@ let Panoptes = createReactClass({
               }).toArray()}
             </Popups>
             <Modal visible={modal ? true : false}
-                   onClose={actions.modalClose}>
+              onClose={actions.modalClose}>
               {modal ?
                 React.cloneElement(modal, {setProps: actions.modalSetProps})
                 : null}
@@ -214,21 +214,21 @@ let Header = createReactClass({
           { this.config.cas.service ? (userId == 'anonymous' ?
             <a href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
             : <span>
-               {userId}
-               <a className="logout" href={this.config.cas.logout}>logout</a>
-             </span>) : null
+              {userId}
+              <a className="logout" href={this.config.cas.logout}>logout</a>
+            </span>) : null
           }
         </div>
         <img className="logo" src={logo}/>
         {this.config.user.isManager ?
           <IconButton tooltip="Set current state as initial view for all users"
-                      iconClassName="fa fa-floppy-o"
-                      onClick={this.handleSaveInitialSession}
+            iconClassName="fa fa-floppy-o"
+            onClick={this.handleSaveInitialSession}
           /> : null}
 
         <IconButton tooltip="Find"
-                    iconClassName="fa fa-search"
-                    onClick={() => actions.session.modalOpen(<Finder />)}
+          iconClassName="fa fa-search"
+          onClick={() => actions.session.modalOpen(<Finder />)}
         />
         <IconButton
           tooltip="Link"

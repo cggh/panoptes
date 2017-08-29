@@ -32,9 +32,9 @@ let Template = createReactClass({
   render() {
     let {content, table, primKey} = this.props;
     return (
-        <ItemTemplate innerClassName="page-template" table={table} primKey={primKey}>
-          {content}
-        </ItemTemplate>
+      <ItemTemplate innerClassName="page-template" table={table} primKey={primKey}>
+        {content}
+      </ItemTemplate>
     );
   },
 });

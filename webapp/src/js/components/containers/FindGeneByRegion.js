@@ -130,63 +130,63 @@ let FindGeneByRegion = createReactClass({
     return (
       <div>
         <table className="table-col">
-        <tbody>
-          <tr>
-            <th className="table-col-header">Chromosome:</th>
-            <td className="table-col-cell">
-              <select value={chromosome} onChange={this.handleChromChange}>
-                {_map(this.config.chromosomes, (length, name) =>
+          <tbody>
+            <tr>
+              <th className="table-col-header">Chromosome:</th>
+              <td className="table-col-cell">
+                <select value={chromosome} onChange={this.handleChromChange}>
+                  {_map(this.config.chromosomes, (length, name) =>
                     <option key={name}
-                            value={name}>
+                      value={name}>
                       {name}
                     </option>
-                )}
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <th className="table-col-header">Start:</th>
-            <td className="table-col-cell">
-              <input
-                ref="startPosition"
-                value={startPosition}
-                onChange={this.handleStartPosChange}
-                min={0}
-                max={endPosition ? endPosition : chromosomeLength}
-                type="number"
-              />
-            </td>
-            <td className="table-col-cell">bp</td>
-          </tr>
-          <tr>
-            <th className="table-col-header">End:</th>
-            <td className="table-col-cell">
-              <input
-                ref="endPosition"
-                value={endPosition}
-                onChange={this.handleEndPosChange}
-                min={startPosition ? startPosition : 0}
-                max={chromosomeLength}
-                type="number"
-              />
-            </td>
-            <td className="table-col-cell">bp</td>
-          </tr>
-          <tr>
-            <th className="table-col-header"></th>
-            <td className="table-col-cell">
-              <RaisedButton
-                label="Find"
-                disabled={startPosition < 0 || endPosition > chromosomeLength}
-                primary={true}
-                icon={<Icon fixedWidth={true} name="search" inverse={true} />}
-                onClick={this.handleFind}
-              />
-            </td>
-            <td className="table-col-cell"></td>
-          </tr>
+                  )}
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <th className="table-col-header">Start:</th>
+              <td className="table-col-cell">
+                <input
+                  ref="startPosition"
+                  value={startPosition}
+                  onChange={this.handleStartPosChange}
+                  min={0}
+                  max={endPosition ? endPosition : chromosomeLength}
+                  type="number"
+                />
+              </td>
+              <td className="table-col-cell">bp</td>
+            </tr>
+            <tr>
+              <th className="table-col-header">End:</th>
+              <td className="table-col-cell">
+                <input
+                  ref="endPosition"
+                  value={endPosition}
+                  onChange={this.handleEndPosChange}
+                  min={startPosition ? startPosition : 0}
+                  max={chromosomeLength}
+                  type="number"
+                />
+              </td>
+              <td className="table-col-cell">bp</td>
+            </tr>
+            <tr>
+              <th className="table-col-header"></th>
+              <td className="table-col-cell">
+                <RaisedButton
+                  label="Find"
+                  disabled={startPosition < 0 || endPosition > chromosomeLength}
+                  primary={true}
+                  icon={<Icon fixedWidth={true} name="search" inverse={true} />}
+                  onClick={this.handleFind}
+                />
+              </td>
+              <td className="table-col-cell"></td>
+            </tr>
 
-        </tbody>
+          </tbody>
         </table>
         {geneList}
       </div>

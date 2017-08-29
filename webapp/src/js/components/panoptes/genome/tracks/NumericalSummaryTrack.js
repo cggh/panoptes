@@ -268,7 +268,7 @@ let NumericalSummaryTrack = createReactClass({
             ctx.lineTo(xPixel + pixelWindowSize, yMaxPixel);
             ctx.lineTo(xPixel, yMaxPixel);
             if (hoverPos != null && (window[i] * windowSize) < hoverPos && hoverPos < (window[i] + 1) * windowSize) {
-              hoverMinMax = {xPixel, pixelWindowSize, yMinPixel, yMaxPixel, min: min[i], max: max[i]}
+              hoverMinMax = {xPixel, pixelWindowSize, yMinPixel, yMaxPixel, min: min[i], max: max[i]};
             }
           }
           lastPointNull = (min[i] === nullVal || min[i] != +min[i]);
@@ -297,7 +297,7 @@ let NumericalSummaryTrack = createReactClass({
             }
             ctx.lineTo(xPixel + pixelWindowSize, yPixel);
             if (hoverPos != null && (window[i] * windowSize) < hoverPos && hoverPos < (window[i] + 1) * windowSize) {
-              hoverAvg = {xPixel, pixelWindowSize, yPixel, avg: avg[i]}
+              hoverAvg = {xPixel, pixelWindowSize, yPixel, avg: avg[i]};
             }
           }
           lastPointNull = (avg[i] === nullVal || avg[i] != +avg[i]);
@@ -318,7 +318,7 @@ let NumericalSummaryTrack = createReactClass({
         ctx.moveTo(xPixel, yPixel);
         ctx.arc(xPixel, yPixel, 2, 0, 2 * Math.PI, false);
         if (hoverPos != null && hoverPos ==  pos[i]) {
-            hoverPoint = {xPixel, yPixel, value: value[i]}
+          hoverPoint = {xPixel, yPixel, value: value[i]};
         }
       }
     });
@@ -342,7 +342,7 @@ let NumericalSummaryTrack = createReactClass({
         ctx.moveTo(xPixel, yMaxPixel);
         ctx.lineTo(xPixel + pixelWindowSize, yMaxPixel);
       }
-      drawText(ctx, f(max), xPixel - 5 , Math.min(yMaxPixel, yMinPixel - 14, hoverAvg.yPixel - 14));
+      drawText(ctx, f(max), xPixel - 5, Math.min(yMaxPixel, yMinPixel - 14, hoverAvg.yPixel - 14));
       ctx.stroke();
     }
     if (hoverAvg && !hoverPoint) {
@@ -420,11 +420,11 @@ let NumericalSummaryTrack = createReactClass({
           const yPixel = height - (yScaleFactor * (value[i] - yMin));
           if (Math.abs(x - xPixel) < nearest) {
             nearest = Math.abs(x - xPixel);
-            nearestIndex = [b,i];
+            nearestIndex = [b, i];
           }
           if (Math.abs(x - xPixel) < nearestClick && Math.abs(y - yPixel) < 5) {
             nearestClick = Math.abs(x - xPixel);
-            nearestClickIndex = [b,i];
+            nearestClickIndex = [b, i];
           }
         }
       });
@@ -478,7 +478,7 @@ let NumericalSummaryTrack = createReactClass({
     const {width, height} = this.props;
     return (
       <canvas ref="canvas"
-              width={width} height={height}
+        width={width} height={height}
       />
     );
   },

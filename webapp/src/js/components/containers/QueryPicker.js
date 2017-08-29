@@ -161,85 +161,85 @@ let QueryPicker = createReactClass({
           transitions={false}
           touch={false}
           sidebar={(
-          <div className="sidebar" style={{width: '348px'}}>
-            <SidebarHeader icon={this.icon()} description={'Filters can be used to show only the rows that meet specific criteria.'}/>
-            <StoredTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
-            <Divider/>
-            <RecentlyUsedTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
+            <div className="sidebar" style={{width: '348px'}}>
+              <SidebarHeader icon={this.icon()} description={'Filters can be used to show only the rows that meet specific criteria.'}/>
+              <StoredTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
+              <Divider/>
+              <RecentlyUsedTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
+            </div>
+          )}>
+          <div className="vertical stack">
+            <div className="top-bar">
+              <Icon className="pointer icon"
+                name={hasSidebar ? 'arrow-left' : 'bars'}
+                onClick={this.handleToggleSidebar}
+                title={hasSidebar ? 'Expand' : 'Sidebar'}
+              />
+              <span className="block text">Filter editor</span>
+            </div>
+            <div className="grow scroll-within query-editor-container">
+              <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
+            </div>
+            <div className="centering-container">
+              <QueryString className="text" table={table} query={query}/>
+            </div>
+            <div className="centering-container">
+              {
+                this.config.user.isManager && query ?
+                  <div className="centering-container">
+                    <RaisedButton
+                      label="Get JSON"
+                      primary={false}
+                      onClick={() => prompt('Query as JSON:', query)}
+                      icon={<Icon fixedWidth={true} name={'paste'} inverse={false} />}
+                    />
+                  </div>
+                  : null
+              }
+              {
+                this.config.user.isManager && storedFilterNameOpen ?
+                  <div>
+                    <HotKeys keyMap={hotKeysKeyMap} handlers={hotKeysHandlers}>
+                      <TextField
+                        ref={(ref) => this.storedFilterNameField = ref}
+                        hintText="Stored filter name"
+                        value={storedFilterName}
+                        onChange={this.handleStoredFilterNameChange}
+                        onBlur={this.handleStoredFilterNameBlur}
+                        style={{width: '10em', marginRight: '10px'}}
+                      />
+                      <RaisedButton
+                        style={{marginRight: '10px'}}
+                        label="Store"
+                        primary={false}
+                        onClick={this.handleStore}
+                        icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+                      />
+                    </HotKeys>
+                  </div>
+                  : null
+              }
+              {
+                this.config.user.isManager && !storedFilterNameOpen ?
+                  <div>
+                    <RaisedButton
+                      style={{marginRight: '10px'}}
+                      label="Store as..."
+                      primary={false}
+                      onClick={this.handleStoredFilterNameOpen}
+                      icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+                    />
+                  </div>
+                  : null
+              }
+              <RaisedButton
+                label="Use"
+                primary={true}
+                onClick={this.handlePick}
+                icon={<Icon fixedWidth={true} name={'check'} inverse={true} />}
+              />
+            </div>
           </div>
-        )}>
-        <div className="vertical stack">
-          <div className="top-bar">
-            <Icon className="pointer icon"
-                  name={hasSidebar ? 'arrow-left' : 'bars'}
-                  onClick={this.handleToggleSidebar}
-                  title={hasSidebar ? 'Expand' : 'Sidebar'}
-            />
-            <span className="block text">Filter editor</span>
-          </div>
-          <div className="grow scroll-within query-editor-container">
-            <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
-          </div>
-          <div className="centering-container">
-            <QueryString className="text" table={table} query={query}/>
-          </div>
-          <div className="centering-container">
-            {
-              this.config.user.isManager && query ?
-              <div className="centering-container">
-                <RaisedButton
-                  label="Get JSON"
-                  primary={false}
-                  onClick={() => prompt('Query as JSON:', query)}
-                  icon={<Icon fixedWidth={true} name={'paste'} inverse={false} />}
-                />
-              </div>
-              : null
-            }
-            {
-              this.config.user.isManager && storedFilterNameOpen ?
-              <div>
-                <HotKeys keyMap={hotKeysKeyMap} handlers={hotKeysHandlers}>
-                  <TextField
-                    ref={(ref) => this.storedFilterNameField = ref}
-                    hintText="Stored filter name"
-                    value={storedFilterName}
-                    onChange={this.handleStoredFilterNameChange}
-                    onBlur={this.handleStoredFilterNameBlur}
-                    style={{width: '10em', marginRight: '10px'}}
-                  />
-                  <RaisedButton
-                    style={{marginRight: '10px'}}
-                    label="Store"
-                    primary={false}
-                    onClick={this.handleStore}
-                    icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
-                  />
-                </HotKeys>
-              </div>
-              : null
-            }
-            {
-              this.config.user.isManager && !storedFilterNameOpen ?
-              <div>
-                <RaisedButton
-                  style={{marginRight: '10px'}}
-                  label="Store as..."
-                  primary={false}
-                  onClick={this.handleStoredFilterNameOpen}
-                  icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
-                />
-              </div>
-              : null
-            }
-            <RaisedButton
-              label="Use"
-              primary={true}
-              onClick={this.handlePick}
-              icon={<Icon fixedWidth={true} name={'check'} inverse={true} />}
-            />
-          </div>
-        </div>
         </Sidebar>
       </div>
     );

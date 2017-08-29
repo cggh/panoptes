@@ -156,44 +156,44 @@ let TreeWithActions = createReactClass({
               options={treeTypeOptions}
             />
             : null }
-            {table ?
-              <PropertySelector
-                table={table}
-                value={nodeColourProperty}
-                label="Node colour"
-                onSelect={this.handleChangeNodeColourProperty}
-                allowNull={true}
-              />
+          {table ?
+            <PropertySelector
+              table={table}
+              value={nodeColourProperty}
+              label="Node colour"
+              onSelect={this.handleChangeNodeColourProperty}
+              allowNull={true}
+            />
             : null }
-            {table ?
-              <PropertySelector
-                table={table}
-                value={branchColourProperty}
-                label="Branch colour"
-                onSelect={this.handleChangeBranchColourProperty}
-                allowNull={true}
-              />
+          {table ?
+            <PropertySelector
+              table={table}
+              value={branchColourProperty}
+              label="Branch colour"
+              onSelect={this.handleChangeBranchColourProperty}
+              allowNull={true}
+            />
             : null }
-            <div className="legend">
+          <div className="legend">
             {nodeColourProperty ?
               <div>
-              <p>Node colours</p>
-              <PropertyLegend
-                table={table}
-                property={nodeColourProperty}
-              />
+                <p>Node colours</p>
+                <PropertyLegend
+                  table={table}
+                  property={nodeColourProperty}
+                />
               </div>
-            : null }
+              : null }
             {branchColourProperty ?
               <div>
-              <p>Branch colours</p>
-              <PropertyLegend
-                table={table}
-                property={branchColourProperty}
-              />
+                <p>Branch colours</p>
+                <PropertyLegend
+                  table={table}
+                  property={branchColourProperty}
+                />
               </div>
-            : null }
-            </div>
+              : null }
+          </div>
         </div>
       </div>
     );
@@ -205,9 +205,9 @@ let TreeWithActions = createReactClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => setProps({sidebar: !sidebar})}/>
+              name={sidebar ? 'arrow-left' : 'bars'}
+              title={sidebar ? 'Expand' : 'Sidebar'}
+              onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">Tree {table ? `of ${this.config.tablesById[table].capNamePlural}` : ''} </span>
           </div>
           <div className="grow">

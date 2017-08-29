@@ -21,7 +21,7 @@ let SidebarHeader = createReactClass({
           <Icon name={icon}/>
         </div>
         <span className="description">
-           {description || <i>No description</i>}
+          {description || <i>No description</i>}
         </span>
         <div style={ {clear: 'both'} }/>
       </div>

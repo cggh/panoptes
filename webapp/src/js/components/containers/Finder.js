@@ -91,10 +91,10 @@ let Finder = createReactClass({
 
       let listItem = (
         <ListItem key="findGeneListItem"
-                  primaryText="Gene"
-                  secondaryText={secondaryText}
-                  leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
-                  onClick={(e) => this.handleOpenPopup(e, <FindGene />)}
+          primaryText="Gene"
+          secondaryText={secondaryText}
+          leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
+          onClick={(e) => this.handleOpenPopup(e, <FindGene />)}
         />
       );
 
@@ -121,10 +121,10 @@ let Finder = createReactClass({
 
       let listItem = (
         <ListItem key={table.id}
-                  primaryText={table.capNameSingle}
-                  secondaryText={secondaryText}
-                  leftIcon={<div><Icon fixedWidth={true} name={table.icon} /></div>}
-                  onClick={(e) => this.handleOpenTableTab(e, table.id)}
+          primaryText={table.capNameSingle}
+          secondaryText={secondaryText}
+          leftIcon={<div><Icon fixedWidth={true} name={table.icon} /></div>}
+          onClick={(e) => this.handleOpenTableTab(e, table.id)}
         />
       );
 

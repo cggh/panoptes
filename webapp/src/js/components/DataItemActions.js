@@ -52,13 +52,13 @@ let DataItemActions = createReactClass({
     };
 
     requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'fetchSingleRecord' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        )
+      LRUCache.get(
+        'fetchSingleRecord' + JSON.stringify(APIargs),
+        (cacheCancellation) =>
+          API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
+        componentCancellation
       )
+    )
       .then((data) => {
         this.setState({data: data});
       })
@@ -105,22 +105,22 @@ let DataItemActions = createReactClass({
               <PerRowIndicatorChannel table={table} />
             </GenomeBrowserWithActions>
           </PopupButton>
-        : null}
+          : null}
         {tableConfig.isRegionOnGenome ?
           <PopupButton label="Show in Genome Browser" icon="bitmap:genomebrowser.png">
             <GenomeBrowserWithActions
               chromosome={data[tableConfig.chromosome]}
               start={parseInt(data[tableConfig.regionStart]) - 50}
               end={parseInt(data[tableConfig.regionStop]) + 50} >
-                <div>RegionChannel table={table}</div>
+              <div>RegionChannel table={table}</div>
             </GenomeBrowserWithActions>
           </PopupButton>
           : null}
         {tableConfig.properties.map((prop) => {
           if (prop.externalUrl) {
             return <ExternalLinkButton key={prop.id}
-                                       label={prop.name}
-                                       urls={data[prop.id].split(';').map((value) => prop.externalUrl.replace('{value}', value))}
+              label={prop.name}
+              urls={data[prop.id].split(';').map((value) => prop.externalUrl.replace('{value}', value))}
             />;
 
           } else {

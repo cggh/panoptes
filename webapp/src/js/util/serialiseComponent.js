@@ -26,9 +26,9 @@ export default function serialiseComponent(component) {
   });
   let props = {};
   if (children) {
-    props = { children: React.Children.map(children, serialiseComponent),
+    props = {children: React.Children.map(children, serialiseComponent),
       ...otherFiltered
-    }
+    };
   } else {
     props = otherFiltered;
   }

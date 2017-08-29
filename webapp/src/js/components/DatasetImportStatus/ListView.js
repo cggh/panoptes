@@ -89,40 +89,40 @@ let DatasetImportStatusListView = createReactClass({
     return (
       <div className="scroll-within">
         <List>
-            {rows.map((row) => {
-              if (row.name.indexOf(this.config.dataset) === -1) { //Horrible hack until the server knows what dataset this calculation is on
-                return null;
-              }
-              let iconName = null;
-              let iconSpin = false;
-              let iconStyle = {};
-              if (row.failed) {
-                iconName = 'warning';
-                iconStyle = {color: 'orange'};
-              } else if (row.completed) {
-                iconName = 'check';
-                iconStyle = {color: 'green'};
-              } else if (row.progress) {
-                iconName = 'cog';
-                iconSpin = true;
-                iconStyle = {color: '#2196f3'};
-              } else {
-                //Unfortunately this state is the way the server communicates "busy" for now...
-                iconName = 'cog';
-                iconSpin = true;
-                iconStyle = {color: '#2196f3'};
-              }
+          {rows.map((row) => {
+            if (row.name.indexOf(this.config.dataset) === -1) { //Horrible hack until the server knows what dataset this calculation is on
+              return null;
+            }
+            let iconName = null;
+            let iconSpin = false;
+            let iconStyle = {};
+            if (row.failed) {
+              iconName = 'warning';
+              iconStyle = {color: 'orange'};
+            } else if (row.completed) {
+              iconName = 'check';
+              iconStyle = {color: 'green'};
+            } else if (row.progress) {
+              iconName = 'cog';
+              iconSpin = true;
+              iconStyle = {color: '#2196f3'};
+            } else {
+              //Unfortunately this state is the way the server communicates "busy" for now...
+              iconName = 'cog';
+              iconSpin = true;
+              iconStyle = {color: '#2196f3'};
+            }
 
-              // row.scope
+            // row.scope
 
-              return <ListItem key={row.id}
-                        primaryText={<div><span>{row.status}</span></div>}
-                        secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
-                        leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
-                        onClick={(e) => this.handleClickImportStatus(row.id, row.name + ' - ' + row.timestamp, iconName)}
-                        secondaryTextLines={2}
-              />;
-            })}
+            return <ListItem key={row.id}
+              primaryText={<div><span>{row.status}</span></div>}
+              secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
+              leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
+              onClick={(e) => this.handleClickImportStatus(row.id, row.name + ' - ' + row.timestamp, iconName)}
+              secondaryTextLines={2}
+            />;
+          })}
         </List>
         <Loading status={loadStatus}/>
       </div>

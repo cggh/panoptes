@@ -17,8 +17,8 @@ import customHandlebars from 'util/customHandlebars';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import _debounce from 'lodash.debounce';
 
-import 'prismjs/themes/prism.css'
-import 'draft-js/dist/Draft.css'
+import 'prismjs/themes/prism.css';
+import 'draft-js/dist/Draft.css';
 
 const decorator = new PrismDecorator({defaultSyntax: 'markup'});
 
@@ -145,10 +145,10 @@ let EditDocPage = createReactClass({
         <div className="grow horizontal stack">
           <div className="editor scroll-within">
             <Editor className="editor"
-                    editorState={editorState}
-                    onChange={this.handleChange}
-                    placeholder="Loading..."
-                    ref="editor"
+              editorState={editorState}
+              onChange={this.handleChange}
+              placeholder="Loading..."
+              ref="editor"
             />
           </div>
           <div className="preview scroll-within">
@@ -172,7 +172,7 @@ let EditDocPage = createReactClass({
                 action: 'replace',
                 content: content
               });
-              actions.session.modalClose()
+              actions.session.modalClose();
             }}
           />
         </div>

@@ -105,7 +105,7 @@ let MapActions = createReactClass({
     }
 
     let baseLayers = _keys(baseLayerProviders);
-    for(let i = 0; i < baseLayers.length; i++) {
+    for (let i = 0; i < baseLayers.length; i++) {
       let name = baseLayers[i];
       this.baseTileLayersMenu.push(<MenuItem key={i} primaryText={name} value={name} />);
     }
@@ -381,7 +381,7 @@ let MapActions = createReactClass({
           {
             table !== undefined && table !== NULL_MARKER_LAYER ?
               <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
-            : null
+              : null
           }
           <SelectField
             autoWidth={true}
@@ -407,7 +407,7 @@ let MapActions = createReactClass({
               onSelect={this.handleChangeMarkerColourProperty}
               allowNull={true}
             />
-          : null }
+            : null }
         </div>
       </div>
     );
@@ -429,9 +429,9 @@ let MapActions = createReactClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => setProps({sidebar: !sidebar})}/>
+              name={sidebar ? 'arrow-left' : 'bars'}
+              title={sidebar ? 'Expand' : 'Sidebar'}
+              onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">{mapTitle}</span>
             {table ?
               <span className="block text">

@@ -105,13 +105,13 @@ let TablePlot = createReactClass({
       }
 
       requestContext.request((componentCancellation) =>
-          LRUCache.get(
-            'query' + JSON.stringify(APIargs),
-            (cacheCancellation) =>
-              API.query({cancellation: cacheCancellation, ...APIargs}),
-            componentCancellation
-          )
+        LRUCache.get(
+          'query' + JSON.stringify(APIargs),
+          (cacheCancellation) =>
+            API.query({cancellation: cacheCancellation, ...APIargs}),
+          componentCancellation
         )
+      )
         .then((data) => {
 
           let dimensionData = {};
@@ -165,15 +165,15 @@ let TablePlot = createReactClass({
       <div className="plot-container">
         {
           plotType ?
-          <Plot
-            className="plot"
-            plotType={plotType}
-            dimensionData={this.state.dimensionData}
-            dimensionMetadata={this.state.dimensionMetadata}
-            title={title}
-            displayModeBar={displayModeBar}
-          />
-          : null
+            <Plot
+              className="plot"
+              plotType={plotType}
+              dimensionData={this.state.dimensionData}
+              dimensionMetadata={this.state.dimensionMetadata}
+              title={title}
+              displayModeBar={displayModeBar}
+            />
+            : null
         }
         <Loading status={this.state.loadStatus} />
       </div>);

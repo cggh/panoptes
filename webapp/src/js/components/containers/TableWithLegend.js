@@ -21,7 +21,7 @@ let TableWithLegend = createReactClass({
   },
 
   getInitialState() {
-    return {}
+    return {};
   },
 
   getDefinedQuery(query, table) {
@@ -31,7 +31,7 @@ let TableWithLegend = createReactClass({
   },
 
   handleOrderChange(order) {
-    this.setState({order})
+    this.setState({order});
   },
 
   render() {
@@ -39,20 +39,20 @@ let TableWithLegend = createReactClass({
     order = this.state.order || order;
     query = this.getDefinedQuery(query, table);
 
-    return(
+    return (
       <div className="vertical stack">
         <div className="centering-container">
-          <Card style={{width:'500px'}}>{children}</Card>
+          <Card style={{width: '500px'}}>{children}</Card>
         </div>
         <div className="centering-container grow">
-          <div style={{width:'90%', height:'100%'}}>
-              <DataTableView table={table}
-                                query={query}
-                                order={order}
-                                columns={columns}
-                                columnWidths={columnWidths}
-                                onColumnResize={this.handleColumnResize}
-                                onOrderChange={this.handleOrderChange}
+          <div style={{width: '90%', height: '100%'}}>
+            <DataTableView table={table}
+              query={query}
+              order={order}
+              columns={columns}
+              columnWidths={columnWidths}
+              onColumnResize={this.handleColumnResize}
+              onOrderChange={this.handleOrderChange}
             />
           </div>
         </div>

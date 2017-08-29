@@ -78,19 +78,19 @@ let APIActions = {
         content
       }
     )
-    .then((resp) => {
-      this.dispatch(
-        APICONST.MODIFY_CONFIG_SUCCESS,
-        {
-          newConfig: resp
-        }
-      );
-    })
-    .catch((error) => {
-      this.dispatch(APICONST.MODIFY_CONFIG_FAIL);
-      //This line here until all modify config components handle errors well
-      ErrorReport(this.flux, error.message, () => this.flux.actions.api.modifyConfig(options));
-    });
+      .then((resp) => {
+        this.dispatch(
+          APICONST.MODIFY_CONFIG_SUCCESS,
+          {
+            newConfig: resp
+          }
+        );
+      })
+      .catch((error) => {
+        this.dispatch(APICONST.MODIFY_CONFIG_FAIL);
+        //This line here until all modify config components handle errors well
+        ErrorReport(this.flux, error.message, () => this.flux.actions.api.modifyConfig(options));
+      });
   },
 
   replaceYAMLConfig(options) {
@@ -104,21 +104,21 @@ let APIActions = {
         content
       }
     )
-    .then((resp) => {
-      this.dispatch(
-        APICONST.MODIFY_CONFIG_SUCCESS,
-        {
-          newConfig: resp
+      .then((resp) => {
+        this.dispatch(
+          APICONST.MODIFY_CONFIG_SUCCESS,
+          {
+            newConfig: resp
+          }
+        );
+        if (onSuccess) {
+          onSuccess();
         }
-      );
-      if (onSuccess) {
-        onSuccess();
-      }
-    }).catch((error) => {
-      const msg = error.message || error.responseText || error;
-      ErrorReport(this.flux, msg, null, 0);
-      this.dispatch(APICONST.MODIFY_CONFIG_FAIL, {msg});
-    });
+      }).catch((error) => {
+        const msg = error.message || error.responseText || error;
+        ErrorReport(this.flux, msg, null, 0);
+        this.dispatch(APICONST.MODIFY_CONFIG_FAIL, {msg});
+      });
   }
 };
 

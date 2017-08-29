@@ -25,7 +25,7 @@ function createStyleJsonFromString(styleString) {
 
 class HTMLWithComponents extends React.Component {
 
-  static displayName = "HTMLWithComponents";
+  static displayName = 'HTMLWithComponents';
 
   static propTypes = {
     className: PropTypes.string,
@@ -56,32 +56,32 @@ class HTMLWithComponents extends React.Component {
               elementProps.className = value;
               break;
             default:
-                //Cast types for known props
+              //Cast types for known props
               if (type.propTypes) {
-                  switch (type.propTypes[key]) {
-                  case PropTypes.bool:
-                    // If the attribute is specfied without a value, e.g. showLegend,
-                    // then value will be an empty string here, which we will interpret as true.
-                    // (Ordinarily, empty string values are interpreted as false in JavaScript.)
-                    value = value == '' || value.toLowerCase() === 'true' || value.toLowerCase() === 'yes' || value.toLowerCase() === '1' ? true : false;
-                    break;
-                  case PropTypes.bool.isRequired:
-                    value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
-                    break;
-                  case PropTypes.number:
-                  case PropTypes.number.isRequired:
-                    value = Number(value);
-                    break;
-                  case PropTypes.array:
-                  case PropTypes.array.isRequired:
-                  case PropTypes.object:
-                  case PropTypes.object.isRequired:
-                    try {
-                      value = JSON.parse(value);
-                    } catch (e) {
-                      throw Error(`Can't parse ${key} attribute for ${node.name}:${value}`);
-                    }
-                    break;
+                switch (type.propTypes[key]) {
+                case PropTypes.bool:
+                  // If the attribute is specfied without a value, e.g. showLegend,
+                  // then value will be an empty string here, which we will interpret as true.
+                  // (Ordinarily, empty string values are interpreted as false in JavaScript.)
+                  value = value == '' || value.toLowerCase() === 'true' || value.toLowerCase() === 'yes' || value.toLowerCase() === '1' ? true : false;
+                  break;
+                case PropTypes.bool.isRequired:
+                  value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
+                  break;
+                case PropTypes.number:
+                case PropTypes.number.isRequired:
+                  value = Number(value);
+                  break;
+                case PropTypes.array:
+                case PropTypes.array.isRequired:
+                case PropTypes.object:
+                case PropTypes.object.isRequired:
+                  try {
+                    value = JSON.parse(value);
+                  } catch (e) {
+                    throw Error(`Can't parse ${key} attribute for ${node.name}:${value}`);
+                  }
+                  break;
                 }
               }
               elementProps[key] = value;

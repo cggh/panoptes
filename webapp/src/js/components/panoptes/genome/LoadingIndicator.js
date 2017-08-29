@@ -93,12 +93,12 @@ let LoadingIndicator = createReactClass({
 
   render() {
     return <canvas ref="canvas"
-                   className={classnames({
-                     'loading-canvas': true,
-                     'loading': this.props.animate
-                   })}
-                   width={this.props.width}
-                   height={HEIGHT}/>;
+      className={classnames({
+        'loading-canvas': true,
+        'loading': this.props.animate
+      })}
+      width={this.props.width}
+      height={HEIGHT}/>;
   },
 });
 

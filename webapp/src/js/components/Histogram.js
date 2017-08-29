@@ -52,35 +52,35 @@ let Histogram = createReactClass({
 
     return (
       <svg style={{top: `${-height / 2}px`, left: `${-width / 2}px`}}
-           className="panoptes-histogram">
-          <rect className="panoptes-histogram-bg"
-                x={xScale.range()[0] - 1} y={-1} width={1 + xScale.range()[1] - xScale.range()[0]} height={height + 1} />
-          {
-            histogramData.map(
-              (d, i) => {
-                let x = d.x0;
-                let y = d.length;
-                let dx = d.x1 - d.x0;
-                if (isNaN(x) || isNaN(dx) || isNaN(y)) {
-                  return null;
-                }
-                // Use the colour from the middle of the bin range.
-                let fillColour = colourScaleFunction((d.x0 + d.x1) / 2);
-                return (
-                  <HistogramBin x={xScale(x)} y={height - yScale(y)} key={i}
-                                width={xScale(dx) - xScale(0)} height={yScale(y)}
-                                fill={fillColour}
-                                title={`${y} ${y > 1 ? unitNamePlural : unitNameSingle} with ${valueName} between ${x.toFixed(2)} and ${(x + dx).toFixed(2)}`}
-                  />
-                );
-              })
-          }
+        className="panoptes-histogram">
+        <rect className="panoptes-histogram-bg"
+          x={xScale.range()[0] - 1} y={-1} width={1 + xScale.range()[1] - xScale.range()[0]} height={height + 1} />
+        {
+          histogramData.map(
+            (d, i) => {
+              let x = d.x0;
+              let y = d.length;
+              let dx = d.x1 - d.x0;
+              if (isNaN(x) || isNaN(dx) || isNaN(y)) {
+                return null;
+              }
+              // Use the colour from the middle of the bin range.
+              let fillColour = colourScaleFunction((d.x0 + d.x1) / 2);
+              return (
+                <HistogramBin x={xScale(x)} y={height - yScale(y)} key={i}
+                  width={xScale(dx) - xScale(0)} height={yScale(y)}
+                  fill={fillColour}
+                  title={`${y} ${y > 1 ? unitNamePlural : unitNameSingle} with ${valueName} between ${x.toFixed(2)} and ${(x + dx).toFixed(2)}`}
+                />
+              );
+            })
+        }
         <line className={isHighlighted ? 'panoptes-histogram-axes-highlighted' : 'panoptes-histogram-axes'}
-              x1={xScale.range()[0] + 1} x2={xScale.range()[0] + 1}
-              y1={height} y2={0} />
+          x1={xScale.range()[0] + 1} x2={xScale.range()[0] + 1}
+          y1={height} y2={0} />
         <line className={isHighlighted ? 'panoptes-histogram-axes-highlighted' : 'panoptes-histogram-axes'}
-              x1={xScale.range()[0]} x2={xScale.range()[1]}
-              y1={height} y2={height} />
+          x1={xScale.range()[0]} x2={xScale.range()[1]}
+          y1={height} y2={height} />
 
       </svg>
     );

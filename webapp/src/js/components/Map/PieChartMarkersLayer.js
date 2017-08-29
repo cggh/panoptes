@@ -305,7 +305,7 @@ let PieChartMarkersLayer = createReactClass({
           <MapControlComponent position="bottomleft">
             <ColoursLegend colours={colours} maxLegendItems={maxLegendItems} />
           </MapControlComponent>
-        : null
+          : null
         }
         <GeoLayouter nodes={markers}>
           {
@@ -315,33 +315,33 @@ let PieChartMarkersLayer = createReactClass({
                 map={map}
               >
                 {renderNodes.map(
+                  (marker, i) =>
+                    <ComponentMarker
+                      key={i}
+                      position={{lat: marker.lat, lng: marker.lng}}
+                      onClick={!disableOnClickMarker ? (e) => this.handleClickMarker(e, marker) : undefined}
+                    >
+                      <PieChart
+                        chartData={marker.chartData}
+                        crs={crs}
+                        key={i}
+                        lat={marker.lat}
+                        lng={marker.lng}
+                        name={marker.name}
+                        originalLat={marker.lat}
+                        originalLng={marker.lng}
+                        radius={marker.radius}
+                      />
+                    </ComponentMarker>
+                ).concat(
+                  renderNodes.map(
                     (marker, i) =>
-                        <ComponentMarker
-                          key={i}
-                          position={{lat: marker.lat, lng: marker.lng}}
-                          onClick={!disableOnClickMarker ? (e) => this.handleClickMarker(e, marker) : undefined}
-                        >
-                          <PieChart
-                            chartData={marker.chartData}
-                            crs={crs}
-                            key={i}
-                            lat={marker.lat}
-                            lng={marker.lng}
-                            name={marker.name}
-                            originalLat={marker.lat}
-                            originalLng={marker.lng}
-                            radius={marker.radius}
-                          />
-                        </ComponentMarker>
-                  ).concat(
-                    renderNodes.map(
-                      (marker, i) =>
-                        <Polyline
-                          className="panoptes-pie-chart-markers-layer-polyline"
-                          positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
-                        />
-                    )
+                      <Polyline
+                        className="panoptes-pie-chart-markers-layer-polyline"
+                        positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
+                      />
                   )
+                )
                 }
               </FeatureGroup>
           }

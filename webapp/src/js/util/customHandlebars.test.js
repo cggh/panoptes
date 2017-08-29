@@ -6,16 +6,14 @@ const hb = customHandlebars({
 });
 const templateData = {data: 'DATA'};
 
-jest.mock('../panoptes/API', () => {
-    return {
-      query: jest.fn(() => Promise.resolve(
-        [
-          {colour: 'blue', size: 'small'},
-          {colour: 'red', size: 'big'}
-        ]
-      ))
-    };
-  }
+jest.mock('../panoptes/API', () => ({
+  query: jest.fn(() => Promise.resolve(
+    [
+      {colour: 'blue', size: 'small'},
+      {colour: 'red', size: 'big'}
+    ]
+  ))
+})
 );
 
 
@@ -54,7 +52,7 @@ test('query with parameterised args', () => {
   API.query.mockClear();
   let template = hb.compile("test{{#query table='{{data}}' query='{{data}}' orderBy='[[\"asc\", \"{{data}}\"]]'}}{{/query}}");
   return template(templateData).then((data) => {
-    expect(API.query.mock.calls[0][0]).toMatchObject({table: 'DATA', query: 'DATA', orderBy: [["asc", "DATA"]]});
+    expect(API.query.mock.calls[0][0]).toMatchObject({table: 'DATA', query: 'DATA', orderBy: [['asc', 'DATA']]});
   });
 });
 

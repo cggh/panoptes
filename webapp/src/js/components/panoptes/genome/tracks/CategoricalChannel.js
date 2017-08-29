@@ -88,10 +88,10 @@ let CategoricalChannel = createReactClass({
     query = this.getDefinedQuery(query, table);
     return (
       <CanvasGroupChannel {...this.props}
-                          side={<Side {...this.props} query={query}/>}
-                          onClose={this.redirectedProps.onClose}
-                          controls={<CategoricalTrackControls {...this.props} query={query} setProps={this.redirectedProps.setProps} />}
-                          legend={<PropertyLegend table={table} property={track} knownValues={knownValues} />}
+        side={<Side {...this.props} query={query}/>}
+        onClose={this.redirectedProps.onClose}
+        controls={<CategoricalTrackControls {...this.props} query={query} setProps={this.redirectedProps.setProps} />}
+        legend={<PropertyLegend table={table} property={track} knownValues={knownValues} />}
       >
         <CategoricalTrack {...this.props} query={query} width={width - sideWidth} onChangeKnownValues={(knownValues) => this.setState({knownValues})}/>
       </CanvasGroupChannel>
@@ -359,7 +359,7 @@ let CategoricalTrack = createReactClass({
   render() {
     let {width, height} = this.props;
     return (
-        <canvas className="categorical" ref="canvas" width={width} height={height}/>
+      <canvas className="categorical" ref="canvas" width={width} height={height}/>
     );
   },
 });
@@ -425,32 +425,32 @@ let CategoricalTrackControls = createReactClass({
           {!autoYScale ? <div className="control">
             <div className="label">Y Min:</div>
             <input className="numeric-input"
-                   ref="yMin"
-                   type="number"
-                   value={yMin}
-                   onChange={() => {
-                     let value = parseFloat(this.refs.yMin.value);
-                     if (_isFinite(value))
-                       this.redirectedProps.setProps({yMin: value});
-                   }
-                                  }/>
+              ref="yMin"
+              type="number"
+              value={yMin}
+              onChange={() => {
+                let value = parseFloat(this.refs.yMin.value);
+                if (_isFinite(value))
+                  this.redirectedProps.setProps({yMin: value});
+              }
+              }/>
           </div>
             : null}
           {!autoYScale ? <div className="control">
             <div className="label">Y Max:</div>
             <input className="numeric-input"
-                   ref="yMax"
-                   type="number"
-                   value={yMax}
-                   onChange={() => {
-                     let value = parseFloat(this.refs.yMax.value);
-                     if (_isFinite(value))
-                       this.redirectedProps.setProps({yMax: value});
-                   }
-                                  }/>
+              ref="yMax"
+              type="number"
+              value={yMax}
+              onChange={() => {
+                let value = parseFloat(this.refs.yMax.value);
+                if (_isFinite(value))
+                  this.redirectedProps.setProps({yMax: value});
+              }
+              }/>
           </div>
             : null}
-          </div>
+        </div>
       </div>
     );
   },
@@ -474,13 +474,13 @@ let Side = createReactClass({
   render() {
     let {query, table, track} = this.props;
     return <div className="side-name">
-      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural+':' : '')}</div>
+      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural + ':' : '')}</div>
       <div className="legend-element">
 
-      <TooltipEllipsis className="label">
+        <TooltipEllipsis className="label">
           {this.tableConfig().propertiesById[track].name}
-      </TooltipEllipsis>
-        </div>
+        </TooltipEllipsis>
+      </div>
     </div>;
   },
 });

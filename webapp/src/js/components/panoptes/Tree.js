@@ -36,7 +36,7 @@ let Tree = createReactClass({
   },
 
   handleResize(size) {
-    var tree = this.phylocanvas.tree;
+    let tree = this.phylocanvas.tree;
     if (tree) {
       tree.resizeToContainer();
       tree.fitInPanel();

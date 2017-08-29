@@ -121,13 +121,13 @@ let TabbedArea = createReactClass({
     }
 
     let tabMarkup = (
-          <div className={classNames(classes)} onClick={this.handleClick.bind(this, id)}>
-            {icons[id] ? <Icon name={icons[id]}/> : null}
-            <div className="title">{titles[id]}</div>
-            {this.props.unclosableTabs.indexOf(id) === -1 ?
-              closeIcon
-            : null}
-          </div>
+      <div className={classNames(classes)} onClick={this.handleClick.bind(this, id)}>
+        {icons[id] ? <Icon name={icons[id]}/> : null}
+        <div className="title">{titles[id]}</div>
+        {this.props.unclosableTabs.indexOf(id) === -1 ?
+          closeIcon
+          : null}
+      </div>
     );
 
     if (this.props.onDragAway && this.props.unclosableTabs.indexOf(id) === -1) {
@@ -140,7 +140,7 @@ let TabbedArea = createReactClass({
           onStop={() => this.handleDragStop(id)}
           onDrag={() => this.setState({dragging: id})}
         >
-        {tabMarkup}
+          {tabMarkup}
         </Draggable>
       );
 

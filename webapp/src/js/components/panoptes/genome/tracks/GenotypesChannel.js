@@ -40,7 +40,7 @@ import NumericInput from 'ui/NumericInput';
 import Icon from 'ui/Icon';
 import queryToString from 'util/queryToString';
 import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
-import "genotypes.scss"
+import 'genotypes.scss';
 const FAN_HEIGHT = 60;
 
 let GenotypesChannel = createReactClass({
@@ -434,7 +434,7 @@ let GenotypesChannel = createReactClass({
 
   handleScroll(scrollDiv) {
     this.setState({visibleTop:
-      -(this.container.getBoundingClientRect().top - scrollDiv.getBoundingClientRect().top)})
+      -(this.container.getBoundingClientRect().top - scrollDiv.getBoundingClientRect().top)});
   },
 
   xyToIndex(x, y) {
@@ -442,7 +442,7 @@ let GenotypesChannel = createReactClass({
     const {rowData, layoutBlocks, genomicPositions, colPrimKeys, colWidth, visibleTop} = this.state;
     const numRows = rowData ? rowData.id.shape[0] : 0;
     const fanTop = Math.min(rowHeight * numRows,
-                  Math.max(0, visibleTop));
+      Math.max(0, visibleTop));
     const scale =  (width - sideWidth) / (end - start);
     const pixColWidth = colWidth * scale;
 
@@ -459,7 +459,7 @@ let GenotypesChannel = createReactClass({
           nearestPos = genomicPositions[j];
         }
         if (y < fanTop + FAN_HEIGHT && y > fanTop + FAN_HEIGHT - 20) { //Only click on hat
-        if (Math.abs(x - columnPixel) < nearestClick) {
+          if (Math.abs(x - columnPixel) < nearestClick) {
             nearestClick = Math.abs(x - columnPixel);
             nearestClickIndex = colPrimKeys[j];
           }
@@ -476,7 +476,7 @@ let GenotypesChannel = createReactClass({
 
   setHover({nearestPos, nearestClickIndex}) {
     if (this.props.onChangeHoverPos) {
-        this.props.onChangeHoverPos(nearestPos);
+      this.props.onChangeHoverPos(nearestPos);
     }
     this.setState({hoverClick: nearestClickIndex});
   },
@@ -537,10 +537,10 @@ let GenotypesChannel = createReactClass({
         />}
         //Override component update to get latest in case of skipped render
         configComponent={<GenotypesControls {...this.props}
-                                            columnQuery={columnQuery}
-                                            rowQuery={rowQuery}
-                                            getDataBlocks={this.getDataBlocks}
-                                            setProps={this.redirectedProps.setProps}/>}
+          columnQuery={columnQuery}
+          rowQuery={rowQuery}
+          getDataBlocks={this.getDataBlocks}
+          setProps={this.redirectedProps.setProps}/>}
         legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
       >
@@ -549,14 +549,14 @@ let GenotypesChannel = createReactClass({
             let {colWidth} = interpolated;
             return <Hammer onTap={this.handleClick}>
               <div
-                        ref={(node) => this.container = node}
-                        className="genotypes-channel"
-                        style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
-                        onMouseOver={this.handleMouseOver}
-                        onMouseMove={this.handleMouseMove}
-                        onMouseOut={this.handleMouseOut}
+                ref={(node) => this.container = node}
+                className="genotypes-channel"
+                style={{cursor: hoverClick ? 'pointer' : 'inherit'}}
+                onMouseOver={this.handleMouseOver}
+                onMouseMove={this.handleMouseMove}
+                onMouseOut={this.handleMouseOut}
               >
-                <div style={{height: FAN_HEIGHT+'px'}} />
+                <div style={{height: FAN_HEIGHT + 'px'}} />
                 <GenotypesTable
                   table={table}
                   rowData={rowData}
@@ -586,9 +586,9 @@ let GenotypesChannel = createReactClass({
                   colWidth={colWidth}
                   hoverPos={hoverPos}
                 />
-            </div>
-          </Hammer>;
-        }}</Motion>
+              </div>
+            </Hammer>;
+          }}</Motion>
       </ChannelWithConfigDrawer>);
   },
 });
@@ -662,18 +662,18 @@ const GenotypesControls = createReactClass({
 
     const dataBlocks = getDataBlocks();
     if (dataBlocks.length == 0) {
-      ErrorReport(this.getFlux(), `No genotype data to download`);
+      ErrorReport(this.getFlux(), 'No genotype data to download');
       return;
     }
     if (_some(dataBlocks, (block) => block._tooBig)) {
-      ErrorReport(this.getFlux(), `Too much genotype data to download - zoom in`);
+      ErrorReport(this.getFlux(), 'Too much genotype data to download - zoom in');
       return;
     }
 
     const rowPrimaryKey = dataBlocks[0][`row_${rowTableConfig.primKey}`].array;
     for (var i = 0; i < rowPrimaryKey.length; i++)
-      data += rowPrimaryKey[i] + '\t'
-    data += "\r\n";
+      data += rowPrimaryKey[i] + '\t';
+    data += '\r\n';
 
     for (let b = 0; b < dataBlocks.length; ++b) {
       let block = dataBlocks[b];
@@ -686,11 +686,11 @@ const GenotypesControls = createReactClass({
       for (i = 0; i < positions.length; i++) {
         if (positions[i] >= start && positions[i] <= end) {
           data += positions[i] + '\t';
-          for (var j = 0; j < rowPrimaryKey.length; j++) {
-            for (var k = 0; k < ploidy; k++) {
+          for (let j = 0; j < rowPrimaryKey.length; j++) {
+            for (let k = 0; k < ploidy; k++) {
               data += propArray[(i * numRows * ploidy) + (j * ploidy) + k];
               if (k < ploidy - 1)
-                data += ','
+                data += ',';
             }
             data += '\t';
           }
@@ -724,42 +724,42 @@ const GenotypesControls = createReactClass({
         <div className="control-group">
           <div className="control">
             <FilterButton table={config.columnDataTable} query={columnQuery}
-                          name={this.config.tablesById[config.columnDataTable].capNamePlural}
-                          onPick={(columnQuery) => this.redirectedProps.setProps({columnQuery})}/>
+              name={this.config.tablesById[config.columnDataTable].capNamePlural}
+              onPick={(columnQuery) => this.redirectedProps.setProps({columnQuery})}/>
           </div>
         </div>
         <div className="control">
           <div className="control-group">
             <FilterButton table={config.rowDataTable} query={rowQuery}
-                          name={this.config.tablesById[config.rowDataTable].capNamePlural}
-                          onPick={(rowQuery) => this.redirectedProps.setProps({rowQuery})}/>
+              name={this.config.tablesById[config.rowDataTable].capNamePlural}
+              onPick={(rowQuery) => this.redirectedProps.setProps({rowQuery})}/>
           </div>
         </div>
         <div className="control-group">
           <div className="control">
             <FlatButton label="Download data"
-                        primary={true}
-                        onClick={() => this.handleDownload()}
-                        icon={<Icon fixedWidth={true} name="download"/>}
+              primary={true}
+              onClick={() => this.handleDownload()}
+              icon={<Icon fixedWidth={true} name="download"/>}
             />
           </div>
         </div>
         <div className="control-group">
           <div className="control">
             <PropertySelector table={config.rowDataTable}
-                              value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
-                              label="Row label"
-                              onSelect={(rowLabel) => this.redirectedProps.setProps({
-                              rowLabel,
-                              rowSort: rowSort || rowLabel
-                            })}/>
+              value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
+              label="Row label"
+              onSelect={(rowLabel) => this.redirectedProps.setProps({
+                rowLabel,
+                rowSort: rowSort || rowLabel
+              })}/>
           </div>
           <div className="control">
             <PropertySelector table={config.rowDataTable}
-                              value={rowSort}
-                              label="Row sort"
-                              allowNull={true}
-                              onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
+              value={rowSort}
+              label="Row sort"
+              allowNull={true}
+              onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
           </div>
           <div className="control">
             <RandomSubsetSizeSelector
@@ -783,31 +783,31 @@ const GenotypesControls = createReactClass({
         <div className="control-group">
           <div className="control">
             <SelectField value={cellColour}
-                         autoWidth={true}
-                         floatingLabelText="Cell colour"
-                         onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
+              autoWidth={true}
+              floatingLabelText="Cell colour"
+              onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
               <MenuItem value="call" primaryText="Call"/>
               <MenuItem value="fraction" primaryText="Ref fraction"/>
             </SelectField>
           </div>
           <div className="control">
             <SelectField value={cellAlpha}
-                         autoWidth={true}
-                         floatingLabelText="Cell opacity"
-                         onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
+              autoWidth={true}
+              floatingLabelText="Cell opacity"
+              onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
-                                                                                  primaryText={config.propertiesById[prop].name}/>)}
+                primaryText={config.propertiesById[prop].name}/>)}
             </SelectField>
           </div>
           <div className="control">
             <SelectField value={cellHeight}
-                         autoWidth={true}
-                         floatingLabelText="Cell height"
-                         onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
+              autoWidth={true}
+              floatingLabelText="Cell height"
+              onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
-                                                                                  primaryText={config.propertiesById[prop].name}/>)}
+                primaryText={config.propertiesById[prop].name}/>)}
             </SelectField>
           </div>
         </div>

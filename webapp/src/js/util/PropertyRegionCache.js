@@ -20,7 +20,7 @@ export function findBlock({start, end, width}) {
     blockLevel,
     blockIndex,
     needNext: end >= Math.pow(2.0, blockLevel) + Math.pow(2.0, blockLevel) * blockIndex,
-    summaryWindow: Math.max(1, Math.pow(2.0, Math.ceil(Math.log(blockSize / (width/2)) / Math.log(2))))
+    summaryWindow: Math.max(1, Math.pow(2.0, Math.ceil(Math.log(blockSize / (width / 2)) / Math.log(2))))
   };
 }
 
@@ -59,16 +59,16 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
       if (seenBlocksForKey[level] && seenBlocksForKey[level][index] && seenBlocksForKey[level][index2]) {
         return Promise.all((index === index2) ? [fetch(APIArgs, cacheArgs, level, index, cancellation)]
           : [fetch(APIArgs, cacheArgs, level, index, cancellation),
-          fetch(APIArgs, cacheArgs, level, index2, cancellation)])
+            fetch(APIArgs, cacheArgs, level, index2, cancellation)])
           .then(ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation));
       }
     }
   }
   //Oh well, all the cached blocks were smaller or didn't contain us, might as well fetch
   return Promise.all([fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
-                        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
-                      fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
-                        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
+    .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
+  fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
+    .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
     .then(flatten);
 }
 
@@ -95,13 +95,13 @@ function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
       //Delay a bit to let quickly cancelled queries not reach the server - a temporary measure until server cancels the DB query
       Q.delay(500).then(() =>
         API[method]({cancellation: cacheCancellation, ...APIArgs})
-            .then((block) => {
-              if (isBlockTooBig(block, blockLimit)) {
-                return {_blockStart: blockStart, _blockSize: blockSize, _tooBig: true, ...block};
-              } else {
-                return {_blockStart: blockStart, _blockSize: blockSize, ...(postProcessBlock ? postProcessBlock(block) : block)};
-              }
-            })
+          .then((block) => {
+            if (isBlockTooBig(block, blockLimit)) {
+              return {_blockStart: blockStart, _blockSize: blockSize, _tooBig: true, ...block};
+            } else {
+              return {_blockStart: blockStart, _blockSize: blockSize, ...(postProcessBlock ? postProcessBlock(block) : block)};
+            }
+          })
       ),
     cancellation
   )
@@ -135,9 +135,9 @@ function ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cance
   return (blocks) => {
     if (_some(blocks, (block) => block._tooBig)) {
       return Promise.all([fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
-                            .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
-                          fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
-                            .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
+        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
+      fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
+        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
         .then(flatten);
     } else {
       return blocks;
@@ -163,7 +163,7 @@ export function combineBlocks(blocks, property) {
   } else {
     let sum = [];
     _each(blocks, (block) => {
-        Array.prototype.push.apply(sum, block[property].array || [])
+      Array.prototype.push.apply(sum, block[property].array || []);
     });
 
     return sum;

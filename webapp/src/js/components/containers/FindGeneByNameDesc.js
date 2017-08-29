@@ -56,10 +56,10 @@ let FindGeneByNameDesc = createReactClass({
 
       geneList = (
         <GeneSearchResultsList
-           search={search}
-           onSelectGene={onSelect}
-           icon="bitmap:genomebrowser.png"
-          />
+          search={search}
+          onSelectGene={onSelect}
+          icon="bitmap:genomebrowser.png"
+        />
       );
 
     }
@@ -68,10 +68,10 @@ let FindGeneByNameDesc = createReactClass({
       <div style={{padding: '10px'}}>
         <div className="search">
           <TextField autoFocus
-                     fullWidth={true}
-                     floatingLabelText="Search"
-                     value={search}
-                     onChange={this.handleSearchChange}
+            fullWidth={true}
+            floatingLabelText="Search"
+            value={search}
+            onChange={this.handleSearchChange}
           />
         </div>
         {geneList}

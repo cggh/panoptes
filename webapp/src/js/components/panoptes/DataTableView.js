@@ -162,22 +162,22 @@ let DataTableView = createReactClass({
           )
         ])
       )
-      .then(([rows, rowsCount]) => {
-        if (fetchStartRowIndex !== undefined && startRowIndex !== undefined && stopRowIndex !== undefined) {
-          rows = rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1);
-        }
-        this.setState({
-          loadStatus: 'loaded',
-          rows,
-          totalRowsCount: rowsCount
+        .then(([rows, rowsCount]) => {
+          if (fetchStartRowIndex !== undefined && startRowIndex !== undefined && stopRowIndex !== undefined) {
+            rows = rows.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStartRowIndex + 1);
+          }
+          this.setState({
+            loadStatus: 'loaded',
+            rows,
+            totalRowsCount: rowsCount
+          });
+        })
+        .catch(API.filterAborted)
+        .catch(LRUCache.filterCancelled)
+        .catch((xhr) => {
+          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+          this.setState({loadStatus: 'error'});
         });
-      })
-      .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled)
-      .catch((xhr) => {
-        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-        this.setState({loadStatus: 'error'});
-      });
     } else {
       this.setState({rows: []});
     }
@@ -362,15 +362,15 @@ let DataTableView = createReactClass({
                     }
 
                     return (
-                        <div className="table-row-cell"
-                                        style={{
-                                          textAlign: alignment,
-                                          width: this.calcColumnWidthPx(column),
-                                          height: ROW_HEIGHT + 'px',
-                                          background: background
-                                        }}>
-                          <PropertyCell prop={columnData} value={cellData}/>
-                        </div>
+                      <div className="table-row-cell"
+                        style={{
+                          textAlign: alignment,
+                          width: this.calcColumnWidthPx(column),
+                          height: ROW_HEIGHT + 'px',
+                          background: background
+                        }}>
+                        <PropertyCell prop={columnData} value={cellData}/>
+                      </div>
                     );
                   }}
                 />;

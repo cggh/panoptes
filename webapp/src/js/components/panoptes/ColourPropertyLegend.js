@@ -8,7 +8,11 @@ import {propertyColour} from 'util/Colours';
 
 class ColourPropertyLegend extends React.Component {
 
-  static displayName = "ColourPropertyLegend";
+  static defaultProps = {
+    query: SQL.nullQuery
+  };
+
+  static displayName = 'ColourPropertyLegend';
 
   static propTypes = {
     table: PropTypes.string.isRequired,
@@ -17,10 +21,6 @@ class ColourPropertyLegend extends React.Component {
     colourProperty: PropTypes.string.isRequired,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
-  };
-
-  static defaultProps = {
-    query: SQL.nullQuery
   };
 
   render() {
@@ -61,7 +61,7 @@ class ColourPropertyLegend extends React.Component {
       <div className="legend-element">{labelPropConfig.name}:</div>
       {maxLegendItems === undefined || (maxLegendItems !== undefined && legendElements.length < maxLegendItems) ?
         legendElements
-      : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
+        : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
       }
     </div>;
   }

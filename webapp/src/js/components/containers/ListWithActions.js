@@ -106,31 +106,31 @@ let ListWithActions = createReactClass({
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
-      <div className="sidebar" style={{height:'100%'}}>
+      <div className="sidebar" style={{height: '100%'}}>
         <div className="item-picker vertical stack">
           <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
           <FlatButton label="Download data"
-                      primary={true}
-                      onClick={() => this.handleDownload()}
-                      icon={<Icon fixedWidth={true} name="download" />}
+            primary={true}
+            onClick={() => this.handleDownload()}
+            icon={<Icon fixedWidth={true} name="download" />}
           />
           <div className="search">
             <TextField ref={(ref) => this.search = ref}
-                       fullWidth={true}
-                       floatingLabelText="Search"
-                       value={search}
-                       onChange={this.handleSearchChange}
+              fullWidth={true}
+              floatingLabelText="Search"
+              value={search}
+              onChange={this.handleSearchChange}
             />
           </div>
           <div className="item-list-container scroll-within grow">
             <div className="item-list">
               <ListView
-               search={search}
-               table={table}
-               selectedPrimKey={selectedPrimKey}
-               onSelect={this.handleSelect}
-               autoSelectIfNoneSelected
-               onRowsCountChange={this.handleRowsCountChange}
+                search={search}
+                table={table}
+                selectedPrimKey={selectedPrimKey}
+                onSelect={this.handleSelect}
+                autoSelectIfNoneSelected
+                onRowsCountChange={this.handleRowsCountChange}
               />
             </div>
           </div>
@@ -153,15 +153,15 @@ let ListWithActions = createReactClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  onClick={() => this.redirectedProps.setProps({sidebar: !sidebar})}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
+              name={sidebar ? 'arrow-left' : 'bars'}
+              onClick={() => this.redirectedProps.setProps({sidebar: !sidebar})}
+              title={sidebar ? 'Expand' : 'Sidebar'}
             />
             {selectedPrimKey ?
               <ItemTemplate className="text" table={table} primKey={selectedPrimKey}>
                 {this.tableConfig().itemTitle || `{{${this.tableConfig().primKey}}}`}
               </ItemTemplate> :
-            null}
+              null}
           </div>
           <div>
             {dataItem}

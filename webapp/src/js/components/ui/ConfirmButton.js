@@ -42,10 +42,10 @@ let ConfirmButton = createReactClass({
     const {label, primary, icon} = this.props;
 
     return <FlatButton label={label}
-                           primary={primary}
-                           onClick={this.handleClick}
-                           icon={icon}
-            />;
+      primary={primary}
+      onClick={this.handleClick}
+      icon={icon}
+    />;
   },
 });
 

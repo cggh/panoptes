@@ -30,7 +30,7 @@ let Icon = createReactClass({
     let {
       name, size, rotate, flip, spin, fixedWidth, stack, inverse,
       className, ...props
-      } = this.props;
+    } = this.props;
     if (!name)
       return;
     let classNames = '';

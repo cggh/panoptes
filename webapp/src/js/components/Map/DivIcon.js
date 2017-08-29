@@ -3,7 +3,7 @@ https://github.com/jgimbel/react-leaflet-div-icon/blob/master/div-icon.js
 */
 import PropTypes from 'prop-types';
 
-import { Children } from 'react';
+import {Children} from 'react';
 import {render, unmountComponentAtNode} from 'react-dom';
 import {DivIcon as LeafletDivIcon, marker} from 'leaflet';
 import {MapLayer} from 'react-leaflet';

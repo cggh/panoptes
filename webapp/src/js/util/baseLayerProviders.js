@@ -6,14 +6,12 @@ if (providers !== undefined) {
   let providerNames = Object.keys(providers);
   providerNames.sort();
 
-  let attributionReplacer = function (attr) {
+  let attributionReplacer = function(attr) {
     if (attr.indexOf('{attribution.') === -1) {
       return attr;
     }
     return attr.replace(/\{attribution.(\w*)\}/,
-      function (match, attributionName) {
-        return attributionReplacer(providers[attributionName].options.attribution);
-      }
+      (match, attributionName) => attributionReplacer(providers[attributionName].options.attribution)
     );
   };
 

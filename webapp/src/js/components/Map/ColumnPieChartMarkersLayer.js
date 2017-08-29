@@ -289,7 +289,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
             <MapControlComponent position="bottomleft">
               <PropertyPrefixLegend table={table} prefix={prefix} maxLegendItems={maxLegendItems} />
             </MapControlComponent>
-          : null
+            : null
           }
           <GeoLayouter nodes={clusterMarkers}>
             {
@@ -300,18 +300,18 @@ let ColumnPieChartMarkersLayer = createReactClass({
                       (marker, i) => {
 
                         let clusterComponent = (
-                            <PieChart
-                              chartData={marker.chartData}
-                              crs={crs}
-                              hideValues={true}
-                              lat={marker.lat}
-                              lng={marker.lng}
-                              originalLat={marker.originalLat}
-                              originalLng={marker.originalLng}
-                              radius={marker.radius}
-                              faceText={(marker.size).toFixed(0)}
-                              name={marker.name}
-                            />
+                          <PieChart
+                            chartData={marker.chartData}
+                            crs={crs}
+                            hideValues={true}
+                            lat={marker.lat}
+                            lng={marker.lng}
+                            originalLat={marker.originalLat}
+                            originalLng={marker.originalLng}
+                            radius={marker.radius}
+                            faceText={(marker.size).toFixed(0)}
+                            name={marker.name}
+                          />
                         );
 
                         return (

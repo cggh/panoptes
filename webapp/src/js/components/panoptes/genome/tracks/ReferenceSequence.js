@@ -80,7 +80,7 @@ let ReferenceSequence = createReactClass({
         && this.blockIndex === blockIndex
         && this.needNext === needNext
         && this.requestSummaryWindow === summaryWindow
-      )) {
+    )) {
       //Current block was unacceptable so choose best one
       this.blockLevel = blockLevel;
       this.blockIndex = blockIndex;
@@ -166,31 +166,31 @@ let ReferenceSequence = createReactClass({
     for (let i = 0, iEnd = sequence.length; i < iEnd; ++i) {
       data[i * 4 + 3] = 255;
       switch (sequence[i]) {
-        case 97: //a
-          data[i * 4] = 255;
-          data[i * 4 + 1] = 50;
-          data[i * 4 + 2] = 50;
-          break;
-        case 116: //t
-          data[i * 4] = 255;
-          data[i * 4 + 1] = 170;
-          data[i * 4 + 2] = 0;
-          break;
-        case 99: //c
-          data[i * 4] = 0;
-          data[i * 4 + 1] = 128;
-          data[i * 4 + 2] = 192;
-          break;
-        case 103: //g
-          data[i * 4] = 0;
-          data[i * 4 + 1] = 192;
-          data[i * 4 + 2] = 120;
-          break;
-        default:
-          data[i * 4] = 0;
-          data[i * 4 + 1] = 0;
-          data[i * 4 + 2] = 0;
-          break;
+      case 97: //a
+        data[i * 4] = 255;
+        data[i * 4 + 1] = 50;
+        data[i * 4 + 2] = 50;
+        break;
+      case 116: //t
+        data[i * 4] = 255;
+        data[i * 4 + 1] = 170;
+        data[i * 4 + 2] = 0;
+        break;
+      case 99: //c
+        data[i * 4] = 0;
+        data[i * 4 + 1] = 128;
+        data[i * 4 + 2] = 192;
+        break;
+      case 103: //g
+        data[i * 4] = 0;
+        data[i * 4 + 1] = 192;
+        data[i * 4 + 2] = 120;
+        break;
+      default:
+        data[i * 4] = 0;
+        data[i * 4 + 1] = 0;
+        data[i * 4 + 2] = 0;
+        break;
       }
     }
     ctx.putImageData(imageData, 0, 0);
@@ -264,7 +264,7 @@ let ReferenceSequence = createReactClass({
       });
       return seq;
     } else {
-      return 'Zoom in until sequence is not summarised'
+      return 'Zoom in until sequence is not summarised';
     }
   },
 
@@ -291,7 +291,7 @@ class Side extends React.Component {
 }
 
 class Legend extends React.Component {
-  state = {seq:''};
+  state = {seq: ''};
 
   shouldComponentUpdate(nextProps, nextState) {
     return nextState.seq !== this.state.seq;
@@ -310,8 +310,8 @@ class Legend extends React.Component {
       ))}
       <div style={{paddingLeft: '10px'}}>(Majority base over window)</div>
       <Tooltip placement={'bottom'}
-               trigger={'click'}
-               overlay={<div style={{overflowWrap: 'break-word', overflow:'auto', maxWidth:'500px'}}>{this.state.seq}</div>}>
+        trigger={'click'}
+        overlay={<div style={{overflowWrap: 'break-word', overflow: 'auto', maxWidth: '500px'}}>{this.state.seq}</div>}>
         <FlatButton
           label="Copy sequence"
           primary={true}

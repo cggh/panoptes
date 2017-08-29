@@ -100,43 +100,43 @@ let FindGene = createReactClass({
 
     return (
       <TabbedArea activeTab={activeTab}
-                  onSwitch={(id) => setProps({activeTab: id})}>
-            <TabPane
-              compId={'tab_0'}
-              key={'tab_0'}
-            >
-                <ComponentStack title="Find gene by name / description">
-                  <FindGeneByNameDesc
-                    setProps={setProps}
-                    onSelect={this.handleSelectGene}
-                    search={search}
-                  />
-                  {recentlyFoundGenes}
-                </ComponentStack>
-            </TabPane>
-            <TabPane
-              compId={'tab_1'}
-              key={'tab_1'}>
-                <ComponentStack title="Find gene by region">
-                  <FindGeneByRegion
-                    setProps={setProps}
-                    onSelect={this.handleSelectGene}
-                    chromosome={setChromosome}
-                    startPosition={startPosition}
-                    endPosition={setEndPosition}
-                    chromosomeLength={setChromosomeLength}
-                  />
-                  {recentlyFoundGenes}
-                </ComponentStack>
-            </TabPane>
-            <TabPane
-              compId={'tab_2'}
-              key={'tab_2'}>
-                <RecentlyFoundGenes
-                  onSelect={this.handleSelectGene}
-                  title="Recently found genes"
-                />
-            </TabPane>
+        onSwitch={(id) => setProps({activeTab: id})}>
+        <TabPane
+          compId={'tab_0'}
+          key={'tab_0'}
+        >
+          <ComponentStack title="Find gene by name / description">
+            <FindGeneByNameDesc
+              setProps={setProps}
+              onSelect={this.handleSelectGene}
+              search={search}
+            />
+            {recentlyFoundGenes}
+          </ComponentStack>
+        </TabPane>
+        <TabPane
+          compId={'tab_1'}
+          key={'tab_1'}>
+          <ComponentStack title="Find gene by region">
+            <FindGeneByRegion
+              setProps={setProps}
+              onSelect={this.handleSelectGene}
+              chromosome={setChromosome}
+              startPosition={startPosition}
+              endPosition={setEndPosition}
+              chromosomeLength={setChromosomeLength}
+            />
+            {recentlyFoundGenes}
+          </ComponentStack>
+        </TabPane>
+        <TabPane
+          compId={'tab_2'}
+          key={'tab_2'}>
+          <RecentlyFoundGenes
+            onSelect={this.handleSelectGene}
+            title="Recently found genes"
+          />
+        </TabPane>
       </TabbedArea>
     );
 

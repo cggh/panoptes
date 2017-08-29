@@ -41,10 +41,10 @@ let PropertyCell = createReactClass({
     let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
     let descriptionIcon = !noLinks && prop.valueDescriptions && prop.valueDescriptions[value] ?
       <Tooltip placement="bottom"
-                 trigger={['click']}
-                 overlay={htmlToReactParser.parse('<span>' + prop.valueDescriptions[value] + '</span>')}>
-          <Icon className="info" name="info-circle"/>
-        </Tooltip> :
+        trigger={['click']}
+        overlay={htmlToReactParser.parse('<span>' + prop.valueDescriptions[value] + '</span>')}>
+        <Icon className="info" name="info-circle"/>
+      </Tooltip> :
       null;
     let content = Formatter(prop, value);
     if (prop.externalUrl && !noLinks) {
@@ -53,33 +53,33 @@ let PropertyCell = createReactClass({
       }
       let refs = value.split(';');
       content = refs.map((ref, index) => (
-          <span key={index}>
+        <span key={index}>
           {index === 0 ? externalLinkIcon : null}
           <a target="_blank" href={prop.externalUrl.replace('{value}', ref)}>
             {ref}
           </a>
-            {index < refs.length - 1 ? ', ' : null}
+          {index < refs.length - 1 ? ', ' : null}
         </span>
-        ));
+      ));
     } else if (prop.valueDisplays && prop.valueDisplays[value]) {
       //Wrap as can only have one tag passed to html-to-react
-      content = htmlToReactParser.parse('<span>' + prop.valueDisplays[value] + '</span>')
+      content = htmlToReactParser.parse('<span>' + prop.valueDisplays[value] + '</span>');
     } else if (prop.dispDataType == 'Boolean' && value !== '') {
       if (value === null) {
         content = 'NULL';
       } else {
         let val = (value === 1 || value === 'True');
         content = <Icon className={(val ? 'prop bool true' : 'prop bool false')}
-              fixedWidth={false}
-              name={val ? 'check' : 'times'}/>;
-        }
+          fixedWidth={false}
+          name={val ? 'check' : 'times'}/>;
+      }
     } else if (!noLinks && prop.relation) {
       content = <ItemLink table={prop.relation.tableId} primKey={value} />;
     } else if (!noLinks && prop.isPrimKey) {
       content = <ItemLink table={prop.tableId} primKey={value} />;
     }
     return <span
-      className={"prop " + className || ''}
+      className={'prop ' + className || ''}
       onClick={(event) => {
         if (onClick && event.target.className.indexOf('info') == -1)
           onClick(event);
