@@ -191,7 +191,7 @@ let PerRowNumericalTrack = createReactClass({
     let tableConfig = this.config.tablesById[table];
 
     if (['chromosome', 'table',
-        'channel', 'query'].some((prop) => this.props[prop] !== props[prop])) {
+      'channel', 'query'].some((prop) => this.props[prop] !== props[prop])) {
       this.data = {
         dataStart: 0,
         dataStep: 0,
@@ -224,47 +224,47 @@ let PerRowNumericalTrack = createReactClass({
       transpose: false
     };
     requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'query' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.query({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        ).then((tableData) => {
-          let primKeys = tableData[tableConfig.primKey].slice(0, 50);
-          this.data.primKeys = primKeys;
-          if (colourProperty) {
-            this.data.colourVals = tableData[colourProperty].slice(0, 50);
-          }
-          return Promise.all(primKeys.map((primKey) =>
-            SummarisationCache.fetch({
-              columns: {
-                [primKey]: {
-                  primKey: primKey,
-                  folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primKey}`,
-                  config: 'Summ',
-                  name: `${channel}_${primKey}_avg`
-                }
-              },
-              minBlockSize: this.tableConfig().tableBasedSummaryValuesById[channel].blockSizeMin,
-              chromosome: chromosome,
-              start: blockStart,
-              end: blockEnd,
-              targetPointCount: blockPixelWidth,
-              cancellation: componentCancellation
-            })
-              .then(({columns, dataStart, dataStep}) => {
-                this.data.dataStart = dataStart;
-                this.data.dataStep = dataStep;
-                _assign(this.data.columns, columns);
-                this.applyData(props);
-                this.calculateYScale(props);
-              }), 'colourProperty'
-          ));
-        }).then((data) => {
-          this.props.onChangeLoadStatus('DONE');
-          return data;
-        })
-      )
+      LRUCache.get(
+        'query' + JSON.stringify(APIargs),
+        (cacheCancellation) =>
+          API.query({cancellation: cacheCancellation, ...APIargs}),
+        componentCancellation
+      ).then((tableData) => {
+        let primKeys = tableData[tableConfig.primKey].slice(0, 50);
+        this.data.primKeys = primKeys;
+        if (colourProperty) {
+          this.data.colourVals = tableData[colourProperty].slice(0, 50);
+        }
+        return Promise.all(primKeys.map((primKey) =>
+          SummarisationCache.fetch({
+            columns: {
+              [primKey]: {
+                primKey: primKey,
+                folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primKey}`,
+                config: 'Summ',
+                name: `${channel}_${primKey}_avg`
+              }
+            },
+            minBlockSize: this.tableConfig().tableBasedSummaryValuesById[channel].blockSizeMin,
+            chromosome: chromosome,
+            start: blockStart,
+            end: blockEnd,
+            targetPointCount: blockPixelWidth,
+            cancellation: componentCancellation
+          })
+            .then(({columns, dataStart, dataStep}) => {
+              this.data.dataStart = dataStart;
+              this.data.dataStep = dataStep;
+              _assign(this.data.columns, columns);
+              this.applyData(props);
+              this.calculateYScale(props);
+            }), 'colourProperty'
+        ));
+      }).then((data) => {
+        this.props.onChangeLoadStatus('DONE');
+        return data;
+      })
+    )
       .catch((err) => {
         this.props.onChangeLoadStatus('DONE');
         throw err;
@@ -401,14 +401,14 @@ let PerRowNumericalTrackControls = createReactClass({
         <div className="control">
           <div className="label">Colour By:</div>
           <PropertySelector table={table}
-                            value={colourProperty}
-                            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})} />
+            value={colourProperty}
+            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})} />
         </div>
         <div className="control">
           <div className="label">Interpolation:</div>
           <DropDownMenu className="dropdown"
-                        value={interpolation}
-                        onChange={(e, i, v) => this.redirectedProps.setProps({interpolation: v})}>
+            value={interpolation}
+            onChange={(e, i, v) => this.redirectedProps.setProps({interpolation: v})}>
             {INTERPOLATIONS.map((interpolation) =>
               <MenuItem key={interpolation.payload} value={interpolation.payload} primaryText={interpolation.text}/>)}
           </DropDownMenu>
@@ -417,11 +417,11 @@ let PerRowNumericalTrackControls = createReactClass({
           <div className="control">
             <div className="label">Tension:</div>
             <Slider className="slider"
-                    style={{marginBottom: '0', marginTop: '0'}}
-                    name="tension"
-                    value={tension}
-                    defaultValue={tension}
-                    onChange={(e, value) => this.redirectedProps.setProps({tension: value})}/>
+              style={{marginBottom: '0', marginTop: '0'}}
+              name="tension"
+              value={tension}
+              defaultValue={tension}
+              onChange={(e, value) => this.redirectedProps.setProps({tension: value})}/>
           </div>
           : null
         }
@@ -437,29 +437,29 @@ let PerRowNumericalTrackControls = createReactClass({
         {!autoYScale ? <div className="control">
           <div className="label">Y Min:</div>
           <input className="numeric-input"
-                 ref="yMin"
-                 type="number"
-                 value={yMin}
-                 onChange={() => {
-                   let value = parseFloat(this.refs.yMin.value);
-                   if (_isFinite(value))
-                     this.redirectedProps.setProps({yMin: value});
-                 }
-                                }/>
+            ref="yMin"
+            type="number"
+            value={yMin}
+            onChange={() => {
+              let value = parseFloat(this.refs.yMin.value);
+              if (_isFinite(value))
+                this.redirectedProps.setProps({yMin: value});
+            }
+            }/>
         </div>
           : null}
         {!autoYScale ? <div className="control">
           <div className="label">Y Max:</div>
           <input className="numeric-input"
-                 ref="yMax"
-                 type="number"
-                 value={yMax}
-                 onChange={() => {
-                   let value = parseFloat(this.refs.yMax.value);
-                   if (_isFinite(value))
-                     this.redirectedProps.setProps({yMax: value});
-                 }
-                                }/>
+            ref="yMax"
+            type="number"
+            value={yMax}
+            onChange={() => {
+              let value = parseFloat(this.refs.yMax.value);
+              if (_isFinite(value))
+                this.redirectedProps.setProps({yMax: value});
+            }
+            }/>
         </div>
           : null}
 

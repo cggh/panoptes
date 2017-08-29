@@ -47,17 +47,17 @@ let ItemTemplate = createReactClass({
   },
 
   componentWillMount() {
-    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
+    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars: this.props.immediate ? Handlebars : null});
   },
 
   onConfigChange() {
-    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars:this.props.immediate ? Handlebars : null});
+    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars: this.props.immediate ? Handlebars : null});
   },
 
   getDefaultProps() {
     return {
       innerClassName: 'item-template'
-    }
+    };
   },
 
   getInitialState() {
@@ -76,9 +76,9 @@ let ItemTemplate = createReactClass({
             rendered
           }));
       } else {
-          this.setState({
-            rendered: result
-          });
+        this.setState({
+          rendered: result
+        });
       }
       return;
     }
@@ -171,8 +171,8 @@ let ItemTemplate = createReactClass({
     return (
       <span className={this.props.className}>
         {rendered ? <HTMLWithComponents className={this.props.innerClassName}>
-                  {rendered}
-                </HTMLWithComponents>
+          {rendered}
+        </HTMLWithComponents>
           : null}
         <Loading status={loadStatus}/>
       </span>

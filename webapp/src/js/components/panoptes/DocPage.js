@@ -55,8 +55,8 @@ let DocPage = createReactClass({
           this.setState({
             loadStatus: 'loaded',
             content: rendered
-          }, () => this.componentWillUpdate(this.props, this.state)))
-        }
+          }, () => this.componentWillUpdate(this.props, this.state)));
+    }
   },
 
   fetchData(props, requestContext) {
@@ -68,9 +68,9 @@ let DocPage = createReactClass({
     if (this.config.docs[path]) {
       this.handlebars.compile(this.config.docs[path])({config: this.config})
         .then((rendered) => this.setState({
-        loadStatus: 'loaded',
-        content: rendered
-      }, () => this.componentWillUpdate(props, this.state)));
+          loadStatus: 'loaded',
+          content: rendered
+        }, () => this.componentWillUpdate(props, this.state)));
       return;
     }
     const {dataset} = this.config;
@@ -147,8 +147,8 @@ let DocPage = createReactClass({
       {this.config.user.isManager ?
         <div className="docpage-edit">
           <IconButton tooltip="Edit"
-                    iconClassName="fa fa-edit"
-                    onClick={() => actions.session.modalOpen(<EditDocPage path={path}/>)}
+            iconClassName="fa fa-edit"
+            onClick={() => actions.session.modalOpen(<EditDocPage path={path}/>)}
           />
         </div>
         : null}

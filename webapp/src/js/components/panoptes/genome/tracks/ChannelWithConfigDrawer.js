@@ -63,20 +63,20 @@ let ChannelWithConfigDrawer = createReactClass({
             {side}
           </div>
           {onClose ?
-          <div className="close button">
-            <Icon name="times" onClick={this.handleClose}/>
-          </div>
+            <div className="close button">
+              <Icon name="times" onClick={this.handleClose}/>
+            </div>
             : null }
           {configComponent ?
             <div className="config button">
               <Icon className={classnames({open: controlsOpen})}
-                    name="cog" onClick={this.handleControlToggle}/>
+                name="cog" onClick={this.handleControlToggle}/>
             </div>
             : null }
           {legendComponent ?
             <div className="legend button" ref="legendToggle">
               <Icon className={classnames({open: legendOpen})}
-                    name="info" onClick={this.handleLegendToggle}/>
+                name="info" onClick={this.handleLegendToggle}/>
             </div>
             : null }
         </div>

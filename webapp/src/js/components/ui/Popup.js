@@ -124,17 +124,17 @@ let Popup = createReactClass({
 
     return (
       <Draggable handle=".popup-drag"
-                 defaultPosition={{x, y}}
-                 onStart={this.handleClick}
-                 onStop={this.handleMoveStop}
-                 position={{x, y}}>
+        defaultPosition={{x, y}}
+        onStart={this.handleClick}
+        onStop={this.handleMoveStop}
+        position={{x, y}}>
         <Resizable width={width} height={height}
-                   minConstraints={[50, 50]}
-                   handleSize={[20, 20]}
-                   onResize={this.handleResize}
-                   onResizeStop={this.handleResizeStop}>
+          minConstraints={[50, 50]}
+          handleSize={[20, 20]}
+          onResize={this.handleResize}
+          onResizeStop={this.handleResizeStop}>
           <div className={'popup ' + className}
-               style={{...style, width, height}}
+            style={{...style, width, height}}
           >
             <div className="popup-header">
               {icon ? <Icon name={icon}/> : null}

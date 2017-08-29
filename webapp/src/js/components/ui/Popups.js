@@ -19,7 +19,7 @@ let Popups = createReactClass({
   render() {
     return (
       <div {...this.props} className="popups">
-          {ValidComponentChildren.map(this.props.children, this.renderPopup, this)}
+        {ValidComponentChildren.map(this.props.children, this.renderPopup, this)}
       </div>
     );
   },

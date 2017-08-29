@@ -227,62 +227,62 @@ let PivotTableView = createReactClass({
 
         switch (display) {
 
-          // Show raw counts.
-          case undefined:
-          case 'counts': {
-            uniqueColumns.forEach(
-              (columnValue) => {
-                uniqueRows.forEach(
-                  (rowValue) => {
-                    if (dataByColumnRow[columnValue][rowValue] !== undefined) {
-                      dataByColumnRow[columnValue][rowValue].displayValue = dataByColumnRow[columnValue][rowValue].count;
-                      dataByColumnRow[columnValue][rowValue].sortValue = dataByColumnRow[columnValue][rowValue].count;
-                      return;
-                    } else {
-                      return dataByColumnRow[columnValue][rowValue] = {displayValue: '', sortValue: 0};
-                    }
+        // Show raw counts.
+        case undefined:
+        case 'counts': {
+          uniqueColumns.forEach(
+            (columnValue) => {
+              uniqueRows.forEach(
+                (rowValue) => {
+                  if (dataByColumnRow[columnValue][rowValue] !== undefined) {
+                    dataByColumnRow[columnValue][rowValue].displayValue = dataByColumnRow[columnValue][rowValue].count;
+                    dataByColumnRow[columnValue][rowValue].sortValue = dataByColumnRow[columnValue][rowValue].count;
+                    return;
+                  } else {
+                    return dataByColumnRow[columnValue][rowValue] = {displayValue: '', sortValue: 0};
                   }
-                );
-              }
-            );
-            break;
-          }
-          case 'percentAll': {
-            const totalCount = dataByColumnRow['_all_']['_all_'].count;
-            uniqueColumns.forEach(
-              (columnValue) => {
-                uniqueRows.forEach(
-                  (rowValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], totalCount)
-                );
-              }
-            );
-            break;
-          }
-          case 'percentColumn': {
-            uniqueColumns.forEach(
-              (columnValue) => {
-                let columnTotalCount = dataByColumnRow[columnValue]['_all_'].count;
-                uniqueRows.forEach(
-                  (rowValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], columnTotalCount)
-                );
-              }
-            );
-            break;
-          }
-          case 'percentRow': {
-            uniqueRows.forEach(
-              (rowValue) => {
-                let rowTotalCount = dataByColumnRow['_all_'][rowValue].count;
-                uniqueColumns.forEach(
-                  (columnValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], rowTotalCount)
-                );
-              }
-            );
-            break;
-          }
-          default: {
-            console.error('Unhandled value for display prop: %o', display);
-          }
+                }
+              );
+            }
+          );
+          break;
+        }
+        case 'percentAll': {
+          const totalCount = dataByColumnRow['_all_']['_all_'].count;
+          uniqueColumns.forEach(
+            (columnValue) => {
+              uniqueRows.forEach(
+                (rowValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], totalCount)
+              );
+            }
+          );
+          break;
+        }
+        case 'percentColumn': {
+          uniqueColumns.forEach(
+            (columnValue) => {
+              let columnTotalCount = dataByColumnRow[columnValue]['_all_'].count;
+              uniqueRows.forEach(
+                (rowValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], columnTotalCount)
+              );
+            }
+          );
+          break;
+        }
+        case 'percentRow': {
+          uniqueRows.forEach(
+            (rowValue) => {
+              let rowTotalCount = dataByColumnRow['_all_'][rowValue].count;
+              uniqueColumns.forEach(
+                (columnValue) => dataByColumnRow[columnValue][rowValue] = calcPercentageData(dataByColumnRow[columnValue][rowValue], rowTotalCount)
+              );
+            }
+          );
+          break;
+        }
+        default: {
+          console.error('Unhandled value for display prop: %o', display);
+        }
         }
 
 
@@ -451,7 +451,7 @@ let PivotTableView = createReactClass({
               let asc = _some(columnSortOrder, ([dir, val]) => dir === 'asc' && val === columnHeading);
               let desc = _some(columnSortOrder, ([dir, val]) => dir === 'desc' && val === columnHeading);
               let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
-                                               name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+                name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
               return (
                 <TableHeaderColumn
                   key={columnHeading}>
@@ -495,7 +495,7 @@ let PivotTableView = createReactClass({
             let asc = _some(rowSortOrder, ([dir, val]) => dir === 'asc' && val === rowHeading);
             let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
             let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
-                                             name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+              name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
             return (
               <TableRow key={rowHeading}>
                 <TableHeaderColumn

@@ -4,7 +4,12 @@ import {arc} from 'd3-shape';
 
 class PieChartSector extends React.Component {
 
-  static displayName = "PieChartSector";
+  static defaultProps = {
+    outerRadius: 20,
+    innerRadius: 0
+  };
+
+  static displayName = 'PieChartSector';
 
   static propTypes = {
     outerRadius: PropTypes.number,
@@ -14,11 +19,6 @@ class PieChartSector extends React.Component {
     title: PropTypes.string,
     onClick: PropTypes.func,
     className: PropTypes.string
-  };
-
-  static defaultProps = {
-    outerRadius: 20,
-    innerRadius: 0
   };
 
   render() {

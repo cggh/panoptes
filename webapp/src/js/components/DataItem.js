@@ -31,7 +31,7 @@ let DataItem = createReactClass({
     children: PropTypes.node
   },
 
-  getDefaultProps: function () {
+  getDefaultProps: function() {
     return {
       activeTab: 'view_0'
     };
@@ -72,7 +72,7 @@ let DataItem = createReactClass({
           >
             {children}
           </TabbedArea> :
-          children[0]}
+            children[0]}
         </div>
         <div>
           <DataItemActions table={table} primKey={primKey}/>

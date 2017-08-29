@@ -12,7 +12,7 @@ import YScale from 'panoptes/genome/tracks/YScale';
 
 
 import {Motion, spring} from 'react-motion';
-const DEFAULT_SPRING = {stiffness:160, damping: 30};
+const DEFAULT_SPRING = {stiffness: 160, damping: 30};
 const NO_SPRING = {stiffness: 2000, damping: 80};
 
 let CanvasGroupChannel = createReactClass({
@@ -150,28 +150,28 @@ let CanvasGroupChannel = createReactClass({
         legendComponent={legend}
         onClose={this.handleClose}
       >
-          <Motion ref="spring" style={yAxisSpring} defaultStyle={initYAxisSpring}>
-            {(interpolated) => {
-              let {yMin, yMax} = interpolated;
-              return <Hammer onTap={this.redirectedProps.onTap}>
-                <div
-                  className="numerical-channel-canvas-holder"
-                  style={this.props.style}
-                  onMouseOver={this.redirectedProps.onMouseOver}
-                  onMouseMove={this.redirectedProps.onMouseMove}
-                  onMouseOut={this.redirectedProps.onMouseOut}
-                 >
-                  <YScale width={width - sideWidth} height={height} min={yMin} max={yMax} />
-                  {React.Children.map(this.props.children, (child, index) => React.cloneElement(child, {
-                    yMin,
-                    yMax,
-                    height,
-                    onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
-                  }))}
-                </div>
-              </Hammer>;
-            }}
-          </Motion>
+        <Motion ref="spring" style={yAxisSpring} defaultStyle={initYAxisSpring}>
+          {(interpolated) => {
+            let {yMin, yMax} = interpolated;
+            return <Hammer onTap={this.redirectedProps.onTap}>
+              <div
+                className="numerical-channel-canvas-holder"
+                style={this.props.style}
+                onMouseOver={this.redirectedProps.onMouseOver}
+                onMouseMove={this.redirectedProps.onMouseMove}
+                onMouseOut={this.redirectedProps.onMouseOut}
+              >
+                <YScale width={width - sideWidth} height={height} min={yMin} max={yMax} />
+                {React.Children.map(this.props.children, (child, index) => React.cloneElement(child, {
+                  yMin,
+                  yMax,
+                  height,
+                  onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
+                }))}
+              </div>
+            </Hammer>;
+          }}
+        </Motion>
       </ChannelWithConfigDrawer>);
   },
 });

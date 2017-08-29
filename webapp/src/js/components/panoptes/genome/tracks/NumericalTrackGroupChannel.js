@@ -154,35 +154,35 @@ let NumericalTrackGroupChannel = createReactClass({
     }
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     children = React.Children.map(children,
-          (child) => React.cloneElement(child, {
-            ...this.props,
-            width: width - sideWidth,
-            colour: child.props.colour || this.config.tablesById[child.props.table].propertiesById[child.props.track].colour || colourFunc(child.props.track),
-            query: table ? query : undefined,
-            ref: (node) => {if (node) this.children.push(node);}
-          }));
+      (child) => React.cloneElement(child, {
+        ...this.props,
+        width: width - sideWidth,
+        colour: child.props.colour || this.config.tablesById[child.props.table].propertiesById[child.props.track].colour || colourFunc(child.props.track),
+        query: table ? query : undefined,
+        ref: (node) => { if (node) this.children.push(node); }
+      }));
     return (
       <CanvasGroupChannel onTap={this.handleTap}
-                          onMouseOver={this.handleMouseOver}
-                          onMouseMove={this.handleMouseMove}
-                          onMouseOut={this.handleMouseOut}
-                          style={{cursor: this.state.pointer ? 'pointer' : 'inherit'}}
-                          {...this.props}
-                          yMin={yMin}
-                          yMax={yMax}
-                          side={<Side {...this.props} setProps={this.redirectedProps.setProps} query={query}>
-                            {children}
-                            </Side>}
-                          onClose={this.redirectedProps.onClose}
-                          controls={<NumericalTrackGroupControls {...this.props}
-                                                                 yMin={yMin}
-                                                                 yMax={yMax}
-                                                                 setProps={this.redirectedProps.setProps}
-                                                                 query={query} />}
-                          legend={<Legend childrenHash={childrenHash} setProps={this.redirectedProps.setProps}>
-                                    {children}
-                                  </Legend>}
-        >
+        onMouseOver={this.handleMouseOver}
+        onMouseMove={this.handleMouseMove}
+        onMouseOut={this.handleMouseOut}
+        style={{cursor: this.state.pointer ? 'pointer' : 'inherit'}}
+        {...this.props}
+        yMin={yMin}
+        yMax={yMax}
+        side={<Side {...this.props} setProps={this.redirectedProps.setProps} query={query}>
+          {children}
+        </Side>}
+        onClose={this.redirectedProps.onClose}
+        controls={<NumericalTrackGroupControls {...this.props}
+          yMin={yMin}
+          yMax={yMax}
+          setProps={this.redirectedProps.setProps}
+          query={query} />}
+        legend={<Legend childrenHash={childrenHash} setProps={this.redirectedProps.setProps}>
+          {children}
+        </Legend>}
+      >
         {children}
       </CanvasGroupChannel>
     );
@@ -215,10 +215,10 @@ let Side = createReactClass({
       <LegendElement
         key={child.props.track}
         name={<PropertyHeader className="table-row-header"
-                              table={table}
-                              propId={child.props.track}
-                              tooltipPlacement={'bottom'}
-                              tooltipTrigger={['click']}
+          table={table}
+          propId={child.props.track}
+          tooltipPlacement={'bottom'}
+          tooltipTrigger={['click']}
         />}
         colour={child.props.colour}
         onPickColour={(colour) =>
@@ -227,16 +227,16 @@ let Side = createReactClass({
           )
         }
 
-    />);
+      />);
     if (trackNames.length > 3) {
       let n = trackNames.length;
-      trackNames = trackNames.slice(0,2).concat(
-        <div>+ <a onClick={this.redirectedProps.onLegendToggle}>{n-2} more</a></div>
-      )
+      trackNames = trackNames.slice(0, 2).concat(
+        <div>+ <a onClick={this.redirectedProps.onLegendToggle}>{n - 2} more</a></div>
+      );
     }
     return <div className="side-name">
-      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural+':' : '')}</div>
-      <div style={{marginLeft:"-13px"}}>{trackNames}</div>
+      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural + ':' : '')}</div>
+      <div style={{marginLeft: '-13px'}}>{trackNames}</div>
     </div>;
   },
 });
@@ -269,7 +269,7 @@ let Legend = createReactClass({
             )
           }
         />)}
-    </div>
+    </div>;
   },
 });
 
@@ -323,23 +323,23 @@ let NumericalTrackGroupControls = createReactClass({
               prop.id !== iTable.position &&
               prop.isNumerical &&
               !prop.isCategorical),
-            (prop) => {
-              let definedPropertyGroupId = prop.groupId !== undefined ? prop.groupId : undefinedPropertyGroupId;
-              // If this propertyGroup hasn't been created yet, create it.
-              if (!propertiesByPropertyGroupId.hasOwnProperty(definedPropertyGroupId)) {
-                propertiesByPropertyGroupId[definedPropertyGroupId] = {
-                  name: iTable.propertyGroupsById[definedPropertyGroupId].name,
-                  items: {}
-                };
-              }
-              propertiesByPropertyGroupId[definedPropertyGroupId].items[prop.id] = {
-                name: prop.name,
-                description: prop.description,
-                icon: prop.icon,
-                payload: serialiseComponent(
-                  <NumericalSummaryTrack table={iTable.id} track={prop.id}/>
-                )
+          (prop) => {
+            let definedPropertyGroupId = prop.groupId !== undefined ? prop.groupId : undefinedPropertyGroupId;
+            // If this propertyGroup hasn't been created yet, create it.
+            if (!propertiesByPropertyGroupId.hasOwnProperty(definedPropertyGroupId)) {
+              propertiesByPropertyGroupId[definedPropertyGroupId] = {
+                name: iTable.propertyGroupsById[definedPropertyGroupId].name,
+                items: {}
               };
+            }
+            propertiesByPropertyGroupId[definedPropertyGroupId].items[prop.id] = {
+              name: prop.name,
+              description: prop.description,
+              icon: prop.icon,
+              payload: serialiseComponent(
+                <NumericalSummaryTrack table={iTable.id} track={prop.id}/>
+              )
+            };
           });
         trackGroups[iTable.id].itemGroups = propertiesByPropertyGroupId;
       }
@@ -365,19 +365,19 @@ let NumericalTrackGroupControls = createReactClass({
         <div className="control-group">
           <div className="control">
             <FlatButton label="Add/Remove Tracks"
-                        primary={true}
-                        onClick={() => actions.session.modalOpen(<ItemPicker
-                          title="Pick tracks to be displayed"
-                          itemName="numerical track"
-                          pickVerb="display"
-                          groups={this.trackGroups()}
-                          initialSelection={React.Children.map(children, (child) => ({
-                            groupId: child.props.table,
-                            itemGroupId: this.config.tablesById[child.props.table].propertiesById[child.props.track].groupId || '_UNGROUPED_',
-                            itemId: child.props.track,
-                          }))}
-                          onPick={this.handleTrackChange}
-                        />)}
+              primary={true}
+              onClick={() => actions.session.modalOpen(<ItemPicker
+                title="Pick tracks to be displayed"
+                itemName="numerical track"
+                pickVerb="display"
+                groups={this.trackGroups()}
+                initialSelection={React.Children.map(children, (child) => ({
+                  groupId: child.props.table,
+                  itemGroupId: this.config.tablesById[child.props.table].propertiesById[child.props.track].groupId || '_UNGROUPED_',
+                  itemId: child.props.track,
+                }))}
+                onPick={this.handleTrackChange}
+              />)}
             />
           </div>
         </div>
@@ -402,29 +402,29 @@ let NumericalTrackGroupControls = createReactClass({
           {!autoYScale ? <div className="control">
             <div className="label">Y Min:</div>
             <input className="numeric-input"
-                   ref="yMin"
-                   type="number"
-                   value={yMin}
-                   onChange={() => {
-                     let value = parseFloat(this.refs.yMin.value);
-                     if (_isFinite(value))
-                       this.redirectedProps.setProps({yMin: value});
-                   }
-                   }/>
+              ref="yMin"
+              type="number"
+              value={yMin}
+              onChange={() => {
+                let value = parseFloat(this.refs.yMin.value);
+                if (_isFinite(value))
+                  this.redirectedProps.setProps({yMin: value});
+              }
+              }/>
           </div>
             : null}
           {!autoYScale ? <div className="control">
             <div className="label">Y Max:</div>
             <input className="numeric-input"
-                   ref="yMax"
-                   type="number"
-                   value={yMax}
-                   onChange={() => {
-                     let value = parseFloat(this.refs.yMax.value);
-                     if (_isFinite(value))
-                       this.redirectedProps.setProps({yMax: value});
-                   }
-                   }/>
+              ref="yMax"
+              type="number"
+              value={yMax}
+              onChange={() => {
+                let value = parseFloat(this.refs.yMax.value);
+                if (_isFinite(value))
+                  this.redirectedProps.setProps({yMax: value});
+              }
+              }/>
           </div>
             : null}
         </div>

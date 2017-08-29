@@ -125,23 +125,23 @@ let GroupedItemPicker = createReactClass({
                     let subItems = _map(properties, (prop) => {
                       let {name, description, id,  icon} = prop;
                       return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                            <ListItem className={classNames({picked: !_includes(picked, id)})}
-                                      key={id}
-                                      primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
-                                      secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-                                      leftIcon={<div><Icon fixedWidth={true} name={icon} /></div>}
-                                      onClick={() => this.handleAdd(id)}
-                              />) : null;
+                        <ListItem className={classNames({picked: !_includes(picked, id)})}
+                          key={id}
+                          primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
+                          secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
+                          leftIcon={<div><Icon fixedWidth={true} name={icon} /></div>}
+                          onClick={() => this.handleAdd(id)}
+                        />) : null;
                     }
-                      );
+                    );
                     return _filter(subItems, (i) => i).length > 0 ? (
                       <ListItem primaryText={name}
-                                key={id}
-                                initiallyOpen={true}
-                                //leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
-                                onClick={() => this.handleAddAll(id)}
-                                nestedItems={subItems}
-                        />
+                        key={id}
+                        initiallyOpen={true}
+                        //leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
+                        onClick={() => this.handleAddAll(id)}
+                        nestedItems={subItems}
+                      />
 
                     ) : null;
                   })
@@ -159,24 +159,24 @@ let GroupedItemPicker = createReactClass({
                   _map(groups, (group) => {
                     let {id, name, properties} = group;
                     return ( _intersection(picked, _map(properties, 'id')).length > 0 ?
-                        <ListItem primaryText={name}
-                                  key={id}
-                                  initiallyOpen={true}
-                                  onClick={() => this.handleRemoveAll(id)}
-                                  nestedItems={
-                      _map(properties, (prop) => {
-                        let {name, description, id, icon} = prop;
-                        return _includes(picked, id) ? (
-                            <ListItem key={id}
-                                      secondaryText={description}
-                                      primaryText={name}
-                                      leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-                                      onClick={() => this.handleRemove(id)}/>
-                          ) : null;
-                      }
-                      )
-                    }
-                          /> : null
+                      <ListItem primaryText={name}
+                        key={id}
+                        initiallyOpen={true}
+                        onClick={() => this.handleRemoveAll(id)}
+                        nestedItems={
+                          _map(properties, (prop) => {
+                            let {name, description, id, icon} = prop;
+                            return _includes(picked, id) ? (
+                              <ListItem key={id}
+                                secondaryText={description}
+                                primaryText={name}
+                                leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+                                onClick={() => this.handleRemove(id)}/>
+                            ) : null;
+                          }
+                          )
+                        }
+                      /> : null
                     );
                   })
                 }

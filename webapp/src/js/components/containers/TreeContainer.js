@@ -87,29 +87,29 @@ let TreeContainer = createReactClass({
             ]
           )
       )
-      .then((data) => {
+        .then((data) => {
 
-        let nodeColourFunction = propertyColour(this.config.tablesById[table].propertiesById[nodeColourProperty]);
-        let branchColourFunction = propertyColour(this.config.tablesById[table].propertiesById[branchColourProperty]);
+          let nodeColourFunction = propertyColour(this.config.tablesById[table].propertiesById[nodeColourProperty]);
+          let branchColourFunction = propertyColour(this.config.tablesById[table].propertiesById[branchColourProperty]);
 
-        let metadata = _map(data[1], (obj) => ({
-          key: obj.key,
-          nodeColour: nodeColourFunction(obj[nodeColourProperty]),
-          branchColour: branchColourFunction(obj[branchColourProperty])
-        }));
+          let metadata = _map(data[1], (obj) => ({
+            key: obj.key,
+            nodeColour: nodeColourFunction(obj[nodeColourProperty]),
+            branchColour: branchColourFunction(obj[branchColourProperty])
+          }));
 
-        let metadataByKey = _keyBy(metadata, (obj) => obj.key);
+          let metadataByKey = _keyBy(metadata, (obj) => obj.key);
 
-        this.setState({
-          data: data[0].data,
-          metadata: metadataByKey,
-          loadStatus: 'loaded'
+          this.setState({
+            data: data[0].data,
+            metadata: metadataByKey,
+            loadStatus: 'loaded'
+          });
+        })
+        .catch((error) => {
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+          this.setState({loadStatus: 'error'});
         });
-      })
-      .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({loadStatus: 'error'});
-      });
     } else {
       this.setState({
         data: null,
@@ -130,7 +130,7 @@ let TreeContainer = createReactClass({
             data={data}
             metadata={metadata}
           />
-        : null}
+          : null}
         <Loading status={loadStatus}/>
       </div>);
   },

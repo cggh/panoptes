@@ -98,7 +98,7 @@ let GenomeBrowser = createReactClass({
     if (nextProps.chromosome !== this.props.chromosome && nextProps.setProps &&
       nextProps.start === this.props.start &&
       nextProps.end === this.props.end
-      ) {
+    ) {
       nextProps.setProps({start: 0, end: this.config.chromosomes[nextProps.chromosome] || 10000});
     }
     if (nextProps.chromosome !== this.props.chromosome) {
@@ -177,8 +177,8 @@ let GenomeBrowser = createReactClass({
     let start = this.actualStart;
     let end = this.actualEnd;
     let scaleFactor = (delta > 0) ?
-    1.0 / (1.0 + 0.04 * Math.abs(delta)) :
-    1.0 + 0.04 * Math.abs(delta);
+      1.0 / (1.0 + 0.04 * Math.abs(delta)) :
+      1.0 + 0.04 * Math.abs(delta);
     pos = (pos != undefined) ? this.scale.invert(pos) : start + ((end - start) / 2);
     let fracX = (pos - start) / (end - start);
     let newWidth = (end - start) / scaleFactor;
@@ -254,7 +254,7 @@ let GenomeBrowser = createReactClass({
   },
 
   handleHover(hoverPos) {
-    this.setState({hoverPos})
+    this.setState({hoverPos});
   },
 
   convertXY(e) {
@@ -263,14 +263,14 @@ let GenomeBrowser = createReactClass({
   },
 
   handleMouseMove(e) {
-    if(this.mainArea && !e.hoverHandled) {
+    if (this.mainArea && !e.hoverHandled) {
       let [x, y] = this.convertXY(e);
       const {sideWidth, start, end} = this.props;
       let {width} = this.state;
       width = Math.max(0, width - scrollbarSize());
       const scaleFactor = (end - start) / (width - sideWidth);
       const hoverPos = Math.round(start + ((x - sideWidth) * scaleFactor));
-      this.handleHover(hoverPos)
+      this.handleHover(hoverPos);
     }
   },
 
@@ -325,8 +325,8 @@ let GenomeBrowser = createReactClass({
           >
             <div ref={(node) => this.mainArea = node} className="main-area">
               <Motion ref="spring"
-                      style={targetPos}
-                      defaultStyle={initTargetPos}>
+                style={targetPos}
+                defaultStyle={initTargetPos}>
                 {(interpolated) => {
                   start = interpolated.mid - interpolated.halfWidth;
                   end = interpolated.mid + interpolated.halfWidth;
@@ -347,21 +347,21 @@ let GenomeBrowser = createReactClass({
                   };
                   return (
                     <div className="tracks vertical stack"
-                        onMouseMove={this.handleMouseMove}
-                        onMouseOver={this.handleMouseOver}
-                        onMouseOut={this.handleMouseOut}
+                      onMouseMove={this.handleMouseMove}
+                      onMouseOver={this.handleMouseOver}
+                      onMouseOut={this.handleMouseOut}
                     >
                       <Background start={start} end={end} width={width} height={Math.max(0, height - CONTROLS_HEIGHT)}
-                                  sideWidth={sideWidth}
-                                  onChangeHoverPos={this.handleHover}
-                                  hoverPos={hoverPos}
+                        sideWidth={sideWidth}
+                        onChangeHoverPos={this.handleHover}
+                        hoverPos={hoverPos}
                       />
 
                       <div className="fixed">
                         <GenomeScale start={start} end={end}
-                                     width={width} sideWidth={sideWidth}
-                                     onChangeHoverPos={this.handleHover}
-                                     hoverPos={hoverPos}
+                          width={width} sideWidth={sideWidth}
+                          onChangeHoverPos={this.handleHover}
+                          hoverPos={hoverPos}
                         />
                         {ValidComponentChildren.map(children,
                           (child, i) => child.props.fixed ?

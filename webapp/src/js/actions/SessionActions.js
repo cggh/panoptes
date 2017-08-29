@@ -89,7 +89,7 @@ let SessionActions = {
   },
 
   reuseComponentOrPopup(componentName, props) {
-    this.dispatch(SESSION.REUSE_OR_POPUP, {componentName, props})
+    this.dispatch(SESSION.REUSE_OR_POPUP, {componentName, props});
   }
 };
 

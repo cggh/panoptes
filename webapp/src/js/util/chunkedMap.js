@@ -3,14 +3,14 @@ export default function chunkedMap(bounds, fn, updateFn, chunkSize, maxTimePerCh
   context = context || window;
   maxTimePerChunk = maxTimePerChunk || 200;
   chunkSize = chunkSize || 100;
-  var index = start;
+  let index = start;
 
   function now() {
     return new Date().getTime();
   }
 
   function doChunk() {
-    var startTime = now();
+    let startTime = now();
     let chunkStart = index;
     while (index < end && ((index - chunkStart < chunkSize) || (now() - startTime) <= maxTimePerChunk && (chunkSize = index))) {
       // callback called with args (value, index, array)

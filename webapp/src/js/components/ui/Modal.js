@@ -92,8 +92,8 @@ let Modal = createReactClass({
     return (
       <HotKeys keyMap={hotKeysKeyMap} handlers={hotKeysHandlers}>
         <div className={classNames(classes)}
-             ref={(node) => this.overlay = node}
-             onClick={this.handleOverlayClick}>
+          ref={(node) => this.overlay = node}
+          onClick={this.handleOverlayClick}>
           <div className="popup"
             {...other}>
             <div className="popup-header">

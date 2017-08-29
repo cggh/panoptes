@@ -34,12 +34,12 @@ let PropertyListItem = createReactClass({
     const propertyData = this.tableConfig().propertiesById[propId];
 
     return (
-       <tr className="table-col-row">
-         <th className="table-col-header">
-           <PropertyHeader table={table} propId={propId} tooltipPlacement={tooltipPlacement} tooltipTrigger={tooltipTrigger} />
-         </th>
-         <td className="table-col-cell" style={{backgroundColor: 'inherit'}}><PropertyCell prop={propertyData} value={value}/></td>
-       </tr>
+      <tr className="table-col-row">
+        <th className="table-col-header">
+          <PropertyHeader table={table} propId={propId} tooltipPlacement={tooltipPlacement} tooltipTrigger={tooltipTrigger} />
+        </th>
+        <td className="table-col-cell" style={{backgroundColor: 'inherit'}}><PropertyCell prop={propertyData} value={value}/></td>
+      </tr>
     );
 
 

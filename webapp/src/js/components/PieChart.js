@@ -69,14 +69,14 @@ let PieChart = createReactClass({
     let arcDescriptors = pieChart(pieData);
 
     let sectors = sectorsData.map((sectorData, i) =>
-        <PieChartSector
-          key={i}
-          arcDescriptor={arcDescriptors[i]}
-          outerRadius={radius}
-          fillColor={sectorData.color}
-          title={sectorData.title !== 'undefined' ? sectorData.title : JSON.stringify(sectorData)}
-          className={isHighlighted ? 'panoptes-chart-pie-sector-highlighted' : 'panoptes-chart-pie-sector'}
-        />
+      <PieChartSector
+        key={i}
+        arcDescriptor={arcDescriptors[i]}
+        outerRadius={radius}
+        fillColor={sectorData.color}
+        title={sectorData.title !== 'undefined' ? sectorData.title : JSON.stringify(sectorData)}
+        className={isHighlighted ? 'panoptes-chart-pie-sector-highlighted' : 'panoptes-chart-pie-sector'}
+      />
     );
 
     // let location = crs.project({lat, lng});

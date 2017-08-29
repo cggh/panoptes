@@ -65,15 +65,15 @@ let PropertyGroup = createReactClass({
         componentCancellation
       )
     )
-    .then((data) => {
-      this.setState({loadStatus: 'loaded', data: data});
-    })
-    .catch(API.filterAborted)
-    .catch(LRUCache.filterCancelled)
-    .catch((error) => {
-      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-      this.setState({loadStatus: 'error'});
-    });
+      .then((data) => {
+        this.setState({loadStatus: 'loaded', data: data});
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+        this.setState({loadStatus: 'error'});
+      });
   },
 
   title() {
@@ -84,16 +84,16 @@ let PropertyGroup = createReactClass({
     let {table, propertyGroupId, className} = this.props;
     let {data, loadStatus} = this.state;
     return (
-        <div>
-          {data ? <PropertyList table={table}
-                        propertiesData={
-                          _map(
-                            _filter(this.config.tablesById[table].properties, {groupId: propertyGroupId} ),
-                            ({id}) => ({id, value:data[id]}))}
-                        className={className}
-          /> : null}
-          <Loading status={loadStatus}/>
-        </div>
+      <div>
+        {data ? <PropertyList table={table}
+          propertiesData={
+            _map(
+              _filter(this.config.tablesById[table].properties, {groupId: propertyGroupId} ),
+              ({id}) => ({id, value: data[id]}))}
+          className={className}
+        /> : null}
+        <Loading status={loadStatus}/>
+      </div>
     );
   },
 });

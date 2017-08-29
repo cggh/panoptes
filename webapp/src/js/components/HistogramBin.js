@@ -34,8 +34,8 @@ let HistogramBin = createReactClass({
 
     return (
       <rect x={x} y={y}
-            width={width} height={height}
-            fill={fill}>
+        width={width} height={height}
+        fill={fill}>
         <title>{title}</title>
       </rect>
     );

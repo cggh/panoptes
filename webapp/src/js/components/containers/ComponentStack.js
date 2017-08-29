@@ -7,9 +7,7 @@ class ComponentStack extends React.Component {
     title: PropTypes.string
   };
 
-  title = () => {
-    return this.props.title;
-  };
+  title = () => this.props.title;
 
   render() {
     return (

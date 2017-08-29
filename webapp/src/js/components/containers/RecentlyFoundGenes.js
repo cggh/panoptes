@@ -47,12 +47,12 @@ let RecentlyFoundGenes = createReactClass({
 
     if (foundGenes.size > 0) {
       let foundGenesListItems = _map(foundGenes.toJS(), ({geneId, geneDesc}) =>
-          <ListItem key={geneId}
-                    primaryText={geneId}
-                    secondaryText={geneDesc}
-                    leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
-                    onClick={(e) => onSelect(e, geneId, geneDesc)}
-          />
+        <ListItem key={geneId}
+          primaryText={geneId}
+          secondaryText={geneDesc}
+          leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
+          onClick={(e) => onSelect(e, geneId, geneDesc)}
+        />
       );
 
       let subheader = undefined;

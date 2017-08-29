@@ -59,11 +59,11 @@ let TableList = createReactClass({
         <Subheader>Open a table:</Subheader>
         {_map(tables, (table) => (
           this.config.tablesById[table.id].isHidden ? null :
-          <ListItem key={table.id}
-                    primaryText={table.capNamePlural}
-                    secondaryText={striptags(table.description)}
-                    leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
-                    onClick={(e) => this.handleTableClick(e, table)} />
+            <ListItem key={table.id}
+              primaryText={table.capNamePlural}
+              secondaryText={striptags(table.description)}
+              leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
+              onClick={(e) => this.handleTableClick(e, table)} />
         ))}
       </List>
 

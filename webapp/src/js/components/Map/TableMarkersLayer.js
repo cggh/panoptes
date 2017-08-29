@@ -491,7 +491,7 @@ let TableMarkersLayer = createReactClass({
                 maxLegendItems={maxLegendItems}
               />
             </MapControlComponent>
-          : null
+            : null
           }
           {clusterMarkers ?
             <GeoLayouter nodes={clusteredMarkers}>
@@ -507,18 +507,18 @@ let TableMarkersLayer = createReactClass({
                           if (marker.clusterType === 'pieChart' || marker.markersAtLocationCount === 1) {
 
                             clusterComponent = (
-                                <PieChart
-                                  chartData={marker.chartData}
-                                  crs={crs}
-                                  hideValues={true}
-                                  lat={marker.lat}
-                                  lng={marker.lng}
-                                  originalLat={marker.originalLat}
-                                  originalLng={marker.originalLng}
-                                  radius={marker.radius}
-                                  faceText={marker.count !== undefined ? marker.count : 1}
-                                  isHighlighted={marker.isHighlighted}
-                                />
+                              <PieChart
+                                chartData={marker.chartData}
+                                crs={crs}
+                                hideValues={true}
+                                lat={marker.lat}
+                                lng={marker.lng}
+                                originalLat={marker.originalLat}
+                                originalLng={marker.originalLng}
+                                radius={marker.radius}
+                                faceText={marker.count !== undefined ? marker.count : 1}
+                                isHighlighted={marker.isHighlighted}
+                              />
                             );
 
                           } else if (marker.clusterType === 'histogram') {
@@ -526,23 +526,23 @@ let TableMarkersLayer = createReactClass({
                             const histogramWidth = Math.sqrt(Math.pow(marker.radius, 2) / 2) * 2;
 
                             clusterComponent = (
-                                <Histogram
-                                  chartData={marker.chartData}
-                                  width={histogramWidth}
-                                  height={histogramWidth}
-                                  radius={marker.radius}
-                                  lat={marker.lat}
-                                  lng={marker.lng}
-                                  originalLat={marker.originalLat}
-                                  originalLng={marker.originalLng}
-                                  unitNameSingle={this.config.tablesById[table].nameSingle}
-                                  unitNamePlural={this.config.tablesById[table].namePlural}
-                                  valueName={this.config.tablesById[table].propertiesById[markerColourProperty].name}
-                                  colourScaleFunction={marker.colourScaleFunction}
-                                  minValue={minValue}
-                                  maxValue={maxValue}
-                                  isHighlighted={marker.isHighlighted}
-                                />
+                              <Histogram
+                                chartData={marker.chartData}
+                                width={histogramWidth}
+                                height={histogramWidth}
+                                radius={marker.radius}
+                                lat={marker.lat}
+                                lng={marker.lng}
+                                originalLat={marker.originalLat}
+                                originalLng={marker.originalLng}
+                                unitNameSingle={this.config.tablesById[table].nameSingle}
+                                unitNamePlural={this.config.tablesById[table].namePlural}
+                                valueName={this.config.tablesById[table].propertiesById[markerColourProperty].name}
+                                colourScaleFunction={marker.colourScaleFunction}
+                                minValue={minValue}
+                                maxValue={maxValue}
+                                isHighlighted={marker.isHighlighted}
+                              />
                             );
 
                           } else {
@@ -592,7 +592,7 @@ let TableMarkersLayer = createReactClass({
                   </FeatureGroup>
               }
             </GeoLayouter>
-          :
+            :
             <FeatureGroup>
               {
                 clusteredMarkers.map(

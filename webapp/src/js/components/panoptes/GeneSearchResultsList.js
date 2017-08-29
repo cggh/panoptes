@@ -72,26 +72,26 @@ let GeneSearchResultsList = createReactClass({
     };
 
     requestContext.request((componentCancellation) =>
-          LRUCache.get(
-            'findGene' + JSON.stringify(APIargs),
-            (cacheCancellation) =>
-              API.findGene({cancellation: cacheCancellation, ...APIargs}),
-            componentCancellation
-          )
-        )
-        .then((data) => {
-          this.setState({
-            loadStatus: 'loaded',
-            matchData: data
-          });
-
-        })
-        .catch(API.filterAborted)
-        .catch(LRUCache.filterCancelled)
-        .catch((xhr) => {
-          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-          this.setState({loadStatus: 'error'});
+      LRUCache.get(
+        'findGene' + JSON.stringify(APIargs),
+        (cacheCancellation) =>
+          API.findGene({cancellation: cacheCancellation, ...APIargs}),
+        componentCancellation
+      )
+    )
+      .then((data) => {
+        this.setState({
+          loadStatus: 'loaded',
+          matchData: data
         });
+
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((xhr) => {
+        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+        this.setState({loadStatus: 'error'});
+      });
   },
 
   render() {
@@ -131,25 +131,25 @@ let GeneSearchResultsList = createReactClass({
 
       listItems.push(
         <ListItem key={matchData.ids[i]}
-                  primaryText={
-                    <div>
-                      <Highlight search={search}>
-                          <span>{matchData.ids[i]}</span>
-                          <span> on </span>
-                          <span>{matchData.chromosomes[i]}</span>
-                      </Highlight>
-                    </div>
-                  }
-                  secondaryText={
-                    <div>
-                      <Highlight search={search}>
-                          {matchData.descriptions[i].split(',').join(', ').split(';').join('; ')}
-                      </Highlight>
-                    </div>
-                  }
-                  secondaryTextLines={2}
-                  onClick={(e) => this.handleSelectGene(e, matchData.ids[i], matchData.descriptions[i].split(',').join(', ').split(';').join('; '))}
-                  leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+          primaryText={
+            <div>
+              <Highlight search={search}>
+                <span>{matchData.ids[i]}</span>
+                <span> on </span>
+                <span>{matchData.chromosomes[i]}</span>
+              </Highlight>
+            </div>
+          }
+          secondaryText={
+            <div>
+              <Highlight search={search}>
+                {matchData.descriptions[i].split(',').join(', ').split(';').join('; ')}
+              </Highlight>
+            </div>
+          }
+          secondaryTextLines={2}
+          onClick={(e) => this.handleSelectGene(e, matchData.ids[i], matchData.descriptions[i].split(',').join(', ').split(';').join('; '))}
+          leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
         />
       );
 

@@ -63,7 +63,7 @@ let CustomButton = createReactClass({
       );
 
     let [anchor, content] = children;
-    return React.cloneElement(anchor, {onClick: this.handleClick})
+    return React.cloneElement(anchor, {onClick: this.handleClick});
   },
 });
 

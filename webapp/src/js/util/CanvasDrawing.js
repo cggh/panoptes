@@ -23,10 +23,10 @@ export function drawText(ctx, text, x, y) {
     fadeX = x - width;
   }
   if (ctx.textAlign == 'center') {
-    fadeX = x - (width/2);
+    fadeX = x - (width / 2);
   }
   if (ctx.textBaseline == 'middle') {
-    fadeY = y - (height/2);
+    fadeY = y - (height / 2);
   }
   if (ctx.textBaseline == 'top') {
     fadeY = y;

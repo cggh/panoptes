@@ -91,18 +91,18 @@ let Gene = createReactClass({
           componentCancellation
         )
       )
-      .then((data) => {
-        this.setState({
-          loadStatus: 'loaded',
-          geneData: data
+        .then((data) => {
+          this.setState({
+            loadStatus: 'loaded',
+            geneData: data
+          });
+        })
+        .catch(API.filterAborted)
+        .catch(LRUCache.filterCancelled)
+        .catch((xhr) => {
+          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(props, requestContext));
+          this.setState({loadStatus: 'error'});
         });
-      })
-      .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled)
-      .catch((xhr) => {
-        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(props, requestContext));
-        this.setState({loadStatus: 'error'});
-      });
     } else {
       this.setState({geneData: null});
     }
@@ -134,14 +134,14 @@ let Gene = createReactClass({
         }
         let genomePositionTableButton = (
           <PopupButton key={table.id}
-                     label={'Show ' + table.namePlural + ' in ' + geneData['fname']}
-                     icon={table.icon} >
+            label={'Show ' + table.namePlural + ' in ' + geneData['fname']}
+            icon={table.icon} >
             {table.listView ? <ListWithActions table={table.id}
-                     query={genomePositionTableQuery} /> :
-            <DataTableWithActions table={table.id}
-                     query={genomePositionTableQuery} />}
+              query={genomePositionTableQuery} /> :
+              <DataTableWithActions table={table.id}
+                query={genomePositionTableQuery} />}
           </PopupButton>
-      );
+        );
         genomePositionTableButtons.push(genomePositionTableButton);
       }
     });
@@ -150,11 +150,11 @@ let Gene = createReactClass({
     let externalGeneLinkButtons = [];
     for (let i = 0, len = externalGeneLinks.length; i < len; i++) {
       let externalGeneLinkButton = (
-      <ExternalLinkButton key={'externalGeneLinkButton_' + i}
-                          label={externalGeneLinks[i].name}
-                          urls={[externalGeneLinks[i].url.replace('{Id}', geneData['fid'])]}
-      />
-    );
+        <ExternalLinkButton key={'externalGeneLinkButton_' + i}
+          label={externalGeneLinks[i].name}
+          urls={[externalGeneLinks[i].url.replace('{Id}', geneData['fid'])]}
+        />
+      );
       externalGeneLinkButtons.push(externalGeneLinkButton);
     }
 
@@ -166,52 +166,52 @@ let Gene = createReactClass({
       end: parseInt(geneData['fstop'])
     };
     return (
-    <DetectResize onResize={(size) => this.setState(size)}>
-      <div>
-        <div className="vertical stack">
-          <GenomeScale {...trackProps}/>
-          <ReferenceSequence {...trackProps}/>
-          { annotation ?
-            <AnnotationChannel name="Structure" {...trackProps} /> : null
-          }
+      <DetectResize onResize={(size) => this.setState(size)}>
+        <div>
+          <div className="vertical stack">
+            <GenomeScale {...trackProps}/>
+            <ReferenceSequence {...trackProps}/>
+            { annotation ?
+              <AnnotationChannel name="Structure" {...trackProps} /> : null
+            }
 
-          <div className="grow">
-            <table className="table-col">
-              <tbody>
-                <tr><th className="table-col-header">ID: </th><td className="table-col-cell">{geneData['fid']}</td></tr>
-                <tr><th className="table-col-header">Name: </th><td className="table-col-cell">{geneData['fname']}</td></tr>
-                <tr><th className="table-col-header">Alternatives: </th><td className="table-col-cell">{geneData['fnames'].split(',').join(', ')}</td></tr>
-                <tr><th className="table-col-header">Description: </th><td className="table-col-cell">{geneData['descr']}</td></tr>
-                <tr><th className="table-col-header">Position: </th><td className="table-col-cell">{geneData['chromid']}:{geneData['fstart']}-{geneData['fstop']}</td></tr>
-              </tbody>
-            </table>
+            <div className="grow">
+              <table className="table-col">
+                <tbody>
+                  <tr><th className="table-col-header">ID: </th><td className="table-col-cell">{geneData['fid']}</td></tr>
+                  <tr><th className="table-col-header">Name: </th><td className="table-col-cell">{geneData['fname']}</td></tr>
+                  <tr><th className="table-col-header">Alternatives: </th><td className="table-col-cell">{geneData['fnames'].split(',').join(', ')}</td></tr>
+                  <tr><th className="table-col-header">Description: </th><td className="table-col-cell">{geneData['descr']}</td></tr>
+                  <tr><th className="table-col-header">Position: </th><td className="table-col-cell">{geneData['chromid']}:{geneData['fstart']}-{geneData['fstop']}</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="horizontal stack wrap">
+              <RaisedButton
+                style={{margin: '7px', color: 'white'}}
+                label="Show in Genome Browser"
+                primary={true}
+                icon={<Icon inverse={true} name="bitmap:genomebrowser.png" />}
+                labelStyle={{textTransform: 'inherit'}}
+                onClick={(e) => {
+                  e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front                e.stopPropagation();
+                  actions.reuseComponentOrPopup('GenomeBrowserWithActions',
+                    {
+                      chromosome: geneData['chromid'],
+                      start: parseInt(geneData['fstart']),
+                      end: parseInt(geneData['fstop'])
+                    }
+                  );
+                }}
+              />
+              {genomePositionTableButtons}
+              {externalGeneLinkButtons}
+            </div>
           </div>
-          <div className="horizontal stack wrap">
-            <RaisedButton
-              style={{margin: '7px', color: 'white'}}
-              label="Show in Genome Browser"
-              primary={true}
-              icon={<Icon inverse={true} name="bitmap:genomebrowser.png" />}
-              labelStyle={{textTransform: 'inherit'}}
-              onClick={(e) => {
-                e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front                e.stopPropagation();
-                actions.reuseComponentOrPopup('GenomeBrowserWithActions',
-                  {
-                    chromosome: geneData['chromid'],
-                    start: parseInt(geneData['fstart']),
-                    end: parseInt(geneData['fstop'])
-                  }
-                );
-              }}
-            />
-            {genomePositionTableButtons}
-            {externalGeneLinkButtons}
-          </div>
+          <Loading status={loadStatus}/>
         </div>
-        <Loading status={loadStatus}/>
-      </div>
-    </DetectResize>
-);
+      </DetectResize>
+    );
 
   },
 });

@@ -68,32 +68,32 @@ let DatasetManagerActions = createReactClass({
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={`Import and configure the ${name} (${dataset}) dataset`} />
         <ConfirmButton label="Reimport everything"
-                       primary={true}
-                       icon={<Icon fixedWidth={true} name={'refresh'} />}
-                       message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
-                       onConfirm={() => this.handleReimport()}
+          primary={true}
+          icon={<Icon fixedWidth={true} name={'refresh'} />}
+          message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
+          onConfirm={() => this.handleReimport()}
         />
         <FlatButton label={'Edit dataset config'}
-                    primary={true}
-                    onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="settings"/>)}
-                    icon={<Icon fixedWidth={true} name={'edit'} />}
+          primary={true}
+          onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="settings"/>)}
+          icon={<Icon fixedWidth={true} name={'edit'} />}
         />
         {this.config.genome !== null ?
           <div>
             <Divider />
             <FlatButton label={'Edit genome config'}
-                        primary={true}
-                        onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="genome"/>)}
-                        icon={<Icon fixedWidth={true} name={'edit'} />}
+              primary={true}
+              onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="genome"/>)}
+              icon={<Icon fixedWidth={true} name={'edit'} />}
             />
           </div>
-        : null}
+          : null}
         <Divider />
         {_map(this.config.tables, (table) => (
           <FlatButton label={`Edit ${table.id}`}
-                      primary={true}
-                      onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path={`tablesById.${table.id}`}/>)}
-                      icon={<Icon fixedWidth={true} name={'edit'} />}
+            primary={true}
+            onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path={`tablesById.${table.id}`}/>)}
+            icon={<Icon fixedWidth={true} name={'edit'} />}
           />
         ))}
 
@@ -107,14 +107,14 @@ let DatasetManagerActions = createReactClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  onClick={() => setProps({sidebar: !sidebar})}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
+              name={sidebar ? 'arrow-left' : 'bars'}
+              onClick={() => setProps({sidebar: !sidebar})}
+              title={sidebar ? 'Expand' : 'Sidebar'}
             />
             <span className="block text">Status logs</span>
           </div>
           <div className="grow scroll-within">
-                <DatasetImportStatusListView refreshMilliseconds={2000} />
+            <DatasetImportStatusListView refreshMilliseconds={2000} />
           </div>
         </div>
       </Sidebar>

@@ -119,7 +119,7 @@ let ScaledSVGChannel = createReactClass({
                 <g
                   transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
                   <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
-                        height={2 * height}/>
+                    height={2 * height}/>
                   {React.Children.map(this.props.children, (child) => React.cloneElement(child, {
                     blockStart: this.blockStart,
                     blockEnd: this.blockEnd,

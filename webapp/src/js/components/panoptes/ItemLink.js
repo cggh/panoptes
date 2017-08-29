@@ -39,11 +39,11 @@ let ItemLink = createReactClass({
           className="prop internal-link"
           onClick={(e) => this.handleClick(e)}
         >
-      {primKey}
-      </span>
+          {primKey}
+        </span>
       );
     } else {
-      return <div style={{cursor:'pointer'}} onClick={(e) => this.handleClick(e)}>{children}</div>;
+      return <div style={{cursor: 'pointer'}} onClick={(e) => this.handleClick(e)}>{children}</div>;
     }
   },
 });

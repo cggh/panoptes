@@ -2,7 +2,7 @@ import API from 'panoptes/API';
 
 let fetchInitialConfig = function(dataset) {
   let isManager = false;
-  let userId = "anonymous";
+  let userId = 'anonymous';
   return API.requestJSON({
     params: {
       datatype: 'datasetinfo',

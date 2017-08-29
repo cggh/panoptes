@@ -121,10 +121,10 @@ let SelectFieldWithNativeFallback = createReactClass({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
               >
-               <option
-                className="dropdown-option"
-                value=""
-               ></option>
+                <option
+                  className="dropdown-option"
+                  value=""
+                ></option>
                 {options.map(({value, label}) =>
                   <option
                     className="dropdown-option"

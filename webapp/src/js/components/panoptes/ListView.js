@@ -102,23 +102,23 @@ let ListView = createReactClass({
         )
       ])
     )
-    .then(([data, rowsCount]) => {
-      if (autoSelectIfNoneSelected && !selectedPrimKey) {
-        onSelect(data[0][tableConfig.primKey]);
-      }
-      this.setState({
-        loadStatus: 'loaded',
-        rows: data,
-        rowsCount
+      .then(([data, rowsCount]) => {
+        if (autoSelectIfNoneSelected && !selectedPrimKey) {
+          onSelect(data[0][tableConfig.primKey]);
+        }
+        this.setState({
+          loadStatus: 'loaded',
+          rows: data,
+          rowsCount
+        });
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((xhr) => {
+        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+        this.setState({loadStatus: 'error'});
+        throw xhr;
       });
-    })
-    .catch(API.filterAborted)
-    .catch(LRUCache.filterCancelled)
-    .catch((xhr) => {
-      ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-      this.setState({loadStatus: 'error'});
-      throw xhr;
-    });
   },
 
   handleSelect(primKey, rowIndex) {
@@ -166,9 +166,9 @@ let ListView = createReactClass({
               className={className}
               key={primKey}
               primaryText={
-                  <Highlight search={search}>
-                    {itemTemplate}
-                  </Highlight>
+                <Highlight search={search}>
+                  {itemTemplate}
+                </Highlight>
               }
               onClick={() => this.handleSelect(primKey)}
               leftIcon={icon ? <div><Icon fixedWidth={true} name={icon}/></div> : null}

@@ -121,15 +121,15 @@ let StoredTableQueries = createReactClass({
       }
 
       return <ListItem
-               key={JSON.stringify({name, query})}
-               primaryText={name}
-               secondaryText={<p className="list-string"><QueryString className="text" table={table} query={query} /></p>}
-               secondaryTextLines={2}
-               onClick={(e) => this.handleClick(e, query)}
-               onDoubleClick={(e) => this.handleDoubleClick(e, query)}
-               leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>}
-               rightIconButton={rightIconButtons}
-             />;
+        key={JSON.stringify({name, query})}
+        primaryText={name}
+        secondaryText={<p className="list-string"><QueryString className="text" table={table} query={query} /></p>}
+        secondaryTextLines={2}
+        onClick={(e) => this.handleClick(e, query)}
+        onDoubleClick={(e) => this.handleDoubleClick(e, query)}
+        leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>}
+        rightIconButton={rightIconButtons}
+      />;
 
     });
 

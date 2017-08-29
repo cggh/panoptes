@@ -45,14 +45,14 @@ export default function(template, possibleTables) {
     }
   });
 
-    hb.registerHelper('if', function(conditional, options) {
+  hb.registerHelper('if', function(conditional, options) {
     if (conditional)
       conditional();
     options.fn(this);
     options.inverse(this);
   });
 
-  hb.registerHelper('with', function(context, options) {
+  hb.registerHelper('with', (context, options) => {
     if (context)
       context();
   });

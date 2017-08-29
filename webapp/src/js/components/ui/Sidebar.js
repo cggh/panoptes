@@ -63,7 +63,7 @@ class Sidebar extends React.Component {
   constructor(props) {
     super(props);
 
-    this.sidebar_width = (this.props.width || 258)+scrollbarSize(); //From css, sadly. We need to fix it as display:none is interfering with measurement
+    this.sidebar_width = (this.props.width || 258) + scrollbarSize(); //From css, sadly. We need to fix it as display:none is interfering with measurement
 
     this.state = {
 
@@ -91,32 +91,18 @@ class Sidebar extends React.Component {
     });
   }
 
-  onTouchStart(ev) {
-    // filter out if a user starts swiping with a second finger
-    if (!this.isTouching()) {
-      const touch = ev.targetTouches[0];
+  // This logic helps us prevents the user from sliding the sidebar horizontally
+  // while scrolling the sidebar vertically. When a scroll event comes in, we're
+  // cancelling the ongoing gesture if it did not move horizontally much.
+  onScroll() {
+    if (this.isTouching() && this.inCancelDistanceOnScroll()) {
       this.setState({
-        touchIdentifier: touch.identifier,
-        touchStartX: touch.clientX,
-        touchStartY: touch.clientY,
-        touchCurrentX: touch.clientX,
-        touchCurrentY: touch.clientY,
+        touchIdentifier: null,
+        touchStartX: null,
+        touchStartY: null,
+        touchCurrentX: null,
+        touchCurrentY: null,
       });
-    }
-  }
-
-  onTouchMove(ev) {
-    if (this.isTouching()) {
-      for (let ind = 0; ind < ev.targetTouches.length; ind++) {
-        // we only care about the finger that we are tracking
-        if (ev.targetTouches[ind].identifier === this.state.touchIdentifier) {
-          this.setState({
-            touchCurrentX: ev.targetTouches[ind].clientX,
-            touchCurrentY: ev.targetTouches[ind].clientY,
-          });
-          break;
-        }
-      }
     }
   }
 
@@ -140,17 +126,31 @@ class Sidebar extends React.Component {
     }
   }
 
-  // This logic helps us prevents the user from sliding the sidebar horizontally
-  // while scrolling the sidebar vertically. When a scroll event comes in, we're
-  // cancelling the ongoing gesture if it did not move horizontally much.
-  onScroll() {
-    if (this.isTouching() && this.inCancelDistanceOnScroll()) {
+  onTouchMove(ev) {
+    if (this.isTouching()) {
+      for (let ind = 0; ind < ev.targetTouches.length; ind++) {
+        // we only care about the finger that we are tracking
+        if (ev.targetTouches[ind].identifier === this.state.touchIdentifier) {
+          this.setState({
+            touchCurrentX: ev.targetTouches[ind].clientX,
+            touchCurrentY: ev.targetTouches[ind].clientY,
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  onTouchStart(ev) {
+    // filter out if a user starts swiping with a second finger
+    if (!this.isTouching()) {
+      const touch = ev.targetTouches[0];
       this.setState({
-        touchIdentifier: null,
-        touchStartX: null,
-        touchStartY: null,
-        touchCurrentX: null,
-        touchCurrentY: null,
+        touchIdentifier: touch.identifier,
+        touchStartX: touch.clientX,
+        touchStartY: touch.clientY,
+        touchCurrentX: touch.clientX,
+        touchCurrentY: touch.clientY,
       });
     }
   }
@@ -251,8 +251,8 @@ class Sidebar extends React.Component {
     } else if (this.props.docked) {
       // show sidebar
       if (this.sidebar_width !== 0) {
-        sidebarStyle.transform = `translateX(0%)`;
-        sidebarStyle.WebkitTransform = `translateX(0%)`;
+        sidebarStyle.transform = 'translateX(0%)';
+        sidebarStyle.WebkitTransform = 'translateX(0%)';
       }
 
       // make space on the left/right side of the content for the sidebar
@@ -263,8 +263,8 @@ class Sidebar extends React.Component {
       }
     } else if (this.props.open) {
       // slide open sidebar
-      sidebarStyle.transform = `translateX(0%)`;
-      sidebarStyle.WebkitTransform = `translateX(0%)`;
+      sidebarStyle.transform = 'translateX(0%)';
+      sidebarStyle.WebkitTransform = 'translateX(0%)';
 
       // show overlay
       overlayStyle.opacity = 1;
@@ -298,8 +298,8 @@ class Sidebar extends React.Component {
 
         dragHandle = (
           <div style={dragHandleStyle}
-               onTouchStart={this.onTouchStart} onTouchMove={this.onTouchMove}
-               onTouchEnd={this.onTouchEnd} onTouchCancel={this.onTouchEnd} />);
+            onTouchStart={this.onTouchStart} onTouchMove={this.onTouchMove}
+            onTouchEnd={this.onTouchEnd} onTouchCancel={this.onTouchEnd} />);
       }
     }
 
@@ -311,11 +311,11 @@ class Sidebar extends React.Component {
           </div>
         </div>
         <div className={this.props.overlayClassName}
-             style={overlayStyle}
-             role="presentation"
-             tabIndex="0"
-             onClick={this.overlayClicked}
-          />
+          style={overlayStyle}
+          role="presentation"
+          tabIndex="0"
+          onClick={this.overlayClicked}
+        />
         <div className={this.props.contentClassName} style={contentStyle}>
           {dragHandle}
           {this.props.children}

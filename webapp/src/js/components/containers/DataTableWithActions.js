@@ -299,26 +299,26 @@ let DataTableWithActions = createReactClass({
     }
     let searchGUI = (
       <FlatButton label="Find text"
-                  disabled={columns === undefined || columns.length === 0}
-                  primary={true}
-                  onClick={this.handleSearchOpen}
-                  icon={<Icon fixedWidth={true} name="search" />}
+        disabled={columns === undefined || columns.length === 0}
+        primary={true}
+        onClick={this.handleSearchOpen}
+        icon={<Icon fixedWidth={true} name="search" />}
       />
     );
     if (searchOpen) {
       searchGUI = (
         <div>
           <RaisedButton label="Find text"
-                      disabled={columns === undefined || columns.length === 0}
-                      primary={true}
-                      icon={<Icon fixedWidth={true} name="search" inverse={true} />}
+            disabled={columns === undefined || columns.length === 0}
+            primary={true}
+            icon={<Icon fixedWidth={true} name="search" inverse={true} />}
           />
           <TextField ref="searchField"
-                     fullWidth={true}
-                     floatingLabelText="Search"
-                     value={searchText}
-                     onChange={this.handleSearchChange}
-                     onBlur={this.handleSearchBlur}
+            fullWidth={true}
+            floatingLabelText="Search"
+            value={searchText}
+            onChange={this.handleSearchChange}
+            onBlur={this.handleSearchBlur}
           />
           <div>{quickFindFieldsList}</div>
         </div>
@@ -340,32 +340,32 @@ let DataTableWithActions = createReactClass({
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
         <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
         <FlatButton label={columnPickerLabel}
-                    primary={true}
-                    onClick={() => actions.session.modalOpen(<GroupedItemPicker
-                      groups={this.propertyGroups}
-                      initialPick={columns}
-                      title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
-                      onPick={this.handleColumnChange}
-                    />)}
-                    icon={<Icon fixedWidth={true} name="columns" />}
+          primary={true}
+          onClick={() => actions.session.modalOpen(<GroupedItemPicker
+            groups={this.propertyGroups}
+            initialPick={columns}
+            title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
+            onPick={this.handleColumnChange}
+          />)}
+          icon={<Icon fixedWidth={true} name="columns" />}
         />
         {searchGUI}
         <Divider />
         <FlatButton label="Download data"
-                    disabled={columns === undefined || columns.length === 0}
-                    primary={true}
-                    onClick={() => this.handleDownload()}
-                    icon={<Icon fixedWidth={true} name="download" />}
+          disabled={columns === undefined || columns.length === 0}
+          primary={true}
+          onClick={() => this.handleDownload()}
+          icon={<Icon fixedWidth={true} name="download" />}
         />
         <FlatButton label="Pivot Table"
-                    primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
-                    icon={<Icon fixedWidth={true} name="table" />}
+          primary={true}
+          onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
+          icon={<Icon fixedWidth={true} name="table" />}
         />
         <FlatButton label="Plot Table"
-                    primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
-                    icon={<Icon fixedWidth={true} name="bar-chart" />}
+          primary={true}
+          onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
+          icon={<Icon fixedWidth={true} name="bar-chart" />}
         />
       </div>
     );
@@ -377,30 +377,30 @@ let DataTableWithActions = createReactClass({
       // Unless we are showing the first row, provide nav to previous rows.
       pageBackwardNav = (
         <span>
-        <Icon className="pointer icon"
-              name="fast-backward"
-              title={'First ' + pageSizeInRows + ' rows'}
-              onClick={this.handleFirstPage}
-        />
-        <Icon className="pointer icon"
-              name="step-backward"
-              title={'Previous ' + pageSizeInRows + ' rows'}
-              onClick={this.handlePreviousPage}
-        />
+          <Icon className="pointer icon"
+            name="fast-backward"
+            title={'First ' + pageSizeInRows + ' rows'}
+            onClick={this.handleFirstPage}
+          />
+          <Icon className="pointer icon"
+            name="step-backward"
+            title={'Previous ' + pageSizeInRows + ' rows'}
+            onClick={this.handlePreviousPage}
+          />
         </span>
       );
     } else {
       // Show disabled backwards nav.
       pageBackwardNav = (
         <span>
-        <Icon className="pointer icon disabled"
-              name="fast-backward"
-              title={'Showing first ' + fetchedRowsCount + ' rows'}
-        />
-        <Icon className="pointer icon disabled"
-              name="step-backward"
-              title={'Showing first ' + fetchedRowsCount + ' rows'}
-        />
+          <Icon className="pointer icon disabled"
+            name="fast-backward"
+            title={'Showing first ' + fetchedRowsCount + ' rows'}
+          />
+          <Icon className="pointer icon disabled"
+            name="step-backward"
+            title={'Showing first ' + fetchedRowsCount + ' rows'}
+          />
         </span>
       );
     }
@@ -427,30 +427,30 @@ let DataTableWithActions = createReactClass({
       // If we are showing something and it's as many as possible, then provide nav to further rows.
       pageForwardNav = (
         <span>
-        <Icon className="pointer icon"
-              name="step-forward"
-              title={'Next ' + pageSizeInRows + ' rows'}
-              onClick={this.handleNextPage}
-        />
-        <Icon className="pointer icon"
-              name="fast-forward"
-              title={'Last ' + pageSizeInRows + ' rows'}
-              onClick={this.handleLastPage}
-        />
+          <Icon className="pointer icon"
+            name="step-forward"
+            title={'Next ' + pageSizeInRows + ' rows'}
+            onClick={this.handleNextPage}
+          />
+          <Icon className="pointer icon"
+            name="fast-forward"
+            title={'Last ' + pageSizeInRows + ' rows'}
+            onClick={this.handleLastPage}
+          />
         </span>
       );
     } else {
       // Show disabled forwards nav.
       pageForwardNav = (
         <span>
-        <Icon className="pointer icon disabled"
-              name="step-forward"
-              title={'Showing last ' + fetchedRowsCount + ' rows'}
-        />
-        <Icon className="pointer icon disabled"
-              name="fast-forward"
-              title={'Showing last ' + pageSizeInRows + ' rows'}
-        />
+          <Icon className="pointer icon disabled"
+            name="step-forward"
+            title={'Showing last ' + fetchedRowsCount + ' rows'}
+          />
+          <Icon className="pointer icon disabled"
+            name="fast-forward"
+            title={'Showing last ' + pageSizeInRows + ' rows'}
+          />
         </span>
       );
     }
@@ -465,9 +465,9 @@ let DataTableWithActions = createReactClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  onClick={() => setProps({sidebar: !sidebar})}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
+              name={sidebar ? 'arrow-left' : 'bars'}
+              onClick={() => setProps({sidebar: !sidebar})}
+              title={sidebar ? 'Expand' : 'Sidebar'}
             />
             <span className="block text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
@@ -477,19 +477,19 @@ let DataTableWithActions = createReactClass({
           </div>
           <div className="grow">
             <DataTableView table={table}
-                           query={dataTableQuery}
-                           order={order}
-                           columns={columns}
-                           columnWidths={columnWidths}
-                           onColumnResize={this.handleColumnResize}
-                           onOrderChange={this.handleOrderChange}
-                           startRowIndex={startRowIndex}
-                           onShowableRowsCountChange={maxRowsPerPage !== undefined ? undefined : this.handleShowableRowsCountChange}
-                           onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
-                           onTotalRowsCountChange={this.handleTotalRowsCountChange}
-                           maxRowsPerPage={maxRowsPerPage}
-              />
-            </div>
+              query={dataTableQuery}
+              order={order}
+              columns={columns}
+              columnWidths={columnWidths}
+              onColumnResize={this.handleColumnResize}
+              onOrderChange={this.handleOrderChange}
+              startRowIndex={startRowIndex}
+              onShowableRowsCountChange={maxRowsPerPage !== undefined ? undefined : this.handleShowableRowsCountChange}
+              onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
+              onTotalRowsCountChange={this.handleTotalRowsCountChange}
+              maxRowsPerPage={maxRowsPerPage}
+            />
+          </div>
         </div>
       </Sidebar>
     );

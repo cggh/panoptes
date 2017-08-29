@@ -63,8 +63,8 @@ let DatasetImportStatusItemView = createReactClass({
       logId: this.props.logId
     };
     requestContext.request((componentCancellation) =>
-        API.fetchImportStatusLog({cancellation: componentCancellation, ...APIargs}),
-      )
+      API.fetchImportStatusLog({cancellation: componentCancellation, ...APIargs}),
+    )
       .then((data) => {
         this.setState({
           loadStatus: 'loaded',

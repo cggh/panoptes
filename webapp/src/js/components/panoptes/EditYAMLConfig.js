@@ -7,8 +7,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import {Editor, EditorState, ContentState, convertFromRaw, convertToRaw} from 'draft-js';
 import PrismDecorator from  'draft-js-prism';
 import 'prismjs/components/prism-yaml';
-import 'prismjs/themes/prism.css'
-import 'draft-js/dist/Draft.css'
+import 'prismjs/themes/prism.css';
+import 'draft-js/dist/Draft.css';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Icon from 'ui/Icon';
@@ -38,8 +38,8 @@ let EditYAMLConfig = createReactClass({
 
   componentWillMount() {
     let {path} = this.props;
-    let yaml = path.split('.').reduce((o,i)=>o[i], this.config)._yaml;
-    var contentState = convertFromRaw({
+    let yaml = path.split('.').reduce((o, i) => o[i], this.config)._yaml;
+    let contentState = convertFromRaw({
       entityMap: {},
       blocks: [
         {
@@ -74,10 +74,10 @@ let EditYAMLConfig = createReactClass({
       <div className="load-container vertical stack">
         <div className="editor grow scroll-within">
           <Editor className="editor"
-                  editorState={editorState}
-                  onChange={this.handleChange}
-                  placeholder=""
-                  ref="editor"
+            editorState={editorState}
+            onChange={this.handleChange}
+            placeholder=""
+            ref="editor"
           />
         </div>
         <div className="centering-container">

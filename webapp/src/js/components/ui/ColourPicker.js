@@ -18,11 +18,11 @@ let ColourPicker = createReactClass({
   render() {
     let {colour, colours, onPick} = this.props;
     return (
-          <BlockPicker
-            color={colour}
-            colors={colours}
-            triangle="hide"
-            onChange={(colour) => onPick(colour.hex)} />
+      <BlockPicker
+        color={colour}
+        colors={colours}
+        triangle="hide"
+        onChange={(colour) => onPick(colour.hex)} />
     );
   },
 });

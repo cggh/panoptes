@@ -180,7 +180,7 @@ let ItemPicker = createReactClass({
           return _some(itemGroupNestedItems) ? (
             <ListItem
               primaryText={<div> {itemGroup.name} ({itemGroupNestedItems.length} <Pluralise text={itemName}
-                                                                                            ord={itemGroupNestedItems.length}/>)
+                ord={itemGroupNestedItems.length}/>)
               </div>}
               key={groupId + itemGroupId + !!search}
               initiallyOpen={!!search}
@@ -197,7 +197,7 @@ let ItemPicker = createReactClass({
           listItems.push(
             <ListItem
               primaryText={<div> {name} ({totalItemGroupItemsCount} <Pluralise text={itemName}
-                                                                               ord={totalItemGroupItemsCount}/>)</div>}
+                ord={totalItemGroupItemsCount}/>)</div>}
               key={groupId + !!search}
               initiallyOpen={!!search || _keys(groups).length === 1}
               leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}

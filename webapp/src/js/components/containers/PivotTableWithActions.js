@@ -100,19 +100,19 @@ let PivotTableWithActions = createReactClass({
         <div className="pivot-controls vertical stack">
           <FilterButton table={table} query={this.getDefinedQuery()} onPick={(query) => this.props.setProps({query})}/>
           <PropertySelector table={table}
-                            key="columnProperty"
-                            value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
-                            label="Column"
-                            allowNull={true}
-                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => setProps({columnProperty: v, columnSortOrder: undefined})}/>
+            key="columnProperty"
+            value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
+            label="Column"
+            allowNull={true}
+            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
+            onSelect={(v) => setProps({columnProperty: v, columnSortOrder: undefined})}/>
           <PropertySelector table={table}
-                            key="rowProperty"
-                            value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
-                            label="Row"
-                            allowNull={true}
-                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => setProps({rowProperty: v, rowSortOrder: undefined})}/>
+            key="rowProperty"
+            value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
+            label="Row"
+            allowNull={true}
+            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
+            onSelect={(v) => setProps({rowProperty: v, rowSortOrder: undefined})}/>
           <SelectField
             autoWidth={true}
             floatingLabelText="Display"
@@ -135,15 +135,15 @@ let PivotTableWithActions = createReactClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => setProps({sidebar: !sidebar})}/>
+              name={sidebar ? 'arrow-left' : 'bars'}
+              title={sidebar ? 'Expand' : 'Sidebar'}
+              onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Column sort: {this.orderDescriptionString(columnSortOrder)}</span>
             <span className="block text">Row sort: {this.orderDescriptionString(rowSortOrder)}</span>
           </div>
           <div className="grow scroll-within">
-              <PivotTableView {...this.props} style={{height: '100%', overflow: 'hidden'}} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
+            <PivotTableView {...this.props} style={{height: '100%', overflow: 'hidden'}} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
           </div>
         </div>
       </Sidebar>

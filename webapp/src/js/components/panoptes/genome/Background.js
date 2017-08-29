@@ -33,9 +33,9 @@ let Background = createReactClass({
     const {width, height} = this.props;
     return (
       <canvas className="background"
-              ref="canvas"
-              width={width}
-              height={height}
+        ref="canvas"
+        width={width}
+        height={height}
       />
     );
   },
@@ -77,8 +77,7 @@ let Background = createReactClass({
     }
     ctx.lineWidth = 0.5;
     ctx.stroke();
-    if (hoverPos != null)
-    {
+    if (hoverPos != null) {
       let x = scale(hoverPos);
       ctx.lineWidth = 1;
       ctx.strokeStyle = 'black';

@@ -25,7 +25,7 @@ let PropertyList = createReactClass({
         id: PropTypes.string.isRequired,
         value: PropTypes.any
       }
-    )).isRequired,
+      )).isRequired,
     className: PropTypes.string
   },
 

@@ -99,14 +99,14 @@ function _decodeSummaryList(columns) {
     let ret = {};
     _forEach(columns, (column, key) => {
       let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
-        //For better or worse we imitate the original behaviour of passing on a lack of data
+      //For better or worse we imitate the original behaviour of passing on a lack of data
       if (data)
         ret[key] = {
           data: DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data),
           summariser: data.summariser
         };
       else
-          ret[key] = null;
+        ret[key] = null;
     }
     );
     return ret;
@@ -448,40 +448,40 @@ function query(options) {
     cache,
     joins: JSON.stringify(joins)
   }))
-  .then((columns) => {
-    if (!typedArrays) {
+    .then((columns) => {
+      if (!typedArrays) {
       //Convert to regular arrays and convert nulls
-      let plainArrays = {};
-      _forEach(columns, (array, name) => plainArrays[name] = Array.prototype.slice.call(array.array));
-      _forEach(plainArrays, (array, name) => {
-        let nullValue = nullValues[columns[name].type];
-        if (nullValue !== undefined) {
-          for (let i = 0, len = array.length; i < len; ++i) {
-            if (array[i] === nullValue) {
-              array[i] =  null;
+        let plainArrays = {};
+        _forEach(columns, (array, name) => plainArrays[name] = Array.prototype.slice.call(array.array));
+        _forEach(plainArrays, (array, name) => {
+          let nullValue = nullValues[columns[name].type];
+          if (nullValue !== undefined) {
+            for (let i = 0, len = array.length; i < len; ++i) {
+              if (array[i] === nullValue) {
+                array[i] =  null;
+              }
             }
           }
-        }
-      });
-      return plainArrays;
-    } else {
-      return columns;
-    }
-  })
-  .then((columns) => {
-    // Transpose into rows if needed
-    if (transpose) {
-      let rows = [];
-      for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
-        let row = {};
-        _forEach(columns, (array, id) => row[id] = array[i]);
-        rows.push(row);
+        });
+        return plainArrays;
+      } else {
+        return columns;
       }
-      return rows;
-    } else {
-      return columns;
-    }
-  });
+    })
+    .then((columns) => {
+    // Transpose into rows if needed
+      if (transpose) {
+        let rows = [];
+        for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
+          let row = {};
+          _forEach(columns, (array, id) => row[id] = array[i]);
+          rows.push(row);
+        }
+        return rows;
+      } else {
+        return columns;
+      }
+    });
 }
 
 function staticContent(options) {

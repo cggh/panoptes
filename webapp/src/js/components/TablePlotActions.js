@@ -160,15 +160,15 @@ let TablePlotActions = createReactClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => setProps({sidebar: !sidebar})}/>
+              name={sidebar ? 'arrow-left' : 'bars'}
+              title={sidebar ? 'Expand' : 'Sidebar'}
+              onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">{table && plotType ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
             {table && plotType ?
               <span className="block text">
                 <QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()} />
               </span>
-            : null}
+              : null}
           </div>
           <div className="grow">
             {table && plotType && dimensionProperties ?

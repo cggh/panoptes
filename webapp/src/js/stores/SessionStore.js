@@ -108,7 +108,7 @@ let SessionStore = createStore({
   popupFocus({compId}) {
     this.state = this.state.updateIn(['popups', 'components'],
       (list) => list.filter((popupId) => popupId !== compId).push(compId));
-    this.useComponent(compId)
+    this.useComponent(compId);
   },
 
   popupMove({compId, pos}) {
@@ -329,8 +329,7 @@ let SessionStore = createStore({
         if (this.state.getIn(['components', compId, 'type']) === componentName) {
           existingCompId = compId;
           return false;
-        }
-        else {
+        } else {
           return true;
         }
       });

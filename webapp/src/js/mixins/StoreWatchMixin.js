@@ -14,22 +14,22 @@ let StoreWatchMixin = function() {
 
       // No autobinding in ES6 classes
       this._setStateFromFlux = function() {
-        if(this.mounted) {
+        if (this.mounted) {
           this.setState(this.getStateFromFlux());
         }
       }.bind(this);
 
-      _each(storeNames, function(store) {
-        flux.store(store).on("change", this._setStateFromFlux);
-      }.bind(this));
+      _each(storeNames, (store) => {
+        flux.store(store).on('change', this._setStateFromFlux);
+      });
     },
 
     componentWillUnmount: function() {
       let flux = this.props.flux || this.context.flux;
       this.mounted = false;
-      _each(storeNames, function(store) {
-        flux.store(store).removeListener("change", this._setStateFromFlux);
-      }.bind(this));
+      _each(storeNames, (store) => {
+        flux.store(store).removeListener('change', this._setStateFromFlux);
+      });
     },
 
     getInitialState: function() {
