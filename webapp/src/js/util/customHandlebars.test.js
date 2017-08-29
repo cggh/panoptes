@@ -58,9 +58,7 @@ test('query with parameterised args', () => {
 
 test('query nested with parameterised args by result of first query', () => {
   API.query.mockClear();
-  let template = hb.compile('test{{#query table="table3" }}' +
-    ' Outer:{{#query table="table4" query="{{colour}}"}} Nested:{{size}}{{/query}}' +
-    '{{/query}}');
+  let template = hb.compile('test{{#query table="table3" }} Outer:{{#query table="table4" query="{{colour}}"}} Nested:{{size}}{{/query}}{{/query}}');
   return template(templateData).then((data) => {
     expect(data).toBe('test Outer: Nested:small Nested:big Outer: Nested:small Nested:big');
     expect(API.query.mock.calls[0][0]).toMatchObject({table: 'table3'});

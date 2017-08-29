@@ -58,7 +58,7 @@ function decodeSingleArray(stream) {
     }
     break;
   default:
-    throw Error('unsupported dtype:' + dtype);
+    throw Error(`unsupported dtype:${dtype}`);
   }
   //Firefox is a PITA and won't let us set properties on TypedArrays, so we have to wrap them in an object
   return {

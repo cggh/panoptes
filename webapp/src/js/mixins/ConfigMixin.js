@@ -5,8 +5,8 @@
 let ConfigMixin = {
   componentWillMount: function() {
     if (!this.props.flux && (!this.context || !this.context.flux)) {
-      let namePart = this.constructor.displayName ? ' of ' + this.constructor.displayName : '';
-      throw new Error('Could not find flux on this.props or this.context' + namePart);
+      let namePart = this.constructor.displayName ? ` of ${this.constructor.displayName}` : '';
+      throw new Error(`Could not find flux on this.props or this.context${namePart}`);
     }
     let flux = this.props.flux || (this.context && this.context.flux);
     flux.store('ConfigStore').on('change', this._setConfigFromFlux);

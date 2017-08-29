@@ -42,7 +42,7 @@ let PropertyCell = createReactClass({
     let descriptionIcon = !noLinks && prop.valueDescriptions && prop.valueDescriptions[value] ?
       <Tooltip placement="bottom"
         trigger={['click']}
-        overlay={htmlToReactParser.parse('<span>' + prop.valueDescriptions[value] + '</span>')}>
+        overlay={htmlToReactParser.parse(`<span>${prop.valueDescriptions[value]}</span>`)}>
         <Icon className="info" name="info-circle"/>
       </Tooltip> :
       null;
@@ -63,7 +63,7 @@ let PropertyCell = createReactClass({
       ));
     } else if (prop.valueDisplays && prop.valueDisplays[value]) {
       //Wrap as can only have one tag passed to html-to-react
-      content = htmlToReactParser.parse('<span>' + prop.valueDisplays[value] + '</span>');
+      content = htmlToReactParser.parse(`<span>${prop.valueDisplays[value]}</span>`);
     } else if (prop.dispDataType == 'Boolean' && value !== '') {
       if (value === null) {
         content = 'NULL';
@@ -78,18 +78,20 @@ let PropertyCell = createReactClass({
     } else if (!noLinks && prop.isPrimKey) {
       content = <ItemLink table={prop.tableId} primKey={value} />;
     }
-    return <span
-      className={'prop ' + className || ''}
-      onClick={(event) => {
-        if (onClick && event.target.className.indexOf('info') == -1)
-          onClick(event);
-      }}
-      {...other}
-    >
-      {prefix}
-      <TooltipEllipsis className="label">{content}</TooltipEllipsis>
-      {descriptionIcon}
-    </span>;
+    return (
+      <span
+        className={`prop ${className}` || ''}
+        onClick={(event) => {
+          if (onClick && event.target.className.indexOf('info') == -1)
+            onClick(event);
+        }}
+        {...other}
+      >
+        {prefix}
+        <TooltipEllipsis className="label">{content}</TooltipEllipsis>
+        {descriptionIcon}
+      </span>
+    );
   },
 });
 

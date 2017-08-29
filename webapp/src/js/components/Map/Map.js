@@ -189,7 +189,7 @@ let Map = createReactClass({
       let newZoom = this.map.leafletElement.getZoom();
 
       if (newZoom > maxZoom) {
-        console.warn('Zooming beyond maxZoom:' + newZoom + '>' + maxZoom);
+        console.warn(`Zooming beyond maxZoom:${newZoom}>${maxZoom}`);
       }
 
       if (!_isEqual(newCenter, this.props.center) || newZoom !== this.props.zoom) {

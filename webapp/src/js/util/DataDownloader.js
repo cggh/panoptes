@@ -43,13 +43,13 @@ export default function downloadTableData(payload) {
 
   let downloadURL = API.serverURL;
   downloadURL += '?datatype=downloadtable';
-  downloadURL += '&database=' + dataset;
-  downloadURL += '&query=' + API.encodeQuery(query);
-  downloadURL += '&table=' + table;
-  downloadURL += '&columns=' + LZString.compressToEncodedURIComponent(columnList);
+  downloadURL += `&database=${dataset}`;
+  downloadURL += `&query=${API.encodeQuery(query)}`;
+  downloadURL += `&table=${table}`;
+  downloadURL += `&columns=${LZString.compressToEncodedURIComponent(columnList)}`;
 
   if (order instanceof Array && order.length > 0) {
-    downloadURL += '&orderBy=' + JSON.stringify(order);
+    downloadURL += `&orderBy=${JSON.stringify(order)}`;
   }
   window.location.href = downloadURL;
 }

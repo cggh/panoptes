@@ -87,7 +87,7 @@ let TabbedArea = createReactClass({
   },
 
   handleDragStop(id) {
-    let state = this.refs['drag_' + id].state;
+    let state = this.refs[`drag_${id}`].state;
     let dist = Math.sqrt(state.y * state.y + state.x * state.x);
     if (dist > 100 && state.y > 50 && this.props.onDragAway) {
       this.props.onDragAway(id, {
@@ -96,7 +96,7 @@ let TabbedArea = createReactClass({
       });
       return false;
     } else {
-      this.refs['drag_' + id].setState({
+      this.refs[`drag_${id}`].setState({
         dragging: false,
         x: 0,
         y: 0
@@ -134,7 +134,7 @@ let TabbedArea = createReactClass({
       // Wrap tabMarkup in Draggable
       tabMarkup = (
         <Draggable
-          ref={'drag_' + id}
+          ref={`drag_${id}`}
           key={id}
           defaultPosition={{x: 0, y: 0}}
           onStop={() => this.handleDragStop(id)}

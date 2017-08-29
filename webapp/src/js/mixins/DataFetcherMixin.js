@@ -28,9 +28,7 @@ let DataFetcherMixin = function() {
 };
 
 DataFetcherMixin.componentWillMount = function() {
-  throw new Error('DataFetcherMixin is a function that takes one or more ' +
-    'prop names to watch as parameters and returns the mixin, e.g.: ' +
-    'mixins: [DataFetcherMixin("Prop1", "Prop2")]');
+  throw new Error('DataFetcherMixin is a function that takes one or more prop names to watch as parameters and returns the mixin, e.g.: mixins: [DataFetcherMixin("Prop1", "Prop2")]');
 };
 
 export default DataFetcherMixin;

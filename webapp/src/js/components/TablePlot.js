@@ -106,7 +106,7 @@ let TablePlot = createReactClass({
 
       requestContext.request((componentCancellation) =>
         LRUCache.get(
-          'query' + JSON.stringify(APIargs),
+          `query${JSON.stringify(APIargs)}`,
           (cacheCancellation) =>
             API.query({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
@@ -159,7 +159,7 @@ let TablePlot = createReactClass({
       query: this.getDefinedQuery(),
       properties: this.config.tablesById[table].properties
     });
-    const title = this.tableConfig().capNamePlural + (this.getDefinedQuery() !== SQL.nullQuery ? ' where ' + query : '');
+    const title = this.tableConfig().capNamePlural + (this.getDefinedQuery() !== SQL.nullQuery ? ` where ${query}` : '');
 
     return (
       <div className="plot-container">

@@ -9,13 +9,13 @@ import FluxMixin from 'mixins/FluxMixin';
 
 const FRACTIONAL_COLOURMAP = [];
 for (let i = 0; i < 255; i++) {
-  FRACTIONAL_COLOURMAP[i + 1] = 'hsla(' + Math.round(240 + ((i / 256) * 120)) + ',100%,35%,';
+  FRACTIONAL_COLOURMAP[i + 1] = `hsla(${Math.round(240 + ((i / 256) * 120))},100%,35%,`;
 }
 FRACTIONAL_COLOURMAP[0] = 'hsl(0,50%,0%)';
 
 function colourToRGBA(colour, alpha) {
   // TODO: Currently only supports RGB to RGBA. Support conversion from HEX, RGBA, HSL, HSLA
-  return colour.replace(/\)/, ', ' + (alpha !== undefined ? alpha : 1) + ')').replace(/rgb/, 'rgba');
+  return colour.replace(/\)/, `, ${alpha !== undefined ? alpha : 1})`).replace(/rgb/, 'rgba');
 }
 
 let GenotypesTable = createReactClass({
@@ -131,7 +131,7 @@ let GenotypesTable = createReactClass({
             }
           } else if (cellColour === 'fraction') {
             const fraction = colArray[index];
-            ctx.fillStyle = fraction > 0 ? FRACTIONAL_COLOURMAP[fraction] + alpha + ')' : FRACTIONAL_COLOURMAP[0];
+            ctx.fillStyle = fraction > 0 ? `${FRACTIONAL_COLOURMAP[fraction] + alpha})` : FRACTIONAL_COLOURMAP[0];
           }
           ctx.fillRect(x, (y * rowHeight) + ((1 - height) * rowHeight * 0.5), 1, height * rowHeight);
         }
@@ -234,7 +234,7 @@ let GenotypesTable = createReactClass({
     const numCols = textArray.shape[0] || 0;
     textArray = textArray.array;
     ctx.save();
-    ctx.font = '' + rowHeight + 'px Roboto';
+    ctx.font = `${rowHeight}px Roboto`;
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';

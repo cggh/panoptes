@@ -262,7 +262,7 @@ let MapActions = createReactClass({
 
       // NB: Leaflet uses [[south, west], [north, east]] bounds.
       let bounds = overlayLayerConfig.bounds !== undefined ? [[overlayLayerConfig.bounds.southLat, overlayLayerConfig.bounds.westLng], [overlayLayerConfig.bounds.northLat, overlayLayerConfig.bounds.eastLng]] : undefined;
-      let mapLayerServerPath = '/panoptes/Maps/' + this.config.dataset + '/' + overlayLayer + '/';
+      let mapLayerServerPath = `/panoptes/Maps/${this.config.dataset}/${overlayLayer}/`;
       let absoluteURLPattern = /^https?:\/\/|^\/\//i;
 
       let overlayLayerProps = {
@@ -294,7 +294,7 @@ let MapActions = createReactClass({
 
       } else if (this.config.mapLayers[overlayLayer].format === 'image') {
 
-        overlayLayerProps.url = mapLayerServerPath + 'data.png';
+        overlayLayerProps.url = `${mapLayerServerPath}data.png`;
 
         overlayLayerComponent = (
           <Overlay
@@ -415,10 +415,10 @@ let MapActions = createReactClass({
     // This title appears above the map, in the blue bar.
     let mapTitle = 'Map';
     if (baseTileLayer !== undefined && baseTileLayer != NULL_BASE_TILE_LAYER) {
-      mapTitle = baseTileLayer + ' map';
+      mapTitle = `${baseTileLayer} map`;
     }
     if (table !== undefined && table !== NULL_MARKER_LAYER) {
-      mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
+      mapTitle =  `${mapTitle} of ${this.config.tablesById[table].namePlural}`;
     }
 
     return (

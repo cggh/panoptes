@@ -225,7 +225,7 @@ let PerRowNumericalTrack = createReactClass({
     };
     requestContext.request((componentCancellation) =>
       LRUCache.get(
-        'query' + JSON.stringify(APIargs),
+        `query${JSON.stringify(APIargs)}`,
         (cacheCancellation) =>
           API.query({cancellation: cacheCancellation, ...APIargs}),
         componentCancellation

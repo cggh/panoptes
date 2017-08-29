@@ -159,7 +159,7 @@ let PivotTableView = createReactClass({
 
     requestContext.request((componentCancellation) =>
       LRUCache.get(
-        'query' + JSON.stringify(queryAPIargs),
+        `query${JSON.stringify(queryAPIargs)}`,
         (cacheCancellation) =>
           API.query({cancellation: cacheCancellation, ...queryAPIargs}),
         componentCancellation
@@ -217,7 +217,7 @@ let PivotTableView = createReactClass({
           if (dataObject !== undefined) {
             let percentage = ((dataObject.count / totalCount) * 100).toFixed(0);
             dataObject.backgroundColor = Color(MAX_COLOR).lighten(0.58 * (1 - (percentage - 0) / 100)).string();
-            dataObject.displayValue = percentage + '%';
+            dataObject.displayValue = `${percentage}%`;
             dataObject.sortValue = percentage;
             return dataObject;
           } else {
@@ -330,7 +330,7 @@ let PivotTableView = createReactClass({
     } else if (axis === 'row') {
       currentOrder = this.props.rowSortOrder;
     } else {
-      console.error('Unhandled order axis: ' + axis);
+      console.error(`Unhandled order axis: ${axis}`);
       return;
     }
 

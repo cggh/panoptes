@@ -304,113 +304,117 @@ let SidebarContent = createReactClass({
 
   render() {
     const actions = this.getFlux().actions;
-    return <div className="sidebar">
-      <SidebarHeader
-        icon="bitmap:genomebrowser.png"
-        description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."
-      />
-      <AddChannelsButton setProps={this.setProps}/>
-      <Divider />
-      {this.config.settings.genomeBrowserChannelSets.length ?
-        <List>
-          <Subheader>Example channel sets:</Subheader>
-          {
-            _map(this.config.settings.genomeBrowserChannelSets, (channelSet, i) => {
-              const {name, description, channels} = channelSet;
-              return <ListItem key={i}
-                primaryText={name}
-                secondaryText={description}
-                secondaryTextLines={2}
-                onClick={() => this.props.setProps((props) => props.set('children', Immutable.fromJS(channels)))}
-                rightIconButton={this.config.user.isManager ?
-                  <IconButton
-                    tooltip="Delete"
-                    onClick={(e) => actions.api.modifyConfig({
-                      dataset: this.config.dataset,
-                      path: `settings.genomeBrowserChannelSets.${i}`,
-                      action: 'delete'
-                    })}
-                  >
-                    <Icon name={'trash-o'} inverse={false} />
-                  </IconButton>
-                  : null}
-              />;
-            })
-          }
-        </List>
-        : null
-      }
-      {this.config.user.isManager ?
-        <FlatButton
-          label="Save channel set"
-          primary={true}
-          icon={<Icon fixedWidth={true} name="floppy-o"/>}
-          onClick={() => actions.session.modalOpen(
-            <ModalInput
-              inputs={['name', 'description']}
-              names={['Name', 'Description']}
-              action="save"
-              actionIcon="floppy-o"
-              onCancel={actions.session.modalClose}
-              onAction={({name, description}) => {
-                actions.api.modifyConfig({
-                  dataset: this.config.dataset,
-                  path: 'settings.genomeBrowserChannelSets',
-                  action: 'merge',
-                  content: [{
-                    name,
-                    description,
-                    channels: React.Children.map(this.props.children, serialiseComponent)
-                  }]
-                });
-                actions.session.modalClose();
-              }}
-            />
-          )}
-        /> : null}
-      {this.config.user.isManager ?
-        <Divider /> : null}
-      <Subheader>Open tables for:</Subheader>
-      {_map(this.config.visibleTables, (table) => {
-        if (table.hasGenomePositions || table.isRegionOnGenome) {
-          return <FlatButton key={table.id}
-            label={table.namePlural + ' in view'}
-            primary={true}
-            icon={<Icon fixedWidth={true} name={table.icon}/>}
-            onClick={() => {
-              let {chromosome, start, end} = this.props;
-              //Set default bounds
-              start = _isNumber(start) ? start : 0;
-              end = (_isNumber(end) ? end : this.config.chromosomes[chromosome]) || 10000;
-              chromosome = chromosome || _head(_keys(this.config.chromosomes));
-              let genomePositionTableQuery = null;
-              if (table.hasGenomePositions) {
-                genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
-                  SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
-                  SQL.WhereClause.CompareFixed(table.position, '>=', Math.floor(start)),
-                  SQL.WhereClause.CompareFixed(table.position, '<=', Math.ceil(end))
-                ]));
-              } else if (table.isRegionOnGenome) {
-                genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
-                  SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
-                  SQL.WhereClause.CompareFixed(table.regionStart, '<=', Math.ceil(end)),
-                  SQL.WhereClause.CompareFixed(table.regionStop, '>=', Math.floor(start))
-                ]));
-              }
-              if (table.listView) {
-                this.flux.actions.session.tabOpen(<ListWithActions table={table.id}
-                  query={genomePositionTableQuery}/>, true);
-              } else {
-                this.flux.actions.session.tabOpen(<DataTableWithActions table={table.id}
-                  query={genomePositionTableQuery}/>, true);
-              }
-
-            }}
-          >
-          </FlatButton>;
+    return (
+      <div className="sidebar">
+        <SidebarHeader
+          icon="bitmap:genomebrowser.png"
+          description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."
+        />
+        <AddChannelsButton setProps={this.setProps}/>
+        <Divider />
+        {this.config.settings.genomeBrowserChannelSets.length ?
+          <List>
+            <Subheader>Example channel sets:</Subheader>
+            {
+              _map(this.config.settings.genomeBrowserChannelSets, (channelSet, i) => {
+                const {name, description, channels} = channelSet;
+                return <ListItem key={i}
+                  primaryText={name}
+                  secondaryText={description}
+                  secondaryTextLines={2}
+                  onClick={() => this.props.setProps((props) => props.set('children', Immutable.fromJS(channels)))}
+                  rightIconButton={this.config.user.isManager ?
+                    <IconButton
+                      tooltip="Delete"
+                      onClick={(e) => actions.api.modifyConfig({
+                        dataset: this.config.dataset,
+                        path: `settings.genomeBrowserChannelSets.${i}`,
+                        action: 'delete'
+                      })}
+                    >
+                      <Icon name={'trash-o'} inverse={false} />
+                    </IconButton>
+                    : null}
+                />;
+              })
+            }
+          </List>
+          : null
         }
-      })}
-    </div>;
+        {this.config.user.isManager ?
+          <FlatButton
+            label="Save channel set"
+            primary={true}
+            icon={<Icon fixedWidth={true} name="floppy-o"/>}
+            onClick={() => actions.session.modalOpen(
+              <ModalInput
+                inputs={['name', 'description']}
+                names={['Name', 'Description']}
+                action="save"
+                actionIcon="floppy-o"
+                onCancel={actions.session.modalClose}
+                onAction={({name, description}) => {
+                  actions.api.modifyConfig({
+                    dataset: this.config.dataset,
+                    path: 'settings.genomeBrowserChannelSets',
+                    action: 'merge',
+                    content: [{
+                      name,
+                      description,
+                      channels: React.Children.map(this.props.children, serialiseComponent)
+                    }]
+                  });
+                  actions.session.modalClose();
+                }}
+              />
+            )}
+          /> : null}
+        {this.config.user.isManager ?
+          <Divider /> : null}
+        <Subheader>Open tables for:</Subheader>
+        {_map(this.config.visibleTables, (table) => {
+          if (table.hasGenomePositions || table.isRegionOnGenome) {
+            return (
+              <FlatButton key={table.id}
+                label={`${table.namePlural} in view`}
+                primary={true}
+                icon={<Icon fixedWidth={true} name={table.icon}/>}
+                onClick={() => {
+                  let {chromosome, start, end} = this.props;
+                  //Set default bounds
+                  start = _isNumber(start) ? start : 0;
+                  end = (_isNumber(end) ? end : this.config.chromosomes[chromosome]) || 10000;
+                  chromosome = chromosome || _head(_keys(this.config.chromosomes));
+                  let genomePositionTableQuery = null;
+                  if (table.hasGenomePositions) {
+                    genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
+                      SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
+                      SQL.WhereClause.CompareFixed(table.position, '>=', Math.floor(start)),
+                      SQL.WhereClause.CompareFixed(table.position, '<=', Math.ceil(end))
+                    ]));
+                  } else if (table.isRegionOnGenome) {
+                    genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
+                      SQL.WhereClause.CompareFixed(table.chromosome, '=', chromosome),
+                      SQL.WhereClause.CompareFixed(table.regionStart, '<=', Math.ceil(end)),
+                      SQL.WhereClause.CompareFixed(table.regionStop, '>=', Math.floor(start))
+                    ]));
+                  }
+                  if (table.listView) {
+                    this.flux.actions.session.tabOpen(<ListWithActions table={table.id}
+                      query={genomePositionTableQuery}/>, true);
+                  } else {
+                    this.flux.actions.session.tabOpen(<DataTableWithActions table={table.id}
+                      query={genomePositionTableQuery}/>, true);
+                  }
+
+                }}
+              >
+              </FlatButton>
+            );
+          }
+        })}
+      </div>
+    );
   },
 });
 

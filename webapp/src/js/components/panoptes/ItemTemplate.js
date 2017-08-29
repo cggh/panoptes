@@ -119,7 +119,7 @@ let ItemTemplate = createReactClass({
             transpose: true
           };
           return LRUCache.get(
-            'query' + JSON.stringify(usedChildTableAPIargs), (cacheCancellation) =>
+            `query${JSON.stringify(usedChildTableAPIargs)}`, (cacheCancellation) =>
               API.query({cancellation: cacheCancellation, ...usedChildTableAPIargs}),
             componentCancellation
           );
@@ -135,7 +135,7 @@ let ItemTemplate = createReactClass({
         };
         promises.push(
           LRUCache.get(
-            'fetchSingleRecord' + JSON.stringify(APIargs),
+            `fetchSingleRecord${JSON.stringify(APIargs)}`,
             (cacheCancellation) =>
               API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
             componentCancellation

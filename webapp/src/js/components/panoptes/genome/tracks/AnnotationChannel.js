@@ -112,7 +112,7 @@ let AnnotationChannel = createReactClass({
 
       requestContext.request((componentCancellation) =>
         LRUCache.get(
-          'query' + JSON.stringify(APIargs),
+          `query${JSON.stringify(APIargs)}`,
           (cacheCancellation) =>
             API.query({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
@@ -241,11 +241,11 @@ let AnnotationChannel = createReactClass({
       ctx.strokeRect(x1, (rows[hoverIndex] * ROW_HEIGHT) + 16, Math.max(0.125, x2 - x1), 10);   //Outline
       let text = names[hoverIndex];
       if (text) {
-        text += ', ' + ids[hoverIndex];
+        text += `, ${ids[hoverIndex]}`;
       } else {
         text = ids[hoverIndex];
       }
-      if (altNames[hoverIndex]) text += ', ' + altNames[hoverIndex];
+      if (altNames[hoverIndex]) text += `, ${altNames[hoverIndex]}`;
       if (text) {
         ctx.fillStyle = '#FFF';
         ctx.fillRect(x1 - 12, (rows[hoverIndex] * ROW_HEIGHT) + 4, 14 + text.length * 6, 10);

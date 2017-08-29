@@ -73,7 +73,7 @@ let GeneSearchResultsList = createReactClass({
 
     requestContext.request((componentCancellation) =>
       LRUCache.get(
-        'findGene' + JSON.stringify(APIargs),
+        `findGene${JSON.stringify(APIargs)}`,
         (cacheCancellation) =>
           API.findGene({cancellation: cacheCancellation, ...APIargs}),
         componentCancellation

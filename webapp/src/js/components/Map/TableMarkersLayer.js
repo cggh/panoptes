@@ -149,7 +149,7 @@ let TableMarkersLayer = createReactClass({
         encodedPopupQuery = SQL.WhereClause.encode(newAND);
       }
 
-      this.getFlux().actions.session.popupOpen(<DataTableWithActions key={table + '_' + encodedPopupQuery} table={table} query={encodedPopupQuery}/>, switchTo);
+      this.getFlux().actions.session.popupOpen(<DataTableWithActions key={`${table}_${encodedPopupQuery}`} table={table} query={encodedPopupQuery}/>, switchTo);
     }
   },
 
@@ -199,7 +199,7 @@ let TableMarkersLayer = createReactClass({
 
     // If no highlight has been specified, but a primKey has been then convert primKey to a highlight.
     if (highlight === undefined && primKey !== undefined) {
-      highlight =  locationPrimKeyProperty + ':' + primKey;
+      highlight =  `${locationPrimKeyProperty}:${primKey}`;
     }
 
     // TODO: check highlight looks like "highlightField:highlightValue"
@@ -207,7 +207,7 @@ let TableMarkersLayer = createReactClass({
       let [highlightField] = highlight.split(':');
       if (highlightField !== undefined) {
         if (tableConfig.propertiesById[highlightField] === undefined) {
-          console.error('The specified highlight field ' + highlightField + ' was not found in the table ' + table);
+          console.error(`The specified highlight field ${highlightField} was not found in the table ${table}`);
         } else {
           locationColumns.add(highlightField);
         }
@@ -216,7 +216,7 @@ let TableMarkersLayer = createReactClass({
 
     if (markerColourProperty !== undefined && typeof markerColourProperty === 'string' && markerColourProperty !== '') {
       if (tableConfig.propertiesById[markerColourProperty] === undefined) {
-        console.error('The specified markerColourProperty field ' + markerColourProperty + ' was not found in the table ' + table);
+        console.error(`The specified markerColourProperty field ${markerColourProperty} was not found in the table ${table}`);
       } else {
         locationColumns.add(markerColourProperty);
       }
@@ -235,7 +235,7 @@ let TableMarkersLayer = createReactClass({
         };
 
         return LRUCache.get(
-          'query' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+          `query${JSON.stringify(locationAPIargs)}`, (cacheCancellation) =>
             API.query({
               cancellation: cacheCancellation,
               ...locationAPIargs
@@ -288,7 +288,7 @@ let TableMarkersLayer = createReactClass({
           let lng = parseFloat(data[i][locationTableConfig.longitude]);
 
           // Compose a unique key string using the location latLng
-          let location = data[i][locationTableConfig.latitude] + '_' + data[i][locationTableConfig.longitude];
+          let location = `${data[i][locationTableConfig.latitude]}_${data[i][locationTableConfig.longitude]}`;
 
           let marker = {
             isHighlighted,
@@ -425,9 +425,9 @@ let TableMarkersLayer = createReactClass({
         for (let value in markersGroupedByValue) {
           uniqueValues[value] = true;
 
-          let name = (value !== 'undefined' ? value + ': ' : '') + markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural);
+          let name = `${(value !== 'undefined' ? `${value}: ` : '') + markersGroupedByValue[value].length} ${markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural}`;
           if (markerColourPropertyIsNumerical) {
-            name = markersGroupedByValue[value].length + ' ' + (markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural) + (value !== 'undefined' ? ' with ' + value : '');
+            name = `${markersGroupedByValue[value].length} ${markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural}${value !== 'undefined' ? ` with ${value}` : ''}`;
           }
 
           markerChartData.push({
@@ -567,7 +567,7 @@ let TableMarkersLayer = createReactClass({
 
                           return (
                             <ComponentMarker
-                              key={'ComponentMarker_' + i}
+                              key={`ComponentMarker_${i}`}
                               position={{lat: marker.lat, lng: marker.lng}}
                               onClick={onClick}
                               zIndexOffset={0}
@@ -583,7 +583,7 @@ let TableMarkersLayer = createReactClass({
                           (marker, i) =>
                             <Polyline
                               className="panoptes-table-markers-layer-polyline"
-                              key={'Polyline_' + i}
+                              key={`Polyline_${i}`}
                               positions={[[marker.lat, marker.lng], [marker.fixedNode.lat, marker.fixedNode.lng]]}
                             />
                         )
@@ -621,7 +621,7 @@ let TableMarkersLayer = createReactClass({
 
                     return (
                       <ComponentMarker
-                        key={'ComponentMarker_' + i}
+                        key={`ComponentMarker_${i}`}
                         position={{lat: marker.lat, lng: marker.lng}}
                         onClick={onClick}
                         zIndexOffset={0}

@@ -73,13 +73,13 @@ let TreeContainer = createReactClass({
           Promise.all(
             [
               LRUCache.get(
-                'treeData' + JSON.stringify(treeAPIargs),
+                `treeData${JSON.stringify(treeAPIargs)}`,
                 (cacheCancellation) =>
                   API.treeData({cancellation: cacheCancellation, ...treeAPIargs}),
                 componentCancellation
               ),
               LRUCache.get(
-                'query' + JSON.stringify(tableAPIargs),
+                `query${JSON.stringify(tableAPIargs)}`,
                 (cacheCancellation) =>
                   API.query({cancellation: cacheCancellation, ...tableAPIargs}),
                 componentCancellation

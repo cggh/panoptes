@@ -73,7 +73,7 @@ let RegionGenesList = createReactClass({
 
     requestContext.request((componentCancellation) =>
       LRUCache.get(
-        'findGenesInRegion' + JSON.stringify(APIargs),
+        `findGenesInRegion${JSON.stringify(APIargs)}`,
         (cacheCancellation) =>
           API.findGenesInRegion({cancellation: cacheCancellation, ...APIargs}),
         componentCancellation

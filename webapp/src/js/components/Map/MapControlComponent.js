@@ -14,7 +14,7 @@ export default class MapControlComponent extends MapControl {
   createLeafletElement({children, position, className}) {
     let con = control({position});
     con.onAdd = (map) => {
-      this.div = DomUtil.create('div', 'map-custom-control ' + className);
+      this.div = DomUtil.create('div', `map-custom-control ${className}`);
       ReactDOM.render(React.cloneElement(React.Children.only(children), {flux: this.context.flux}), this.div);
       return this.div;
     };

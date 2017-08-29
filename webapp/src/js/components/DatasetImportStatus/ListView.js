@@ -115,13 +115,15 @@ let DatasetImportStatusListView = createReactClass({
 
             // row.scope
 
-            return <ListItem key={row.id}
-              primaryText={<div><span>{row.status}</span></div>}
-              secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
-              leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
-              onClick={(e) => this.handleClickImportStatus(row.id, row.name + ' - ' + row.timestamp, iconName)}
-              secondaryTextLines={2}
-            />;
+            return (
+              <ListItem key={row.id}
+                primaryText={<div><span>{row.status}</span></div>}
+                secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
+                leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
+                onClick={(e) => this.handleClickImportStatus(row.id, `${row.name} - ${row.timestamp}`, iconName)}
+                secondaryTextLines={2}
+              />
+            );
           })}
         </List>
         <Loading status={loadStatus}/>

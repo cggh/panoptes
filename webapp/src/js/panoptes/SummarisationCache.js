@@ -64,7 +64,7 @@ let SummarisationCache = {
       };
       //select max("AF_1"), min("AF_1"), avg("AF_1"), p/512 as b from variants where "CHROM"='2L' and p between 512*1000 and 512*2001 group by b ;
       return LRUCache.get(
-        'summarisation' + JSON.stringify(APIargs),
+        `summarisation${JSON.stringify(APIargs)}`,
         (cacheCancellation) =>
           API.query({
             cancellation: cacheCancellation,

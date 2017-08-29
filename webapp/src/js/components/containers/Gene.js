@@ -70,7 +70,7 @@ let Gene = createReactClass({
   },
 
   title() {
-    return 'Gene ' + this.props.geneId;
+    return `Gene ${this.props.geneId}`;
   },
 
   //Called by DataFetcherMixin
@@ -85,7 +85,7 @@ let Gene = createReactClass({
       };
       requestContext.request((componentCancellation) =>
         LRUCache.get(
-          'fetchGene' + JSON.stringify(APIargs),
+          `fetchGene${JSON.stringify(APIargs)}`,
           (cacheCancellation) =>
             API.fetchGene({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
@@ -134,7 +134,7 @@ let Gene = createReactClass({
         }
         let genomePositionTableButton = (
           <PopupButton key={table.id}
-            label={'Show ' + table.namePlural + ' in ' + geneData['fname']}
+            label={`Show ${table.namePlural} in ${geneData['fname']}`}
             icon={table.icon} >
             {table.listView ? <ListWithActions table={table.id}
               query={genomePositionTableQuery} /> :
@@ -150,7 +150,7 @@ let Gene = createReactClass({
     let externalGeneLinkButtons = [];
     for (let i = 0, len = externalGeneLinks.length; i < len; i++) {
       let externalGeneLinkButton = (
-        <ExternalLinkButton key={'externalGeneLinkButton_' + i}
+        <ExternalLinkButton key={`externalGeneLinkButton_${i}`}
           label={externalGeneLinks[i].name}
           urls={[externalGeneLinks[i].url.replace('{Id}', geneData['fid'])]}
         />

@@ -90,7 +90,7 @@ function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   }
 
   return LRUCache.get(
-    'propertyRegionCache' + method + JSON.stringify(APIArgs),
+    `propertyRegionCache${method}${JSON.stringify(APIArgs)}`,
     (cacheCancellation) =>
       //Delay a bit to let quickly cancelled queries not reach the server - a temporary measure until server cancels the DB query
       Q.delay(500).then(() =>

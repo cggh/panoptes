@@ -133,7 +133,7 @@ let Popup = createReactClass({
           handleSize={[20, 20]}
           onResize={this.handleResize}
           onResizeStop={this.handleResizeStop}>
-          <div className={'popup ' + className}
+          <div className={`popup ${className}`}
             style={{...style, width, height}}
           >
             <div className="popup-header">

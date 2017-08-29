@@ -25,7 +25,7 @@ const customHandlebars = ({dataset, handlebars}) => {
       try {
         orderBy = JSON.parse(Handlebars.compile(orderBy)(this));
       } catch (e) {
-        throw Error("orderBy should be a list of columns e.g. [['asc', 'col1'], ['desc', 'col2']] is currently: " + Handlebars.compile(orderBy)(this));
+        throw Error(`orderBy should be a list of columns e.g. [['asc', 'col1'], ['desc', 'col2']] is currently: ${Handlebars.compile(orderBy)(this)}`);
       }
     } else {
       orderBy = '';
@@ -39,7 +39,7 @@ const customHandlebars = ({dataset, handlebars}) => {
       transpose: true //We want rows, not columns
     };
     return LRUCache.get(
-      'query' + JSON.stringify(queryAPIargs),
+      `query${JSON.stringify(queryAPIargs)}`,
       (cacheCancellation) =>
         API.query({cancellation: cacheCancellation, ...queryAPIargs}),
       Q.defer().promise  //For now don't support cancellation

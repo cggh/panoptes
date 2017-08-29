@@ -89,13 +89,13 @@ let ListView = createReactClass({
     requestContext.request((componentCancellation) =>
       Promise.all([
         LRUCache.get(
-          'query' + JSON.stringify(queryAPIargs),
+          `query${JSON.stringify(queryAPIargs)}`,
           (cacheCancellation) =>
             API.query({cancellation: cacheCancellation, ...queryAPIargs}),
           componentCancellation
         ),
         LRUCache.get(
-          'rowsCount' + JSON.stringify(queryAPIargs),
+          `rowsCount${JSON.stringify(queryAPIargs)}`,
           (cacheCancellation) =>
             API.rowsCount({cancellation: cacheCancellation, ...queryAPIargs}),
           componentCancellation

@@ -149,13 +149,13 @@ let DataTableView = createReactClass({
       requestContext.request((componentCancellation) =>
         Promise.all([
           LRUCache.get(
-            'query' + JSON.stringify(queryAPIargs),
+            `query${JSON.stringify(queryAPIargs)}`,
             (cacheCancellation) =>
               API.query({cancellation: cacheCancellation, ...queryAPIargs}),
             componentCancellation
           ),
           LRUCache.get(
-            'rowsCount' + JSON.stringify(queryAPIargs),
+            `rowsCount${JSON.stringify(queryAPIargs)}`,
             (cacheCancellation) =>
               API.rowsCount({cancellation: cacheCancellation, ...queryAPIargs}),
             componentCancellation
@@ -261,7 +261,7 @@ let DataTableView = createReactClass({
     // NB: This method is not supported by IE < v9.0
     // Also used in GenotypesTable.js
 
-    let propertyHeaderElementId = 'PropertyHeader_' + column;
+    let propertyHeaderElementId = `PropertyHeader_${column}`;
     let propertyHeaderElement = document.getElementById(propertyHeaderElementId);
 
     if (propertyHeaderElement !== undefined && propertyHeaderElement !== null) {
@@ -270,7 +270,7 @@ let DataTableView = createReactClass({
       let propertyHeaderTextElementStyles = window.getComputedStyle(propertyHeaderTextElement);
       let canvas2dContext = this.canvas2dContext || (this.canvas2dContext = document.createElement('canvas').getContext('2d'));
       // NB: syntax [font style][font weight][font size][font face]
-      canvas2dContext.font = propertyHeaderTextElementStyles['fontStyle'] + ' ' + propertyHeaderTextElementStyles['fontWeight'] + ' ' + propertyHeaderTextElementStyles['fontSize'] + ' "' + propertyHeaderTextElementStyles['fontFamily'] + '"';
+      canvas2dContext.font = `${propertyHeaderTextElementStyles['fontStyle']} ${propertyHeaderTextElementStyles['fontWeight']} ${propertyHeaderTextElementStyles['fontSize']} "${propertyHeaderTextElementStyles['fontFamily']}"`;
       columnWidthPx = Math.ceil(canvas2dContext.measureText(columnData.name).width) + paddingWidthPx;
       MEASURED_COLUMN_WIDTHS[columnData.tableId] = MEASURED_COLUMN_WIDTHS[columnData.tableId] || {};
       MEASURED_COLUMN_WIDTHS[columnData.tableId][columnData.id] = columnWidthPx;
@@ -309,71 +309,73 @@ let DataTableView = createReactClass({
                 let {id, isPrimKey} = columnData;
                 let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
                 let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
-                return <Column
-                  width={this.calcColumnWidthPx(column)}
-                  key={column}
-                  columnKey={column}
-                  fixed={isPrimKey}
-                  allowCellsRecycling={true}
-                  isResizable={true}
-                  minWidth={50}
-                  header={
-                    <PropertyHeader
-                      id={'PropertyHeader_' + column}
-                      className={classNames({
-                        'pointer': true,
-                        'table-row-header': true,
-                        'sort-column-ascending': asc,
-                        'sort-column-descending': desc
-                      })}
-                      style={{width: this.calcColumnWidthPx(column)}}
-                      table={table}
-                      propId={column}
-                      onClick={() => this.handleOrderChange(column)}
-                      prefix={(asc || desc) ?
-                        <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> :
-                        null}
-                      tooltipPlacement={'bottom'}
-                      tooltipTrigger={['click']}
-                    />
-                  }
-                  cell={({rowIndex}) => {
-
-                    let background = 'inherit';
-                    let {maxVal, minVal, valueColours, showBar, alignment} = columnData;
-                    let cellData = rows[rowIndex][id];
-                    if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
-                      cellData = parseFloat(cellData);
-                      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
-                      background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
-                    } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
-                      let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
-                      background = _cloneDeep(MAX_COLOR).lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
+                return (
+                  <Column
+                    width={this.calcColumnWidthPx(column)}
+                    key={column}
+                    columnKey={column}
+                    fixed={isPrimKey}
+                    allowCellsRecycling={true}
+                    isResizable={true}
+                    minWidth={50}
+                    header={
+                      <PropertyHeader
+                        id={`PropertyHeader_${column}`}
+                        className={classNames({
+                          'pointer': true,
+                          'table-row-header': true,
+                          'sort-column-ascending': asc,
+                          'sort-column-descending': desc
+                        })}
+                        style={{width: this.calcColumnWidthPx(column)}}
+                        table={table}
+                        propId={column}
+                        onClick={() => this.handleOrderChange(column)}
+                        prefix={(asc || desc) ?
+                          <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> :
+                          null}
+                        tooltipPlacement={'bottom'}
+                        tooltipTrigger={['click']}
+                      />
                     }
-                    if (valueColours) {
-                      let col = valueColours[cellData] || valueColours['_other_'];
-                      if (col) {
-                        col = Color(col).lighten(0.3);
-                        if (rowIndex % 2)
-                          col.darken(0.1);
+                    cell={({rowIndex}) => {
 
-                        background = col.string();
+                      let background = 'inherit';
+                      let {maxVal, minVal, valueColours, showBar, alignment} = columnData;
+                      let cellData = rows[rowIndex][id];
+                      if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                        cellData = parseFloat(cellData);
+                        let percent = 100 * (cellData - minVal) / (maxVal - minVal);
+                        background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
+                      } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                        let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
+                        background = _cloneDeep(MAX_COLOR).lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
                       }
-                    }
+                      if (valueColours) {
+                        let col = valueColours[cellData] || valueColours['_other_'];
+                        if (col) {
+                          col = Color(col).lighten(0.3);
+                          if (rowIndex % 2)
+                            col.darken(0.1);
 
-                    return (
-                      <div className="table-row-cell"
-                        style={{
-                          textAlign: alignment,
-                          width: this.calcColumnWidthPx(column),
-                          height: ROW_HEIGHT + 'px',
-                          background: background
-                        }}>
-                        <PropertyCell prop={columnData} value={cellData}/>
-                      </div>
-                    );
-                  }}
-                />;
+                          background = col.string();
+                        }
+                      }
+
+                      return (
+                        <div className="table-row-cell"
+                          style={{
+                            textAlign: alignment,
+                            width: this.calcColumnWidthPx(column),
+                            height: `${ROW_HEIGHT}px`,
+                            background: background
+                          }}>
+                          <PropertyCell prop={columnData} value={cellData}/>
+                        </div>
+                      );
+                    }}
+                  />
+                );
               })
               }
             </Table>

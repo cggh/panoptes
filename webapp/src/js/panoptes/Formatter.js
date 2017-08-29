@@ -22,11 +22,9 @@ export default function(property, value) {
     if (isNaN(dt.getTime()))
       return '2000-01-01';
     let pad = function(n) {
-      return n < 10 ? '0' + n : n;
+      return n < 10 ? `0${n}` : n;
     };
-    return dt.getUTCFullYear()
-        + '-' + pad(dt.getUTCMonth() + 1)
-        + '-' + pad(dt.getUTCDate());
+    return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
   }
 
   if (property.isFloat && value !== '') {

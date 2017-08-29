@@ -473,15 +473,17 @@ let Side = createReactClass({
 
   render() {
     let {query, table, track} = this.props;
-    return <div className="side-name">
-      <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? this.tableConfig().capNamePlural + ':' : '')}</div>
-      <div className="legend-element">
+    return (
+      <div className="side-name">
+        <div>{((query !== SQL.nullQuery) && table ? 'Filtered ' : '') + (table ? `${this.tableConfig().capNamePlural}:` : '')}</div>
+        <div className="legend-element">
 
-        <TooltipEllipsis className="label">
-          {this.tableConfig().propertiesById[track].name}
-        </TooltipEllipsis>
+          <TooltipEllipsis className="label">
+            {this.tableConfig().propertiesById[track].name}
+          </TooltipEllipsis>
+        </div>
       </div>
-    </div>;
+    );
   },
 });
 

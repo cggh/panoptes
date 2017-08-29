@@ -100,7 +100,7 @@ export const plotTypes = {
             colorscale: _map(scaleColours, (scaleColour, index) => [index, scaleColour]),
             showscale: true
           },
-          text: _map(data.colour, (colour) =>  metadata.colour.name + ': ' + colour.toFixed()),
+          text: _map(data.colour, (colour) =>  `${metadata.colour.name}: ${colour.toFixed()}`),
           type: 'scatter',
           mode: 'markers'
         }];
