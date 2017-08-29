@@ -115,23 +115,26 @@ let ScaledSVGChannel = createReactClass({
           <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
-              return <g>
-                <g
-                  transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
-                  <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
-                    height={2 * height}/>
-                  {React.Children.map(this.props.children, (child) => React.cloneElement(child, {
-                    blockStart: this.blockStart,
-                    blockEnd: this.blockEnd,
-                    blockPixelWidth: blockPixelWidth
-                  }))}
+              return (
+                <g>
+                  <g
+                    transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
+                    <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
+                      height={2 * height}/>
+                    {React.Children.map(this.props.children, (child) => React.cloneElement(child, {
+                      blockStart: this.blockStart,
+                      blockEnd: this.blockEnd,
+                      blockPixelWidth
+                    }))}
+                  </g>
+                  <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
                 </g>
-                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
-              </g>;
+              );
             }}
           </Motion>
         </svg>
-      </ChannelWithConfigDrawer>);
+      </ChannelWithConfigDrawer>
+    );
   },
 });
 

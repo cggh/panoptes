@@ -3,7 +3,7 @@ function errorNotify(flux, message, retryFunc, dismiss = 5) {
   let note = {
     title: 'Error',
     level: 'error',
-    message: message,
+    message,
     autoDismiss: dismiss,
   };
   if (retryFunc) {

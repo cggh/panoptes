@@ -195,7 +195,7 @@ let CategoricalTrack = createReactClass({
       let APIargs = {
         database: this.config.dataset,
         table,
-        columns: columns,
+        columns,
         query: SQL.WhereClause.encode(query),
         groupBy: ['window', track],
         orderBy: [['asc', 'window'], ['asc', track]],

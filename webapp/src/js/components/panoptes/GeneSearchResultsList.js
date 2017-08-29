@@ -67,8 +67,8 @@ let GeneSearchResultsList = createReactClass({
 
     let APIargs = {
       database: this.config.dataset,
-      search: search,
-      maxMatches: maxMatches
+      search,
+      maxMatches
     };
 
     requestContext.request((componentCancellation) =>

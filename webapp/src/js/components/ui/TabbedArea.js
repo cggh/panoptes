@@ -57,8 +57,8 @@ let TabbedArea = createReactClass({
     });
     if (!(_isEqual(this.state.icons, icons) && _isEqual(this.state.titles, titles)))
       this.setState({
-        icons: icons,
-        titles: titles
+        icons,
+        titles
       });
   },
 

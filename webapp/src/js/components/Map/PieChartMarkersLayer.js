@@ -240,7 +240,7 @@ let PieChartMarkersLayer = createReactClass({
           }
 
           markers.push({
-            chartDataTable: chartDataTable,
+            chartDataTable,
             key: locationDataPrimKey,
             lat: locationData[i][locationTableConfig.latitude],
             lng: locationData[i][locationTableConfig.longitude],
@@ -249,7 +249,7 @@ let PieChartMarkersLayer = createReactClass({
             chartData: markerChartData,
             locationTable: locationDataTable,
             locationPrimKey: locationDataPrimKey,
-            primKey: primKey
+            primKey
           });
 
         }
@@ -258,7 +258,7 @@ let PieChartMarkersLayer = createReactClass({
         // NB: calcMapBounds is only based on lat lng positions, not radii.
         let bounds = CalcMapBounds.calcMapBounds(markers);
         this.setState({markers, colours});
-        changeLayerStatus({loadStatus: 'loaded', bounds: bounds});
+        changeLayerStatus({loadStatus: 'loaded', bounds});
 
       })
       .catch(API.filterAborted)

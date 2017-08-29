@@ -18,7 +18,7 @@ let CustomButton = createReactClass({
 
   propTypes: {
     target: PropTypes.string,
-    children: function(props, propName, componentName) {
+    children(props, propName, componentName) {
       // Only accept a single child, of the appropriate type
       let children = filterChildren(this, React.Children.toArray(props[propName]));
       if (children.length < 2 || !(children[0].type === Anchor && children[1].type === Content))

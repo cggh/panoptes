@@ -81,7 +81,7 @@ let Gene = createReactClass({
       this.setState({loadStatus: 'loading'});
       let APIargs = {
         database: this.config.dataset,
-        geneId: geneId
+        geneId
       };
       requestContext.request((componentCancellation) =>
         LRUCache.get(

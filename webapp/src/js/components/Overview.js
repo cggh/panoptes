@@ -65,7 +65,7 @@ let Overview = createReactClass({
       )
     )
       .then((data) => {
-        this.setState({loadStatus: 'loaded', data: data});
+        this.setState({loadStatus: 'loaded', data});
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)

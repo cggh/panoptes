@@ -50,7 +50,7 @@ let Plot = createReactClass({
     };
     const config = {
       showLink: false,
-      displayModeBar: displayModeBar
+      displayModeBar
     };
 
     let showLegend = false;

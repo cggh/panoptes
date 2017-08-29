@@ -218,9 +218,9 @@ let PerRowNumericalTrack = createReactClass({
       columns.push(colourProperty);
     let APIargs = {
       database: this.config.dataset,
-      table: table,
-      columns: columns,
-      query: query,
+      table,
+      columns,
+      query,
       transpose: false
     };
     requestContext.request((componentCancellation) =>
@@ -239,14 +239,14 @@ let PerRowNumericalTrack = createReactClass({
           SummarisationCache.fetch({
             columns: {
               [primKey]: {
-                primKey: primKey,
+                primKey,
                 folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primKey}`,
                 config: 'Summ',
                 name: `${channel}_${primKey}_avg`
               }
             },
             minBlockSize: this.tableConfig().tableBasedSummaryValuesById[channel].blockSizeMin,
-            chromosome: chromosome,
+            chromosome,
             start: blockStart,
             end: blockEnd,
             targetPointCount: blockPixelWidth,
@@ -309,8 +309,8 @@ let PerRowNumericalTrack = createReactClass({
     }
     this.setState({
       //area: area,
-      lines: lines,
-      colours: colours
+      lines,
+      colours
     });
   },
 

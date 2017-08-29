@@ -145,6 +145,6 @@ let removeResizeListener = function(element, fn) {
 };
 
 module.exports = {
-  addResizeListener: addResizeListener,
-  removeResizeListener: removeResizeListener
+  addResizeListener,
+  removeResizeListener
 };

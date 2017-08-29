@@ -140,45 +140,47 @@ let EditDocPage = createReactClass({
     const {editorState, content, loadStatus, rendered} = this.state;
     const actions = this.getFlux().actions;
 
-    return <div className="large-modal edit-doc-page">
-      <div className="load-container vertical stack">
-        <div className="grow horizontal stack">
-          <div className="editor scroll-within">
-            <Editor className="editor"
-              editorState={editorState}
-              onChange={this.handleChange}
-              placeholder="Loading..."
-              ref="editor"
+    return (
+      <div className="large-modal edit-doc-page">
+        <div className="load-container vertical stack">
+          <div className="grow horizontal stack">
+            <div className="editor scroll-within">
+              <Editor className="editor"
+                editorState={editorState}
+                onChange={this.handleChange}
+                placeholder="Loading..."
+                ref="editor"
+              />
+            </div>
+            <div className="preview scroll-within">
+              <HTMLWithComponents>{rendered}</HTMLWithComponents>
+            </div>
+          </div>
+          <div className="centering-container">
+            <FlatButton
+              label="Cancel"
+              primary={false}
+              onClick={() => actions.session.modalClose()}
+            />
+            <RaisedButton
+              label="Save"
+              primary={true}
+              icon={<Icon fixedWidth={true} name={'save'} inverse={true} />}
+              onClick={() =>  {
+                this.getFlux().actions.api.modifyConfig({
+                  dataset: this.config.dataset,
+                  path: `docs.${this.props.path}`,
+                  action: 'replace',
+                  content
+                });
+                actions.session.modalClose();
+              }}
             />
           </div>
-          <div className="preview scroll-within">
-            <HTMLWithComponents>{rendered}</HTMLWithComponents>
-          </div>
+          <Loading status={loadStatus}/>
         </div>
-        <div className="centering-container">
-          <FlatButton
-            label="Cancel"
-            primary={false}
-            onClick={() => actions.session.modalClose()}
-          />
-          <RaisedButton
-            label="Save"
-            primary={true}
-            icon={<Icon fixedWidth={true} name={'save'} inverse={true} />}
-            onClick={() =>  {
-              this.getFlux().actions.api.modifyConfig({
-                dataset: this.config.dataset,
-                path: `docs.${this.props.path}`,
-                action: 'replace',
-                content: content
-              });
-              actions.session.modalClose();
-            }}
-          />
-        </div>
-        <Loading status={loadStatus}/>
       </div>
-    </div>;
+    );
   },
 });
 

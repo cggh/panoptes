@@ -62,7 +62,7 @@ let PropertyLegend = createReactClass({
         <div key="min" className="legend-element">{min || propConfig.minVal}</div>,
         <div key="bar" className="legend-element">
           <div
-            style={{width: '100px', height: '10px', background: background}}
+            style={{width: '100px', height: '10px', background}}
           >
           </div>
         </div>,

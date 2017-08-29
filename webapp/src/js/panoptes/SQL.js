@@ -55,7 +55,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '=', name: '=',
     String: true, Float: true, Integer: true, MultiChoiceInt: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', '=', '');
     },
     fieldType: 'value'
@@ -63,7 +63,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '<>', name: 'not =',
     String: true, Float: true, Integer: true, MultiChoiceInt: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', '<>', '');
     },
     fieldType: 'value'
@@ -71,7 +71,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '<', name: '<',
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', '<', '');
     },
     fieldType: 'value'
@@ -79,7 +79,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '>', name: '>',
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', '>', '');
     },
     fieldType: 'value'
@@ -87,7 +87,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '<=', name: '<=',
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', '<=', '');
     },
     fieldType: 'value'
@@ -95,7 +95,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '>=', name: '>=',
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', '>=', '');
     },
     fieldType: 'value'
@@ -103,7 +103,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: 'between', name: 'Between',
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareBetween('', '', '');
     },
     fieldType: 'minMax'
@@ -111,7 +111,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: 'CONTAINS', name: 'Contains',
     String: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', 'CONTAINS', '');
     },
     fieldType: 'value',
@@ -120,7 +120,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: 'NOTCONTAINS', name: 'Does not contain',
     String: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', 'NOTCONTAINS', '');
     },
     fieldType: 'value',
@@ -129,7 +129,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: 'STARTSWITH', name: 'Starts with',
     String: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', 'STARTSWITH', '');
     },
     fieldType: 'value',
@@ -138,7 +138,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: 'LIKE', name: 'Like',
     String: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareFixed('', 'LIKE', '');
     },
     fieldType: 'value',
@@ -147,7 +147,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: 'ISPRESENT', name: 'Is present', MultiChoiceInt: true,
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.IsPresent();
     },
     fieldType: 'none'
@@ -155,21 +155,21 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: 'ISABSENT', name: 'Is absent', MultiChoiceInt: true,
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.IsAbsent();
     },
     fieldType: 'none'
   },
   {
     ID: 'ISNOTEMPTYSTR', name: 'Is present', String: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.IsNotEmptyStr();
     },
     fieldType: 'none'
   },
   {
     ID: 'ISEMPTYSTR', name: 'Is absent', String: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.IsEmptyStr();
     },
     fieldType: 'none'
@@ -177,7 +177,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '=FIELD', name: 'Equals column', MultiChoiceInt: true, //test the equality with another database field
     String: true, Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.EqualsField();
     },
     fieldType: 'otherColumn'
@@ -185,7 +185,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '<>FIELD', name: 'Differs from column', MultiChoiceInt: true, //test the difference with another database field
     String: true, Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.DiffersField();
     },
     fieldType: 'otherColumn'
@@ -193,7 +193,7 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '<FIELD', name: '< Column', //Performs a < operation with a linear function of another field
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareField('<FIELD');
     },
     fieldType: 'otherColumnWithScaleAndOffset'
@@ -201,21 +201,21 @@ SQL.WhereClause._fieldComparisonOperators = [
   {
     ID: '>FIELD', name: '> Column', //Performs a > operation with a linear function of another field
     Float: true, Integer: true,
-    Create: function() {
+    Create() {
       return SQL.WhereClause.CompareField('>FIELD');
     },
     fieldType: 'otherColumnWithScaleAndOffset'
   },
   {
     ID: '_subset_', name: 'in subset',
-    Create: function() {
+    Create() {
       return SQL.WhereClause.InSubset();
     },
     fieldType: 'subset'
   },
   {
     ID: '_note_', name: 'has note containing',
-    Create: function() {
+    Create() {
       return SQL.WhereClause.NoteContains();
     },
     fieldType: 'note'

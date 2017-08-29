@@ -31,7 +31,7 @@ let DataItem = createReactClass({
     children: PropTypes.node
   },
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       activeTab: 'view_0'
     };

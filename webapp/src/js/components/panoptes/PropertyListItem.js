@@ -29,7 +29,7 @@ let PropertyListItem = createReactClass({
     tooltipTrigger: PropTypes.arrayOf(PropTypes.string),
   },
 
-  render: function() {
+  render() {
     const {table, propId, value, tooltipPlacement, tooltipTrigger} = this.props;
     const propertyData = this.tableConfig().propertiesById[propId];
 

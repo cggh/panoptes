@@ -98,7 +98,7 @@ let ReferenceSequence = createReactClass({
       let APIargs = {
         database: this.config.dataset,
         table: '_sequence_',
-        columns: columns,
+        columns,
         query: SQL.WhereClause.encode(query),
         groupBy: ['base', 'window'],
         orderBy: [['asc', 'window'], ['desc', 'count']],

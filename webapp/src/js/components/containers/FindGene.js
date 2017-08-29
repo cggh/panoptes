@@ -39,7 +39,7 @@ let FindGene = createReactClass({
     chromosomeLength: PropTypes.number,
   },
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       activeTab: 'tab_0',
       startPosition: 0

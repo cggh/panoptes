@@ -51,10 +51,10 @@ function encodeQuery(query) {
 function request(options, method = 'GET', data = null) {
   let defaults = {
     url: serverURL,
-    method: method,
+    method,
     params: {},
     timeout: 60000,
-    data: data
+    data
   };
   //Remove null params
   for (let key in options.params) {
@@ -121,7 +121,7 @@ function treeData(options) {
     ...args,
     params: {
       datatype: 'getgraph',
-      database: database,
+      database,
       tableid: table,
       graphid: tree
     }
@@ -134,13 +134,13 @@ function storeData(data) {
   return requestJSON({
     method: 'POST',
     params: {datatype: 'storedata'},
-    data: data
+    data
   }).then((resp) => resp.id);
 }
 
 function fetchData(id) {
   return requestJSON({
-    params: {datatype: 'fetchstoredata', id: id}
+    params: {datatype: 'fetchstoredata', id}
   }).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
@@ -150,7 +150,7 @@ function fetchSingleRecord(options) {
   let recordQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKey, '=', primKeyValue));
   return query({
     cancellation,
-    database: database,
+    database,
     table,
     columns,
     query: recordQuery,
@@ -171,7 +171,7 @@ function findGene(options) {
     ...args,
     params: {
       datatype: 'findgene',
-      database: database,
+      database,
       table: 'annotation',
       pattern: search,
       count: maxMatches,
@@ -213,9 +213,9 @@ function findGenesInRegion(options) {
 
   return query(
     {
-      database: database,
+      database,
       table: 'annotation',
-      columns: columns,
+      columns,
       query: recordQuery,
       transpose: true
     }
@@ -227,7 +227,7 @@ function fetchGene(options) {
   let {database, geneId} = options;
   let recordQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed('fid', '=', geneId));
   return query({
-    database: database,
+    database,
     table: 'annotation',
     columns: ['fid', 'chromid', 'fname', 'fnames', 'descr', 'fstart', 'fstop', 'fparentid', 'ftype'],
     query: recordQuery,
@@ -261,7 +261,7 @@ function fetchImportStatusData(options) {
     {
       database: 'datasets',
       table: 'calculations',
-      columns: columns,
+      columns,
       query: recordQuery,
       orderBy: [['desc', 'timestamp']],
       transpose: true,
@@ -438,7 +438,7 @@ function query(options) {
   JSON.stringify({
     database,
     table,
-    query: query,
+    query,
     columns: JSON.stringify(columns),
     limit: (_isNumber(start) && _isNumber(stop)) ? `${start}~${stop}` : undefined,
     distinct: distinct ? 'true' : 'false',

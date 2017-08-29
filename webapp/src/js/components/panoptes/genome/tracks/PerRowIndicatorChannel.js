@@ -162,7 +162,7 @@ let PerRowIndicatorChannel = createReactClass({
       let APIargs = {
         database: this.config.dataset,
         table,
-        columns: columns,
+        columns,
         query: SQL.WhereClause.encode(decodedQuery),
         transpose: false,
         typedArrays: true,

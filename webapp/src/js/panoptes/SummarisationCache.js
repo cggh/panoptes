@@ -56,7 +56,7 @@ let SummarisationCache = {
       let APIargs = {
         database: dataset,
         table,
-        columns: columns,
+        columns,
         query: SQL.WhereClause.encode(SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(chromosomeField, '=', chromosome),
           SQL.WhereClause.CompareFixed(positionField, '>=', sliceStart * optimalBlockSize),
           SQL.WhereClause.CompareFixed(positionField, '<', (sliceStart + FETCH_SIZE) * optimalBlockSize)])),
@@ -113,7 +113,7 @@ let SummarisationCache = {
         columns: data,
         dataStart: blockStart * optimalBlockSize,
         dataStep: optimalBlockSize,
-        chromosome: chromosome
+        chromosome
       };
     };
 

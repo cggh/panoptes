@@ -32,10 +32,10 @@ const customHandlebars = ({dataset, handlebars}) => {
     }
     let queryAPIargs = {
       database: dataset,
-      table: table,
-      columns: columns,
-      orderBy: orderBy,
-      query: query,
+      table,
+      columns,
+      orderBy,
+      query,
       transpose: true //We want rows, not columns
     };
     return LRUCache.get(

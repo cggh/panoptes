@@ -37,7 +37,7 @@ let PropertyHeader = createReactClass({
     onClick: PropTypes.func
   },
 
-  render: function() {
+  render() {
     const {table, propId, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
     const {name, description} = this.propertiesByColumn(propId);
     delete other.columnKey;

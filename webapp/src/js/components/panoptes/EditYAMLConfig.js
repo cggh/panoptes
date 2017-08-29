@@ -70,39 +70,41 @@ let EditYAMLConfig = createReactClass({
     const {editorState, content} = this.state;
     const actions = this.getFlux().actions;
     const loading = this.config.loadStatus == 'LOADING';
-    return <div className="large-modal edit-doc-page">
-      <div className="load-container vertical stack">
-        <div className="editor grow scroll-within">
-          <Editor className="editor"
-            editorState={editorState}
-            onChange={this.handleChange}
-            placeholder=""
-            ref="editor"
-          />
-        </div>
-        <div className="centering-container">
-          <FlatButton
-            label="Close"
-            primary={false}
-            onClick={() => actions.session.modalClose()}
-          />
-          <RaisedButton
-            label="Save"
-            primary={true}
-            disabled={loading}
-            icon={<Icon fixedWidth={true} name={loading ? 'spinner' : 'save'} spin={loading} inverse={true} />}
-            onClick={() =>  {
-              this.getFlux().actions.api.replaceYAMLConfig({
-                dataset: this.config.dataset,
-                path: `${this.props.path}`,
-                content: content,
-                onSuccess: () => actions.session.modalClose()
-              });
-            }}
-          />
+    return (
+      <div className="large-modal edit-doc-page">
+        <div className="load-container vertical stack">
+          <div className="editor grow scroll-within">
+            <Editor className="editor"
+              editorState={editorState}
+              onChange={this.handleChange}
+              placeholder=""
+              ref="editor"
+            />
+          </div>
+          <div className="centering-container">
+            <FlatButton
+              label="Close"
+              primary={false}
+              onClick={() => actions.session.modalClose()}
+            />
+            <RaisedButton
+              label="Save"
+              primary={true}
+              disabled={loading}
+              icon={<Icon fixedWidth={true} name={loading ? 'spinner' : 'save'} spin={loading} inverse={true} />}
+              onClick={() =>  {
+                this.getFlux().actions.api.replaceYAMLConfig({
+                  dataset: this.config.dataset,
+                  path: `${this.props.path}`,
+                  content,
+                  onSuccess: () => actions.session.modalClose()
+                });
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>;
+    );
   },
 });
 
