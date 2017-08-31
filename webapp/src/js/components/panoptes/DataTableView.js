@@ -351,7 +351,7 @@ let DataTableView = createReactClass({
                         background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
                       } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
                         let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
-                        background = _cloneDeep(MAX_COLOR).lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
+                        background = _cloneDeep(MAX_COLOR).lighten(1 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
                       }
                       if (valueColours) {
                         let col = valueColours[cellData] || valueColours['_other_'];
