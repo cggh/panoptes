@@ -28,7 +28,8 @@ let SelectRow = createReactClass({
   propTypes: {
     query: PropTypes.string,
     table: PropTypes.string.isRequired,
-    queryTable: PropTypes.string
+    queryTable: PropTypes.string,
+    selected: PropTypes.string
   },
 
   getDefaultProps() {
@@ -38,7 +39,7 @@ let SelectRow = createReactClass({
   },
 
   render() {
-    let {data, table, config} = this.props;
+    let {data, table, selected, config} = this.props;
     let tableConfig = config.tablesById[table];
     let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
     let itemTitle = tableConfig.itemTitle || `{{${tableConfig.primKey}}}`;
@@ -49,7 +50,7 @@ let SelectRow = createReactClass({
       return <SelectField hintText={`No ${tableConfig.capNamePlural} to choose from`} disabled={true}>
       </SelectField>;
     } else {
-      return <SelectField hintText={`Choose a ${tableConfig.capNameSingle}`} onChange={(e, k, v) => {
+      return <SelectField value={selected} hintText={`Choose a ${tableConfig.capNameSingle}`} onChange={(e, k, v) => {
         this.getFlux().actions.session.popupOpen(<DataItem primKey={v} table={table}>{views}</DataItem>);
       }}>
         {_map(data, (row) =>
