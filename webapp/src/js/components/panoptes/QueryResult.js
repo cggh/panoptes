@@ -34,7 +34,7 @@ let QueryResult = createReactClass({
     let {formatNumber, data} = this.props;
     if (!_isUndefined(data) && !_isUndefined(formatNumber)) {
       data = format(formatNumber)(data.result[0]);
-    } else if (!_isUndefined(data)) {
+    } else if (!_isUndefined(data) && data) {
       data = data.result[0];
     }
     return <span>{data ? data : '...'}</span>;
