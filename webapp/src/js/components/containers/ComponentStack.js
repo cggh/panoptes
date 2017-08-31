@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 class ComponentStack extends React.Component {
+  static displayName = 'ComponentStack';
+
   static propTypes = {
     children: PropTypes.node,
     title: PropTypes.string

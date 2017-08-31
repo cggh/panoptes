@@ -44,6 +44,8 @@ let forceCrossLink = function(links) {
 };
 
 class GeoLayouter extends React.Component {
+  static displayName = 'GeoLayouter'
+
   static contextTypes = {
     map: PropTypes.object,
   };

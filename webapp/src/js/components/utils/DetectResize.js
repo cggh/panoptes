@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom';
 import detectResize from 'util/DetectElementResize';
 
 class DetectResize extends React.Component {
+  static displayName = 'DetectResize'
+
   static propTypes = {
     onResize: PropTypes.func,
     children: PropTypes.element.isRequired

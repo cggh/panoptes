@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from  'react';
+import React from 'react';
 import createReactClass from 'create-react-class';
 import deserialiseComponent from 'util/deserialiseComponent';
 // Mixins
@@ -28,9 +28,9 @@ let SessionComponent = createReactClass({
   componentWillMount() {
     //Store this so that we can access changes without render.
     this.updateTitleIcon =
-          (function() {
-            return this.props.updateTitleIcon.apply(this, arguments);
-          }).bind(this);
+      (function () {
+        return this.props.updateTitleIcon.apply(this, arguments);
+      }).bind(this);
   },
 
   getStateFromFlux(props) {
@@ -64,11 +64,11 @@ let SessionComponent = createReactClass({
     let actions = this.getFlux().actions.session;
 
     return component ? React.cloneElement(deserialiseComponent(component, [compId], {
-      setProps: actions.componentSetProps,
-      replaceSelf: actions.componentReplace,
-      updateTitleIcon: this.updateTitleIcon
-    }), {ref: 'child', replaceable})
-      : <span>Component does not exist</span>;
+          setProps: actions.componentSetProps,
+          replaceSelf: actions.componentReplace,
+          updateTitleIcon: this.updateTitleIcon
+        }), {ref: 'child', replaceable})
+        : <span>Component does not exist</span>;
   },
 });
 

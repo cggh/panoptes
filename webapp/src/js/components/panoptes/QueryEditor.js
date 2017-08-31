@@ -648,6 +648,8 @@ let Criterion = createReactClass({
 
 
 class QueryEditor extends React.Component {
+  static displayName = 'QueryEditor'
+
   static propTypes = {
     table: PropTypes.string.isRequired,
     query: PropTypes.string.isRequired,
