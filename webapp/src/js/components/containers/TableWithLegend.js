@@ -45,7 +45,7 @@ let TableWithLegend = createReactClass({
           <Card style={{width: '500px'}}>{children}</Card>
         </div>
         <div className="centering-container grow">
-          <div style={{width: '90%', height: '100%'}}>
+          <div style={{width: '80%', height: '100%'}}>
             <DataTableView table={table}
               query={query}
               order={order}
