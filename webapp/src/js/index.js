@@ -22,24 +22,18 @@ import APIActions from 'actions/APIActions';
 import API from 'panoptes/API';
 
 import InitialConfig from 'panoptes/InitialConfig';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import Perf from 'react-addons-perf';
+// import Perf from 'react-addons-perf';
 import _filter from 'lodash.filter';
 
-if (process.env.NODE_ENV !== 'production') { //eslint-disable-line no-undef
-  window.Perf = Perf;
-}
+
+//Disable Perf for React 16 beta
+// if (process.env.NODE_ENV !== 'production') { //eslint-disable-line no-undef
+//   window.Perf = Perf;
+// }
 
 import 'console-polyfill';
 import 'normalize.css';
-
-//Needed for onTouchTap
-//Can go away when react 1.0 release
-//Check this repo:
-//https://github.com/zilverline/react-tap-event-plugin
-injectTapEventPlugin();
-
 
 const HASH_REGEX = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/;
 
