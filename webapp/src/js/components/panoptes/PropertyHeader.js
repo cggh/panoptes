@@ -42,20 +42,13 @@ let PropertyHeader = createReactClass({
     const {name, description} = this.propertiesByColumn(propId);
     delete other.columnKey;
     const tooltip = <Tooltip placement={tooltipPlacement}
-      trigger={tooltipTrigger}
-      overlay={<div className="vertical stack">
-        <div className="tooltip-description"><HTMLWithComponents>{description}</HTMLWithComponents></div>
-        <div className="grow"><div className="tooltip-plot"><TablePlot
-          table={table}
-          plotType="histogram"
-          // query={this.getDefinedQuery()}
-          horizontal={propId}
-          // randomSubsetSize={randomSubsetSize}
-        /></div></div>
-      </div>
-      }>
-      <Icon className="info" name="info-circle"/>
-    </Tooltip>;
+               trigger={tooltipTrigger}
+               overlay={<div className="vertical stack">
+                 <div className="tooltip-description"><HTMLWithComponents>{description}</HTMLWithComponents></div>
+                 </div >
+                 }>
+        <Icon className="info" name="info-circle"/>
+      </Tooltip>;
     return (
       <span onClick={(event) => {
         if (onClick && event.target.className.indexOf('info') == -1)
@@ -64,7 +57,7 @@ let PropertyHeader = createReactClass({
       {...other}>
         {prefix}
         <TooltipEllipsis className="label">{name}</TooltipEllipsis>
-        {tooltip}
+        {description ? tooltip : null}
       </span>
     );
   },
