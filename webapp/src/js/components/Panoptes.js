@@ -27,8 +27,7 @@ import createPalette from 'material-ui/styles/createPalette';
 import createTypography from 'material-ui/styles/createTypography';
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {withTheme} from 'material-ui/styles';
-import {blue, pink} from 'material-ui/colors';
-import {A200 as pinkA200} from 'material-ui/colors/pink';
+import {blue, pink, deepOrange, blueGrey} from 'material-ui/colors';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
@@ -46,11 +45,8 @@ import 'ui-components.scss';
 import 'main.scss';
 
 const palette = createPalette({
-  primary: blue,
-  accent: pink,
-  primary1Color: blue[500],
-  primary2Color: blue[700],
-  accent1Color: pinkA200,
+  primary: deepOrange,
+  secondary: blueGrey,
   genotypeRefColor: 'rgb(0, 128, 192)',
   genotypeAltColor: 'rgb(255, 50, 50)',
   genotypeHetColor: 'rgb(0, 192, 120)',
