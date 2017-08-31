@@ -216,7 +216,7 @@ let DataTableView = createReactClass({
   },
 
   setShowableRows(size) {
-    this.setState({showableRowsCount: size.height ? Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) : 0});
+//    this.setState({showableRowsCount: size.height ? Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) : 0});
   },
 
   componentDidUpdate(prevProps, prevState) {
