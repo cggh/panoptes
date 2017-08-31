@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import deserialiseComponent from 'util/deserialiseComponent';
+import ErrorBoundary from 'components/ErrorBoundary';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
@@ -63,12 +64,14 @@ let SessionComponent = createReactClass({
     const {component} = this.state;
     let actions = this.getFlux().actions.session;
 
-    return component ? React.cloneElement(deserialiseComponent(component, [compId], {
+    return <ErrorBoundary>
+      {component ? React.cloneElement(deserialiseComponent(component, [compId], {
           setProps: actions.componentSetProps,
           replaceSelf: actions.componentReplace,
           updateTitleIcon: this.updateTitleIcon
         }), {ref: 'child', replaceable})
-        : <span>Component does not exist</span>;
+        : <span>Component does not exist</span>}
+    </ErrorBoundary>;
   },
 });
 
