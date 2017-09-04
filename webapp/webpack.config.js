@@ -163,7 +163,7 @@ module.exports = function (env) {
         'src/js',
         'src/js/components',
         'src/styles',
-        'node_modules'
+        path.resolve(__dirname, 'node_modules')
       ],
     },
 
