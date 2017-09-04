@@ -16,6 +16,7 @@ import Icon from 'ui/Icon';
 import customHandlebars from 'util/customHandlebars';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import _debounce from 'lodash.debounce';
+import ErrorBoundary from 'components/ErrorBoundary';
 
 import 'prismjs/themes/prism.css';
 import 'draft-js/dist/Draft.css';
@@ -153,7 +154,7 @@ let EditDocPage = createReactClass({
               />
             </div>
             <div className="preview scroll-within">
-              <HTMLWithComponents>{rendered}</HTMLWithComponents>
+              <ErrorBoundary><HTMLWithComponents>{rendered}</HTMLWithComponents></ErrorBoundary>
             </div>
           </div>
           <div className="centering-container">
