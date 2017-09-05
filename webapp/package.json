@@ -27,7 +27,8 @@
     "unlazy-loader": "^0.1.2",
     "url-loader": "^0.5.7",
     "webpack": "^3.5.5",
-    "webpack-dev-server": "^2.4.1"
+    "webpack-bundle-analyzer": "^2.9.0",
+    "webpack-dev-server": "^2.7.1"
   },
   "scripts": {
     "test": "jest",
