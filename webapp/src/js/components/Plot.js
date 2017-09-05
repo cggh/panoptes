@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import createPlotlyComponent from 'react-plotlyjs';
-import Plotly from 'plotly.js/dist/plotly-cartesian';
-const PlotlyComponent = createPlotlyComponent(Plotly);
 import _reduce from 'lodash.reduce';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -32,7 +30,24 @@ let Plot = createReactClass({
     };
   },
 
+  componentWillMount() {
+    Promise.all([
+      import('plotly.js/dist/plotly-cartesian'),
+      //...more imports
+    ]).then(([Plotly]) => {
+      this.hasImported = true;
+      this.Plotly = Plotly;
+      this.PlotlyComponent = createPlotlyComponent(this.Plotly);
+      this.forceUpdate();
+    }).catch((error) => 'An error occurred while loading the component: ' + error);
+  },
+
   render() {
+
+    if (!this.hasImported) {
+      return null;
+    }
+
     let {width, height} = this.state;
     let {plotType, dimensionData, dimensionMetadata, title, displayModeBar} = this.props;
 
@@ -73,6 +88,8 @@ let Plot = createReactClass({
     let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);
     let layout = {...defaultLayout, ...plotTypes[plotType].layout, ...dataDependentLayout};
 
+    let PlotlyComponent = this.PlotlyComponent;
+
     return (
       <DetectResize
         onResize={(size) => {
@@ -88,6 +105,7 @@ let Plot = createReactClass({
       </DetectResize>
     );
   },
+
 });
 
 export default Plot;
