@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import createPlotlyComponent from 'react-plotlyjs';
 import _reduce from 'lodash.reduce';
 import Loading from 'ui/Loading';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -33,23 +32,23 @@ let Plot = createReactClass({
   componentWillMount() {
     Promise.all([
       import('plotly.js/dist/plotly-cartesian'),
-      //...more imports
-    ]).then(([Plotly]) => {
-      this.hasImported = true;
-      this.Plotly = Plotly;
-      this.PlotlyComponent = createPlotlyComponent(this.Plotly);
-      this.forceUpdate();
-    }).catch((error) => 'An error occurred while loading the component: ' + error);
+      import('react-plotlyjs'),
+    ]).then(([Plotly, createPlotlyComponent]) => {
+      this.setState({
+        PlotlyComponent: createPlotlyComponent.default(Plotly),
+        hasImported: true,
+      });
+    }).catch((error) => console.error(error));
   },
 
   render() {
 
-    if (!this.hasImported) {
+    let {width, height, hasImported, PlotlyComponent} = this.state;
+    let {plotType, dimensionData, dimensionMetadata, title, displayModeBar} = this.props;
+
+    if (!hasImported) {
       return <Loading status="loading"/>;
     }
-
-    let {width, height} = this.state;
-    let {plotType, dimensionData, dimensionMetadata, title, displayModeBar} = this.props;
 
     // data and plotType-independent config
     const defaultLayout = {
@@ -87,8 +86,6 @@ let Plot = createReactClass({
 
     let plotData = plotTypes[plotType].plotlyTraces(dimensionData, dimensionMetadata);
     let layout = {...defaultLayout, ...plotTypes[plotType].layout, ...dataDependentLayout};
-
-    let PlotlyComponent = this.PlotlyComponent;
 
     return (
       <DetectResize
