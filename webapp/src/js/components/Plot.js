@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import createPlotlyComponent from 'react-plotlyjs';
 import _reduce from 'lodash.reduce';
-
+import Loading from 'ui/Loading';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
@@ -45,7 +45,7 @@ let Plot = createReactClass({
   render() {
 
     if (!this.hasImported) {
-      return null;
+      return <Loading status="loading"/>;
     }
 
     let {width, height} = this.state;
