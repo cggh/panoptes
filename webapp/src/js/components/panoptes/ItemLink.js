@@ -43,7 +43,7 @@ let ItemLink = createReactClass({
         </span>
       );
     } else {
-      return <div style={{cursor: 'pointer'}} onClick={(e) => this.handleClick(e)}>{children}</div>;
+      return <span style={{cursor: 'pointer'}} onClick={(e) => this.handleClick(e)}>{children}</span>;
     }
   },
 });
