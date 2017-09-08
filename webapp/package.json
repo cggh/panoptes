@@ -5,6 +5,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "ansi-styles": "2.2.1",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.23.1",
     "babel-eslint": "^7.1.1",
