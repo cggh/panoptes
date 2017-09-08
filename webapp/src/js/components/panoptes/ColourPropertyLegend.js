@@ -70,6 +70,10 @@ class ColourPropertyLegend extends React.Component {
 ColourPropertyLegend = withAPIData(ColourPropertyLegend, ({config, props}) => {
 
   let {table, colourProperty, labelProperty, query} = props;
+  query = query ||
+    (table ? config.tablesById[table].defaultQuery : null) ||
+    SQL.nullQuery;
+
 
   let columns = [colourProperty, (labelProperty === undefined ? config.tablesById[table].primKey : labelProperty)];
 
