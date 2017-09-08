@@ -68,12 +68,6 @@ let TableGeoJSONsLayer = createReactClass({
     };
   },
 
-  getDefinedQuery(query, table) {
-    return (query || this.props.query) ||
-      ((table || this.props.table) ? this.props.config.tablesById[table || this.props.table].defaultQuery : null) ||
-      SQL.nullQuery;
-  },
-
   render() {
 
     let {layerContainer, map} = this.context;
@@ -162,6 +156,10 @@ let TableGeoJSONsLayer = createReactClass({
 TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, ({config, props}) => {
 
   let {table, query, colourProperty, geoJsonProperty, labelProperty} = props;
+
+  query = query ||
+    (table  ? config.tablesById[table].defaultQuery : null) ||
+    SQL.nullQuery;
 
   let tableConfig = config.tablesById[table];
   if (tableConfig === undefined) {
