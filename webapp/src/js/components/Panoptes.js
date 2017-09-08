@@ -188,20 +188,18 @@ let Panoptes = createReactClass({
                 <Tab label="Guidebook" />
                 <Tab label="Viewer" />
               </Tabs>
-              <SwipeableViews
-                index={tabIndex}
-                onChangeIndex={this.handleChangeTab}
-              >
+              {tabIndex === 0 ?
                 <div className="body scroll-within">
-                  <SessionComponent compId={"FirstTab"} />
-                </div>
+                  <SessionComponent key="FirstTab" compId={"FirstTab"} />
+                </div> :null}
+              {tabIndex === 1 ?
                 <div className="body scroll-within">
-                  <SessionComponent compId={selectedDocPage} />
-                </div>
+                  <SessionComponent key={selectedDocPage} compId={selectedDocPage} />
+                </div>:null}
+              {tabIndex === 2 ?
                 <div className="body scroll-within">
-                  <SessionComponent compId={selectedOther} />
-                </div>
-              </SwipeableViews>
+                  <SessionComponent key={selectedOther} compId={selectedOther} />
+                </div>:null}
             </div>
             <Modal visible={!!modal}
               onClose={actions.modalClose}>
