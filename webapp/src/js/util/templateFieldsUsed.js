@@ -64,8 +64,8 @@ export default function(template, possibleTables, possibleParentTablesAndFields)
     options.inverse(this);
   });
 
-  hb.registerHelper('query', function(options) {
-    let {fn, inverse, hash} = options;
+  hb.registerHelper('query', function() {
+    let {fn, inverse, hash} = arguments[arguments.length-1];
     let {table, query, orderBy} = hash;
     table = table || '';
     query = query || '';
