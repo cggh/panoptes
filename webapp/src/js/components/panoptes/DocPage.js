@@ -143,9 +143,9 @@ let DocPage = createReactClass({
     const actions = this.getFlux().actions;
 
     return <div className="load-container">
-      <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
+      <HTMLWithComponents className="doc-page" replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       {this.config.user.isManager ?
-        <div className="docpage-edit">
+        <div className="docpage-edit"  style={{zIndex:'99999'}}>
           <IconButton
             aria-label="Edit"
             className="fa fa-edit"
