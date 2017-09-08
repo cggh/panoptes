@@ -396,6 +396,12 @@
   padding: 20px;
 }
 
+.horiz-centering-container {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
 .scroll-within {
   overflow: auto;
 }
