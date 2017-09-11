@@ -146,8 +146,9 @@ let DocPage = createReactClass({
       <HTMLWithComponents replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       {this.config.user.isManager ?
         <div className="docpage-edit">
-          <IconButton tooltip="Edit"
-            iconClassName="fa fa-edit"
+          <IconButton
+            aria-label="Edit"
+            className="fa fa-edit"
             onClick={() => actions.session.modalOpen(<EditDocPage path={path}/>)}
           />
         </div>

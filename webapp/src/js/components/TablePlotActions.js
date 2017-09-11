@@ -16,8 +16,9 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Material UI
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Select from 'material-ui/Select';
+import Input from 'material-ui/Input';
+import {MenuItem} from 'material-ui/Menu';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -29,7 +30,7 @@ import SQL from 'panoptes/SQL';
 import TablePlot from 'TablePlot';
 import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
-import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
+import SelectWithNativeFallback from 'panoptes/SelectWithNativeFallback';
 import FilterButton from 'panoptes/FilterButton';
 import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
 
@@ -60,6 +61,7 @@ let TablePlotActions = createReactClass({
   // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
+      plotType: '',
       query: undefined,
       setProps: null,
       sidebar: true,
@@ -109,33 +111,30 @@ let TablePlotActions = createReactClass({
       label: table.capNamePlural
     }));
 
-    let plotTypeOptions = _map(plotTypes, (plot, key) => <MenuItem value={key} key={key} primaryText={plot.displayName}/>);
-
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
         <SidebarHeader icon={this.icon()} description="View table data graphically"/>
         <div className="plot-controls vertical stack">
-          <SelectFieldWithNativeFallback
+          <SelectWithNativeFallback
             value={table}
-            autoWidth={true}
-            floatingLabelText="Table"
-            onChange={(v) => this.handleChangeTable(v)}
+            fullWidth={true}
+            hintText="Table"
+            onChange={this.handleChangeTable}
             options={tableOptions}
           />
           {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
           <RandomSubsetSizeSelector
             value={randomSubsetSize}
-            onChange={(v) => this.handleChangeRandomSubsetSize(v)}
+            onChange={this.handleChangeRandomSubsetSize}
           />
-          <SelectField
+          <SelectWithNativeFallback
             value={plotType}
-            autoWidth={true}
-            floatingLabelText="Plot type"
-            onChange={(e, i, v) => this.handleChangePlotType(v)}
-          >
-            {plotTypeOptions}
-          </SelectField>
+            fullWidth={true}
+            hintText="Plot type"
+            onChange={this.handleChangePlotType}
+            options={_map(plotTypes, (plot, key) => ({ value: key, key: key, label: plot.displayName}))}
+          />
           {table && plotType ?
             _map(plotTypes[plotType].dimensions, (dimension) =>
               <PropertySelector

@@ -6,8 +6,12 @@ import classNames from 'classnames';
 import Highlight from 'react-highlighter';
 
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import {List, ListItem} from 'material-ui/List';
+import Button from 'ui/Button';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import Collapse from 'material-ui/transitions/Collapse';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
+import {withStyles} from 'material-ui/styles';
 import _map from 'lodash.map';
 import _includes from 'lodash.includes';
 import _intersection from 'lodash.intersection';
@@ -19,6 +23,11 @@ import _filter from 'lodash.filter';
 import _difference from 'lodash.difference';
 import Icon from 'ui/Icon';
 
+const styles = (theme) => ({
+  nested: {
+    paddingLeft: theme.spacing.unit * 4,
+  },
+});
 
 let GroupedItemPicker = createReactClass({
   displayName: 'GroupedItemPicker',
@@ -124,26 +133,44 @@ let GroupedItemPicker = createReactClass({
                     let {id, name, properties} = group;
                     let subItems = _map(properties, (prop) => {
                       let {name, description, id,  icon} = prop;
-                      return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                        <ListItem className={classNames({picked: !_includes(picked, id)})}
-                          key={id}
-                          primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
-                          secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-                          leftIcon={<div><Icon fixedWidth={true} name={icon} /></div>}
-                          onClick={() => this.handleAdd(id)}
-                        />) : null;
+                      return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ?
+                        (
+                          <ListItem
+                            button
+                            className={classNames({picked: !_includes(picked, id)})}
+                            key={id}
+                            onClick={() => this.handleAdd(id)}
+                          >
+                            <ListItemIcon>
+                              <Icon fixedWidth={true} name={icon} />
+                            </ListItemIcon>
+                            <ListItemText
+                              inset
+                              primary={<Highlight search={search}>{name}</Highlight>}
+                              secondary={<Highlight search={search}>{description}</Highlight>}
+                            />
+                          </ListItem>
+                        ) : null;
                     }
                     );
-                    return _filter(subItems, (i) => i).length > 0 ? (
-                      <ListItem primaryText={name}
-                        key={id}
-                        initiallyOpen={true}
-                        //leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
-                        onClick={() => this.handleAddAll(id)}
-                        nestedItems={subItems}
-                      />
-
-                    ) : null;
+                    return _filter(subItems, (i) => i).length > 0 ?
+                      (
+                        <div>
+                          <ListItem
+                            button
+                            key={id}
+                            onClick={() => this.handleAddAll(id)}
+                          >
+                            <ListItemText
+                              primary={name}
+                            />
+                            {this.state.open ? <ExpandMore /> : <ExpandLess />}
+                          </ListItem>
+                          <Collapse in={this.state.open} transitionDuration="auto" unmountOnExit>
+                            {subItems}
+                          </Collapse>
+                        </div>
+                      ) : null;
                   })
                 }
               </List>
@@ -159,32 +186,49 @@ let GroupedItemPicker = createReactClass({
                   _map(groups, (group) => {
                     let {id, name, properties} = group;
                     return ( _intersection(picked, _map(properties, 'id')).length > 0 ?
-                      <ListItem primaryText={name}
-                        key={id}
-                        initiallyOpen={true}
-                        onClick={() => this.handleRemoveAll(id)}
-                        nestedItems={
-                          _map(properties, (prop) => {
-                            let {name, description, id, icon} = prop;
-                            return _includes(picked, id) ? (
-                              <ListItem key={id}
-                                secondaryText={description}
-                                primaryText={name}
-                                leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-                                onClick={() => this.handleRemove(id)}/>
-                            ) : null;
+                      <div>
+                        <ListItem
+                          button
+                          key={id}
+                          onClick={() => this.handleRemoveAll(id)}
+                        >
+                          <ListItemText
+                            primary={name}
+                          />
+                          {this.state.open ? <ExpandMore /> : <ExpandLess />}
+                        </ListItem>
+                        <Collapse in={this.state.open} transitionDuration="auto" unmountOnExit>
+                          {
+                            _map(properties, (prop) => {
+                              let {name, description, id, icon} = prop;
+                              return _includes(picked, id) ? (
+                                <ListItem
+                                  button
+                                  key={id}
+                                  onClick={() => this.handleRemove(id)}
+                                >
+                                  <ListItemIcon>
+                                    <Icon fixedWidth={true} name={icon} />
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    inset
+                                    primary={name}
+                                    secondary={description}
+                                  />
+                                </ListItem>
+                              ) : null;
+                            })
                           }
-                          )
-                        }
-                      /> : null
+                        </Collapse>
+                      </div>
+                      : null
                     );
                   })
                 }
-
               </List>
             </div>
             <div className="centering-container">
-              <RaisedButton label="Use" primary={true} onClick={this.handlePick}/>
+              <Button raised label="Use" color="primary" onClick={this.handlePick}/>
             </div>
           </div>
         </div>
@@ -193,4 +237,4 @@ let GroupedItemPicker = createReactClass({
   },
 });
 
-export default GroupedItemPicker;
+export default withStyles(styles)(GroupedItemPicker);

@@ -2,24 +2,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Highlight from 'react-highlighter';
-// Mixins
+
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-// Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-
-// Utils
 import LRUCache from 'util/LRUCache';
-
-// Material UI components
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-
-// UI components
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import ListSubheader from 'material-ui/List/ListSubheader';
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
@@ -123,34 +116,36 @@ let GeneSearchResultsList = createReactClass({
     }
 
 
-    // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text)
+    // FIXME: Highlighting isn't working since adapting to new ListItemText component.
 
     let listItems = [];
 
     for (let i = 0, len = matchData.ids.length; i < len; i++) {
 
       listItems.push(
-        <ListItem key={matchData.ids[i]}
-          primaryText={
-            <div>
+        <ListItem
+          button
+          key={matchData.ids[i]}
+          onClick={(e) => this.handleSelectGene(e, matchData.ids[i], matchData.descriptions[i].split(',').join(', ').split(';').join('; '))}
+        >
+          <ListItemIcon>
+            <Icon fixedWidth={true} name={icon}/>
+          </ListItemIcon>
+          <ListItemText
+            primary={
               <Highlight search={search}>
                 <span>{matchData.ids[i]}</span>
                 <span> on </span>
                 <span>{matchData.chromosomes[i]}</span>
               </Highlight>
-            </div>
-          }
-          secondaryText={
-            <div>
+            }
+            secondary={
               <Highlight search={search}>
-                {matchData.descriptions[i].split(',').join(', ').split(';').join('; ')}
+                <span>{matchData.descriptions[i].split(',').join(', ').split(';').join('; ')}</span>
               </Highlight>
-            </div>
-          }
-          secondaryTextLines={2}
-          onClick={(e) => this.handleSelectGene(e, matchData.ids[i], matchData.descriptions[i].split(',').join(', ').split(';').join('; '))}
-          leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-        />
+            }
+          />
+        </ListItem>
       );
 
     }
@@ -158,7 +153,7 @@ let GeneSearchResultsList = createReactClass({
     return (
       <div>
         <List>
-          <Subheader>{subheaderText}</Subheader>
+          <ListSubheader>{subheaderText}</ListSubheader>
           {listItems}
         </List>
         <Loading status={loadStatus}/>

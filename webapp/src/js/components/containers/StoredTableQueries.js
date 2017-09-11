@@ -9,8 +9,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
+import List, {ListItem, ListItemText, ListItemIcon, ListItemSecondaryAction} from 'material-ui/List';
+import ListSubheader from 'material-ui/List/ListSubheader';
 import IconButton from 'material-ui/IconButton';
 
 // UI
@@ -120,16 +120,25 @@ let StoredTableQueries = createReactClass({
         );
       }
 
-      return <ListItem
-        key={JSON.stringify({name, query})}
-        primaryText={name}
-        secondaryText={<p className="list-string"><QueryString className="text" table={table} query={query} /></p>}
-        secondaryTextLines={2}
-        onClick={(e) => this.handleClick(e, query)}
-        onDoubleClick={(e) => this.handleDoubleClick(e, query)}
-        leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>}
-        rightIconButton={rightIconButtons}
-      />;
+      return (
+        <ListItem
+          button
+          key={JSON.stringify({name, query})}
+          onClick={(e) => this.handleClick(e, query)}
+          onDoubleClick={(e) => this.handleDoubleClick(e, query)}
+        >
+          <ListItemIcon>
+            <div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>
+          </ListItemIcon>
+          <ListItemText
+            primary={name}
+            secondary={<span className="list-string"><QueryString className="text" table={table} query={query} /></span>}
+          />
+          <ListItemSecondaryAction>
+            {rightIconButtons}
+          </ListItemSecondaryAction>
+        </ListItem>
+      );
 
     });
 
@@ -137,21 +146,32 @@ let StoredTableQueries = createReactClass({
     // TODO: Fix icon position and font-size style for stacked icons, being overridden by .icon style.
     return (
       <List>
-        <Subheader>Stored filters:</Subheader>
+        <ListSubheader>Stored filters:</ListSubheader>
         <ListItem
-          primaryText="No filter"
+          button
           onClick={(e) => this.handleClick(e, SQL.nullQuery)}
           onDoubleClick={(e) => this.handleDoubleClick(e, SQL.nullQuery)}
-          leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'} /></span></div>}
-        />
+        >
+          <ListItemIcon>
+            <div><span className={'fa-stack'}><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'} /></span></div>
+          </ListItemIcon>
+          <ListItemText
+            primary="No filter"
+          />
+        </ListItem>
         <ListItem
-          primaryText="Default filter"
-          secondaryText={<p className="list-string"><QueryString className="text" table={table} query={defaultQuery} /></p>}
-          secondaryTextLines={2}
+          button
           onClick={(e) => this.handleClick(e, defaultQuery)}
           onDoubleClick={(e) => this.handleDoubleClick(e, defaultQuery)}
-          leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} inverse={true} /></span></div>}
-        />
+        >
+          <ListItemIcon>
+            <div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} inverse={true} /></span></div>
+          </ListItemIcon>
+          <ListItemText
+            primary="Default filter"
+            secondary={<span className="list-string"><QueryString className="text" table={table} query={defaultQuery} /></span>}
+          />
+        </ListItem>
         {storedQueriesListItems}
       </List>
     );

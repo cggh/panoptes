@@ -26,7 +26,7 @@ import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
 
 // UI
 import Loading from 'ui/Loading';
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 import Icon from 'ui/Icon';
 
 import _forEach from 'lodash.foreach';
@@ -187,11 +187,13 @@ let Gene = createReactClass({
               </table>
             </div>
             <div className="horizontal stack wrap">
-              <RaisedButton
+              <Button
+                raised
                 style={{margin: '7px', color: 'white'}}
                 label="Show in Genome Browser"
-                primary={true}
-                icon={<Icon inverse={true} name="bitmap:genomebrowser.png" />}
+                color="primary"
+                iconName="bitmap:genomebrowser.png"
+                iconInverse={true}
                 labelStyle={{textTransform: 'inherit'}}
                 onClick={(e) => {
                   e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front                e.stopPropagation();

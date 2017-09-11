@@ -10,8 +10,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import Loading from 'ui/Loading';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 import Icon from 'ui/Icon';
 import customHandlebars from 'util/customHandlebars';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
@@ -158,15 +157,16 @@ let EditDocPage = createReactClass({
             </div>
           </div>
           <div className="centering-container">
-            <FlatButton
+            <Button
               label="Cancel"
-              primary={false}
               onClick={() => actions.session.modalClose()}
             />
-            <RaisedButton
+            <Button
+              raised
               label="Save"
-              primary={true}
-              icon={<Icon fixedWidth={true} name={'save'} inverse={true} />}
+              color="primary"
+              iconName="save"
+              iconInverse={true}
               onClick={() =>  {
                 this.getFlux().actions.api.modifyConfig({
                   dataset: this.config.dataset,

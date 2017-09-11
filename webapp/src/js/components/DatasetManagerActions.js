@@ -3,24 +3,20 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
 import EditYAMLConfig from 'panoptes/EditYAMLConfig';
-import FlatButton from 'material-ui/FlatButton';
 import _map from 'lodash.map';
-import Divider from 'material-ui/Divider';
 
-// Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 import Sidebar from 'ui/Sidebar';
-
-// UI components
+import Divider from 'material-ui/Divider';
+import Button from 'ui/Button';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import ConfirmButton from 'ui/ConfirmButton';
 import Loading from 'ui/Loading';
 
-// Panoptes components
 import DatasetImportStatusListView from 'DatasetImportStatus/ListView';
 import API from 'panoptes/API';
 
@@ -62,43 +58,55 @@ let DatasetManagerActions = createReactClass({
     if (!this.config.user.isManager) {
       return <Loading status="custom">Sorry you do not have management permissions for this dataset</Loading>;
     }
+
     const name = this.config.settings.name;
     const dataset = this.config.dataset;
+    const buttonStyle = {width: '100%', justifyContent: 'left'};
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={`Import and configure the ${name} (${dataset}) dataset`} />
-        <ConfirmButton label="Reimport everything"
-          primary={true}
-          icon={<Icon fixedWidth={true} name={'refresh'} />}
+        <ConfirmButton
+          label="Reimport everything"
+          color="primary"
+          iconName="refresh"
           message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
           onConfirm={() => this.handleReimport()}
+          style={buttonStyle}
         />
-        <FlatButton label={'Edit dataset config'}
-          primary={true}
+        <Button
+          color="primary"
           onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="settings"/>)}
-          icon={<Icon fixedWidth={true} name={'edit'} />}
+          iconName="edit"
+          label="Edit dataset config"
+          style={buttonStyle}
         />
         {this.config.genome !== null ?
           <div>
             <Divider />
-            <FlatButton label={'Edit genome config'}
-              primary={true}
+            <Button
+              color="primary"
               onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path="genome"/>)}
-              icon={<Icon fixedWidth={true} name={'edit'} />}
+              iconName="edit"
+              label="Edit genome config"
+              style={buttonStyle}
             />
           </div>
           : null}
         <Divider />
         {_map(this.config.tables, (table) => (
-          <FlatButton label={`Edit ${table.id}`}
-            primary={true}
+          <Button
+            key={table.id}
+            color="primary"
             onClick={() => this.getFlux().actions.session.modalOpen(<EditYAMLConfig path={`tablesById.${table.id}`}/>)}
-            icon={<Icon fixedWidth={true} name={'edit'} />}
+            iconName="edit"
+            label={`Edit ${table.id}`}
+            style={buttonStyle}
           />
         ))}
-
       </div>
     );
+
     return (
       <Sidebar
         styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
@@ -119,6 +127,7 @@ let DatasetManagerActions = createReactClass({
         </div>
       </Sidebar>
     );
+
   },
 });
 

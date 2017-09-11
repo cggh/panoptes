@@ -16,7 +16,7 @@ import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps'
 
 import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
 import Checkbox from 'material-ui/Checkbox';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 import serialiseComponent from 'util/serialiseComponent';
 import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
 import filterChildren from 'util/filterChildren';
@@ -366,8 +366,9 @@ let NumericalTrackGroupControls = createReactClass({
       <div className="channel-controls">
         <div className="control-group">
           <div className="control">
-            <FlatButton label="Add/Remove Tracks"
-              primary={true}
+            <Button
+              label="Add/Remove Tracks"
+              color="primary"
               onClick={() => actions.session.modalOpen(<ItemPicker
                 title="Pick tracks to be displayed"
                 itemName="numerical track"

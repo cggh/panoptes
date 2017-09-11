@@ -9,8 +9,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Material UI
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import ListSubheader from 'material-ui/List/ListSubheader';
 
 // UI
 import Icon from 'ui/Icon';
@@ -71,12 +71,20 @@ let RecentlyUsedTableQueries = createReactClass({
         if (usedTableQuery.get('table') === table) {
 
           let usedTableQueriesListItem = (
-            <ListItem key={`usedTableQueriesListItem${i}`}
-              primaryText={<span className="list-string"><QueryString className="text" table={table} query={usedTableQuery.get('query')}/></span>}
+            <ListItem
+              button
+              key={`usedTableQueriesListItem${i}`}
               onClick={(e) => this.handleClick(e, usedTableQuery.get('query'))}
               onDoubleClick={(e) => this.handleDoubleClick(e, usedTableQuery.get('query'))}
-              leftIcon={<Icon fixedWidth={true} name={'filter'}/>}
-            />
+            >
+              <ListItemIcon>
+                <Icon fixedWidth={true} name={'filter'}/>
+              </ListItemIcon>
+              <ListItemText
+                primary={<span className="list-string"><QueryString className="text" table={table} query={usedTableQuery.get('query')}/></span>}
+                secondary="Import and configure datasets"
+              />
+            </ListItem>
           );
 
           usedTableQueriesListItems.push(usedTableQueriesListItem);
@@ -87,7 +95,7 @@ let RecentlyUsedTableQueries = createReactClass({
 
       usedTableQueriesList = (
         <List>
-          <Subheader>Recently used filters:</Subheader>
+          <ListSubheader>Recently used filters:</ListSubheader>
           {usedTableQueriesListItems}
         </List>
       );
@@ -95,7 +103,7 @@ let RecentlyUsedTableQueries = createReactClass({
     } else {
       usedTableQueriesList = (
         <List>
-          <Subheader>No recently used filters.</Subheader>
+          <ListSubheader>No recently used filters.</ListSubheader>
         </List>
       );
     }

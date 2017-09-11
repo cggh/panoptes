@@ -12,7 +12,7 @@ import SQL from 'panoptes/SQL';
 import Formatter from 'panoptes/Formatter';
 import Deformatter from 'panoptes/Deformatter';
 import PropertyInput from 'panoptes/PropertyInput';
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 import Paper from 'material-ui/Paper';
 import Icon from 'ui/Icon';
 import _assign from 'lodash.assign';
@@ -366,8 +366,11 @@ let Criterion = createReactClass({
     if (component.isTrivial)
       return (
         <div className="criterion">
-          <RaisedButton label="Add Criterion"
-            onClick={this.handleReplaceTrivial}/>
+          <Button
+            raised
+            label="Add Criterion"
+            onClick={this.handleReplaceTrivial}
+          />
         </div>
       );
 

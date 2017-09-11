@@ -13,7 +13,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
 
 // Material UI
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 
 let Alert = createReactClass({
   displayName: 'Alert',
@@ -54,11 +54,13 @@ let Alert = createReactClass({
       <div style={{padding: '10px', maxWidth: '80vw'}}>
         <div style={{padding: '10px'}}>{message}</div>
         <div style={{padding: '5px 0 0 0', textAlign: 'center'}}>
-          <RaisedButton
+          <Button
+            raised
             style={{marginRight: '10px'}}
             label={OKButtonLabel}
-            primary={true}
-            icon={<Icon name="check" inverse={true} />}
+            color="primary"
+            iconName="check"
+            iconInverse={true}
             onClick={this.handleOK}
           />
         </div>

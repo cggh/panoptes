@@ -3,8 +3,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Select from 'material-ui/Select';
+import Input from 'material-ui/Input';
+import {MenuItem} from 'material-ui/Menu';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -113,17 +114,18 @@ let PivotTableWithActions = createReactClass({
             allowNull={true}
             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
             onSelect={(v) => setProps({rowProperty: v, rowSortOrder: undefined})}/>
-          <SelectField
-            autoWidth={true}
+          <Select
+            fullWidth={true}
             floatingLabelText="Display"
             onChange={(e, i, v) => setProps({display: v})}
             value={display}
+            input={<Input id="display" />}
           >
             <MenuItem key={'Counts'} primaryText={'Counts'} value={'counts'} />
             <MenuItem key={'All'} primaryText={'Percentage of total'} value={'percentAll'} />
             <MenuItem key={'Column'} primaryText={'Percentage of column total'} value={'percentColumn'} />
             <MenuItem key={'Row'} primaryText={'Percentage of row total'} value={'percentRow'} />
-          </SelectField>
+          </Select>
         </div>
       </div>
     );

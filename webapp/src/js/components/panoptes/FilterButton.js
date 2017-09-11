@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 import SQL from 'panoptes/SQL';
 import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
@@ -39,19 +39,20 @@ let FilterButton = createReactClass({
     let decodedQuery = SQL.WhereClause.decode(query);
 
     return <div>
-      <FlatButton label={decodedQuery.isTrivial ? `Add ${name || ''} Filter` : `Change ${name || ''} Filter`}
-        primary={true}
+      <Button
+        label={decodedQuery.isTrivial ? `Add ${name || ''} Filter` : `Change ${name || ''} Filter`}
+        color="primary"
         onClick={() => this.getFlux().actions.session.modalOpen(<QueryPicker
           table={table}
           initialQuery={query}
           onPick={this.handlePick}
         />)}
-        icon={<Icon fixedWidth={true} name="filter" />}
+        iconName="filter"
       />
       {decodedQuery.isTrivial ? null :
-        <FlatButton
+        <Button
           label={`Clear ${name || ''} Filter`}
-          primary={true}
+          color="primary"
           onClick={() => {
             this.handlePick(SQL.nullQuery);
           }}

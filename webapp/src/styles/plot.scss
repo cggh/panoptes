@@ -17,21 +17,4 @@
 
 .plot-controls {
   align-items: flex-start;
-  .dropdown-option {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;a
-    .icon {
-      color: $light-text-colour;
-      padding-right: 7px;
-    }
-  }
-}
-
-//Inside the popover menu we are not inside plot-controls
-.dropdown-option {
-  .icon {
-    color: $light-text-colour;
-    padding-right: 7px;
-  }
 }

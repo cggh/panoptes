@@ -28,9 +28,9 @@ import GenotypesChannel from 'panoptes/genome/tracks/GenotypesChannel';
 import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChannel';
 import ItemPicker from 'containers/ItemPicker';
 import ModalInput from 'ui/ModalInput';
-import FlatButton from 'material-ui/FlatButton';
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
+import Button from 'ui/Button';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import ListSubheader from 'material-ui/List/ListSubheader';
 import IconButton from 'material-ui/IconButton';
 import scrollbarSize from 'scrollbar-size';
 import ListWithActions from 'containers/ListWithActions';
@@ -271,10 +271,10 @@ let AddChannelsButton = createReactClass({
 
   render() {
     const actions = this.getFlux().actions;
-    return <FlatButton
+    return <Button
       label="Add Channels"
-      primary={true}
-      icon={<Icon fixedWidth={true} name="plus"/>}
+      color="primary"
+      iconName="plus"
       onClick={() => actions.session.modalOpen(
         <ItemPicker
           title="Pick channels to be added"
@@ -314,38 +314,47 @@ let SidebarContent = createReactClass({
         <Divider />
         {this.config.settings.genomeBrowserChannelSets.length ?
           <List>
-            <Subheader>Example channel sets:</Subheader>
+            <ListSubheader>Example channel sets:</ListSubheader>
             {
               _map(this.config.settings.genomeBrowserChannelSets, (channelSet, i) => {
                 const {name, description, channels} = channelSet;
-                return <ListItem key={i}
-                  primaryText={name}
-                  secondaryText={description}
-                  secondaryTextLines={2}
-                  onClick={() => this.props.setProps((props) => props.set('children', Immutable.fromJS(channels)))}
-                  rightIconButton={this.config.user.isManager ?
-                    <IconButton
-                      tooltip="Delete"
-                      onClick={(e) => actions.api.modifyConfig({
-                        dataset: this.config.dataset,
-                        path: `settings.genomeBrowserChannelSets.${i}`,
-                        action: 'delete'
-                      })}
-                    >
-                      <Icon name={'trash-o'} inverse={false} />
-                    </IconButton>
-                    : null}
-                />;
+                return (
+                  <ListItem
+                    button
+                    key={i}
+                    onClick={() => this.props.setProps((props) => props.set('children', Immutable.fromJS(channels)))}
+                  >
+                    <ListItemText
+                      primary={name}
+                      secondary={description}
+                    />
+                    {this.config.user.isManager ?
+                      <ListItemIcon>
+                        <IconButton
+                          tooltip="Delete"
+                          onClick={(e) => actions.api.modifyConfig({
+                            dataset: this.config.dataset,
+                            path: `settings.genomeBrowserChannelSets.${i}`,
+                            action: 'delete'
+                          })}
+                        >
+                          <Icon name={'trash-o'} inverse={false} />
+                        </IconButton>
+                      </ListItemIcon>
+                      : null
+                    }
+                  </ListItem>
+                );
               })
             }
           </List>
           : null
         }
         {this.config.user.isManager ?
-          <FlatButton
+          <Button
             label="Save channel set"
-            primary={true}
-            icon={<Icon fixedWidth={true} name="floppy-o"/>}
+            color="primary"
+            iconName="floppy-o"
             onClick={() => actions.session.modalOpen(
               <ModalInput
                 inputs={['name', 'description']}
@@ -371,14 +380,15 @@ let SidebarContent = createReactClass({
           /> : null}
         {this.config.user.isManager ?
           <Divider /> : null}
-        <Subheader>Open tables for:</Subheader>
+        <ListSubheader>Open tables for:</ListSubheader>
         {_map(this.config.visibleTables, (table) => {
           if (table.hasGenomePositions || table.isRegionOnGenome) {
             return (
-              <FlatButton key={table.id}
+              <Button
+                key={table.id}
                 label={`${table.namePlural} in view`}
-                primary={true}
-                icon={<Icon fixedWidth={true} name={table.icon}/>}
+                color="primary"
+                iconName={table.icon}
                 onClick={() => {
                   let {chromosome, start, end} = this.props;
                   //Set default bounds
@@ -408,8 +418,7 @@ let SidebarContent = createReactClass({
                   }
 
                 }}
-              >
-              </FlatButton>
+              />
             );
           }
         })}

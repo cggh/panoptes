@@ -7,15 +7,6 @@
 // NB: .map-controls is on the sidebar
 .map-controls {
   align-items: flex-start;
-  .dropdown-option {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    .icon {
-      color: $light-text-colour;
-      padding-right: 7px;
-    }
-  }
   .legend {
     // NB: copied from genomebrowser.scss (and tree.scss)
     .legend-element {
@@ -33,14 +24,6 @@
 
 .map-content {
   height: calc(100% - #{$topbar-height});
-}
-
-//Inside the popover menu we are not inside plot-controls
-.dropdown-option {
-  .icon {
-    color: $light-text-colour;
-    padding-right: 7px;
-  }
 }
 
 // Custom controls (e.g. legend) on the map itself

@@ -1,20 +1,32 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import PureRenderMixin from 'mixins/PureRenderMixin';
 import Highlight from 'react-highlighter';
-import Pluralise from 'ui/Pluralise';
 
 import _map from 'lodash.map';
 import _some from 'lodash.some';
-import _keys from 'lodash.keys';
+import _clone from 'lodash.clone';
+
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
-import {List, ListItem} from 'material-ui/List';
+import Button from 'ui/Button';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import Collapse from 'material-ui/transitions/Collapse';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
+import {withStyles} from 'material-ui/styles';
 import Icon from 'ui/Icon';
+import Pluralise from 'ui/Pluralise';
 
+const styles = (theme) => ({
+  nested: {
+    paddingLeft: theme.spacing.unit * 4,
+  },
+  nestedMore: {
+    paddingLeft: theme.spacing.unit * 8,
+  },
+});
 
 let ItemPicker = createReactClass({
   displayName: 'ItemPicker',
@@ -63,7 +75,8 @@ let ItemPicker = createReactClass({
       })),
     onPick: PropTypes.func.isRequired,
     icon: PropTypes.string,
-    title: PropTypes.string
+    title: PropTypes.string,
+    classes: PropTypes.object
   },
 
   getDefaultProps() {
@@ -80,11 +93,10 @@ let ItemPicker = createReactClass({
   getInitialState() {
     return {
       picked: this.props.initialSelection,
-      search: ''
+      search: '',
+      itemGroupsExpanded: {},
+      groupsExpanded: {}
     };
-  },
-
-  componentWillMount() {
   },
 
   icon() {
@@ -124,24 +136,72 @@ let ItemPicker = createReactClass({
     this.setState({'search': event.target.value});
   },
 
+  handleExpandGroup(groupId) {
+    let groupsExpanded = _clone(this.state.groupsExpanded);
+    let groupExpanded = groupsExpanded[groupId];
+    if (groupExpanded === undefined) {
+      groupExpanded = true;
+    } else {
+      groupExpanded = !groupExpanded;
+    }
+    groupsExpanded[groupId] = groupExpanded;
+    this.setState({groupsExpanded: groupsExpanded});
+  },
+
+  // NOTE: An itemGroup is an item in a group (groupId) that is itself a group.
+  handleExpandItemGroup(groupId, itemGroupId) {
+    let itemGroupsExpanded = _clone(this.state.itemGroupsExpanded);
+    if (itemGroupsExpanded[groupId] === undefined) {
+      itemGroupsExpanded[groupId] = {};
+    }
+    let itemGroupExpanded = itemGroupsExpanded[groupId][itemGroupId];
+    if (itemGroupExpanded === undefined) {
+      itemGroupExpanded = true;
+    } else {
+      itemGroupExpanded = !itemGroupExpanded;
+    }
+    itemGroupsExpanded[groupId][itemGroupId] = itemGroupExpanded;
+    this.setState({itemGroupsExpanded: itemGroupsExpanded});
+  },
+
+  isGroupExpanded(groupId) {
+    return (this.state.groupsExpanded[groupId] !== undefined && this.state.groupsExpanded[groupId]);
+  },
+
+  isItemGroupExpanded(groupId, itemGroupId) {
+    return (this.state.itemGroupsExpanded[groupId] !== undefined && this.state.itemGroupsExpanded[groupId][itemGroupId] !== undefined && this.state.itemGroupsExpanded[groupId][itemGroupId]);
+  },
+
   convertItemTolistItem(item, itemId, search, groupId, itemGroupId) {
     let {name, description, icon, payload} = item;
+    const classes = this.props.classes;
     // Exclude this ListItem if this item's name and description doesn't contain the search text.
     return (`${name}#${description || ''}`).toLowerCase().indexOf(search.toLowerCase()) !== -1 ?
       (
         <ListItem
+          button
           key={itemId}
-          primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
-          secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-          leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
+          className={itemGroupId !== undefined && itemGroupId !== '_UNGROUPED_' ? classes.nestedMore : classes.nested}
           onClick={() => this.handleAdd({groupId, itemId, payload, itemGroupId})}
-        />
+        >
+          {icon ?
+            <ListItemIcon>
+              <Icon fixedWidth={true} name={icon}/>
+            </ListItemIcon>
+            : null
+          }
+          <ListItemText
+            primary={<Highlight search={search}>{name}</Highlight>}
+            secondary={<Highlight search={search}>{description}</Highlight>}
+          />
+        </ListItem>
       ) : null;
   },
 
   render() {
     let {picked, search} = this.state;
-    let {itemName, pickVerb, groups, groupName} = this.props;
+    let {itemName, pickVerb, groups} = this.props;
+    const classes = this.props.classes;
     let totalItemsCount = 0;
     let listItems = _map(groups, (group, groupId) => {
       let {name, icon, items, itemGroups} = group;
@@ -154,14 +214,24 @@ let ItemPicker = createReactClass({
       // then convert this group to a ListItem component containing the nestedItems.
       if (nestedItems.length !== 0) {
         listItems.push(
-          <ListItem
-            primaryText={<div> {name} ({nestedItems.length} <Pluralise text={itemName} ord={nestedItems.length}/>)</div>}
-            key={groupId + !!search}
-            initiallyOpen={!!search}
-            leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
-            primaryTogglesNestedList={true}
-            nestedItems={nestedItems}
-          />
+          <div key={groupId + !!search}>
+            <ListItem
+              button
+              onClick={() => this.handleExpandGroup(groupId)}
+            >
+              <ListItemIcon>
+                <Icon fixedWidth={true} name={icon}/>
+              </ListItemIcon>
+              <ListItemText
+                inset
+                primary={<div> {name} ({nestedItems.length} <Pluralise text={itemName} ord={nestedItems.length}/>)</div>}
+              />
+              {this.isGroupExpanded(groupId) ? <ExpandMore /> : <ExpandLess />}
+            </ListItem>
+            <Collapse in={this.isGroupExpanded(groupId)} transitionDuration="auto" unmountOnExit>
+              {nestedItems}
+            </Collapse>
+          </div>
         );
       }
       if (itemGroups) {
@@ -178,16 +248,28 @@ let ItemPicker = createReactClass({
           let itemGroupNestedItems = _map(itemGroup.items, (item, itemId) => this.convertItemTolistItem(item, itemId, search, groupId, itemGroupId));
           totalItemGroupItemsCount += itemGroupNestedItems.length;
           return _some(itemGroupNestedItems) ? (
-            <ListItem
-              primaryText={<div> {itemGroup.name} ({itemGroupNestedItems.length} <Pluralise text={itemName}
-                ord={itemGroupNestedItems.length}/>)
-              </div>}
-              key={groupId + itemGroupId + !!search}
-              initiallyOpen={!!search}
-              leftIcon={itemGroup.icon ? <Icon fixedWidth={true} name={itemGroup.icon}/> : null}
-              primaryTogglesNestedList={true}
-              nestedItems={itemGroupNestedItems}
-            />
+            <div key={groupId + itemGroupId + !!search}>
+              <ListItem
+                button
+                onClick={() => this.handleExpandItemGroup(groupId, itemGroupId)}
+                className={classes.nested}
+              >
+                {itemGroup.icon ?
+                  <ListItemIcon>
+                    <Icon fixedWidth={true} name={itemGroup.icon}/>
+                  </ListItemIcon>
+                  : null
+                }
+                <ListItemText
+                  inset
+                  primary={<span>{itemGroup.name} ({itemGroupNestedItems.length} <Pluralise text={itemName} ord={itemGroupNestedItems.length} />)</span>}
+                />
+                {this.isItemGroupExpanded(groupId, itemGroupId) ? <ExpandMore /> : <ExpandLess />}
+              </ListItem>
+              <Collapse in={this.isItemGroupExpanded(groupId, itemGroupId)} transitionDuration="auto" unmountOnExit>
+                {itemGroupNestedItems}
+              </Collapse>
+            </div>
           ) : null;
         }));
         totalItemsCount += totalItemGroupItemsCount;
@@ -195,15 +277,27 @@ let ItemPicker = createReactClass({
         // then convert this group to a ListItem component containing the nestedItemGroups (along with their nestedItems).
         if (nestedItemGroups.length !== 0) {
           listItems.push(
-            <ListItem
-              primaryText={<div> {name} ({totalItemGroupItemsCount} <Pluralise text={itemName}
-                ord={totalItemGroupItemsCount}/>)</div>}
-              key={groupId + !!search}
-              initiallyOpen={!!search || _keys(groups).length === 1}
-              leftIcon={icon ? <Icon fixedWidth={true} name={icon}/> : null}
-              primaryTogglesNestedList={true}
-              nestedItems={nestedItemGroups}
-            />
+            <div key={groupId + !!search}>
+              <ListItem
+                button
+                onClick={() => this.handleExpandGroup(groupId)}
+              >
+                {icon ?
+                  <ListItemIcon>
+                    <Icon fixedWidth={true} name={icon} />
+                  </ListItemIcon>
+                  : null
+                }
+                <ListItemText
+                  inset
+                  primary={<div> {name} ({totalItemGroupItemsCount} <Pluralise text={itemName} ord={totalItemGroupItemsCount}/>)</div>}
+                />
+                {this.isGroupExpanded(groupId) ? <ExpandMore /> : <ExpandLess />}
+              </ListItem>
+              <Collapse in={this.isGroupExpanded(groupId)} transitionDuration="auto" unmountOnExit>
+                {nestedItemGroups}
+              </Collapse>
+            </div>
           );
         }
       }
@@ -242,22 +336,29 @@ let ItemPicker = createReactClass({
 
                     return (
                       <ListItem
+                        button
                         key={index}
-                        secondaryText={description}
-                        primaryText={primaryText}
-                        leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
                         onClick={() => this.handleRemove(index)}
-                      />
+                      >
+                        <ListItemIcon>
+                          <Icon fixedWidth={true} name={icon}/>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={primaryText}
+                          secondary={description}
+                        />
+                      </ListItem>
                     );
                   })
                 }
               </List>
             </div>
             <div className="centering-container">
-              <div style={{paddingRight: '10px'}}><FlatButton label="Clear" onClick={this.handleRemoveAll}/></div>
-              <RaisedButton
+              <div style={{paddingRight: '10px'}}><Button label="Clear" onClick={this.handleRemoveAll}/></div>
+              <Button
+                raised
                 label={<span>{`${pickVerb} ${picked.length}`} <Pluralise text={itemName} ord={picked.length}/></span>}
-                primary={true}
+                color="primary"
                 onClick={this.handlePick}
               />
             </div>
@@ -268,4 +369,4 @@ let ItemPicker = createReactClass({
   },
 });
 
-export default ItemPicker;
+export default withStyles(styles)(ItemPicker);

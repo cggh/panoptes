@@ -18,13 +18,11 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-import {
-  Table,
+import Table, {
   TableBody,
-  TableHeader,
-  TableHeaderColumn,
+  TableHead,
   TableRow,
-  TableRowColumn
+  TableCell
 } from 'material-ui/Table';
 // Panoptes components
 import API from 'panoptes/API';
@@ -413,30 +411,26 @@ let PivotTableView = createReactClass({
 
     let tableOnCellClick = null;
     if (hasClickableCells) {
-      tableOnCellClick = (rowNumber, columnId) => this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId - 2]);
+      tableOnCellClick = (rowNumber, columnId) => {
+        this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId]);
+      }
     }
 
     return (
       <Table
-        wrapperStyle={style}
-        classname={className}
+        className={className}
         height={height}
-        onCellClick={tableOnCellClick}
       >
-        <TableHeader
-          adjustForCheckbox={false}
-          displaySelectAll={false}
-
-        >
+        <TableHead>
           <TableRow>
-            <TableHeaderColumn style={{overflow: 'hidden'}}>
+            <TableCell style={{overflow: 'hidden'}}>
               <div>
                 {columnProperty ? <PropertyHeader className="table-row-header" style={{display: 'flex', justifyContent: 'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
               </div>
               <div>
                 {rowProperty ? <PropertyHeader className="table-row-header"  style={{display: 'flex', justifyContent: 'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
               </div>
-            </TableHeaderColumn>
+            </TableCell>
             {uniqueColumns.map((columnHeading) => {
               const colPropConfig = this.tableConfig().propertiesById[columnProperty] || {};
               const valueColours = colPropConfig.valueColours;
@@ -453,7 +447,7 @@ let PivotTableView = createReactClass({
               let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
                 name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
               return (
-                <TableHeaderColumn
+                <TableCell
                   key={columnHeading}>
                   { columnHeading == '_all_' ?
                     'All' :
@@ -473,16 +467,13 @@ let PivotTableView = createReactClass({
                       prefix={icon}
                       prop={colPropConfig}
                       value={columnHeading === '__NULL__' ? null : columnHeading}/>}
-                </TableHeaderColumn>
+                </TableCell>
               );
             })}
           </TableRow>
-        </TableHeader>
-        <TableBody
-          displayRowCheckbox={false}
-          showRowHover={true}
-        >
-          {uniqueRows.map((rowHeading) => {
+        </TableHead>
+        <TableBody>
+          {uniqueRows.map((rowHeading, i) => {
             const rowPropConfig = this.tableConfig().propertiesById[rowProperty] || {};
             const valueColours = rowPropConfig.valueColours;
             let background = 'inherit';
@@ -498,8 +489,8 @@ let PivotTableView = createReactClass({
             let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
               name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
             return (
-              <TableRow key={rowHeading}>
-                <TableHeaderColumn
+              <TableRow key={rowHeading} hover>
+                <TableCell
                   key={rowHeading}>
                   { rowHeading == '_all_' ?
                     'All' :
@@ -519,11 +510,15 @@ let PivotTableView = createReactClass({
                       prefix={icon}
                       prop={rowPropConfig}
                       value={rowHeading === '__NULL__' ? null : rowHeading}/>}
-                </TableHeaderColumn>
-                {uniqueColumns.map((columnHeading) =>
-                  <TableRowColumn key={columnHeading} style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}>
+                </TableCell>
+                {uniqueColumns.map((columnHeading,j) =>
+                  <TableCell
+                    key={columnHeading}
+                    style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}
+                    onClick={() => tableOnCellClick(i,j)}
+                  >
                     {dataByColumnRow[columnHeading][rowHeading].displayValue.toLocaleString()}
-                  </TableRowColumn>
+                  </TableCell>
                 )}
               </TableRow>
             );

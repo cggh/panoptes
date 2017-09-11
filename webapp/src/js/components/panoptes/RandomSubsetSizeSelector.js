@@ -2,8 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import SelectWithNativeFallback from 'panoptes/SelectWithNativeFallback';
 
 // NB: The null value cannot be undefined or null or '',
 // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
@@ -41,32 +40,31 @@ let RandomSubsetSizeSelector = createReactClass({
     let {label, value} = this.props;
 
     let options = [
-      <MenuItem key={NULL_VALUE} primaryText="No subsampling" value={NULL_VALUE} />,
-      <MenuItem key={20} primaryText={'20'} value={20} />,
-      <MenuItem key={50} primaryText={'50'} value={50} />,
-      <MenuItem key={100} primaryText={'100'} value={100} />,
-      <MenuItem key={200} primaryText={'200'} value={200} />,
-      <MenuItem key={500} primaryText={'500'} value={500} />,
-      <MenuItem key={1000} primaryText={'1K'} value={1000} />,
-      <MenuItem key={2000} primaryText={'2K'} value={2000} />,
-      <MenuItem key={5000} primaryText={'5K'} value={5000} />,
-      <MenuItem key={10000} primaryText={'10K'} value={10000} />,
-      <MenuItem key={20000} primaryText={'20K'} value={20000} />,
-      <MenuItem key={50000} primaryText={'50K'} value={50000} />,
-      <MenuItem key={100000} primaryText={'100K'} value={100000} />,
-      <MenuItem key={200000} primaryText={'200K'} value={200000} />,
-      <MenuItem key={500000} primaryText={'500K'} value={500000} />,
+      { key: NULL_VALUE , label: "No subsampling" , value: NULL_VALUE },
+      { key: 20 , label: '20' , value: 20 },
+      { key: 50 , label: '50' , value: 50 },
+      { key: 100 , label: '100' , value: 100 },
+      { key: 200 , label: '200' , value: 200 },
+      { key: 500 , label: '500' , value: 500 },
+      { key: 1000 , label: '1K' , value: 1000 },
+      { key: 2000 , label: '2K' , value: 2000 },
+      { key: 5000 , label: '5K' , value: 5000 },
+      { key: 10000 , label: '10K' , value: 10000 },
+      { key: 20000 , label: '20K' , value: 20000 },
+      { key: 50000 , label: '50K' , value: 50000 },
+      { key: 100000 , label: '100K' , value: 100000 },
+      { key: 200000 , label: '200K' , value: 200000 },
+      { key: 500000 , label: '500K' , value: 500000 },
     ];
 
     return (
-      <SelectField
-        value={value === NULL_VALUE ? undefined : value}
-        autoWidth={true}
-        floatingLabelText={label}
-        onChange={(e, i, v) => this.handleChangeValue(v)}
-      >
-        {options}
-      </SelectField>
+      <SelectWithNativeFallback
+        value={value}
+        fullWidth={true}
+        hintText={label}
+        onChange={this.handleChangeValue}
+        options={options}
+      />
     );
   },
 });

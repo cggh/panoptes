@@ -34,8 +34,8 @@ let FindGene = createReactClass({
     activeTab: PropTypes.string,
     search: PropTypes.string,
     chromosome: PropTypes.string,
-    startPosition: PropTypes.number,
-    endPosition: PropTypes.number,
+    startPosition: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    endPosition: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     chromosomeLength: PropTypes.number,
   },
 
@@ -92,11 +92,7 @@ let FindGene = createReactClass({
 
     }
 
-    let recentlyFoundGenes = (
-      <div style={{borderTop: '4px solid #3d8bd5'}}>
-        <RecentlyFoundGenes onSelect={this.handleSelectGene} subheaderText="Recently found genes" />
-      </div>
-    );
+    let recentlyFoundGenes = <RecentlyFoundGenes onSelect={this.handleSelectGene} subheaderText="Recently found genes" />;
 
     return (
       <TabbedArea activeTab={activeTab}

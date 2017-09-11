@@ -22,7 +22,7 @@ import LRUCache from 'util/LRUCache';
 import templateFieldsUsed from 'util/templateFieldsUsed';
 
 // Material UI components
-import {List, ListItem} from 'material-ui/List';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -162,17 +162,28 @@ let ListView = createReactClass({
         let content = search ? striptags(ReactDOMServer.renderToStaticMarkup(itemTemplate)).toLowerCase() : '';
         if (search && content.indexOf(search.toLowerCase()) !== -1 || !search) {
           listItems.push(
+
             <ListItem
+              button
               className={className}
               key={primKey}
-              primaryText={
-                <Highlight search={search}>
-                  {itemTemplate}
-                </Highlight>
-              }
               onClick={() => this.handleSelect(primKey)}
-              leftIcon={icon ? <div><Icon fixedWidth={true} name={icon}/></div> : null}
-            />
+            >
+              {icon ?
+                <ListItemIcon>
+                  <Icon fixedWidth={true} name={icon}/>
+                </ListItemIcon>
+                : null
+              }
+              <ListItemText
+                primary={
+                  <Highlight search={search}>
+                    {itemTemplate}
+                  </Highlight>
+                }
+                secondary="Import and configure datasets"
+              />
+            </ListItem>
           );
         }
       });

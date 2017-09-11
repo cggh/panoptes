@@ -20,10 +20,11 @@ import _some from 'lodash.some';
 import _takeRight from 'lodash.takeright';
 import _unique from 'lodash.uniq';
 import _isFinite from 'lodash.isfinite';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Select from 'material-ui/Select';
+import Input from 'material-ui/Input';
+import {MenuItem} from 'material-ui/Menu';
 import Checkbox from 'material-ui/Checkbox';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 
 import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet, combineBlocks} from 'util/PropertyRegionCache';
@@ -736,10 +737,11 @@ const GenotypesControls = createReactClass({
         </div>
         <div className="control-group">
           <div className="control">
-            <FlatButton label="Download data"
-              primary={true}
+            <Button
+              label="Download data"
+              color="primary"
               onClick={() => this.handleDownload()}
-              icon={<Icon fixedWidth={true} name="download"/>}
+              iconName="download"
             />
           </div>
         </div>
@@ -781,33 +783,39 @@ const GenotypesControls = createReactClass({
         </div>
         <div className="control-group">
           <div className="control">
-            <SelectField value={cellColour}
-              autoWidth={true}
+            <Select value={cellColour}
+              fullWidth={true}
               floatingLabelText="Cell colour"
-              onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
+              onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}
+              input={<Input id="cellColour" />}
+            >
               <MenuItem value="call" primaryText="Call"/>
               <MenuItem value="fraction" primaryText="Ref fraction"/>
-            </SelectField>
+            </Select>
           </div>
           <div className="control">
-            <SelectField value={cellAlpha}
-              autoWidth={true}
+            <Select value={cellAlpha}
+              fullWidth={true}
               floatingLabelText="Cell opacity"
-              onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
+              onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}
+              input={<Input id="cellAlpha" />}
+            >
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
                 primaryText={config.propertiesById[prop].name}/>)}
-            </SelectField>
+            </Select>
           </div>
           <div className="control">
-            <SelectField value={cellHeight}
-              autoWidth={true}
+            <Select value={cellHeight}
+              fullWidth={true}
               floatingLabelText="Cell height"
-              onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
+              onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}
+              input={<Input id="cellHeight" />}
+            >
               <MenuItem value="none" primaryText="None"/>
               {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
                 primaryText={config.propertiesById[prop].name}/>)}
-            </SelectField>
+            </Select>
           </div>
         </div>
         <div className="control-group">
