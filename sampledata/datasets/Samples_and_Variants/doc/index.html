@@ -47,23 +47,27 @@
             <TreeContainer table="samples" tree="tree2"/>
         </PopupButton>
         <p>A drop down that chooses a component</p>
-        <SelectComponent hintText="Choose a thing:">
-            <option label="Text1" index="1">
-                <p>Text 1</p>
-            </option>
-            <option label="Text2" index="2">
-                <p>Text 1</p>
-            </option>
-        </SelectComponent>
+        <div style="width:200px;position:relative">
+            <SelectComponent label="Choose a thing:">
+                <option label="Text1" index="1">
+                    <p>Text 1</p>
+                </option>
+                <option label="Text2" index="2">
+                    <p>Text 1</p>
+                </option>
+            </SelectComponent>
+        </div>
         <p>A drop down that chooses a component, that already has a selection</p>
-        <SelectComponent hintText="Choose a thing:" selectedIndex="1">
+        <div style="width:200px;position:relative">
+            <SelectComponent label="Choose a thing:" selectedIndex="1">
             <option label="Text1" index="1">
                 <p>Text 1</p>
             </option>
             <option label="Text2" index="2">
                 <p>Text 1</p>
             </option>
-        </SelectComponent>
+            </SelectComponent>
+        </div>
         <p>A custom button targeting a tab:</p>
 	    <CustomButton target="tab">
             <Anchor>
@@ -75,17 +79,21 @@
 	    </CustomButton>
         <ToggleBox>
             <Caption>
-                <span>Title of hidden stuff<span>
+                <span>Title of hidden stuff</span>
             </Caption>
             <Content>
                 <span>I was hidden!</span>
             </Content>
         </ToggleBox>
         <div> A drop down allowing one to select a row:<br/>
-            <SelectRow table="contributors">
+            <div style="width:200px;position:relative">
+                <SelectRow table="contributors" />
+            </div>
         </div>
         <div> A drop down allowing one to select a row, restricted to a query on a related table:<br/>
-            <SelectRow table="contributors" queryTable="samples" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Site_ID","CompValue":"St01","isRoot":true,"ColName2":"key","Tpe":"="}'>
+            <div style="width:200px;position:relative">
+                <SelectRow table="contributors" queryTable="samples" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Site_ID","CompValue":"St01","isRoot":true,"ColName2":"key","Tpe":"="}' />
+            </div>
         </div>
         <PopupButton label="Table with legend" target="tab">
             <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
@@ -96,7 +104,7 @@
             </TableWithLegend>
         </PopupButton>
         <p>A table, with styled headers</p>
-        <PivotTableView table="variants" columnProperty="Extra_1" rowProperty="HighQuality"/>
+            <PivotTableView table="variants" columnProperty="Extra_1" rowProperty="HighQuality"/>
         <p>A tree of samples</p>
         <div style="position:relative;width:300px;height:300px">
             <TreeContainer table="samples" tree="tree2"/>

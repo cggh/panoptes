@@ -17,8 +17,8 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
 
 // Material UI components
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import ListSubheader from 'material-ui/List/ListSubheader';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -37,8 +37,8 @@ let RegionGenesList = createReactClass({
   propTypes: {
     chromosome: PropTypes.string.isRequired,
     onSelectGene: PropTypes.func.isRequired,
-    startPosition: PropTypes.number.isRequired,
-    endPosition: PropTypes.number.isRequired,
+    startPosition: PropTypes.oneOfType([PropTypes.number.isRequired, PropTypes.string.isRequired]),
+    endPosition: PropTypes.oneOfType([PropTypes.number.isRequired, PropTypes.string.isRequired]),
     icon: PropTypes.string
   },
 
@@ -124,23 +124,25 @@ let RegionGenesList = createReactClass({
     for (let i = 0, len = regionGenesData.length; i < len; i++) {
 
       listItems.push(
-        <ListItem key={regionGenesData[i].fid}
-          primaryText={
-            <div>
-              <span>{regionGenesData[i].fname}</span>
-              <span> between </span>
-              <span>{regionGenesData[i].fstart} and {regionGenesData[i].fstop}</span>
-            </div>
-          }
-          secondaryText={
-            <div>
-              {regionGenesData[i].descr.split(';').join('; ').split(',').join(', ')}
-            </div>
-          }
-          secondaryTextLines={2}
+        <ListItem
+          button
+          key={regionGenesData[i].fid}
           onClick={(e) => this.handleSelectGene(e, regionGenesData[i].fid, regionGenesData[i].descr.split(';').join('; ').split(',').join(', '))}
-          leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-        />
+        >
+          <ListItemIcon>
+            <Icon fixedWidth={true} name={icon} />
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <span>
+                <span>{regionGenesData[i].fname}</span>
+                <span> between </span>
+                <span>{regionGenesData[i].fstart} and {regionGenesData[i].fstop}</span>
+              </span>
+            }
+            secondary={regionGenesData[i].descr.split(';').join('; ').split(',').join(', ')}
+          />
+        </ListItem>
       );
 
     }
@@ -149,7 +151,7 @@ let RegionGenesList = createReactClass({
     return (
       <div>
         <List>
-          <Subheader>{subheaderText}</Subheader>
+          <ListSubheader>{subheaderText}</ListSubheader>
           {listItems}
         </List>
         <Loading status={loadStatus}/>

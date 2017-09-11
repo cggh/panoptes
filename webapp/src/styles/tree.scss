@@ -21,15 +21,6 @@
 
 .tree-controls {
   align-items: flex-start;
-  .dropdown-option {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    .icon {
-      color: $light-text-colour;
-      padding-right: 7px;
-    }
-  }
   .legend {
     // NB: copied from genomebrowser.scss
     .legend-element {
@@ -45,10 +36,3 @@
   }
 }
 
-//Inside the popover menu we are not inside tree-controls
-.dropdown-option {
-  .icon {
-    color: $light-text-colour;
-    padding-right: 7px;
-  }
-}

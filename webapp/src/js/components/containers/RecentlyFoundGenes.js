@@ -3,16 +3,13 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import _map from 'lodash.map';
 
-// Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-// Material UI
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
 
-// UI
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import ListSubheader from 'material-ui/List/ListSubheader';
 import Icon from 'ui/Icon';
 
 let RecentlyFoundGenes = createReactClass({
@@ -47,17 +44,24 @@ let RecentlyFoundGenes = createReactClass({
 
     if (foundGenes.size > 0) {
       let foundGenesListItems = _map(foundGenes.toJS(), ({geneId, geneDesc}) =>
-        <ListItem key={geneId}
-          primaryText={geneId}
-          secondaryText={geneDesc}
-          leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
+        <ListItem
+          button
+          key={geneId}
           onClick={(e) => onSelect(e, geneId, geneDesc)}
-        />
+        >
+          <ListItemIcon>
+            <Icon fixedWidth={true} name="bitmap:genomebrowser.png" />
+          </ListItemIcon>
+          <ListItemText
+            primary={geneId}
+            secondary={geneDesc}
+          />
+        </ListItem>
       );
 
       let subheader = undefined;
       if (subheaderText !== undefined) {
-        subheader = <Subheader>{subheaderText}</Subheader>;
+        subheader = <ListSubheader>{subheaderText}</ListSubheader>;
       }
 
       foundGenesList = (
@@ -70,7 +74,7 @@ let RecentlyFoundGenes = createReactClass({
     } else {
       foundGenesList = (
         <List>
-          <Subheader>No recently found genes.</Subheader>
+          <ListSubheader>No recently found genes.</ListSubheader>
         </List>
       );
     }

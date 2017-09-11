@@ -9,14 +9,16 @@ import templateFieldsUsed from 'util/templateFieldsUsed';
 import _uniq from 'lodash.uniq';
 import _keys from 'lodash.keys';
 import _map from 'lodash.map';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Select from 'material-ui/Select';
+import Input from 'material-ui/Input';
+import {MenuItem} from 'material-ui/Menu';
 import ItemTemplate from 'panoptes/ItemTemplate';
 import FluxMixin from 'mixins/FluxMixin';
 import DataItem from 'DataItem';
 import DataItemViews from 'panoptes/DataItemViews';
 import SQL from 'panoptes/SQL';
 import resolveJoins from 'panoptes/resolveJoins';
+import SelectWithNativeFallback from 'panoptes/SelectWithNativeFallback';
 
 let SelectRow = createReactClass({
   displayName: 'SelectRow',
@@ -44,18 +46,22 @@ let SelectRow = createReactClass({
     let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
     let itemTitle = tableConfig.itemTitle || `{{${tableConfig.primKey}}}`;
     if (_isUndefined(data)) {
-      return <SelectField hintText="Loading..." disabled={true}>
-      </SelectField>;
+      return <SelectWithNativeFallback fullWidth={true} hintText="Loading..." disabled={true} />;
     } else if (data.length === 0) {
-      return <SelectField hintText={`No ${tableConfig.capNamePlural} to choose from`} disabled={true}>
-      </SelectField>;
+      return <SelectWithNativeFallback fullWidth={true} hintText={`No ${tableConfig.capNamePlural} to choose from`} disabled={true} />;
     } else {
-      return <SelectField value={selected} hintText={`Choose a ${tableConfig.capNameSingle}`} onChange={(e, k, v) => {
-        this.getFlux().actions.session.popupOpen(<DataItem primKey={v} table={table}>{views}</DataItem>);
-      }}>
-        {_map(data, (row) =>
-          <MenuItem key={row[tableConfig.primKey]} value={row[tableConfig.primKey]} primaryText={
-            <ItemTemplate
+      return <SelectWithNativeFallback
+        allowNone={false}
+        fullWidth={true}
+        value={selected}
+        hintText={`Choose a ${tableConfig.capNameSingle}`}
+        onChange={(v) => {
+          this.getFlux().actions.session.popupOpen(<DataItem primKey={v} table={table}>{views}</DataItem>);
+        }}
+        options = {_map(data, (row) => ({
+          key: row[tableConfig.primKey],
+          value: row[tableConfig.primKey],
+          label: <ItemTemplate
               table={table}
               primKey={row[tableConfig.primKey]}
               data={row}
@@ -63,9 +69,7 @@ let SelectRow = createReactClass({
             >
               {itemTitle}
             </ItemTemplate>
-
-          }/>)}
-      </SelectField>;
+         }))}/>
     }
   },
 });
@@ -94,4 +98,3 @@ SelectRow = withAPIData(SelectRow, ({config, props}) => {
 });
 
 export default SelectRow;
-

@@ -14,7 +14,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import LegendElement from 'panoptes/LegendElement';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 
@@ -312,9 +312,9 @@ class Legend extends React.Component {
       <Tooltip placement={'bottom'}
         trigger={'click'}
         overlay={<div style={{overflowWrap: 'break-word', overflow: 'auto', maxWidth: '500px'}}>{this.state.seq}</div>}>
-        <FlatButton
+        <Button
           label="Copy sequence"
-          primary={true}
+          color="primary"
           onClick={() => this.setState({seq: this.props.getSeq()})}
         />
       </Tooltip>

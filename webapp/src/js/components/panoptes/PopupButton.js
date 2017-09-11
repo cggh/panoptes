@@ -4,7 +4,7 @@ import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 import filterChildren from 'util/filterChildren';
 import _isArray from 'lodash.isarray';
 
@@ -52,11 +52,13 @@ let PopupButton = createReactClass({
       throw Error('PopupButton can only have one child not none');
     }
 
-    return <RaisedButton
+    return <Button
+      raised
       style={{margin: '7px', color: 'white'}}
       label={label}
-      primary={true}
-      icon={icon ? <Icon inverse={true} name={icon} /> : null}
+      color="primary"
+      iconName={icon ? icon : undefined}
+      iconInverse={true}
       labelStyle={{textTransform: 'inherit'}}
       onClick={this.handleClick}
     />;

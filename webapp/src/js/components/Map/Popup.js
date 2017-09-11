@@ -43,9 +43,9 @@ let MapPopup = createReactClass({
   render() {
     let children = filterChildren(this, this.props.children);
     return (
-      <LeafletPopup
-        children={React.Children.only(children)}
-      />
+      <LeafletPopup>
+        {React.Children.only(children)}
+      </LeafletPopup>
     );
 
   },

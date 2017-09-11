@@ -26,12 +26,19 @@ import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
-import getMuiTheme from  'material-ui/styles/getMuiTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import {
-  blue500, blue700,
-  pinkA200,
-} from 'material-ui/styles/colors';
+// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+// import createMuiTheme from 'material-ui/styles/createMuiTheme';
+import createPalette from 'material-ui/styles/createPalette';
+import createTypography from 'material-ui/styles/createTypography';
+import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import {withTheme} from 'material-ui/styles';
+import Tooltip from 'material-ui/Tooltip';
+
+//https://github.com/facebook/flow/issues/380
+import {blue, pink} from 'material-ui/colors';
+import {A200 as pinkA200} from 'material-ui/colors/pink';
+//import red from 'material-ui/colors/red';
+
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
 
@@ -39,27 +46,39 @@ import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
 
-const muiTheme = getMuiTheme({
+const palette = createPalette({
+  primary: blue,
+  accent: pink,
+  primary1Color: blue[500],
+  primary2Color: blue[700],
+  accent1Color: pinkA200,
+  genotypeRefColor: 'rgb(0, 128, 192)',
+  genotypeAltColor: 'rgb(255, 50, 50)',
+  genotypeHetColor: 'rgb(0, 192, 120)',
+  genotypeNoCallColor: 'rgb(230, 230, 230)'
+});
+
+const fontStyle = {
   fontFamily: 'Roboto, sans-serif',
+};
+
+const muiTheme = createMuiTheme({
+  typography: createTypography(palette, fontStyle),
   tableHeaderColumn: {
     height: 56,
     spacing: 12,
+    textColor: 'black'
   },
   tableRowColumn: {
     height: 48,
     spacing: 12,
   },
-  tableHeaderColumn: {
-    textColor: 'black'
-  },
-  palette: {
-    primary1Color: blue500,
-    primary2Color: blue700,
-    accent1Color: pinkA200,
-    genotypeRefColor: 'rgb(0, 128, 192)',
-    genotypeAltColor: 'rgb(255, 50, 50)',
-    genotypeHetColor: 'rgb(0, 192, 120)',
-    genotypeNoCallColor: 'rgb(230, 230, 230)'
+  overrides: {
+    MuiListSubheader: {
+      sticky: {
+        backgroundColor: 'white'
+      }
+    }
   }
 });
 
@@ -72,6 +91,10 @@ let Panoptes = createReactClass({
     PureRenderMixin,
     StoreWatchMixin('SessionStore', 'PanoptesStore')],
 
+  propTypes: {
+    theme: PropTypes.object
+  },
+
   componentDidMount() {
     let store = this.getFlux().store('SessionStore');
     store.on('notify',
@@ -79,6 +102,7 @@ let Panoptes = createReactClass({
         _assign(store.getLastNotification(), {position: 'tc'})));
     //We don't need this as it will come to us in page load json
     //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
+    console.info('Theme: %o', this.props.theme);
   },
 
   getStateFromFlux() {
@@ -102,7 +126,7 @@ let Panoptes = createReactClass({
     // NB: initialConfig is actually defined (in index.html)
     return (
       <DetectResize onResize={this.handleResize}>
-        <MuiThemeProvider muiTheme={muiTheme}>
+        <MuiThemeProvider theme={muiTheme}>
           <div>
             <div className="loading-container">
               <div className="spinner" />
@@ -206,7 +230,6 @@ let Header = createReactClass({
     let {dataset, name, logo} = this.props;
     let actions = this.getFlux().actions;
     const userId = this.config.user.id;
-    // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
     return (
       <div className="header">
         <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
@@ -221,23 +244,29 @@ let Header = createReactClass({
         </div>
         <img className="logo" src={logo}/>
         {this.config.user.isManager ?
-          <IconButton tooltip="Set current state as initial view for all users"
-            iconClassName="fa fa-floppy-o"
-            onClick={this.handleSaveInitialSession}
-          /> : null}
-
-        <IconButton tooltip="Find"
-          iconClassName="fa fa-search"
-          onClick={() => actions.session.modalOpen(<Finder />)}
-        />
-        <IconButton
-          tooltip="Link"
-          iconClassName="fa fa-link"
-          onClick={this.handlePageLinkClick}
-        />
+          <Tooltip title="Set current state as initial view for all users">
+            <IconButton
+              className="fa fa-floppy-o"
+              onClick={this.handleSaveInitialSession}
+            />
+          </Tooltip>
+          : null
+        }
+        <Tooltip title="Find">
+          <IconButton
+            className="fa fa-search"
+            onClick={() => actions.session.modalOpen(<Finder />)}
+          />
+        </Tooltip>
+        <Tooltip title="Link">
+          <IconButton
+            className="fa fa-link"
+            onClick={this.handlePageLinkClick}
+          />
+        </Tooltip>
       </div>
     );
   },
 });
 
-export default Panoptes;
+export default withTheme(Panoptes);

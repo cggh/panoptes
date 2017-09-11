@@ -11,10 +11,7 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // UI
 import Icon from 'ui/Icon';
-
-// Material UI
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 
 let Confirm = createReactClass({
   displayName: 'Confirm',
@@ -64,21 +61,22 @@ let Confirm = createReactClass({
       <div style={{padding: '10px', maxWidth: '80vw'}}>
         <div style={{padding: '10px'}}>{message}</div>
         <div style={{padding: '5px 0 0 0', textAlign: 'center'}}>
-          <FlatButton
+          <Button
             label={cancelButtonLabel}
-            primary={false}
-            icon={<Icon name="close" inverse={false} />}
+            color="primary"
+            iconName="close"
             onClick={this.handleCancel}
           />
-          <RaisedButton
+          <Button
+            raised
             autoFocus={true}
             style={{marginRight: '10px'}}
             label={confirmButtonLabel}
-            primary={true}
-            icon={<Icon name="check" inverse={true} />}
+            color="primary"
+            iconName="check"
+            iconInverse={true}
             onClick={this.handleConfirm}
           />
-
         </div>
       </div>
     );

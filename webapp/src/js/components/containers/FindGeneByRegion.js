@@ -18,7 +18,7 @@ import RegionGenesList from 'panoptes/RegionGenesList';
 import Icon from 'ui/Icon';
 
 // Material UI
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 
 
 let FindGeneByRegion = createReactClass({
@@ -35,8 +35,8 @@ let FindGeneByRegion = createReactClass({
     activeTab: PropTypes.string,
     search: PropTypes.string,
     chromosome: PropTypes.string,
-    startPosition: PropTypes.number,
-    endPosition: PropTypes.number,
+    startPosition: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    endPosition: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     chromosomeLength: PropTypes.number,
     onSelect: PropTypes.func
   },
@@ -175,11 +175,13 @@ let FindGeneByRegion = createReactClass({
             <tr>
               <th className="table-col-header"></th>
               <td className="table-col-cell">
-                <RaisedButton
+                <Button
+                  raised
                   label="Find"
                   disabled={startPosition < 0 || endPosition > chromosomeLength}
-                  primary={true}
-                  icon={<Icon fixedWidth={true} name="search" inverse={true} />}
+                  color="primary"
+                  iconName="search"
+                  iconInverse={true}
                   onClick={this.handleFind}
                 />
               </td>

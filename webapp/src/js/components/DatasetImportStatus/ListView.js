@@ -18,7 +18,7 @@ import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
 // Material UI
-import {List, ListItem} from 'material-ui/List';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
 
 // Utils
 import RequestContext from 'util/RequestContext';
@@ -116,13 +116,19 @@ let DatasetImportStatusListView = createReactClass({
             // row.scope
 
             return (
-              <ListItem key={row.id}
-                primaryText={<div><span>{row.status}</span></div>}
-                secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
-                leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
+              <ListItem
+                button
+                key={row.id}
                 onClick={(e) => this.handleClickImportStatus(row.id, `${row.name} - ${row.timestamp}`, iconName)}
-                secondaryTextLines={2}
-              />
+              >
+                <ListItemIcon>
+                  <Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<div><span>{row.status}</span></div>}
+                  secondary={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
+                />
+              </ListItem>
             );
           })}
         </List>

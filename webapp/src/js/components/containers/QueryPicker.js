@@ -11,7 +11,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
 
@@ -187,11 +187,12 @@ let QueryPicker = createReactClass({
               {
                 this.config.user.isManager && query ?
                   <div className="centering-container">
-                    <RaisedButton
+                    <Button
+                      raised
                       label="Get JSON"
-                      primary={false}
+                      color="primary"
                       onClick={() => prompt('Query as JSON:', query)}
-                      icon={<Icon fixedWidth={true} name={'paste'} inverse={false} />}
+                      iconName="paste"
                     />
                   </div>
                   : null
@@ -208,12 +209,13 @@ let QueryPicker = createReactClass({
                         onBlur={this.handleStoredFilterNameBlur}
                         style={{width: '10em', marginRight: '10px'}}
                       />
-                      <RaisedButton
+                      <Button
+                        raised
                         style={{marginRight: '10px'}}
                         label="Store"
-                        primary={false}
+                        color="primary"
                         onClick={this.handleStore}
-                        icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+                        iconName="database"
                       />
                     </HotKeys>
                   </div>
@@ -222,21 +224,24 @@ let QueryPicker = createReactClass({
               {
                 this.config.user.isManager && !storedFilterNameOpen ?
                   <div>
-                    <RaisedButton
+                    <Button
+                      raised
                       style={{marginRight: '10px'}}
                       label="Store as..."
-                      primary={false}
+                      color="primary"
                       onClick={this.handleStoredFilterNameOpen}
-                      icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+                      iconName="database"
                     />
                   </div>
                   : null
               }
-              <RaisedButton
+              <Button
+                raised
                 label="Use"
-                primary={true}
+                color="primary"
                 onClick={this.handlePick}
-                icon={<Icon fixedWidth={true} name={'check'} inverse={true} />}
+                iconName="check"
+                iconInverse={true}
               />
             </div>
           </div>

@@ -13,7 +13,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
 
 // Material UI
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 
 // Credit: http://stackoverflow.com/users/7173/jason
 function selectText(element) {
@@ -78,11 +78,13 @@ let Copy = createReactClass({
         <div style={{padding: '10px'}}>{introContent}</div>
         <div style={{padding: '10px'}} id="selectedContent">{selectedContent}</div>
         <div style={{padding: '5px 0 0 0', textAlign: 'center'}}>
-          <RaisedButton
+          <Button
+            raised
             style={{marginRight: '10px'}}
             label={OKButtonLabel}
-            primary={true}
-            icon={<Icon name="check" inverse={true} />}
+            color="primary"
+            iconName="check"
+            iconInverse={true}
             onClick={this.handleOK}
           />
         </div>

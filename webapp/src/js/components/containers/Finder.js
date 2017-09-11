@@ -1,21 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import createReactClass from 'create-react-class';
+import _forEach from 'lodash.foreach';
 
-// Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-// Material UI
-import {List, ListItem} from 'material-ui/List';
-
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
 import Icon from 'ui/Icon';
-
-// lodash
-import _forEach from 'lodash.foreach';
-
 import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';
 import FindGene from 'containers/FindGene';
@@ -84,18 +77,22 @@ let Finder = createReactClass({
 
     if (this.config.genome.annotation) {
 
-      // TODO: not sure whether exposing these setting values (GeneNameAttribute, GeneDescriptionAttribute) is wise
-      // let annotationSettings = JSON.parse(this.config.settings.annotation);
-      // let secondaryText = annotationSettings['GeneNameAttribute'] + ', ' + annotationSettings['GeneDescriptionAttribute'] + ', Genomic region';
       let secondaryText = 'Name, Description, Genomic region';
 
       let listItem = (
-        <ListItem key="findGeneListItem"
-          primaryText="Gene"
-          secondaryText={secondaryText}
-          leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
+        <ListItem
+          button
+          key="findGeneListItem"
           onClick={(e) => this.handleOpenPopup(e, <FindGene />)}
-        />
+        >
+          <ListItemIcon>
+            <Icon fixedWidth={true} name="bitmap:genomebrowser.png" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Gene"
+            secondary={secondaryText}
+          />
+        </ListItem>
       );
 
       listItems.push(listItem);
@@ -120,12 +117,19 @@ let Finder = createReactClass({
       }
 
       let listItem = (
-        <ListItem key={table.id}
-          primaryText={table.capNameSingle}
-          secondaryText={secondaryText}
-          leftIcon={<div><Icon fixedWidth={true} name={table.icon} /></div>}
+        <ListItem
+          button
+          key={table.id}
           onClick={(e) => this.handleOpenTableTab(e, table.id)}
-        />
+        >
+          <ListItemIcon>
+            <Icon fixedWidth={true} name={table.icon} />
+          </ListItemIcon>
+          <ListItemText
+            primary={table.capNameSingle}
+            secondary={secondaryText}
+          />
+        </ListItem>
       );
 
       listItems.push(listItem);

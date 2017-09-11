@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import Tooltip from 'rc-tooltip';
+//import Tooltip from 'rc-tooltip';
 import _forEach from 'lodash.foreach';
 import Hammer from 'react-hammerjs'; //We need hammer as "onClick" would fire for panning moves
 
@@ -411,5 +411,3 @@ class Legend extends React.Component {
 }
 
 export default AnnotationChannel;
-
-

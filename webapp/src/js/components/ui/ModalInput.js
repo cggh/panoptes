@@ -4,8 +4,7 @@ import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import TextField from 'material-ui/TextField';
 import _map from 'lodash.map';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 import Icon from 'ui/Icon';
 
 let ModalInput = createReactClass({
@@ -32,18 +31,20 @@ let ModalInput = createReactClass({
             ref={input}/>
         )}
         <div className="centering-container horizontal stack">
-          <FlatButton
+          <Button
             label="Cancel"
-            primary={false}
-            icon={<Icon name="close" inverse={false} />}
+            color="primary"
+            iconName="close"
             onClick={onCancel}
           />
-          <RaisedButton
+          <Button
+            raised
             autoFocus={true}
             style={{marginRight: '10px'}}
             label={action}
-            primary={true}
-            icon={<Icon name="check" inverse={true} />}
+            color="primary"
+            iconName="check"
+            iconInverse={true}
             onClick={() => {
               let values = {};
               _map(inputs, (input) => values[input] = this.refs[input].input.value);

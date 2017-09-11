@@ -11,7 +11,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
 import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -109,10 +109,11 @@ let ListWithActions = createReactClass({
       <div className="sidebar" style={{height: '100%'}}>
         <div className="item-picker vertical stack">
           <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
-          <FlatButton label="Download data"
-            primary={true}
+          <Button
+            label="Download data"
+            color="primary"
             onClick={() => this.handleDownload()}
-            icon={<Icon fixedWidth={true} name="download" />}
+            iconName="download"
           />
           <div className="search">
             <TextField ref={(ref) => this.search = ref}

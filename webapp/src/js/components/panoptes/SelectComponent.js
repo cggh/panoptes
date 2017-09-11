@@ -4,11 +4,13 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import _map from 'lodash.map';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Select from 'material-ui/Select';
+import Input, {InputLabel} from 'material-ui/Input';
+import {FormControl, FormHelperText} from 'material-ui/Form';
+import {MenuItem} from 'material-ui/Menu';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
-import _find from 'lodash.find';
+import uid from 'uid';
 
 let SelectComponent = createReactClass({
   displayName: 'SelectComponent',
@@ -18,29 +20,53 @@ let SelectComponent = createReactClass({
   ],
 
   propTypes: {
-    hintText: PropTypes.string,
     children: PropTypes.node,
-    selectedIndex: PropTypes.string
+    selectedIndex: PropTypes.string,
+    label: PropTypes.string
   },
 
   getDefaultProps() {
     return {
-      hintText: 'Choose',
     };
   },
 
+  getInitialState() {
+    return {
+      selectedIndex: (this.props.selectedIndex !== undefined ? this.props.selectedIndex : ''),
+      uid: uid(5)
+    };
+  },
+
+  handleChange(event, options) {
+    const selectedIndex = event.target.value;
+    this.setState({selectedIndex});
+    let selectedOption = options[selectedIndex];
+    this.getFlux().actions.session.popupOpen(selectedOption);
+  },
+
   render() {
-    let {selectedIndex, hintText, children} = this.props;
-    children = filterChildren(this, React.Children.toArray(children), ['option']);
-    let selectedValue = _find(children, (child) => child.props.index === selectedIndex);
-    return <SelectField hintText={hintText} value={selectedIndex ? selectedValue : null} onChange={(e, k, v) => {
-      this.getFlux().actions.session.popupOpen(filterChildren(this, React.Children.toArray(v.props.children)));
-    }}>
-      {_map(children, (row) =>
-        <MenuItem key={row} value={row} primaryText={row.props.label}/>)}
-    </SelectField>;
+    const {children, label} = this.props;
+    const options = filterChildren(this, React.Children.toArray(children), ['option']);
+
+    // NOTE: Select (Input) values can only be string, number, or Array of number (for multiple selects):
+    // https://material-ui-1dab0.firebaseapp.com/api/input/
+
+    return (
+      <FormControl fullWidth={true}>
+        <InputLabel htmlFor={this.state.uid}>{label}</InputLabel>
+        <Select
+          value={this.state.selectedIndex}
+          onChange={this.handleChange}
+          input={<Input id={this.state.uid} />}
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          {_map(options, (row) => <MenuItem key={row.props.index} value={row.props.index}>{row.props.label}</MenuItem>)}
+        </Select>
+      </FormControl>
+    );
   },
 });
 
 export default SelectComponent;
-

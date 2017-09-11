@@ -9,8 +9,7 @@ import PrismDecorator from  'draft-js-prism';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/themes/prism.css';
 import 'draft-js/dist/Draft.css';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'ui/Button';
 import Icon from 'ui/Icon';
 
 // const decorator = new PrismDecorator({defaultSyntax: 'yaml'});
@@ -82,14 +81,15 @@ let EditYAMLConfig = createReactClass({
             />
           </div>
           <div className="centering-container">
-            <FlatButton
+            <Button
               label="Close"
-              primary={false}
+              color="primary"
               onClick={() => actions.session.modalClose()}
             />
-            <RaisedButton
+            <Button
+              raised
               label="Save"
-              primary={true}
+              color="primary"
               disabled={loading}
               icon={<Icon fixedWidth={true} name={loading ? 'spinner' : 'save'} spin={loading} inverse={true} />}
               onClick={() =>  {

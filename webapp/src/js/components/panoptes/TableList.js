@@ -5,12 +5,12 @@ import _map from 'lodash.map';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
+import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import ListSubheader from 'material-ui/List/ListSubheader';
 import Icon from 'ui/Icon';
 import striptags from 'striptags';
-import FluxMixin from 'mixins/FluxMixin';
 import ListWithActions from 'containers/ListWithActions';
 import DataTableWithActions from 'containers/DataTableWithActions';
 
@@ -56,14 +56,22 @@ let TableList = createReactClass({
     let {tables} = this.config;
     return (
       <List style={this.props.style}>
-        <Subheader>Open a table:</Subheader>
+        <ListSubheader>Open a table:</ListSubheader>
         {_map(tables, (table) => (
           this.config.tablesById[table.id].isHidden ? null :
-            <ListItem key={table.id}
-              primaryText={table.capNamePlural}
-              secondaryText={striptags(table.description)}
-              leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
-              onClick={(e) => this.handleTableClick(e, table)} />
+            <ListItem
+              button
+              key={table.id}
+              onClick={(e) => this.handleTableClick(e, table)}
+            >
+              <ListItemIcon>
+                <Icon fixedWidth={true} name={table.icon}/>
+              </ListItemIcon>
+              <ListItemText
+                primary={table.capNamePlural}
+                secondary={striptags(table.description)}
+              />
+            </ListItem>
         ))}
       </List>
 

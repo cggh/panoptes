@@ -25,9 +25,10 @@ import PropertySelector from 'panoptes/PropertySelector';
 import {propertyColour, categoryColours} from 'util/Colours';
 
 import Checkbox from 'material-ui/Checkbox';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
-import Slider from 'material-ui/Slider';
+import Select from 'material-ui/Select';
+import Input from 'material-ui/Input';
+import {MenuItem} from 'material-ui/Menu';
+import Slider from 'rc-slider';
 import FilterButton from 'panoptes/FilterButton';
 import _assign from 'lodash.assign';
 
@@ -406,12 +407,14 @@ let PerRowNumericalTrackControls = createReactClass({
         </div>
         <div className="control">
           <div className="label">Interpolation:</div>
-          <DropDownMenu className="dropdown"
+          <Select className="dropdown"
             value={interpolation}
-            onChange={(e, i, v) => this.redirectedProps.setProps({interpolation: v})}>
+            onChange={(e, i, v) => this.redirectedProps.setProps({interpolation: v})}
+            input={<Input id="interpolation" />}
+          >
             {INTERPOLATIONS.map((interpolation) =>
               <MenuItem key={interpolation.payload} value={interpolation.payload} primaryText={interpolation.text}/>)}
-          </DropDownMenu>
+          </Select>
         </div>
         {INTERPOLATION_HAS_TENSION[interpolation] ?
           <div className="control">

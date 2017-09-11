@@ -17,8 +17,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 // Material UI
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 import TextField from 'material-ui/TextField';
 import Divider from 'material-ui/Divider';
 
@@ -100,7 +99,9 @@ let DataTableWithActions = createReactClass({
     if (this.state.searchOpen && this.props.searchText === '') {
       // Focus the searchField whenever the search is open and there is no searchText,
       // e.g. when opened from the Finder, or by clicking on the Find Text button.
-      this.refs.searchField.focus();
+      // FIXME: "Warning: Stateless function components cannot be given refs. Attempts to access this ref will fail."
+      // <TextField ref={(input) => { this.searchField = input; }}
+      // this.searchField.focus();
     }
   },
 
@@ -298,22 +299,26 @@ let DataTableWithActions = createReactClass({
 
     }
     let searchGUI = (
-      <FlatButton label="Find text"
+      <Button
+        label="Find text"
         disabled={columns === undefined || columns.length === 0}
-        primary={true}
+        color="primary"
         onClick={this.handleSearchOpen}
-        icon={<Icon fixedWidth={true} name="search" />}
+        iconName="search"
       />
     );
     if (searchOpen) {
       searchGUI = (
         <div>
-          <RaisedButton label="Find text"
+          <Button
+            raised
+            label="Find text"
             disabled={columns === undefined || columns.length === 0}
-            primary={true}
-            icon={<Icon fixedWidth={true} name="search" inverse={true} />}
+            color="primary"
+            iconName="search"
+            iconInverse={true}
           />
-          <TextField ref="searchField"
+          <TextField
             fullWidth={true}
             floatingLabelText="Search"
             value={searchText}
@@ -339,33 +344,37 @@ let DataTableWithActions = createReactClass({
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
         <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
-        <FlatButton label={columnPickerLabel}
-          primary={true}
+        <Button
+          label={columnPickerLabel}
+          color="primary"
           onClick={() => actions.session.modalOpen(<GroupedItemPicker
             groups={this.propertyGroups}
             initialPick={columns}
             title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
             onPick={this.handleColumnChange}
           />)}
-          icon={<Icon fixedWidth={true} name="columns" />}
+          iconName="columns"
         />
         {searchGUI}
         <Divider />
-        <FlatButton label="Download data"
+        <Button
+          label="Download data"
           disabled={columns === undefined || columns.length === 0}
-          primary={true}
+          color="primary"
           onClick={() => this.handleDownload()}
-          icon={<Icon fixedWidth={true} name="download" />}
+          iconName="download"
         />
-        <FlatButton label="Pivot Table"
-          primary={true}
+        <Button
+          label="Pivot Table"
+          color="primary"
           onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
-          icon={<Icon fixedWidth={true} name="table" />}
+          iconName="table"
         />
-        <FlatButton label="Plot Table"
-          primary={true}
+        <Button
+          label="Plot Table"
+          color="primary"
           onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
-          icon={<Icon fixedWidth={true} name="bar-chart" />}
+          iconName="bar-chart"
         />
       </div>
     );

@@ -15,11 +15,11 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from 'ui/Button';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import TreeContainer from 'containers/TreeContainer';
-import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
+import SelectWithNativeFallback from 'panoptes/SelectWithNativeFallback';
 import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
 
@@ -124,34 +124,35 @@ let TreeWithActions = createReactClass({
       <div className="sidebar tree-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
         <div className="tree-controls vertical stack">
-          <SelectFieldWithNativeFallback
+          <SelectWithNativeFallback
             value={table}
-            autoWidth={true}
-            floatingLabelText="Table"
+            fullWidth={true}
+            hintText="Table"
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
           {table ?
-            <SelectFieldWithNativeFallback
+            <SelectWithNativeFallback
               value={tree}
-              autoWidth={true}
-              floatingLabelText="Tree"
+              fullWidth={true}
+              hintText="Tree"
               onChange={this.handleChangeTree}
               options={treeOptions}
             />
             : null }
           {treeInfo && treeInfo.crossLink && _has(this.config.tablesById, treeInfo.crossLink.split('::')[0]) ?
-            <RaisedButton
+            <Button
+              raised
               onClick={this.handleCrossLink}
               label={`Show ${this.config.tablesById[treeInfo.crossLink.split('::')[0]].capNameSingle}`}
-              icon={<Icon fixedWidth={true} name={this.config.tablesById[treeInfo.crossLink.split('::')[0]].icon} />}
+              iconName={this.config.tablesById[treeInfo.crossLink.split('::')[0]].icon}
             />
             : null}
           {treeInfo ?
-            <SelectFieldWithNativeFallback
+            <SelectWithNativeFallback
               value={treeType}
-              autoWidth={true}
-              floatingLabelText="Tree Layout"
+              fullWidth={true}
+              hintText="Tree Layout"
               onChange={this.handleChangeTreeType}
               options={treeTypeOptions}
             />
