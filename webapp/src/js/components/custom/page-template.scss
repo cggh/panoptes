@@ -1,0 +1,58 @@
+.obs-page-backdrop {
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center center;
+  opacity: 0.3;
+  filter: blur(2px);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 1;
+}
+
+.obs-page-container{
+  position: relative;
+  min-height: 100%
+}
+
+.obs-page-content {
+  font-family: Roboto, Cochin, Georgia, serif;
+  height: 100%;
+  position: relative;
+  z-index: 100;
+}
+
+.card-stack {
+  max-width:650px;
+}
+
+.obs-leader {
+  max-width: 80%;
+  font-size: 25px;
+  padding: 25px;
+  text-align: center;
+  background: rgba(255,255,255,0.6);
+  margin-bottom: 20px;
+}
+
+.obs-highlight {
+  color: rgb(230, 74, 25);
+}
+
+.card-stack > div {
+  margin-bottom: 15px;
+}
+
+.obs-breadcrumb {
+  background: rgba(255,255,255,0.6);
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  //justify-content: center;
+  align-items: center;
+}
+
+li {
+  padding-bottom: 5px;
+}
