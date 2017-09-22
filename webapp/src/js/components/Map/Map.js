@@ -94,7 +94,8 @@ let Map = createReactClass({
     setProps: PropTypes.func, // NB: session will not record {center, zoom} when component is in templates
     onChange: PropTypes.func,
     title: PropTypes.string,
-    zoom: PropTypes.number
+    zoom: PropTypes.number,
+    disableInteraction: PropTypes.bool
   },
 
   childContextTypes: {
@@ -124,6 +125,19 @@ let Map = createReactClass({
       bounds: undefined,
       loadStatus: 'loaded'
     };
+  },
+
+  componentDidMount() {
+    if (this.props.disableInteraction) {
+      let map = this.map.leafletElement;
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+      if (map.tap) map.tap.disable();
+    }
   },
 
   // Event handlers
@@ -218,7 +232,7 @@ let Map = createReactClass({
   },
 
   render() {
-    let {center, children, zoom} = this.props;
+    let {center, children, zoom, disableInteraction} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     let {bounds, loadStatus} = this.state;
 
@@ -247,6 +261,7 @@ let Map = createReactClass({
       ref: (ref) => this.map = ref,
       zoom,
       zoomAnimation: false,
+      zoomControl: !disableInteraction,
       zoomSnap: 0.5,
       zoomDelta: 0.5,
       wheelPxPerZoomLevel: 120
