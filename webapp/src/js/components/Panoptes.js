@@ -280,6 +280,7 @@ let Header = createReactClass({
             {<span><img className="top-bar-logo" src={logo}/><HTMLWithComponents className="top-bar-title">{name}</HTMLWithComponents></span>}
           </Typography>
           {this.config.user.isManager ? [<IconButton
+            key="1"
             style={{color: 'white'}}
             aria-label="More"
             aria-owns={this.state.open ? 'long-menu' : null}
@@ -289,6 +290,7 @@ let Header = createReactClass({
             <MoreVert />
           </IconButton>,
           <Menu
+            key="2"
             id="long-menu"
             anchorEl={this.state.anchorEl}
             open={this.state.open}
