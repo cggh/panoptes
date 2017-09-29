@@ -28,22 +28,41 @@ dynreq.keys().forEach((component) => {
 });
 
 //We now add in specific material-ui classes
-import Card, {CardActions, CardContent, CardMedia, CardHeader} from 'material-ui/Card';
+import Card, { CardHeader, CardMedia, CardContent, CardActions } from 'material-ui/Card';
 typeByDisplayName['Card'] = Card;
 typeByDisplayName['CardActions'] = CardActions;
-typeByDisplayName['CardContent'] = CardContent;
-typeByDisplayName['CardMedia'] = CardMedia;
 typeByDisplayName['CardHeader'] = CardHeader;
+typeByDisplayName['CardMedia'] = CardMedia;
+typeByDisplayName['CardContent'] = CardContent;
+
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+typeByDisplayName['List'] = List;
+typeByDisplayName['ListItem'] = ListItem;
+let wrappedListItemIcon = ({children}) => {
+  children = filterChildren(this, children);
+  return <ListItemIcon>{children}</ListItemIcon>;
+};
+wrappedListItemIcon.displayName = "ListItemIcon";
+typeByDisplayName['ListItemIcon'] = wrappedListItemIcon;
+
+let wrappedListItemText = ({children}) => {
+  children = filterChildren(this, children);
+  if (_isArray(children)) {
+    return <ListItemText primary={children[0]} secondary={children[1]}/>;
+  }
+  else return <ListItemText primary={children}/>;
+};
+wrappedListItemText.displayName = "ListItemText";
+typeByDisplayName['ListItemText'] = wrappedListItemText;
+
 import Typography from 'material-ui/Typography';
 Typography.displayName = 'Typography';
 
 typeByDisplayName['Typography'] = Typography;
+
 import {Tabs, Tab} from 'material-ui/Tabs';
 typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
-
-
-
 
 console.info('Components: %o', typeByDisplayName);
 
