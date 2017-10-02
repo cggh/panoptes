@@ -13,7 +13,13 @@ export default function serialiseComponent(component) {
   if (_isString(component)) {
     return component;
   }
-  const displayName = getDisplayName(component.type);
+  let displayName = getDisplayName(component.type);
+  displayName = displayName.split('(');
+  if (displayName.length > 1) {
+    displayName = displayName[1].substr(0,displayName[1].length-1);
+  } else {
+    displayName = displayName[0];
+  }
   if (displayName == 'Component') {
     throw Error('Attempted to serialise a non React component');
   }
