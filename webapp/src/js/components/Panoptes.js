@@ -32,7 +32,8 @@ import createPalette from 'material-ui/styles/createPalette';
 import createTypography from 'material-ui/styles/createTypography';
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {withTheme} from 'material-ui/styles';
-import Tooltip from 'material-ui/Tooltip';
+import Tooltip from 'rc-tooltip';
+import 'rc-tooltip/assets/bootstrap.css';
 
 //https://github.com/facebook/flow/issues/380
 import {blue, pink} from 'material-ui/colors';
@@ -244,7 +245,7 @@ let Header = createReactClass({
         </div>
         <img className="logo" src={logo}/>
         {this.config.user.isManager ?
-          <Tooltip title="Set current state as initial view for all users">
+          <Tooltip overlay="Set current state as initial view for all users">
             <IconButton
               className="fa fa-floppy-o"
               onClick={this.handleSaveInitialSession}
@@ -252,13 +253,13 @@ let Header = createReactClass({
           </Tooltip>
           : null
         }
-        <Tooltip title="Find">
+        <Tooltip overlay="Find">
           <IconButton
             className="fa fa-search"
             onClick={() => actions.session.modalOpen(<Finder />)}
           />
         </Tooltip>
-        <Tooltip title="Link">
+        <Tooltip overlay="Link">
           <IconButton
             className="fa fa-link"
             onClick={this.handlePageLinkClick}
@@ -269,4 +270,4 @@ let Header = createReactClass({
   },
 });
 
-export default withTheme(Panoptes);
+export default withTheme()(Panoptes);
