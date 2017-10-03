@@ -66,12 +66,12 @@ dataItemViews:
         </ul>
     {{/if}}
     <div style="width:300px;height:300px">
-      <ItemMap table='samplingsites' highlight='Contributor_ID:{{ID}}' />
+      <TableMap table='samplingsites' highlight='Contributor_ID:{{ID}}' />
     </div>
     <h4>
       More information on the nature of contribution <DocLink href="samples.html">here</DocLink>
     </h4>
     WTF
-    <Card><CardText> This text is on a mui card</CardText></Card>
+    <Card><Typography> This text is on a mui card</Typography></Card>
 
 
