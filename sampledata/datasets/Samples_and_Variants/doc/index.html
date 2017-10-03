@@ -97,10 +97,12 @@
         </div>
         <PopupButton label="Table with legend" target="tab">
             <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
-                <CardTitle title="A table" subtitle="" titleStyle='{"fontSize":"18px"}' />
-                <CardText>
+              <CardHeader title="A table" />
+              <CardContent>
+                <Typography>
                     This is a table which has interesting data in
-                </CardText>
+                </Typography>
+              </CardContent>
             </TableWithLegend>
         </PopupButton>
         <p>A table, with styled headers</p>
