@@ -9,7 +9,6 @@ import ComponentRegistry from 'util/ComponentRegistry';
 
 function getViews(dataItemViews, hasGeoCoord) {
   /*eslint-disable react/display-name */
-  //TODO: deprecate ItemMap for TableMap
   const viewTypes = {
     Overview: (dataItemView, key) => (<Overview title="Overview" key={key}/>),
     PieChartMap: (dataItemView, key) => (<PieChartMap
@@ -21,7 +20,6 @@ function getViews(dataItemViews, hasGeoCoord) {
       title={dataItemView.name}
       residualFractionName={dataItemView.residualFractionName}
       key={key} />),
-    ItemMap: (dataItemView, key) => (<TableMap title={dataItemView.name} key={key} />),
     TableMap: (dataItemView, key) => (<TableMap title={dataItemView.name} key={key} />),
     FieldList: (dataItemView, key) => (<FieldList title={dataItemView.name} fields={dataItemView.fields} key={key} />),
     PropertyGroup: (dataItemView, key) => (<PropertyGroup
