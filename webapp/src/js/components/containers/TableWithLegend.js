@@ -5,7 +5,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import SQL from 'panoptes/SQL';
 import DataTableView from 'panoptes/DataTableView';
-import {Card, CardText} from 'material-ui/Card';
+import Card from 'material-ui/Card';
 
 let TableWithLegend = createReactClass({
   displayName: 'TableWithLegend',
