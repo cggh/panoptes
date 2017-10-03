@@ -627,7 +627,7 @@ let Criterion = createReactClass({
     ];
 
     return (
-      <Paper zDepth={1} className="criterion" key={key}>
+      <Paper elevation={1} className="criterion" key={key}>
         <div className="inputs">
           {propertySelect}
           {operatorSelect}
