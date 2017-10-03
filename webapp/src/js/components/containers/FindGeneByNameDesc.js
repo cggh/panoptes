@@ -69,7 +69,7 @@ let FindGeneByNameDesc = createReactClass({
         <div className="search">
           <TextField autoFocus
             fullWidth={true}
-            floatingLabelText="Search"
+            label="Search"
             value={search}
             onChange={this.handleSearchChange}
           />

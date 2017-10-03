@@ -203,7 +203,7 @@ let QueryPicker = createReactClass({
                     <HotKeys keyMap={hotKeysKeyMap} handlers={hotKeysHandlers}>
                       <TextField
                         ref={(ref) => this.storedFilterNameField = ref}
-                        hintText="Stored filter name"
+                        helperText="Stored filter name"
                         value={storedFilterName}
                         onChange={this.handleStoredFilterNameChange}
                         onBlur={this.handleStoredFilterNameBlur}

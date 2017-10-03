@@ -320,7 +320,7 @@ let DataTableWithActions = createReactClass({
           />
           <TextField
             fullWidth={true}
-            floatingLabelText="Search"
+            label="Search"
             value={searchText}
             onChange={this.handleSearchChange}
             onBlur={this.handleSearchBlur}

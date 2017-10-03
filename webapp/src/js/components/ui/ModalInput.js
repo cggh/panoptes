@@ -27,7 +27,7 @@ let ModalInput = createReactClass({
         {_map(inputs, (input, i) =>
           <TextField key={input}
             autoFocus
-            floatingLabelText={names[i]}
+            label={names[i]}
             ref={input}/>
         )}
         <div className="centering-container horizontal stack">

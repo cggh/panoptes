@@ -345,7 +345,7 @@ let MapActions = createReactClass({
         <div className="map-controls vertical stack">
           <SelectWithNativeFallback
             fullWidth={true}
-            hintText="Table for Markers"
+            helperText="Table for Markers"
             onChange={this.handleChangeTable}
             options={tableOptions}
             value={table}
@@ -358,7 +358,7 @@ let MapActions = createReactClass({
           }
           <SelectWithNativeFallback
             fullWidth={true}
-            hintText="Base layer"
+            helperText="Base layer"
             onChange={this.handleChangeBaseTileLayer}
             value={baseTileLayer}
             options={this.baseTileLayersMenu}
@@ -366,7 +366,7 @@ let MapActions = createReactClass({
           />
           <SelectWithNativeFallback
             fullWidth={true}
-            hintText="Overlay"
+            helperText="Overlay"
             onChange={this.handleChangeOverlayLayer}
             value={overlayLayer}
             options={this.overlayLayersMenu}

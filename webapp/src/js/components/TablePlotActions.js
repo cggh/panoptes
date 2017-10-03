@@ -118,7 +118,7 @@ let TablePlotActions = createReactClass({
           <SelectWithNativeFallback
             value={table}
             fullWidth={true}
-            hintText="Table"
+            helperText="Table"
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
@@ -131,7 +131,7 @@ let TablePlotActions = createReactClass({
           <SelectWithNativeFallback
             value={plotType}
             fullWidth={true}
-            hintText="Plot type"
+            helperText="Plot type"
             onChange={this.handleChangePlotType}
             options={_map(plotTypes, (plot, key) => ({ value: key, key: key, label: plot.displayName}))}
           />

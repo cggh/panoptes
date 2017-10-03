@@ -46,15 +46,15 @@ let SelectRow = createReactClass({
     let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
     let itemTitle = tableConfig.itemTitle || `{{${tableConfig.primKey}}}`;
     if (_isUndefined(data)) {
-      return <SelectWithNativeFallback fullWidth={true} hintText="Loading..." disabled={true} />;
+      return <SelectWithNativeFallback fullWidth={true} helperText="Loading..." disabled={true} />;
     } else if (data.length === 0) {
-      return <SelectWithNativeFallback fullWidth={true} hintText={`No ${tableConfig.capNamePlural} to choose from`} disabled={true} />;
+      return <SelectWithNativeFallback fullWidth={true} helperText={`No ${tableConfig.capNamePlural} to choose from`} disabled={true} />;
     } else {
       return <SelectWithNativeFallback
         allowNone={false}
         fullWidth={true}
         value={selected}
-        hintText={`Choose a ${tableConfig.capNameSingle}`}
+        helperText={`Choose a ${tableConfig.capNameSingle}`}
         onChange={(v) => {
           this.getFlux().actions.session.popupOpen(<DataItem primKey={v} table={table}>{views}</DataItem>);
         }}
