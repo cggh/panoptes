@@ -28,12 +28,14 @@ dynreq.keys().forEach((component) => {
 });
 
 //We now add in specific material-ui classes
-import {Card, CardActions, CardHeader, CardTitle, CardText} from 'material-ui/Card';
+import Card, {CardActions, CardContent, CardMedia, CardHeader} from 'material-ui/Card';
 typeByDisplayName['Card'] = Card;
 typeByDisplayName['CardActions'] = CardActions;
+typeByDisplayName['CardContent'] = CardContent;
+typeByDisplayName['CardMedia'] = CardMedia;
 typeByDisplayName['CardHeader'] = CardHeader;
-typeByDisplayName['CardTitle'] = CardTitle;
-typeByDisplayName['CardText'] = CardText;
+import Typography from 'material-ui/Typography';
+typeByDisplayName['Typography'] = Typography;
 import {Tabs, Tab} from 'material-ui/Tabs';
 typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
