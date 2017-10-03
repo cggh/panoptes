@@ -125,8 +125,8 @@ let DatasetImportStatusListView = createReactClass({
                   <Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} />
                 </ListItemIcon>
                 <ListItemText
-                  primary={<div><span>{row.status}</span></div>}
-                  secondary={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
+                  primary={<span>{row.status}</span>}
+                  secondary={<span><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></span>}
                 />
               </ListItem>
             );
