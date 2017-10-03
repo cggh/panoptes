@@ -127,7 +127,7 @@ let TreeWithActions = createReactClass({
           <SelectWithNativeFallback
             value={table}
             fullWidth={true}
-            hintText="Table"
+            helperText="Table"
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
@@ -135,7 +135,7 @@ let TreeWithActions = createReactClass({
             <SelectWithNativeFallback
               value={tree}
               fullWidth={true}
-              hintText="Tree"
+              helperText="Tree"
               onChange={this.handleChangeTree}
               options={treeOptions}
             />
@@ -152,7 +152,7 @@ let TreeWithActions = createReactClass({
             <SelectWithNativeFallback
               value={treeType}
               fullWidth={true}
-              hintText="Tree Layout"
+              helperText="Tree Layout"
               onChange={this.handleChangeTreeType}
               options={treeTypeOptions}
             />

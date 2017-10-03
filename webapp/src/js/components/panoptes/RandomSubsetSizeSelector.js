@@ -61,7 +61,7 @@ let RandomSubsetSizeSelector = createReactClass({
       <SelectWithNativeFallback
         value={value}
         fullWidth={true}
-        hintText={label}
+        helperText={label}
         onChange={this.handleChangeValue}
         options={options}
       />

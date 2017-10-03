@@ -785,7 +785,7 @@ const GenotypesControls = createReactClass({
           <div className="control">
             <Select value={cellColour}
               fullWidth={true}
-              floatingLabelText="Cell colour"
+              label="Cell colour"
               onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}
               input={<Input id="cellColour" />}
             >
@@ -796,7 +796,7 @@ const GenotypesControls = createReactClass({
           <div className="control">
             <Select value={cellAlpha}
               fullWidth={true}
-              floatingLabelText="Cell opacity"
+              label="Cell opacity"
               onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}
               input={<Input id="cellAlpha" />}
             >
@@ -808,7 +808,7 @@ const GenotypesControls = createReactClass({
           <div className="control">
             <Select value={cellHeight}
               fullWidth={true}
-              floatingLabelText="Cell height"
+              label="Cell height"
               onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}
               input={<Input id="cellHeight" />}
             >

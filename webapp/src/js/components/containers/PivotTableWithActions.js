@@ -116,7 +116,7 @@ let PivotTableWithActions = createReactClass({
             onSelect={(v) => setProps({rowProperty: v, rowSortOrder: undefined})}/>
           <Select
             fullWidth={true}
-            floatingLabelText="Display"
+            label="Display"
             onChange={(e, i, v) => setProps({display: v})}
             value={display}
             input={<Input id="display" />}

@@ -118,7 +118,7 @@ let ListWithActions = createReactClass({
           <div className="search">
             <TextField ref={(ref) => this.search = ref}
               fullWidth={true}
-              floatingLabelText="Search"
+              label="Search"
               value={search}
               onChange={this.handleSearchChange}
             />

@@ -77,7 +77,7 @@ let NumericInput = createReactClass({
         type="number"
         style={{width: `${width * 30}px`}}
         ref={(node) => this.textField = node}
-        floatingLabelText={label}
+        label={label}
         errorText={error}
         value={value}
         onBlur={this.handleBlur}

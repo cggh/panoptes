@@ -29,11 +29,11 @@ let SelectWithNativeFallback = createReactClass({
 
   propTypes: {
     fullWidth: PropTypes.bool,
-    floatingLabelText: PropTypes.string,
+    label: PropTypes.string,
     onChange: PropTypes.func,
     options: PropTypes.array,
     disabled: PropTypes.bool,
-    hintText: PropTypes.string,
+    helperText: PropTypes.string,
     allowNone: PropTypes.bool
   },
 
@@ -52,13 +52,13 @@ let SelectWithNativeFallback = createReactClass({
 
 
   render() {
-    let {value, fullWidth, hintText, floatingLabelText, onChange, allowNone, options} = this.props;
+    let {value, fullWidth, helperText, label, onChange, allowNone, options} = this.props;
 
     if (options.length > MAX_SELECTFIELD_OPTIONS) {
       return (
         <div className="native-select" >
           <label >
-            {hintText || floatingLabelText}
+            {helperText || label}
           </label>
           <div className="native-select-inner">
             <div className="native-select-inner2">
@@ -100,7 +100,7 @@ let SelectWithNativeFallback = createReactClass({
     } else {
       return (
         <FormControl fullWidth={fullWidth}>
-          <InputLabel htmlFor={this.state.uid}>{hintText}</InputLabel>
+          <InputLabel htmlFor={this.state.uid}>{helperText}</InputLabel>
           <Select
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -121,7 +121,7 @@ let SelectWithNativeFallback = createReactClass({
               </MenuItem>
             )}
           </Select>
-          <FormHelperText>{floatingLabelText}</FormHelperText>
+          <FormHelperText>{label}</FormHelperText>
         </FormControl>
       );
     }
