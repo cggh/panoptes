@@ -64,6 +64,7 @@ const fontStyle = {
 };
 
 const muiTheme = createMuiTheme({
+  palette,
   typography: createTypography(palette, fontStyle),
   tableHeaderColumn: {
     height: 56,
