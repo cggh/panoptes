@@ -245,7 +245,10 @@ let Header = createReactClass({
         </div>
         <img className="logo" src={logo}/>
         {this.config.user.isManager ?
-          <Tooltip overlay="Set current state as initial view for all users">
+          <Tooltip
+            overlay="Set current state as initial view for all users"
+            placement="bottom"
+          >
             <IconButton
               className="fa fa-floppy-o"
               onClick={this.handleSaveInitialSession}
@@ -253,13 +256,19 @@ let Header = createReactClass({
           </Tooltip>
           : null
         }
-        <Tooltip overlay="Find">
+        <Tooltip
+          overlay="Find"
+          placement="bottom"
+        >
           <IconButton
             className="fa fa-search"
             onClick={() => actions.session.modalOpen(<Finder />)}
           />
         </Tooltip>
-        <Tooltip overlay="Link">
+        <Tooltip
+          overlay="Link"
+          placement="bottom"
+        >
           <IconButton
             className="fa fa-link"
             onClick={this.handlePageLinkClick}
