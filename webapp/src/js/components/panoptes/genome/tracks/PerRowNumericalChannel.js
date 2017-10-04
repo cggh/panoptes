@@ -413,7 +413,8 @@ let PerRowNumericalTrackControls = createReactClass({
             input={<Input id="interpolation" />}
           >
             {INTERPOLATIONS.map((interpolation) =>
-              <MenuItem key={interpolation.payload} value={interpolation.payload} primaryText={interpolation.text}/>)}
+              <MenuItem key={interpolation.payload} value={interpolation.payload}>{interpolation.text}</MenuItem>
+            )}
           </Select>
         </div>
         {INTERPOLATION_HAS_TENSION[interpolation] ?
