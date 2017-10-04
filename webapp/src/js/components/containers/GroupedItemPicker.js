@@ -21,6 +21,7 @@ import _forEach from 'lodash.foreach';
 import _sumBy from 'lodash.sumby';
 import _filter from 'lodash.filter';
 import _difference from 'lodash.difference';
+import _clone from 'lodash.clone';
 import Icon from 'ui/Icon';
 
 const styles = (theme) => ({
@@ -28,6 +29,9 @@ const styles = (theme) => ({
     paddingLeft: theme.spacing.unit * 4,
   },
 });
+
+const defaultAvailableExpanded = true;
+const defaultPickedExpanded = true;
 
 let GroupedItemPicker = createReactClass({
   displayName: 'GroupedItemPicker',
@@ -40,7 +44,8 @@ let GroupedItemPicker = createReactClass({
     groups: PropTypes.objectOf(PropTypes.object),
     initialPick: PropTypes.arrayOf(PropTypes.string),
     onPick: PropTypes.func,
-    title: PropTypes.string
+    title: PropTypes.string,
+    classes: PropTypes.object
   },
 
   getDefaultProps() {
@@ -54,7 +59,9 @@ let GroupedItemPicker = createReactClass({
   getInitialState() {
     return {
       picked: this.props.initialPick,
-      search: ''
+      search: '',
+      availableExpanded: {},
+      pickedExpanded: {}
     };
   },
 
@@ -67,10 +74,6 @@ let GroupedItemPicker = createReactClass({
 
   title() {
     return this.props.title;
-  },
-
-  handleEnter() {
-    this.handlePick();
   },
 
   handleAdd(propId) {
@@ -112,9 +115,29 @@ let GroupedItemPicker = createReactClass({
     this.props.onPick(result);
   },
 
+  handleToggleAvailableExpand(id) {
+    let availableExpanded = _clone(this.state.availableExpanded);
+    availableExpanded[id] = availableExpanded[id] === undefined ? availableExpanded[id] = !defaultAvailableExpanded : availableExpanded[id] = !availableExpanded[id];
+    this.setState({'availableExpanded': availableExpanded});
+  },
+
+  isAvailableExpanded(id) {
+    return this.state.availableExpanded[id] === undefined ? defaultAvailableExpanded : this.state.availableExpanded[id];
+  },
+
+  handleTogglePickedExpand(id) {
+    let pickedExpanded = _clone(this.state.pickedExpanded);
+    pickedExpanded[id] = pickedExpanded[id] === undefined ? pickedExpanded[id] = !defaultPickedExpanded : pickedExpanded[id] = !pickedExpanded[id];
+    this.setState({'pickedExpanded': pickedExpanded});
+  },
+
+  isPickedExpanded(id) {
+    return this.state.pickedExpanded[id] === undefined ? defaultPickedExpanded : this.state.pickedExpanded[id];
+  },
+
   render() {
     let {picked, search} = this.state;
-    let {groups} = this.props;
+    let {groups, classes} = this.props;
     let count = _sumBy(groups, (group) => group.properties.length);
     return (
       <div className="large-modal item-picker">
@@ -137,7 +160,7 @@ let GroupedItemPicker = createReactClass({
                         (
                           <ListItem
                             button
-                            className={classNames({picked: !_includes(picked, id)})}
+                            className={[classes.nested, classNames({picked: !_includes(picked, id)})]}
                             key={id}
                             onClick={() => this.handleAdd(id)}
                           >
@@ -159,14 +182,14 @@ let GroupedItemPicker = createReactClass({
                           <ListItem
                             button
                             key={id}
-                            onClick={() => this.handleAddAll(id)}
+                            onClick={() => this.handleToggleAvailableExpand(id)}
                           >
                             <ListItemText
                               primary={name}
                             />
-                            {this.state.open ? <ExpandMore /> : <ExpandLess />}
+                            {this.isAvailableExpanded(id) ? <ExpandMore /> : <ExpandLess />}
                           </ListItem>
-                          <Collapse in={this.state.open} transitionDuration="auto" unmountOnExit>
+                          <Collapse in={this.isAvailableExpanded(id)} transitionDuration="auto" unmountOnExit>
                             {subItems}
                           </Collapse>
                         </div>
@@ -190,14 +213,14 @@ let GroupedItemPicker = createReactClass({
                         <ListItem
                           button
                           key={id}
-                          onClick={() => this.handleRemoveAll(id)}
+                          onClick={() => this.handleTogglePickedExpand(id)}
                         >
                           <ListItemText
                             primary={name}
                           />
-                          {this.state.open ? <ExpandMore /> : <ExpandLess />}
+                          {this.isPickedExpanded(id) ? <ExpandMore /> : <ExpandLess />}
                         </ListItem>
-                        <Collapse in={this.state.open} transitionDuration="auto" unmountOnExit>
+                        <Collapse in={this.isPickedExpanded(id)} transitionDuration="auto" unmountOnExit>
                           {
                             _map(properties, (prop) => {
                               let {name, description, id, icon} = prop;
@@ -206,6 +229,7 @@ let GroupedItemPicker = createReactClass({
                                   button
                                   key={id}
                                   onClick={() => this.handleRemove(id)}
+                                  className={classes.nested}
                                 >
                                   <ListItemIcon>
                                     <Icon fixedWidth={true} name={icon} />
