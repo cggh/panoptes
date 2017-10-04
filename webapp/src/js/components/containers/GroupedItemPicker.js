@@ -7,10 +7,12 @@ import Highlight from 'react-highlighter';
 
 import TextField from 'material-ui/TextField';
 import Button from 'ui/Button';
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import List, {ListItem, ListItemText, ListItemIcon, ListItemSecondaryAction} from 'material-ui/List';
 import Collapse from 'material-ui/transitions/Collapse';
 import ExpandLess from 'material-ui-icons/ExpandLess';
 import ExpandMore from 'material-ui-icons/ExpandMore';
+import DeleteIcon from 'material-ui-icons/Delete';
+import PlaylistAddIcon from 'material-ui-icons/PlaylistAdd';
 import {withStyles} from 'material-ui/styles';
 import _map from 'lodash.map';
 import _includes from 'lodash.includes';
@@ -23,6 +25,7 @@ import _filter from 'lodash.filter';
 import _difference from 'lodash.difference';
 import _clone from 'lodash.clone';
 import Icon from 'ui/Icon';
+import IconButton from 'material-ui/IconButton';
 
 const styles = (theme) => ({
   nested: {
@@ -182,12 +185,25 @@ let GroupedItemPicker = createReactClass({
                           <ListItem
                             button
                             key={id}
-                            onClick={() => this.handleToggleAvailableExpand(id)}
                           >
                             <ListItemText
                               primary={name}
+                              onClick={() => this.handleToggleAvailableExpand(id)}
                             />
-                            {this.isAvailableExpanded(id) ? <ExpandMore /> : <ExpandLess />}
+                            {this.isAvailableExpanded(id) ?
+                              <ExpandMore onClick={() => this.handleToggleAvailableExpand(id)} />
+                              : <ExpandLess onClick={() => this.handleToggleAvailableExpand(id)} />
+                            }
+                            <span style={{marginLeft: '50px'}}>
+                              <ListItemSecondaryAction>
+                                <IconButton
+                                  aria-label="Add group"
+                                  onClick={() => this.handleAddAll(id)}
+                                >
+                                  <PlaylistAddIcon />
+                                </IconButton>
+                              </ListItemSecondaryAction>
+                            </span>
                           </ListItem>
                           <Collapse in={this.isAvailableExpanded(id)} transitionDuration="auto" unmountOnExit>
                             {subItems}
@@ -208,17 +224,31 @@ let GroupedItemPicker = createReactClass({
                 {
                   _map(groups, (group) => {
                     let {id, name, properties} = group;
+                    // Note: onClick on ListItem would confuse the SecondaryAction.
                     return ( _intersection(picked, _map(properties, 'id')).length > 0 ?
                       <div>
                         <ListItem
                           button
                           key={id}
-                          onClick={() => this.handleTogglePickedExpand(id)}
                         >
                           <ListItemText
                             primary={name}
+                            onClick={() => this.handleTogglePickedExpand(id)}
                           />
-                          {this.isPickedExpanded(id) ? <ExpandMore /> : <ExpandLess />}
+                          {this.isPickedExpanded(id) ?
+                            <ExpandMore onClick={() => this.handleTogglePickedExpand(id)} />
+                            : <ExpandLess onClick={() => this.handleTogglePickedExpand(id)} />
+                          }
+                          <span style={{marginLeft: '50px'}}>
+                            <ListItemSecondaryAction>
+                              <IconButton
+                                aria-label="Remove group"
+                                onClick={() => this.handleRemoveAll(id)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </ListItemSecondaryAction>
+                          </span>
                         </ListItem>
                         <Collapse in={this.isPickedExpanded(id)} transitionDuration="auto" unmountOnExit>
                           {
