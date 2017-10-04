@@ -117,14 +117,14 @@ let PivotTableWithActions = createReactClass({
           <Select
             fullWidth={true}
             label="Display"
-            onChange={(e, i, v) => setProps({display: v})}
+            onChange={(e) => setProps({display: e.target.value})}
             value={display}
             input={<Input id="display" />}
           >
-            <MenuItem key={'Counts'} primaryText={'Counts'} value={'counts'} />
-            <MenuItem key={'All'} primaryText={'Percentage of total'} value={'percentAll'} />
-            <MenuItem key={'Column'} primaryText={'Percentage of column total'} value={'percentColumn'} />
-            <MenuItem key={'Row'} primaryText={'Percentage of row total'} value={'percentRow'} />
+            <MenuItem key={'Counts'} value={'counts'}>Counts</MenuItem>
+            <MenuItem key={'All'} value={'percentAll'}>Percentage of total</MenuItem>
+            <MenuItem key={'Column'} value={'percentColumn'}>Percentage of column total</MenuItem>
+            <MenuItem key={'Row'} value={'percentRow'}>Percentage of row total</MenuItem>
           </Select>
         </div>
       </div>

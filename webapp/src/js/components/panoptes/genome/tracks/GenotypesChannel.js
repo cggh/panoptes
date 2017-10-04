@@ -789,8 +789,8 @@ const GenotypesControls = createReactClass({
               onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}
               input={<Input id="cellColour" />}
             >
-              <MenuItem value="call" primaryText="Call"/>
-              <MenuItem value="fraction" primaryText="Ref fraction"/>
+              <MenuItem value="call">Call</MenuItem>
+              <MenuItem value="fraction">Ref fraction</MenuItem>
             </Select>
           </div>
           <div className="control">
@@ -800,9 +800,10 @@ const GenotypesControls = createReactClass({
               onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}
               input={<Input id="cellAlpha" />}
             >
-              <MenuItem value="none" primaryText="None"/>
-              {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
-                primaryText={config.propertiesById[prop].name}/>)}
+              <MenuItem value="none">None</MenuItem>
+              {config.showInGenomeBrowser.extraProperties.map((prop) =>
+                <MenuItem value={prop} key={prop}>{config.propertiesById[prop].name}</MenuItem>
+              )}
             </Select>
           </div>
           <div className="control">
@@ -812,9 +813,10 @@ const GenotypesControls = createReactClass({
               onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}
               input={<Input id="cellHeight" />}
             >
-              <MenuItem value="none" primaryText="None"/>
-              {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop}
-                primaryText={config.propertiesById[prop].name}/>)}
+              <MenuItem value="none">None</MenuItem>
+              {config.showInGenomeBrowser.extraProperties.map((prop) =>
+                <MenuItem value={prop} key={prop}>{config.propertiesById[prop].name}</MenuItem>
+              )}
             </Select>
           </div>
         </div>
