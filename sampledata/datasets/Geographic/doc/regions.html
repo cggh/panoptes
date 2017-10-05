@@ -1,6 +1,6 @@
 <title>Regions</title>
 <div style="margin: 10px">
-
+  
   <p>Here's a map showing the GeoJSON for each region:</p>
   <div style="width:600px;height:300px">
     <Map>
@@ -25,7 +25,6 @@
     </Map>
   </div>
   
-  
   <p>Here's a map with maxLegendItems set to 2:</p>
   <div style="width:600px;height:300px">
     <Map>
@@ -33,5 +32,18 @@
       <TableGeoJSONsLayer table="regions" geoJsonProperty="regionPolygon" colourProperty="colour" labelProperty="name" maxLegendItems="2" />
     </Map>
   </div>
-  
+
+  <p>Here's a map showing clickable regions beneath non-clickable point markers:</p>
+  <div style="height:300px">
+      <Map>
+          <TileLayer/>
+              <TableGeoJSONsLayer table="countries" geoJsonProperty="geojson" colourProperty="country_id" showLegend="false"/>
+              <TableMarkersLayer disableOnClickMarker table="sites" clusterMarkers="false">
+                <svg style="width: 4px; height: 4px; position: absolute; left: -2px; top: -2px;" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="50" strokeWidth="0" fill="black" opacity="0.5" />
+                </svg>
+              </TableMarkersLayer>
+      </Map>
+   </div>
+
 </div>

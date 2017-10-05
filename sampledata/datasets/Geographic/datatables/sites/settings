@@ -1,0 +1,24 @@
+nameSingle: site
+namePlural: sites
+icon: fa-map-marker
+primKey: site_id
+isPositionOnGenome: false
+
+properties:
+- id: site_id
+  name: Site ID
+  description: Unique identifier of a site
+  dataType: Text
+  search: StartPattern
+
+- id: lng
+  name: Longitude
+  dataType: GeoLongitude     # Specifies a geographic longitude property
+
+- id: lat
+  name: Latitude
+  dataType: GeoLatitude     # Specifies a geographic latitude property
+
+- id: name
+  name: Name
+  dataType: Text     

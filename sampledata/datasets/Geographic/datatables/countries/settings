@@ -1,0 +1,37 @@
+nameSingle: country
+namePlural: countries
+
+description: Information about countries
+
+icon: fa-globe
+
+primKey: country_id
+quickFindFields: country_id, name
+sortDefault: name
+listView: true
+
+itemTitle: "{{name}}"
+
+properties: 
+- id: country_id
+  dataType: Text
+
+- id: lat
+  dataType: Double
+- id: lng
+  dataType: Double
+
+- id: name
+  dataType: Text
+
+- id: alpha_3_code
+  dataType: Text
+
+- id: geojson
+  dataType: Text
+  isCategorical: False
+
+- id: something
+  dataType: Text
+
+primKey: country_id
