@@ -1,5 +1,6 @@
 <title>Examples of Maps</title>
 <div style="margin: 10px">
+
   <h2>A map of markers</h2>
   <div style="width:600px;height:300px">
     <Map>
@@ -32,8 +33,8 @@
       </TableMarkersLayer>
       <TableMarkersLayer table="things" clusterMarkers="false">
         <!-- In this example, there is no need to show the overflow if the entire element is shifted to realign the center of the circles with the origin of the element. -->
-        <!-- Setting the position to either "absolute" or "relative" seems to work. -->
-        <svg style="width: 50px; height: 50px; position: relative; left: -25px; top: -25px;" viewBox="0 0 100 100">
+        <!-- Setting the position to "relative" doesn't seems to work for all widths, oddly. -->
+        <svg style="width: 50px; height: 50px; position: absolute; left: -25px; top: -25px;" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="30" strokeWidth="3" stroke="green" fill="transparent" />
           <circle cx="50" cy="50" r="10" stroke="green" fill="transparent" />
         </svg>
@@ -48,6 +49,33 @@
           <circle cx="0" cy="0" r="20" strokeWidth="5" stroke="purple" fill="transparent" opacity="0.5" />
         </svg>
       </TableMarkersLayer>
+      <TableMarkersLayer table="things" clusterMarkers="false">
+        <svg style="width: 50px; height: 50px; position: relative; left: -25px; top: -25px;" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="50" strokeWidth="0" fill="black" opacity="0.5" />
+        </svg>
+      </TableMarkersLayer>
+      <!-- Setting position to "relative" here makes it render too low. -->
+      <TableMarkersLayer table="things" clusterMarkers="false">
+        <svg style="width: 4px; height: 4px; position: absolute; left: -2px; top: -2px;" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="50" strokeWidth="0" fill="red" opacity="1" />
+        </svg>
+      </TableMarkersLayer>
     </Map>
   </div>
+  
+  
+  <p>Here's a map showing clickable regions beneath clickable point markers:</p>
+  <div style="width:600px;height:300px">
+    <Map>
+      <TileLayer />
+      <TableMarkersLayer table="sites" clusterMarkers="false">
+        <svg style="width: 4px; height: 4px; position: absolute; left: -2px; top: -2px;" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="50" strokeWidth="0" fill="black" opacity="0.5" />
+        </svg>
+      </TableMarkersLayer>
+      <TableGeoJSONsLayer table="countries" geoJsonProperty="geojson" colourProperty="country_id" showLegend="false" />
+    </Map>
+  </div>
+  
+  
 </div>
