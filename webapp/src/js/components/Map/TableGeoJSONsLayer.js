@@ -10,6 +10,8 @@ import ColourPropertyLegend from 'panoptes/ColourPropertyLegend';
 import MapControlComponent from 'Map/MapControlComponent';
 import GeoJSON from 'GeoJSON';
 import withAPIData from 'hoc/withAPIData';
+import DataItem from 'DataItem';
+import DataItemViews from 'panoptes/DataItemViews';
 
 const DEFAULT_GEOJSON_FILL_COLOUR = '#3d8bd5';
 
@@ -96,6 +98,9 @@ let TableGeoJSONsLayer = createReactClass({
         value = nullifiedValue;
       }
 
+      let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
+      let onClick = () => this.getFlux().actions.session.popupOpen(<DataItem primKey={primKey} table={table}>{views}</DataItem>);
+
       if (data[i][geoJsonProperty]) {
         let json =  JSON.parse(data[i][geoJsonProperty]);
         let geoJSON = {
@@ -104,7 +109,8 @@ let TableGeoJSONsLayer = createReactClass({
           title: labelProperty !== undefined ? labelProperty : primKey,
           valueAsColour,
           value,
-          json
+          json,
+          onClick
         };
         geoJSONs.push(geoJSON);
       }
@@ -141,6 +147,7 @@ let TableGeoJSONsLayer = createReactClass({
                   colour={geoJSON.valueAsColour}
                   weight={geoJSON.weight}
                   opacity={geoJSON.opacity}
+                  onClick={geoJSON.onClick}
                 />
             )
           }
