@@ -17,7 +17,8 @@ let GeoJSON = createReactClass({
     json: PropTypes.object.isRequired,
     colour: PropTypes.string,
     weight: PropTypes.number,
-    opacity: PropTypes.number
+    opacity: PropTypes.number,
+    onClick: PropTypes.func
   },
 
   getDefaultProps() {
@@ -29,7 +30,7 @@ let GeoJSON = createReactClass({
   },
 
   render() {
-    let {json, colour, weight, opacity} = this.props;
+    let {json, colour, weight, opacity, onClick} = this.props;
 
     let style = {
       color: colour,
@@ -37,7 +38,7 @@ let GeoJSON = createReactClass({
       opacity
     };
 
-    return (<LeafletGeoJSON data={json} style={style} />);
+    return (<LeafletGeoJSON data={json} style={style} onClick={onClick} />);
 
   },
 });
