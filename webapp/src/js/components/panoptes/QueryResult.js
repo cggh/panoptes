@@ -43,14 +43,16 @@ let QueryResult = createReactClass({
 
 QueryResult = withAPIData(QueryResult, ({config, props}) => (
   {
-    data: {
-      method: 'query',
-      args: {
-        database: config.dataset,
-        table: props.table,
-        columns: [{expr: JSON.parse(props.expression), as: 'result'}],
-        query: props.query,
-        distinct: props.distinct
+    requests: {
+      data: {
+        method: 'query',
+        args: {
+          database: config.dataset,
+          table: props.table,
+          columns: [{expr: JSON.parse(props.expression), as: 'result'}],
+          query: props.query,
+          distinct: props.distinct
+        }
       }
     }
   })

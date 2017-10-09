@@ -83,16 +83,18 @@ SelectRow = withAPIData(SelectRow, ({config, props}) => {
   columns = _uniq(columns);
   columns = _map(columns, (column) => `${table}.${column}`);
   return {
-    data: {
-      method: 'query',
-      args: resolveJoins({
-        database: config.dataset,
-        table: queryTable || table,
-        columns,
-        query,
-        transpose: true,
-        distinct: true
-      }, config)
+    requests: {
+      data: {
+        method: 'query',
+        args: resolveJoins({
+          database: config.dataset,
+          table: queryTable || table,
+          columns,
+          query,
+          transpose: true,
+          distinct: true
+        }, config)
+      }
     }
   };
 });

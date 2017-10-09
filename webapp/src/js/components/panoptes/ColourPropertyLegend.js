@@ -78,14 +78,16 @@ ColourPropertyLegend = withAPIData(ColourPropertyLegend, ({config, props}) => {
   let columns = [colourProperty, (labelProperty === undefined ? config.tablesById[table].primKey : labelProperty)];
 
   return {
-    data: {
-      method: 'query',
-      args: {
-        database: config.dataset,
-        table,
-        columns,
-        query,
-        transpose: true
+    requests: {
+      data: {
+        method: 'query',
+        args: {
+          database: config.dataset,
+          table,
+          columns,
+          query,
+          transpose: true
+        }
       }
     }
   };
