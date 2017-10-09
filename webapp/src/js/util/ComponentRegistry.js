@@ -1,5 +1,8 @@
 const dynreq = require.context('../components', true);
 import getDisplayName from 'util/getDisplayName';
+import filterChildren from 'util/filterChildren';
+import React from 'react';
+import _isArray from 'lodash/isArray';
 
 if (typeof String.prototype.endsWith !== 'function') {
   String.prototype.endsWith = function(suffix) {
@@ -61,6 +64,7 @@ typeByDisplayName['Typography'] = Typography;
 import {Tabs, Tab} from 'material-ui/Tabs';
 typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
+
 
 console.info('Components: %o', typeByDisplayName);
 
