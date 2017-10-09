@@ -1,3 +1,6 @@
+$card-max-width: 650px;
+$text-side-padding: 16px;
+
 .obs-page-backdrop {
   background-size: cover;
   background-attachment: fixed;
@@ -24,7 +27,7 @@
 }
 
 .card-stack {
-  max-width:650px;
+  max-width: $card-max-width;
 }
 
 .obs-leader {
@@ -47,7 +50,9 @@
 .obs-breadcrumb {
   background: rgba(255,255,255,0.6);
   margin-bottom: 15px;
-  width: 100%;
+  width: $card-max-width;
+  padding-left: $text-side-padding;
+  padding-right: $text-side-padding;
   display: flex;
   //justify-content: center;
   align-items: center;
