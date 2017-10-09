@@ -36,7 +36,7 @@ import Icon from 'ui/Icon';
 import DetectResize from 'utils/DetectResize';
 
 // Constants in this component
-const MAX_COLOR = Color('#d62728');
+const MAX_COLOR = Color('#f3a891');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 const PREDEFINED_COLUMN_WIDTH = 90;
@@ -413,7 +413,7 @@ let DataTableView = createReactClass({
                         background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
                       } else if (showBackgroundColour && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                         let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
-                        background = _cloneDeep(MAX_COLOR).lighten(1 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
+                        background = _cloneDeep(MAX_COLOR).lighten(0.3 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
                       }
                       if (valueColours) {
                         let col = valueColours[cellData] || valueColours['_other_'];
