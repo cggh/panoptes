@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
 import _assign from 'lodash.assign';
-import SwipeableViews from 'react-swipeable-views';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
