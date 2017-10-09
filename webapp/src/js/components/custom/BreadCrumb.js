@@ -21,7 +21,7 @@ class BreadCrumb extends React.Component {
     a === 'pv' ? children.unshift(<DocLink href="pv.html">Plasmodium vivax</DocLink>) :  null;
     a === 'ag' ? children.unshift(<DocLink href="ag.html">Anopheles gambiae</DocLink>) :  null;
 
-    children.unshift(<span>Guidebook</span>);
+    // children.unshift(<span>Guidebook</span>);
 
     return (
       <div className="obs-breadcrumb">
