@@ -369,4 +369,6 @@ let ItemPicker = createReactClass({
   },
 });
 
-export default withStyles(styles)(ItemPicker);
+let module = withStyles(styles)(ItemPicker);
+module.displayName = 'ItemPicker';
+export default module;
