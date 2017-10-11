@@ -12,6 +12,7 @@ import GeoJSON from 'GeoJSON';
 import withAPIData from 'hoc/withAPIData';
 import DataItem from 'DataItem';
 import DataItemViews from 'panoptes/DataItemViews';
+import CalcMapBounds from 'util/CalcMapBounds';
 
 const DEFAULT_GEOJSON_FILL_COLOUR = '#3d8bd5';
 
@@ -73,54 +74,11 @@ let TableGeoJSONsLayer = createReactClass({
   render() {
 
     let {layerContainer, map} = this.context;
-    let {colourProperty, table, labelProperty, geoJsonProperty, showLegend, maxLegendItems, config, data} = this.props;
-
-    if (data === undefined || data === null) {
-      return null;
-    }
-
-    // Translate the apiData data into GeoJSONs.
-    let geoJSONs = [];
-
-    let tableConfig = config.tablesById[table];
-    let primKeyProperty = tableConfig.primKey;
-
-    for (let i = 0; i < data.length; i++) {
-
-      let primKey = data[i][primKeyProperty];
-
-      let valueAsColour = DEFAULT_GEOJSON_FILL_COLOUR;
-      let value = undefined;
-      if (colourProperty !== undefined && colourProperty !== null) {
-        let colourFunction = propertyColour(config.tablesById[table].propertiesById[colourProperty]);
-        let nullifiedValue = (data[i][colourProperty] === '' ? null : data[i][colourProperty]);
-        valueAsColour = colourFunction(nullifiedValue);
-        value = nullifiedValue;
-      }
-
-      let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
-      let onClick = () => this.getFlux().actions.session.popupOpen(<DataItem primKey={primKey} table={table}>{views}</DataItem>);
-
-      if (data[i][geoJsonProperty]) {
-        let json =  JSON.parse(data[i][geoJsonProperty]);
-        let geoJSON = {
-          table,
-          primKey,
-          title: labelProperty !== undefined ? labelProperty : primKey,
-          valueAsColour,
-          value,
-          json,
-          onClick
-        };
-        geoJSONs.push(geoJSON);
-      }
-
-    }
+    let {colourProperty, table, labelProperty, showLegend, maxLegendItems, geoJSONs} = this.props;
 
     if (_isEmpty(geoJSONs)) {
       return null;
     }
-
     return (
       <FeatureGroup
         layerContainer={layerContainer}
@@ -160,7 +118,7 @@ let TableGeoJSONsLayer = createReactClass({
 });
 
 
-TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, ({config, props}) => {
+TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
   let {table, query, colourProperty, geoJsonProperty, labelProperty} = props;
 
@@ -168,7 +126,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, ({config, props}) => {
     (table  ? config.tablesById[table].defaultQuery : null) ||
     SQL.nullQuery;
 
-  let tableConfig = config.tablesById[table];
+  let tableConfig = this.config.tablesById[table];
   if (tableConfig === undefined) {
     console.error('tableConfig === undefined');
     return null;
@@ -203,15 +161,60 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, ({config, props}) => {
   }
 
   return {
-    data: {
-      method: 'query',
-      args: {
-        database: config.dataset,
-        table,
-        columns,
-        query,
-        transpose: true
+    requests: {
+      data: {
+        method: 'query',
+        args: {
+          database: this.config.dataset,
+          table,
+          columns,
+          query,
+          transpose: true
+        },
+      },
+    },
+    postProcess: function({data}) {
+      // Translate the apiData data into GeoJSONs.
+      let geoJSONs = [];
+      let jsons = [];
+
+      let tableConfig = this.config.tablesById[table];
+      let primKeyProperty = tableConfig.primKey;
+
+      for (let i = 0; i < data.length; i++) {
+
+        let primKey = data[i][primKeyProperty];
+
+        let valueAsColour = DEFAULT_GEOJSON_FILL_COLOUR;
+        let value = undefined;
+        if (colourProperty !== undefined && colourProperty !== null) {
+          let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty]);
+          let nullifiedValue = (data[i][colourProperty] === '' ? null : data[i][colourProperty]);
+          valueAsColour = colourFunction(nullifiedValue);
+          value = nullifiedValue;
+        }
+
+        let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
+        let onClick = () => this.getFlux().actions.session.popupOpen(<DataItem primKey={primKey} table={table}>{views}</DataItem>);
+
+        if (data[i][geoJsonProperty]) {
+          let json = JSON.parse(data[i][geoJsonProperty]);
+          let geoJSON = {
+            table,
+            primKey,
+            title: labelProperty !== undefined ? labelProperty : primKey,
+            valueAsColour,
+            value,
+            json,
+            onClick
+          };
+          geoJSONs.push(geoJSON);
+          jsons.push(json);
+        }
       }
+
+      this.context.changeLayerStatus({loadStatus: 'loaded', bounds: CalcMapBounds.calcMapBoundsFromGeoJsonObjects(jsons)});
+      return {geoJSONs};
     }
   };
 });

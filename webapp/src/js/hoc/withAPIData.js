@@ -21,6 +21,8 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
     DataFetcherMixin()
   ],
 
+  contextTypes: WrappedComponent.contextTypes,
+  childContextTypes: WrappedComponent.childContextTypes,
   propTypes: WrappedComponent.propTypes,
   displayName: getDisplayName(WrappedComponent.displayName),
 
@@ -30,8 +32,12 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
     };
   },
 
+  getChildContext() {
+    return WrappedComponent.getChildContext ? WrappedComponent.getChildContext.bind(this)() : {};
+  },
+
   getDefaultProps() {
-    return WrappedComponent.getDefaultProps ? WrappedComponent.getDefaultProps() : {};
+    return WrappedComponent.getDefaultProps ? WrappedComponent.getDefaultProps.bind(this)() : {};
   },
 
   componentDidMount() {
@@ -39,18 +45,18 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
   },
 
   icon() {
-    return WrappedComponent.icon ? WrappedComponent.icon() : '';
+    return WrappedComponent.icon ? WrappedComponent.icon.bind(this)() : '';
   },
 
   title() {
-    return WrappedComponent.title ? WrappedComponent.title() : '';
+    return WrappedComponent.title ? WrappedComponent.title.bind(this)() : '';
   },
 
   fetchData(props, requestContext) {
-    let APIArgSet = APIArgsFromProps({config: this.config, props});
+    let APIArgSet = APIArgsFromProps.bind(this)({config: this.config, props});
     if (_isEqual(this.lastAPIArgs, APIArgSet)) return;
-    const keys = _keys(APIArgSet);
-    const values = _values(APIArgSet);
+    const keys = _keys(APIArgSet.requests);
+    const values = _values(APIArgSet.requests);
     requestContext.request((componentCancellation) =>
       Promise.all(_map(values, ({method, args}) => LRUCache.get(
         method + JSON.stringify(args),
@@ -63,7 +69,7 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
       _forEach(_zip(keys, data), ([key, value]) => result[key] = value);
       this.setState({
         loadStatus: 'loaded',
-        ...result,
+        ... APIArgSet.postProcess ? APIArgSet.postProcess.bind(this)(result) : result,
       });
     })
       .catch(API.filterAborted)

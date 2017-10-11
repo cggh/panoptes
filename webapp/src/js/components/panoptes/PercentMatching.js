@@ -47,25 +47,26 @@ let PercentMatching = createReactClass({
 
 PercentMatching = withAPIData(PercentMatching, ({config, props}) => (
   {
-    matching: {
-      method: 'query',
-      args: {
-        database: config.dataset,
-        table: props.table,
-        columns: [{expr: ['count', ['*']], as: 'result'}],
-        query: props.numQuery
-      }
-    },
-    all: {
-      method: 'query',
-      args: {
-        database: config.dataset,
-        table: props.table,
-        columns: [{expr: ['count', ['*']], as: 'result'}],
-        query: props.domQuery
+    requests: {
+      matching: {
+        method: 'query',
+        args: {
+          database: config.dataset,
+          table: props.table,
+          columns: [{expr: ['count', ['*']], as: 'result'}],
+          query: props.numQuery
+        }
+      },
+      all: {
+        method: 'query',
+        args: {
+          database: config.dataset,
+          table: props.table,
+          columns: [{expr: ['count', ['*']], as: 'result'}],
+          query: props.domQuery
+        }
       }
     }
-
   })
 );
 

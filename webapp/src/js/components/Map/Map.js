@@ -246,7 +246,10 @@ let Map = createReactClass({
       style: {height: '100%'},
       ref: (ref) => this.map = ref,
       zoom,
-      zoomAnimation: false
+      zoomAnimation: false,
+      zoomSnap: 0.5,
+      zoomDelta: 0.5,
+      wheelPxPerZoomLevel: 120
     };
 
     let mapComponent = null;
