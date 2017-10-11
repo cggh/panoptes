@@ -120,7 +120,7 @@
     "lodash.without": "^4.4.0",
     "lodash.zip": "^4.2.0",
     "lz-string": "git+https://github.com/benjeffery/lz-string.git",
-    "material-ui": "^1.0.0-beta.13",
+    "material-ui": "^1.0.0-beta.16",
     "material-ui-icons": "^1.0.0-beta.5",
     "normalize-wheel": "^1.0.1",
     "performance-now": "^2.1.0",
