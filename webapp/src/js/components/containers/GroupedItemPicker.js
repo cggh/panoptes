@@ -291,4 +291,6 @@ let GroupedItemPicker = createReactClass({
   },
 });
 
-export default withStyles(styles)(GroupedItemPicker);
+let module = withStyles(styles)(GroupedItemPicker);
+module.displayName = 'GroupedItemPicker';
+export default module;
