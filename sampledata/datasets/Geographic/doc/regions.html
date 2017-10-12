@@ -17,7 +17,7 @@
       <TableGeoJSONsLayer table="regions" geoJsonProperty="regionPolygon" />
     </Map>
   </div>
-  
+
   <p>Here's the same map with polygon colours determined by a specific column in the same table:</p>
   <div style="width:600px;height:300px">
     <Map>
@@ -25,7 +25,7 @@
       <TableGeoJSONsLayer table="regions" geoJsonProperty="regionPolygon" colourProperty="colour" />
     </Map>
   </div>
-  
+
   <p>Here's the same map with a query and a specified labelProperty for the legend:</p>
   <div style="width:600px;height:300px">
     <Map>
@@ -33,7 +33,7 @@
       <TableGeoJSONsLayer table="regions" geoJsonProperty="regionPolygon" colourProperty="colour" labelProperty="name" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"colour","CompValue":"red","isRoot":true,"Tpe":"="}' />
     </Map>
   </div>
-  
+
   <p>Here's a map with maxLegendItems set to 2:</p>
   <div style="width:600px;height:300px">
     <Map>
@@ -44,15 +44,11 @@
 
   <p>Here's a map showing clickable regions beneath non-clickable point markers:</p>
   <div style="height:300px">
-      <Map>
-          <TileLayer/>
-              <TableGeoJSONsLayer table="countries" geoJsonProperty="geojson" colourProperty="country_id" showLegend="false"/>
-              <TableMarkersLayer disableOnClickMarker table="sites" clusterMarkers="false">
-                <svg style="width: 4px; height: 4px; position: absolute; left: -2px; top: -2px;" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="50" strokeWidth="0" fill="black" opacity="0.5" />
-                </svg>
-              </TableMarkersLayer>
-      </Map>
-   </div>
+    <Map>
+      <TileLayer/>
+      <TableGeoJSONsLayer table="countries" geoJsonProperty="geojson" colourProperty="country_id" showLegend="false"/>
+      <TableMarkersLayer table="sites" clickPrimaryKeyProperty="name" clickTable="regions" clusterMarkers="false" />
+    </Map>
+  </div>
 
 </div>

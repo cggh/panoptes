@@ -29,7 +29,8 @@ let ComponentMarker = createReactClass({
     opacity: PropTypes.number,
     zIndexOffset: PropTypes.number,
     fillColour: PropTypes.string,
-    iconColour: PropTypes.string
+    iconColour: PropTypes.string,
+    popup: PropTypes.node
   },
 
   childContextTypes: {
@@ -51,13 +52,8 @@ let ComponentMarker = createReactClass({
     };
   },
 
-  // Event handlers
-  handleClick(e) {
-    this.props.onClick(e);
-  },
-
   render() {
-    let {alt, children, fillColour, iconColour, onClick, opacity, position, title, zIndexOffset} = this.props;
+    let {alt, children, fillColour, iconColour, onClick, opacity, position, title, zIndexOffset, popup} = this.props;
 
     if (alt === undefined && title !== undefined) {
       // If not alt has been specified, then use the title.
@@ -67,7 +63,7 @@ let ComponentMarker = createReactClass({
 
     /* Credit: https://materialdesignicons.com */
 
-    if (children === undefined) {
+    if (!children) {
       children = (
         <svg style={{overflow: 'visible', width: '25px', height: '25px'}} viewBox="0 0 24 24">
           <g transform="translate(-6, -14)">
@@ -90,12 +86,6 @@ let ComponentMarker = createReactClass({
 
     // NB: any className to override the default white squares set by Leaflet CSS.
 
-    // NB: setting DivIcon's onClick to undefined does not prevent it being called downstream.
-    let existentialProps = {};
-    if (onClick !== undefined) {
-      existentialProps.onClick = (e) => onClick(e, this);
-    }
-
     return (
       <DivIcon
         alt={alt}
@@ -105,7 +95,9 @@ let ComponentMarker = createReactClass({
         title={title}
         iconSize={0}
         zIndexOffset={zIndexOffset}
-        {...existentialProps}
+        popup={popup}
+        onClick={onClick}
+
       >
         {React.Children.only(children)}
       </DivIcon>
