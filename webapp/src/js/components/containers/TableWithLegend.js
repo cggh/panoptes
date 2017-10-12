@@ -4,8 +4,15 @@ import createReactClass from 'create-react-class';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import SQL from 'panoptes/SQL';
-import DataTableView from 'panoptes/DataTableView';
-import Card from 'material-ui/Card';
+import MuiDataTableView from 'panoptes/MuiDataTableView';
+import Card, {CardContent} from 'material-ui/Card';
+import {withStyles} from 'material-ui/styles';
+
+const styles = (theme) => ({
+  card: {
+    maxWidth: 650,
+  },
+});
 
 let TableWithLegend = createReactClass({
   displayName: 'TableWithLegend',
@@ -15,9 +22,10 @@ let TableWithLegend = createReactClass({
     table: PropTypes.string,
     query: PropTypes.string,
     order: PropTypes.array,
-    columns: PropTypes.array,
+    columns: PropTypes.oneOfType(PropTypes.array, PropTypes.string),
     columnWidths: PropTypes.object,
-    children: PropTypes.node
+    children: PropTypes.node,
+    classes: PropTypes.object
   },
 
   getInitialState() {
@@ -35,30 +43,37 @@ let TableWithLegend = createReactClass({
   },
 
   render() {
-    let {table, query, order, columns, columnWidths, children} = this.props;
+    let {table, query, order, columns, children, classes} = this.props;
     order = this.state.order || order;
     query = this.getDefinedQuery(query, table);
+
+    // NOTE: Samples_and_Variants example is arriving as string
+    // <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
+    if (typeof columns === 'string') {
+      columns = JSON.parse(columns);
+    }
 
     return (
       <div className="vertical stack">
         <div className="centering-container">
-          <Card style={{width: '500px'}}>{children}</Card>
-        </div>
-        <div className="centering-container grow">
-          <div style={{width: '80%', height: '100%'}}>
-            <DataTableView table={table}
-              query={query}
-              order={order}
-              columns={columns}
-              columnWidths={columnWidths}
-              onColumnResize={this.handleColumnResize}
-              onOrderChange={this.handleOrderChange}
-            />
-          </div>
+          <Card className={classes.card}>
+            {children}
+            <CardContent>
+              <MuiDataTableView
+                table={table}
+                query={query}
+                order={order}
+                columns={columns}
+                onOrderChange={this.handleOrderChange}
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
   },
 });
 
-export default TableWithLegend;
+let module = withStyles(styles)(TableWithLegend);
+module.displayName = 'TableWithLegend';
+export default module;
