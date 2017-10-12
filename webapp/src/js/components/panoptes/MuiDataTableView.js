@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
 import Tooltip from 'material-ui/Tooltip'; // NOTE: rc-tooltip is incompatible here
-import {withStyles} from 'material-ui/styles';
 import _forEach from 'lodash.foreach';
 import _filter from 'lodash.filter';
 import _cloneDeep from 'lodash.clonedeep';
@@ -29,14 +28,6 @@ import PropertyCell from 'panoptes/PropertyCell';
 
 // Constants in this component
 const MAX_COLOR = Color('#f3a891');
-
-const styles = (theme) => ({
-  table: {
-    width: 600,
-    overflowX: 'auto',
-  },
-});
-
 
 let MuiDataTableView = createReactClass({
   displayName: 'MuiDataTableView',
@@ -124,7 +115,7 @@ let MuiDataTableView = createReactClass({
   },
 
   render() {
-    let {className, columns, order, classes, data} = this.props;
+    let {className, columns, order, data} = this.props;
     let {loadStatus} = this.state;
 
     if (!this.tableConfig()) {
@@ -146,8 +137,8 @@ let MuiDataTableView = createReactClass({
 
     if (columns.length > 0) {
       return (
-        <div className={classNames('load-container', className)} style={{width: 620, overflowX: 'auto'}} >
-          <Table className={classes.table}>
+        <div>
+          <Table>
             <TableHead>
               <TableRow>
                 {columns.map((column) => {
@@ -277,6 +268,4 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
 
 });
 
-let module = withStyles(styles)(MuiDataTableView);
-module.displayName = 'MuiDataTableView';
-export default module;
+export default MuiDataTableView;
