@@ -78,16 +78,6 @@ let TableWithLegend = createReactClass({
     query = this.getDefinedQuery(query, table);
     const filteredChildren = filterChildren(this, React.Children.toArray(children));
 
-    // NOTE: Samples_and_Variants example is arriving as string
-    // <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
-    if (typeof columns === 'string') {
-      columns = JSON.parse(columns);
-    }
-
-    if (typeof order === 'string') {
-      order = JSON.parse(order);
-    }
-
     return (
       <div style={{position: 'relative',minHeight: '100%'}}>
         <div className="horiz-centering-container vertical stack"
