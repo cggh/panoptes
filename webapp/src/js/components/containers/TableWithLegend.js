@@ -23,7 +23,7 @@ let TableWithLegend = createReactClass({
     table: PropTypes.string,
     query: PropTypes.string,
     order: PropTypes.array,
-    columns: PropTypes.array,
+    columns: PropTypes.oneOfType(PropTypes.array, PropTypes.string),
     columnWidths: PropTypes.object,
     classes: PropTypes.object,
     disableMultipleColumnOrder: PropTypes.bool,
@@ -77,6 +77,12 @@ let TableWithLegend = createReactClass({
     order = this.state.order || order;
     query = this.getDefinedQuery(query, table);
     const filteredChildren = filterChildren(this, React.Children.toArray(children));
+
+    // NOTE: Samples_and_Variants example is arriving as string
+    // <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
+    if (typeof columns === 'string') {
+      columns = JSON.parse(columns);
+    }
 
     return (
       <div className="horiz-centering-container vertical stack obs-page-content">
