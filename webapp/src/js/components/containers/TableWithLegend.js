@@ -84,6 +84,10 @@ let TableWithLegend = createReactClass({
       columns = JSON.parse(columns);
     }
 
+    if (typeof order === 'string') {
+      order = JSON.parse(order);
+    }
+
     return (
       <div style={{position: 'relative',minHeight: '100%'}}>
         <div className="horiz-centering-container vertical stack"
