@@ -257,19 +257,21 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
   let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
 
   return {
-    data: {
-      method: 'query',
-      args: resolveJoins({
-        database: config.dataset,
-        table,
-        columns,
-        query,
-        transpose: true,
-        start: fetchStartRowIndex,
-        stop: fetchStopRowIndex,
-        joins,
-        orderBy: order
-      }, config)
+    requests: {
+      data: {
+        method: 'query',
+        args: resolveJoins({
+          database: config.dataset,
+          table,
+          columns,
+          query,
+          transpose: true,
+          start: fetchStartRowIndex,
+          stop: fetchStopRowIndex,
+          joins,
+          orderBy: order
+        }, config)
+      }
     }
   };
 
