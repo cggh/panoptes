@@ -21,8 +21,8 @@ let TableWithLegend = createReactClass({
   propTypes: {
     table: PropTypes.string,
     query: PropTypes.string,
-    order: PropTypes.array,
-    columns: PropTypes.oneOfType(PropTypes.array, PropTypes.string),
+    order: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
+    columns: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     columnWidths: PropTypes.object,
     children: PropTypes.node,
     classes: PropTypes.object
@@ -51,6 +51,10 @@ let TableWithLegend = createReactClass({
     // <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
     if (typeof columns === 'string') {
       columns = JSON.parse(columns);
+    }
+
+    if (typeof order === 'string') {
+      order = JSON.parse(order);
     }
 
     return (
