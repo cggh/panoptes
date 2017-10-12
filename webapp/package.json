@@ -156,10 +156,7 @@
     "react-resizable": "^1.6.0",
     "react-sidebar": "^2.3.0",
     "react-swipeable-views": "^0.12.5",
-<<<<<<< 18c417b981a395e11466ee7e5102d5c7db4cf7a7
     "react-transition-group": "^2.2.0",
-=======
->>>>>>> Add three tabs
     "readline": "^1.3.0",
     "repeat-string": "^1.6.1",
     "scrollbar-size": "^2.1.0",
