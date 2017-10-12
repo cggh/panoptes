@@ -58,21 +58,19 @@ let TableWithLegend = createReactClass({
     }
 
     return (
-      <div className="vertical stack">
-        <div className="centering-container">
-          <Card className={classes.card}>
-            {children}
-            <CardContent>
-              <MuiDataTableView
-                table={table}
-                query={query}
-                order={order}
-                columns={columns}
-                onOrderChange={this.handleOrderChange}
-              />
-            </CardContent>
-          </Card>
-        </div>
+      <div className="centering-container">
+        <Card className={classes.card}>
+          {children}
+          <CardContent>
+            <MuiDataTableView
+              table={table}
+              query={query}
+              order={order}
+              columns={columns}
+              onOrderChange={this.handleOrderChange}
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   },
