@@ -18,6 +18,7 @@ import _filter from 'lodash.filter';
 import _map from 'lodash.map';
 import _forEach from 'lodash.foreach';
 import _keys from 'lodash.keys';
+import _countBy from 'lodash.countby';
 
 // Panoptes
 import API from 'panoptes/API';
@@ -38,6 +39,7 @@ import {scaleColour} from 'util/Colours';
 import PropertyLegend from 'panoptes/PropertyLegend';
 import MapControlComponent from 'Map/MapControlComponent';
 import filterChildren from 'util/filterChildren';
+import ItemLink from 'panoptes/ItemLink';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
@@ -77,6 +79,8 @@ let TableMarkersLayer = createReactClass({
     maxLegendItems: PropTypes.number,
     disableOnClickMarker: PropTypes.bool,
     clusterMarkers: PropTypes.bool,
+    clickTable: PropTypes.string,
+    clickPrimaryKeyProperty: PropTypes.string,
     children: PropTypes.node
   },
 
@@ -90,7 +94,6 @@ let TableMarkersLayer = createReactClass({
     return {
       layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
       map: this.props.map !== undefined ? this.props.map : this.context.map,
-      onClickMarker: this.handleClickSingleMarker
     };
   },
 
@@ -161,7 +164,7 @@ let TableMarkersLayer = createReactClass({
 
   fetchData(props, requestContext) {
 
-    let {highlight, primKey, table, query, markerColourProperty} = props;
+    let {highlight, primKey, table, query, markerColourProperty, clickPrimaryKeyProperty} = props;
     let {changeLayerStatus} = this.context;
 
     if (table !== this.props.table ||
@@ -196,6 +199,9 @@ let TableMarkersLayer = createReactClass({
     locationColumns.add(locationPrimKeyProperty);
     locationColumns.add(locationLongitudeProperty);
     locationColumns.add(locationLatitudeProperty);
+    if (clickPrimaryKeyProperty) {
+      locationColumns.add(clickPrimaryKeyProperty);
+    }
 
     // If no highlight has been specified, but a primKey has been then convert primKey to a highlight.
     if (highlight === undefined && primKey !== undefined) {
@@ -302,7 +308,8 @@ let TableMarkersLayer = createReactClass({
             latProperty: locationTableConfig.latitude,
             lngProperty: locationTableConfig.longitude,
             originalLat: lat,
-            originalLng: lng
+            originalLng: lng,
+            clickPrimKey: data[i][clickPrimaryKeyProperty]
           };
 
           markers.push({lat, lng}); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
@@ -330,7 +337,7 @@ let TableMarkersLayer = createReactClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker, clusterMarkers, children} = this.props;
+    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker, clusterMarkers, children, clickPrimaryKeyProperty, clickTable} = this.props;
 
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
@@ -367,7 +374,7 @@ let TableMarkersLayer = createReactClass({
       }
 
 
-      if ((markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) && markersAtLocationCount !== 1) {
+      if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
 
         //// Prepare a histogram
 
@@ -436,6 +443,7 @@ let TableMarkersLayer = createReactClass({
             color: markersGroupedByValue[value][0].valueAsColour
           });
         }
+
         clusteredMarkers.push({
           clusterType: 'pieChart',
           chartDataTable: table,
@@ -451,13 +459,13 @@ let TableMarkersLayer = createReactClass({
           lngProperty: markersGroupedByLocation[location][0].lngProperty,
           originalLat: markersGroupedByLocation[location][0].originalLat,
           originalLng: markersGroupedByLocation[location][0].originalLng,
-          markersAtLocationCount
+          markersAtLocationCount,
+          clickPrimKeyBreakdown: _countBy(markersGroupedByLocation[location], 'clickPrimKey')
         });
 
       }
 
     }
-
     if (clusteredMarkers.length > 0) {
 
       // NB: Copied from PieChartMarkersLayer
@@ -504,8 +512,7 @@ let TableMarkersLayer = createReactClass({
 
                           let clusterComponent = undefined;
 
-                          if (marker.clusterType === 'pieChart' || marker.markersAtLocationCount === 1) {
-
+                          if (marker.clusterType === 'pieChart') {
                             clusterComponent = (
                               <PieChart
                                 chartData={marker.chartData}
@@ -549,27 +556,17 @@ let TableMarkersLayer = createReactClass({
                             console.error('Unhandled marker.clusterType: %o', marker.clusterType);
                           }
 
-                          let onClickPayload = {
-                            table: marker.table,
-                            originalLat: marker.originalLat,
-                            originalLng: marker.originalLng,
-                            latProperty: marker.latProperty,
-                            lngProperty: marker.lngProperty
-                          };
-
-                          let onClick = undefined;
-                          if (!disableOnClickMarker) {
-                            onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
-                            if (marker.markersAtLocationCount === 1) {
-                              onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
-                            }
-                          }
-
                           return (
                             <ComponentMarker
                               key={`ComponentMarker_${i}`}
                               position={{lat: marker.lat, lng: marker.lng}}
-                              onClick={onClick}
+                              onClick={disableOnClickMarker ? null : (e) => this.handleClickClusterMarker(e, {
+                                table: marker.table,
+                                originalLat: marker.originalLat,
+                                originalLng: marker.originalLng,
+                                latProperty: marker.latProperty,
+                                lngProperty: marker.lngProperty
+                              })}
                               zIndexOffset={0}
                             >
                               {clusterComponent}
@@ -596,41 +593,29 @@ let TableMarkersLayer = createReactClass({
             <FeatureGroup>
               {
                 clusteredMarkers.map(
-                  (marker, i) => {
-
-                    let onClickPayload = {
-                      table: marker.table,
-                      originalLat: marker.originalLat,
-                      originalLng: marker.originalLng,
-                      latProperty: marker.latProperty,
-                      lngProperty: marker.lngProperty
-                    };
-
-                    let onClick = undefined;
-                    if (!disableOnClickMarker) {
-                      onClick = (e) => this.handleClickClusterMarker(e, onClickPayload);
-                      if (marker.markersAtLocationCount === 1) {
-                        onClick = (e) => this.handleClickSingleMarker(e, {table: marker.table, primKey: marker.primKey});
-                      }
-                    }
-
-                    let existentialProps = {};
-                    if (children !== undefined && children !== null) {
-                      existentialProps.children = children;
-                    }
-
-                    return (
+                  (marker, i) =>
                       <ComponentMarker
                         key={`ComponentMarker_${i}`}
                         position={{lat: marker.lat, lng: marker.lng}}
-                        onClick={onClick}
+                        onClick={disableOnClickMarker || clickPrimaryKeyProperty ? null : (e) => this.handleClickClusterMarker(e, {
+                          table: marker.table,
+                          originalLat: marker.originalLat,
+                          originalLng: marker.originalLng,
+                          latProperty: marker.latProperty,
+                          lngProperty: marker.lngProperty
+                        })}
                         zIndexOffset={0}
-                        {...existentialProps}
-                      />
-                    );
-
-                  }
-                )
+                        popup={
+                          <span>
+                            {_map(marker.clickPrimKeyBreakdown, (val, key) => {
+                              return <div><ItemLink table={clickTable} primKey={key} />: {val} {this.config.tablesById[marker.table]['capName' + (val > 1 ? 'Plural' : 'Single')]}</div>
+                            })}
+                          </span>
+                        }
+                      >
+                        {children}
+                      </ComponentMarker>
+                    )
               }
             </FeatureGroup>
           }
