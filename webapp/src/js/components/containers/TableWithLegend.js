@@ -21,8 +21,8 @@ let TableWithLegend = createReactClass({
   propTypes: {
     table: PropTypes.string,
     query: PropTypes.string,
-    order: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    columns: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
+    order: PropTypes.array,
+    columns: PropTypes.array,
     columnWidths: PropTypes.object,
     children: PropTypes.node,
     classes: PropTypes.object
@@ -47,16 +47,6 @@ let TableWithLegend = createReactClass({
     order = this.state.order || order;
     query = this.getDefinedQuery(query, table);
 
-    // NOTE: Samples_and_Variants example is arriving as string
-    // <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
-    if (typeof columns === 'string') {
-      columns = JSON.parse(columns);
-    }
-
-    if (typeof order === 'string') {
-      order = JSON.parse(order);
-    }
-
     return (
       <div className="centering-container">
         <Card className={classes.card}>
@@ -78,4 +68,5 @@ let TableWithLegend = createReactClass({
 
 let module = withStyles(styles)(TableWithLegend);
 module.displayName = 'TableWithLegend';
+module.propTypes = TableWithLegend.propTypes;
 export default module;
