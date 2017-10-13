@@ -18,7 +18,7 @@ $usual-text-size: 14px;
 .obs-page-container {
   position: relative;
   min-height: 100%;
-  p {
+  div.paragraph, p {
     font-size: $usual-text-size;
     margin-bottom: $usual-text-size;
     &:last-of-type {
