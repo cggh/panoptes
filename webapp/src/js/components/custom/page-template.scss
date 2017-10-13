@@ -1,5 +1,6 @@
 $card-max-width: 650px;
 $text-side-padding: 16px;
+$usual-text-size: 14px;
 
 .obs-page-backdrop {
   background-size: cover;
@@ -14,9 +15,16 @@ $text-side-padding: 16px;
   z-index: 1;
 }
 
-.obs-page-container{
+.obs-page-container {
   position: relative;
-  min-height: 100%
+  min-height: 100%;
+  p {
+    font-size: $usual-text-size;
+    margin-bottom: $usual-text-size;
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .obs-page-content {
