@@ -1,33 +1,41 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import {Card, CardText} from 'material-ui/Card';
+import Card, {CardContent} from 'material-ui/Card';
 import filterChildren from 'util/filterChildren';
+import {withStyles} from 'material-ui/styles';
+
+const styles = (theme) => ({
+  card: {
+    maxWidth: 650,
+  },
+});
 
 let ComponentWithLegend = createReactClass({
   displayName: 'ComponentWithLegend',
 
   propTypes: {
-    children: PropTypes.node
+    children: PropTypes.node,
+    classes: PropTypes.object
   },
 
-
   render() {
-    let {children} = this.props;
+    let {children, classes} = this.props;
     children = filterChildren(this, children);
     return (
-      <div className="vertical stack">
-        <div className="centering-container">
-          <Card style={{width: '500px'}}>{children[0]}</Card>
-        </div>
-        <div className="centering-container grow">
-          <div style={{width: '80%', height: '100%'}}>
+      <div className="centering-container">
+        <Card className={classes.card}>
+          {children[0]}
+          <CardContent>
             {children[1]}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     );
   },
 });
 
-export default ComponentWithLegend;
+let module = withStyles(styles)(ComponentWithLegend);
+module.displayName = 'ComponentWithLegend';
+module.propTypes = ComponentWithLegend.propTypes;
+export default module;
