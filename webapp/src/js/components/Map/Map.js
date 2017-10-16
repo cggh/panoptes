@@ -2,7 +2,7 @@ import {Map as LeafletMap} from 'react-leaflet';
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import displayName from 'react-display-name';
+import displayName from 'util/getDisplayName';
 import 'leaflet-loading/src/Control.Loading.js';
 
 //Panoptes

@@ -12,7 +12,7 @@ import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import getDisplayName from 'react-display-name';
+import getDisplayName from 'util/getDisplayName';
 
 let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
   mixins: [

@@ -1,5 +1,5 @@
 const dynreq = require.context('../components', true);
-import getDisplayName from 'react-display-name';
+import getDisplayName from 'util/getDisplayName';
 
 if (typeof String.prototype.endsWith !== 'function') {
   String.prototype.endsWith = function(suffix) {

@@ -1,4 +1,4 @@
-import displayName from 'react-display-name';
+import displayName from 'util/getDisplayName';
 import _includes from 'lodash.includes';
 import _isString from 'lodash.isstring';
 import _isArray from 'lodash.isarray';
