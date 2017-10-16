@@ -34,6 +34,10 @@ $usual-text-size: 14px;
   z-index: 100;
 }
 
+.plot-container {
+  position: relative;
+}
+
 .card-stack {
   max-width: $card-max-width;
 }
