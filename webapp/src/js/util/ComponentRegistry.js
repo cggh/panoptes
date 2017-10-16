@@ -1,5 +1,5 @@
 const dynreq = require.context('../components', true);
-import getDisplayName from 'react-display-name';
+import getDisplayName from 'util/getDisplayName';
 import filterChildren from 'util/filterChildren';
 import React from 'react';
 import _isArray from 'lodash/isArray';
