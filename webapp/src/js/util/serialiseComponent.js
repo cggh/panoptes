@@ -1,6 +1,6 @@
 import React from 'react';
 import Immutable from 'immutable';
-import getDisplayName from 'react-display-name';
+import getDisplayName from 'util/getDisplayName';
 import _map from 'lodash.map';
 import _isString from 'lodash.isstring';
 import _isFunction from 'lodash.isfunction';
@@ -14,12 +14,6 @@ export default function serialiseComponent(component) {
     return component;
   }
   let displayName = getDisplayName(component.type);
-  displayName = displayName.split('(');
-  if (displayName.length > 1) {
-    displayName = displayName[1].substr(0,displayName[1].length-1);
-  } else {
-    displayName = displayName[0];
-  }
   if (displayName == 'Component') {
     throw Error('Attempted to serialise a non React component');
   }
