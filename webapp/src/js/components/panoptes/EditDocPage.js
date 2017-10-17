@@ -34,7 +34,7 @@ let EditDocPage = createReactClass({
   getInitialState() {
     return {
       loadStatus: 'loading',
-      editorState: EditorState.createEmpty(decorator),
+      editorState: EditorState.createEmpty(),//decorator),
       content: '',
       rendered: '....loading preview'
     };
@@ -74,7 +74,7 @@ let EditDocPage = createReactClass({
 
     this.setState({
       content,
-      editorState: EditorState.createWithContent(contentState, decorator)
+      editorState: EditorState.createWithContent(contentState)//, decorator)
     });
     this.previewUpdate(content);
   },
@@ -139,7 +139,6 @@ let EditDocPage = createReactClass({
   render() {
     const {editorState, content, loadStatus, rendered} = this.state;
     const actions = this.getFlux().actions;
-
     return (
       <div className="large-modal edit-doc-page">
         <div className="load-container vertical stack">
