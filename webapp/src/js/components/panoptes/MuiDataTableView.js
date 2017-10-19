@@ -62,7 +62,7 @@ let MuiDataTableView = createReactClass({
       startRowIndex: 0,
       columns: [],
       columnWidths: {},
-      joins: [],
+      joins: []
     };
   },
 
@@ -150,6 +150,7 @@ let MuiDataTableView = createReactClass({
             <TableHead>
               <TableRow>
                 {columns.map((column) => {
+
                   let columnData = this.propertiesByColumn(column);
                   return (
                     <TableCell
@@ -216,7 +217,7 @@ let MuiDataTableView = createReactClass({
                         }}
                       >
                         <PropertyCell
-                          noLinks="true"
+                          noLinks={true}
                           prop={columnData}
                           value={cellData}
                           style={{
@@ -247,7 +248,6 @@ let MuiDataTableView = createReactClass({
 
 
 MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
-  // DataFetcherMixin('table', 'query', 'columns', 'order', 'startRowIndex', 'joins')
 
   let {table, columns, order, startRowIndex, query, maxRowsPerPage, joins} = props;
 
@@ -271,7 +271,7 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
         args: resolveJoins({
           database: config.dataset,
           table,
-          columns,
+          columns: columns.concat([config.tablesById[table].primKey]),
           query,
           transpose: true,
           start: fetchStartRowIndex,
