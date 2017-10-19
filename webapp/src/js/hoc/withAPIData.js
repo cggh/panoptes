@@ -54,7 +54,13 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
 
   fetchData(props, requestContext) {
     let APIArgSet = APIArgsFromProps.bind(this)({config: this.config, props});
-    if (_isEqual(this.lastAPIArgs, APIArgSet)) return;
+    if (_isEqual(this.lastAPIArgs, APIArgSet.requests)) {
+      console.log('equal');
+      return;
+    } else {
+      console.log('diff', this.lastAPIArgs, APIArgSet.requests);
+    }
+    this.lastAPIArgs = APIArgSet.requests;
     const keys = _keys(APIArgSet.requests);
     const values = _values(APIArgSet.requests);
     requestContext.request((componentCancellation) =>
@@ -75,6 +81,7 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((xhr) => {
+        this.lastAPIArgs = null;
         ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
         this.setState({loadStatus: 'error', data: null});
       });
