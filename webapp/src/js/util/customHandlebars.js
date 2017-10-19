@@ -16,9 +16,10 @@ const customHandlebars = ({dataset, handlebars}) => {
       columns.push(arguments[i]);
     }
     let {fn, inverse, hash} = options;
-    let {table, query, orderBy} = hash;
+    let {table, query, orderBy, distinct} = hash;
     query = query || SQL.nullQuery;
     orderBy = orderBy || null;
+    distinct = distinct === 'true' ? true : false;
     table = Handlebars.compile(table)(this);
     query = Handlebars.compile(query)(this);
     if (orderBy) {
@@ -35,6 +36,7 @@ const customHandlebars = ({dataset, handlebars}) => {
       table,
       columns,
       orderBy,
+      distinct,
       query,
       transpose: true //We want rows, not columns
     };
