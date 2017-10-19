@@ -66,7 +66,7 @@ let ComponentMarker = createReactClass({
     if (!children) {
       children = (
         <svg style={{overflow: 'visible', width: '25px', height: '25px'}} viewBox="0 0 24 24">
-          <g transform="translate(-6, -14)">
+          <g transform="translate(-12, -24)">
             <g transform="scale(0.4) translate(18, 10)">
               <path
                 fill={iconColour}
