@@ -40,6 +40,7 @@ $usual-text-size: 14px;
 
 .card-stack {
   max-width: $card-max-width;
+  width: 100%
 }
 
 .obs-leader {
@@ -79,6 +80,21 @@ $usual-text-size: 14px;
     }
   }
 }
+
+.auto-half-height-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 50%;
+  height: 0;
+}
+
+.auto-height-inner {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+}
+
 
 
 
