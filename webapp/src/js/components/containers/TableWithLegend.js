@@ -25,7 +25,14 @@ let TableWithLegend = createReactClass({
     columns: PropTypes.array,
     columnWidths: PropTypes.object,
     children: PropTypes.node,
-    classes: PropTypes.object
+    classes: PropTypes.object,
+    disableMultipleColumnOrder: PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return {
+      disableMultipleColumnOrder: false
+    };
   },
 
   getInitialState() {
@@ -39,6 +46,11 @@ let TableWithLegend = createReactClass({
   },
 
   handleOrderChange(order) {
+    if (this.props.disableMultipleColumnOrder && order !== undefined && order.length > 1) {
+      // Using slice instead of splice because we need a new array to trigger state change.
+      let newOrder = order.slice(order.length - 1, order.length);
+      order = newOrder;
+    }
     this.setState({order});
   },
 
