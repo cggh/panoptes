@@ -149,12 +149,12 @@ let MuiDataTableView = createReactClass({
           <Table>
             <TableHead>
               <TableRow>
-                {columns.map((column) => {
+                {columns.map((column, columnIndex) => {
 
                   let columnData = this.propertiesByColumn(column);
                   return (
                     <TableCell
-                      key={columnData.id}
+                      key={'column_' + columnIndex}
                       numeric={columnData.isNumerical}
                       padding={'none'}
                     >
@@ -176,14 +176,12 @@ let MuiDataTableView = createReactClass({
               {data.map((row, rowIndex) =>
                 <TableRow
                   hover
-                  key={row[primaryKeyColumnId]}
+                  key={'row_' + rowIndex}
                   style={{cursor: 'pointer'}}
                   onClick={(e) => this.handleClick(e, row[primaryKeyColumnId])}
                 >
-                  {columns.map((column) => {
+                  {columns.map((column, columnIndex) => {
                     const columnData = this.propertiesByColumn(column);
-                    const key = row[primaryKeyColumnId] + '_' + columnData.id;
-
                     let {maxVal, minVal, alignment, valueColours, showBar} = columnData;
                     let cellData = row[columnData.id];
 
@@ -209,7 +207,7 @@ let MuiDataTableView = createReactClass({
 
                     return (
                       <TableCell
-                        key={key}
+                        key={'cell_' + rowIndex + '_' + columnIndex}
                         numeric={columnData.isNumerical}
                         padding={'none'}
                         style={{
