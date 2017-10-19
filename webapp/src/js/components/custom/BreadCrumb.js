@@ -25,9 +25,11 @@ class BreadCrumb extends React.Component {
 
     return (
       <div className="obs-breadcrumb">
-        {React.Children.map(children, (child, i) =>
-          [child, i < children.length - 1 ? <KeyboardArrowRight/>: null]
-        )}
+        <div className="obs-breadcrumb-inner">
+          {React.Children.map(children, (child, i) =>
+            [<div className="obs-breadcrumb-component">{child}</div>, i < children.length - 1 ? <KeyboardArrowRight/>: null]
+          )}
+        </div>
       </div>
     );
   }
