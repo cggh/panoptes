@@ -43,7 +43,8 @@ let TableGeoJSONsLayer = createReactClass({
     showLegend: PropTypes.bool,
     maxLegendItems: PropTypes.number,
     config: PropTypes.object, // This will be provided via withAPIData
-    data: PropTypes.array // This will be provided via withAPIData
+    data: PropTypes.array, // This will be provided via withAPIData
+    disableClick: PropTypes.bool
   },
 
   childContextTypes: {
@@ -74,7 +75,7 @@ let TableGeoJSONsLayer = createReactClass({
   render() {
 
     let {layerContainer, map} = this.context;
-    let {colourProperty, table, labelProperty, showLegend, maxLegendItems, geoJSONs} = this.props;
+    let {colourProperty, table, labelProperty, showLegend, maxLegendItems, disableClick, geoJSONs} = this.props;
 
     if (_isEmpty(geoJSONs)) {
       return null;
@@ -105,7 +106,7 @@ let TableGeoJSONsLayer = createReactClass({
                   colour={geoJSON.valueAsColour}
                   weight={geoJSON.weight}
                   opacity={geoJSON.opacity}
-                  onClick={geoJSON.onClick}
+                  onClick={disableClick ? () => null : geoJSON.onClick}
                 />
             )
           }
