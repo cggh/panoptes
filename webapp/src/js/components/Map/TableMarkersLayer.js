@@ -608,7 +608,7 @@ let TableMarkersLayer = createReactClass({
                         popup={
                           <span>
                             {_map(marker.clickPrimKeyBreakdown, (val, key) => {
-                              return <div><ItemLink table={clickTable} primKey={key} />: {val} {this.config.tablesById[marker.table]['capName' + (val > 1 ? 'Plural' : 'Single')]}</div>
+                              return <div><ItemLink flux={this.getFlux()} table={clickTable} primKey={key} />: {val} {this.config.tablesById[marker.table]['capName' + (val > 1 ? 'Plural' : 'Single')]}</div>
                             })}
                           </span>
                         }
