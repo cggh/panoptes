@@ -62,13 +62,26 @@ $usual-text-size: 14px;
 .obs-breadcrumb {
   background: rgba(255,255,255,0.6);
   margin-bottom: 15px;
-  width: $card-max-width;
-  padding-left: $text-side-padding;
-  padding-right: $text-side-padding;
-  display: flex;
-  //justify-content: center;
-  align-items: center;
+  max-width: $card-max-width;
+  width: 100%;
+  position: relative;
+  .obs-breadcrumb-inner {
+    width: 100%;
+    padding-left: $text-side-padding;
+    padding-right: $text-side-padding;
+    display: flex;
+    flex-wrap: wrap;
+    //justify-content: center;
+    align-items: center;
+    .obs-breadcrumb-component {
+      word-break: keep-all;
+      white-space: nowrap;
+    }
+  }
 }
+
+
+
 
 li {
   padding-bottom: 5px;
