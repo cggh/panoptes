@@ -168,7 +168,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
         args: {
           database: this.config.dataset,
           table,
-          columns,
+          columns: Array.from(columns),
           query,
           transpose: true
         },
