@@ -6,6 +6,7 @@ import Color from 'color';
 import Tooltip from 'material-ui/Tooltip'; // NOTE: rc-tooltip is incompatible here
 import _forEach from 'lodash.foreach';
 import _filter from 'lodash.filter';
+import _cloneDeep from 'lodash.clonedeep';
 import Table, {
   TableBody,
   TableCell,
@@ -24,6 +25,8 @@ import resolveJoins from 'panoptes/resolveJoins';
 import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
+
+const MAX_COLOR = Color('#f3a891');
 
 let MuiDataTableView = createReactClass({
   displayName: 'MuiDataTableView',
@@ -180,10 +183,27 @@ let MuiDataTableView = createReactClass({
                     const columnData = this.propertiesByColumn(column);
                     const key = row[primaryKeyColumnId] + '_' + columnData.id;
 
-                    let {maxVal, minVal, alignment} = columnData;
+                    let {maxVal, minVal, alignment, valueColours, showBar} = columnData;
                     let cellData = row[columnData.id];
-                    if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+
+                    let background = 'inherit';
+                    if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       cellData = parseFloat(cellData);
+                      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
+                      background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
+                    } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                      let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
+                      background = _cloneDeep(MAX_COLOR).lighten(0.3 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
+                    }
+                    if (valueColours) {
+                      let col = valueColours[cellData] || valueColours['_other_'];
+                      if (col) {
+                        col = Color(col).lighten(0.3);
+                        if (rowIndex % 2)
+                          col.darken(0.1);
+
+                        background = col.string();
+                      }
                     }
 
                     return (
@@ -192,10 +212,19 @@ let MuiDataTableView = createReactClass({
                         numeric={columnData.isNumerical}
                         padding={'none'}
                         style={{
-                          textAlign: alignment,
+                          textAlign: alignment
                         }}
                       >
-                        <PropertyCell noLinks="true" prop={columnData} value={cellData}/>
+                        <PropertyCell
+                          noLinks="true"
+                          prop={columnData}
+                          value={cellData}
+                          style={{
+                            background,
+                            paddingLeft: '2px',
+                            paddingRight: '2px'
+                          }}
+                        />
                       </TableCell>
                     );
                   }, this)}
