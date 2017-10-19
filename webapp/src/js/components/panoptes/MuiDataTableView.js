@@ -6,7 +6,6 @@ import Color from 'color';
 import Tooltip from 'material-ui/Tooltip'; // NOTE: rc-tooltip is incompatible here
 import _forEach from 'lodash.foreach';
 import _filter from 'lodash.filter';
-import _cloneDeep from 'lodash.clonedeep';
 import Table, {
   TableBody,
   TableCell,
@@ -26,7 +25,7 @@ import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
 
-const MAX_COLOR = Color('#f3a891');
+const MAX_COLOR = '#f3a891';
 
 let MuiDataTableView = createReactClass({
   displayName: 'MuiDataTableView',
@@ -188,11 +187,11 @@ let MuiDataTableView = createReactClass({
                     let background = 'inherit';
                     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       cellData = parseFloat(cellData);
-                      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
+                      let percent = 100 * (cellData - minVal) / (Val - minVal);
                       background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
                     } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
-                      background = _cloneDeep(MAX_COLOR).lighten(0.3 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
+                      background = Color(MAX_COLOR).lighten(0.3 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
                     }
                     if (valueColours) {
                       let col = valueColours[cellData] || valueColours['_other_'];
