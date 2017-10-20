@@ -62,8 +62,8 @@ let TableWithLegend = createReactClass({
     return (
       <div className="centering-container">
         <Card className={classes.card}>
-          {children}
           <CardContent>
+            {children}
             <MuiDataTableView
               table={table}
               query={query}
