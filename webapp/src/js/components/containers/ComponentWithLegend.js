@@ -25,9 +25,8 @@ let ComponentWithLegend = createReactClass({
     return (
       <div className="centering-container">
         <Card className={classes.card}>
-          {children[0]}
           <CardContent>
-            {children[1]}
+            {children}
           </CardContent>
         </Card>
       </div>
