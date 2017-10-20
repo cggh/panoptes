@@ -32,7 +32,7 @@ let ResistanceMap = createReactClass({
         <Card>
           <CardContent>
             <CardHeader title={<span>Sites with <em>P. falciparum</em> samples</span>} />
-            <Typography component="p">This map shows the location of sites providing samples in this data set. Clicking a site will lead to information about that site. To view the proportion of resistant samples as a pie chart at each site, select a drug below.</Typography>
+            <Typography component="p">This map shows the location of sites providing samples in this data set. Clicking a site will lead to information about that site. <br/> To view the proportion of resistant samples as a pie chart at each site, select a drug below. The number in each pie is the number of samples from that site.</Typography>
             <FormControl component="fieldset">
               <RadioGroup
                 aria-label="drug"
