@@ -597,12 +597,9 @@ let TableMarkersLayer = createReactClass({
                       <ComponentMarker
                         key={`ComponentMarker_${i}`}
                         position={{lat: marker.lat, lng: marker.lng}}
-                        onClick={disableOnClickMarker || clickPrimaryKeyProperty ? null : (e) => this.handleClickClusterMarker(e, {
+                        onClick={disableOnClickMarker || clickPrimaryKeyProperty ? null : (e) => this.handleClickSingleMarker(e, {
                           table: marker.table,
-                          originalLat: marker.originalLat,
-                          originalLng: marker.originalLng,
-                          latProperty: marker.latProperty,
-                          lngProperty: marker.lngProperty
+                          primKey: marker.primKey
                         })}
                         zIndexOffset={0}
                         popup={

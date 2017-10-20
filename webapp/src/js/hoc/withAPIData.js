@@ -55,10 +55,7 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
   fetchData(props, requestContext) {
     let APIArgSet = APIArgsFromProps.bind(this)({config: this.config, props});
     if (_isEqual(this.lastAPIArgs, APIArgSet.requests)) {
-      console.log('equal');
       return;
-    } else {
-      console.log('diff', this.lastAPIArgs, APIArgSet.requests);
     }
     this.lastAPIArgs = APIArgSet.requests;
     const keys = _keys(APIArgSet.requests);
