@@ -142,14 +142,81 @@ let MuiDataTableView = createReactClass({
 
     const primaryKeyColumnId = this.tableConfig().primKey;
 
+    // Get info on column groups.
+    let columnGroups = {};
+    for (let i = 0; i < columns.length; i++) {
+      let {groupId} = this.propertiesByColumn(columns[i]);
+      if (groupId !== undefined) {
+        if (groupId in columnGroups) {
+          columnGroups[groupId].columns.push(columns[i]);
+        } else {
+          columnGroups[groupId] = {columns: []};
+          columnGroups[groupId].columns.push(columns[i]);
+        }
+        columnGroups[groupId].name = this.tableConfig().propertyGroupsById[groupId].name;
+      }
+    }
+
+    // To reorder columns, where they share a group with other columns.
+    let groupOrderedColumns = [];
+
     if (columns.length > 0) {
       return (
         <div>
           <Table>
             <TableHead>
+              {Object.keys(columnGroups).length ?
+                <TableRow
+                  style={{height: 'auto'}}
+                >
+                  {columns.map((column, columnIndex) => {
+                    let columnData = this.propertiesByColumn(column);
+                    if (columnData.groupId !== undefined && columnGroups[columnData.groupId].done === undefined) {
+                      columnGroups[columnData.groupId].done = 'done'; // What's done is done.
+                      groupOrderedColumns = groupOrderedColumns.concat(columnGroups[columnData.groupId].columns);
+                      return (
+                        <TableCell
+                          key={'group_column_' + columnIndex}
+                          numeric={columnData.isNumerical}
+                          padding={'none'}
+                          style={{
+                            textAlign: 'center',
+                            borderBottom: 'none',
+                            borderLeft: 'solid 1px rgba(0, 0, 0, 0.075)',
+                            borderRight: 'solid 1px rgba(0, 0, 0, 0.075)',
+                            borderTop: 'solid 1px rgba(0, 0, 0, 0.075)',
+                            paddingTop: '5px'
+                          }}
+                          colSpan={columnGroups[columnData.groupId].columns.length}
+                        >
+                          {columnGroups[columnData.groupId].name}
+                        </TableCell>
+                      );
+                    } else if (columnData.groupId === undefined) {
+                      // This column is not part of a group, so will stand alone.
+                      groupOrderedColumns.push(column);
+                      return (
+                        <TableCell
+                          key={'group_column_' + columnIndex}
+                          numeric={columnData.isNumerical}
+                          padding={'none'}
+                          style={{borderBottom: 'none'}}
+                        />
+                      );
+                    } else if (columnData.groupId !== undefined && columnGroups[columnData.groupId].done !== undefined) {
+                      // This column header has already been written alongside its group siblings.
+                      return null;
+                    } else {
+                      // This shouldn't happen.
+                      console.error('Unexpected logic branch in MuiDataTableView column group headings.');
+                      return null;
+                    }
+                  }, this)}
+                </TableRow>
+                : null
+              }
               <TableRow>
-                {columns.map((column, columnIndex) => {
-
+                {groupOrderedColumns.map((column, columnIndex) => {
                   let columnData = this.propertiesByColumn(column);
                   return (
                     <TableCell
@@ -179,7 +246,7 @@ let MuiDataTableView = createReactClass({
                   style={{cursor: 'pointer'}}
                   onClick={(e) => this.handleClick(e, row[primaryKeyColumnId])}
                 >
-                  {columns.map((column, columnIndex) => {
+                  {groupOrderedColumns.map((column, columnIndex) => {
                     const columnData = this.propertiesByColumn(column);
                     let {maxVal, minVal, alignment, valueColours, showBar} = columnData;
                     let cellData = row[columnData.id];
@@ -187,7 +254,7 @@ let MuiDataTableView = createReactClass({
                     let background = 'inherit';
                     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       cellData = parseFloat(cellData);
-                      let percent = 100 * (cellData - minVal) / (Val - minVal);
+                      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
                       background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
                     } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
