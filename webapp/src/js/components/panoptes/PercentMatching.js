@@ -31,6 +31,8 @@ let PercentMatching = createReactClass({
     return {
       numquery: SQL.nullQuery,
       domQuery: PropTypes.string,
+      childNumeratorProp: 'numerator',
+      childDenominatorProp: 'denominator',
     };
   },
 
