@@ -12,6 +12,7 @@ let ProportionBar = createReactClass({
     denominator: PropTypes.number,
     convertToPercentage: PropTypes.bool,
     roundToInteger: PropTypes.bool,
+    barHeight: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -23,7 +24,7 @@ let ProportionBar = createReactClass({
   },
 
   render() {
-    const {label, numerator, denominator, convertToPercentage, roundToInteger} = this.props;
+    const {label, numerator, denominator, convertToPercentage, roundToInteger, barHeight} = this.props;
 
     const formattingFunction = roundToInteger ? (n) => Math.round(n) : (n) => n;
     const numeratorAsPercentage = Number(formattingFunction((numerator / denominator) * 100));
@@ -35,17 +36,24 @@ let ProportionBar = createReactClass({
 
     const textShadow = '0px 0px 3px #fff, 0px 0px 2px #fff';
 
+    const barStyle = {
+      textShadow,
+      display: 'flex',
+      alignItems: 'center',
+    };
+
     const leftBarStyle = {
       width: numeratorAsPercentage + '%',
       backgroundColor: colours[1],
-      textAlign: 'right',
-      textShadow,
+      ...barStyle,
+      justifyContent: 'flex-end',
+      alignItems: 'center',
     };
     const rightBarStyle = {
       flexGrow: '1',
       backgroundColor: colours[0],
-      textAlign: 'left',
-      textShadow,
+      ...barStyle,
+      justifyContent: 'flex-start',
     };
 
     if (numeratorAsPercentage < 10) {
@@ -60,7 +68,7 @@ let ProportionBar = createReactClass({
           <div style={{paddingRight: '10px'}}>{label}</div>
         </div>
         {numerator !== undefined ?
-          <div style={{display: 'inline-flex', width: '60%', verticalAlign: 'top'}}>
+          <div style={{display: 'inline-flex', width: '60%', verticalAlign: 'top', height: barHeight !== undefined ? barHeight : 'auto'}}>
             <div style={leftBarStyle}>{leftBarText}</div>
             <div style={rightBarStyle}>{rightBarText}</div>
           </div>
