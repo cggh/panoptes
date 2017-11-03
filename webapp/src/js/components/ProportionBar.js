@@ -23,7 +23,7 @@ let ProportionBar = createReactClass({
     colourTable: PropTypes.string,
     colourProperty: PropTypes.string,
     numeratorPropertyValue: PropTypes.string,
-    denominatorPropertyValue: PropTypes.string,
+    remainderPropertyValue: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -36,7 +36,7 @@ let ProportionBar = createReactClass({
 
   render() {
     const {label, numerator, denominator, convertToPercentage, roundToInteger,
-      barHeight, colourTable, colourProperty, numeratorPropertyValue, denominatorPropertyValue
+      barHeight, colourTable, colourProperty, numeratorPropertyValue, remainderPropertyValue
     } = this.props;
 
     const formattingFunction = roundToInteger ? (n) => Math.round(n) : (n) => n;
@@ -60,8 +60,8 @@ let ProportionBar = createReactClass({
     if (colourTable !== undefined && colourProperty !== undefined && numeratorPropertyValue !== undefined) {
       let colourFunction = propertyColour(this.config.tablesById[colourTable].propertiesById[colourProperty]);
       leftBarColour = colourFunction(numeratorPropertyValue);
-      if (denominatorPropertyValue !== undefined) {
-        rightBarColour = colourFunction(denominatorPropertyValue);
+      if (remainderPropertyValue !== undefined) {
+        rightBarColour = colourFunction(remainderPropertyValue);
       }
     }
 
