@@ -1,10 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import {colours} from 'util/Colours';
+import {colours, propertyColour} from 'util/Colours';
+import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin'; // required by ConfigMixin
 
 let ProportionBar = createReactClass({
   displayName: 'ProportionBar',
+
+  mixins: [
+    FluxMixin, // required by ConfigMixin
+    ConfigMixin,
+  ],
 
   propTypes: {
     label: PropTypes.string,
@@ -13,6 +20,10 @@ let ProportionBar = createReactClass({
     convertToPercentage: PropTypes.bool,
     roundToInteger: PropTypes.bool,
     barHeight: PropTypes.string,
+    colourTable: PropTypes.string,
+    colourProperty: PropTypes.string,
+    numeratorPropertyValue: PropTypes.string,
+    denominatorPropertyValue: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -24,7 +35,9 @@ let ProportionBar = createReactClass({
   },
 
   render() {
-    const {label, numerator, denominator, convertToPercentage, roundToInteger, barHeight} = this.props;
+    const {label, numerator, denominator, convertToPercentage, roundToInteger,
+      barHeight, colourTable, colourProperty, numeratorPropertyValue, denominatorPropertyValue
+    } = this.props;
 
     const formattingFunction = roundToInteger ? (n) => Math.round(n) : (n) => n;
     const numeratorAsPercentage = Number(formattingFunction((numerator / denominator) * 100));
@@ -42,16 +55,26 @@ let ProportionBar = createReactClass({
       alignItems: 'center',
     };
 
+    let leftBarColour = colours[1];
+    let rightBarColour = colours[0];
+    if (colourTable !== undefined && colourProperty !== undefined && numeratorPropertyValue !== undefined) {
+      let colourFunction = propertyColour(this.config.tablesById[colourTable].propertiesById[colourProperty]);
+      leftBarColour = colourFunction(numeratorPropertyValue);
+      if (denominatorPropertyValue !== undefined) {
+        rightBarColour = colourFunction(denominatorPropertyValue);
+      }
+    }
+
     const leftBarStyle = {
       width: numeratorAsPercentage + '%',
-      backgroundColor: colours[1],
+      backgroundColor: leftBarColour,
       ...barStyle,
       justifyContent: 'flex-end',
       alignItems: 'center',
     };
     const rightBarStyle = {
       flexGrow: '1',
-      backgroundColor: colours[0],
+      backgroundColor: rightBarColour,
       ...barStyle,
       justifyContent: 'flex-start',
     };
