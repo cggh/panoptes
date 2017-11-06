@@ -43,14 +43,11 @@ let ProportionBar = createReactClass({
     const numeratorAsPercentage = Number(formattingFunction((numerator / denominator) * 100));
     const proportionAsString = convertToPercentage ? numeratorAsPercentage + '%' : formattingFunction(numerator) + '/' + formattingFunction(denominator);
     const sampleSizeAsString = denominator !== undefined ? denominator : '';
-
-    const leftBarText = numeratorAsPercentage < 10 ? String.fromCharCode(8203) : proportionAsString;
-    const rightBarText = numeratorAsPercentage < 10 ? proportionAsString : String.fromCharCode(8203);
-
-    const textShadow = '0px 0px 3px #fff, 0px 0px 2px #fff';
+    const leftBarTextPercentageMinimum = 25;
+    const leftBarText = numeratorAsPercentage < leftBarTextPercentageMinimum ? String.fromCharCode(8203) : proportionAsString;
+    const rightBarText = numeratorAsPercentage < leftBarTextPercentageMinimum ? proportionAsString : String.fromCharCode(8203);
 
     const barStyle = {
-      textShadow,
       display: 'flex',
       alignItems: 'center',
     };
@@ -65,9 +62,24 @@ let ProportionBar = createReactClass({
       }
     }
 
+    // Credit: https://24ways.org/2010/calculating-color-contrast
+    function isHexColourDark(hexColour) {
+      const r = parseInt(hexColour.substr(1, 2), 16);
+      const g = parseInt(hexColour.substr(3, 2), 16);
+      const b = parseInt(hexColour.substr(5, 2), 16);
+      const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+      return (yiq >= 128) ? false : true;
+    }
+
+    const lightColour = '#F0F0F0';
+    const darkColour = '#101010';
+    const leftBarTextColour = isHexColourDark(leftBarColour) ? lightColour : darkColour;
+    const rightBarTextColour = isHexColourDark(rightBarColour) ? lightColour : darkColour;
+
     const leftBarStyle = {
       width: numeratorAsPercentage + '%',
       backgroundColor: leftBarColour,
+      color: leftBarTextColour,
       ...barStyle,
       justifyContent: 'flex-end',
       alignItems: 'center',
@@ -75,11 +87,12 @@ let ProportionBar = createReactClass({
     const rightBarStyle = {
       flexGrow: '1',
       backgroundColor: rightBarColour,
+      color: rightBarTextColour,
       ...barStyle,
       justifyContent: 'flex-start',
     };
 
-    if (numeratorAsPercentage < 10) {
+    if (numeratorAsPercentage < leftBarTextPercentageMinimum) {
       rightBarStyle.paddingLeft = '3px';
     } else {
       leftBarStyle.paddingRight = '3px';
