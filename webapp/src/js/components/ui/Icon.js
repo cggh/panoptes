@@ -23,13 +23,14 @@ let Icon = createReactClass({
     stack: PropTypes.oneOf(['1x', '2x']),
     inverse: PropTypes.bool,
     className: PropTypes.string,
-    children: PropTypes.element
+    children: PropTypes.element,
+    baseURL: PropTypes.string,
   },
 
   render() {
     let {
       name, size, rotate, flip, spin, fixedWidth, stack, inverse,
-      className, ...props
+      className, baseURL, ...props
     } = this.props;
     if (!name)
       return;
@@ -68,10 +69,12 @@ let Icon = createReactClass({
     if (className) {
       classNames += ` ${className}`;
     }
-    if (_startsWith(name, 'bitmap:'))
-      return <span {...props} className={classNames}><img className="bitmap" src={dynamicRequire(name.substring(7))} /></span>;
-    else
-      return <span {...props} className={classNames}> { this.props.children} </span>;
+    if (_startsWith(name, 'bitmap:')) {
+      const fileName = name.substring(7);
+      return <span {...props} className={classNames}><img className="bitmap" src={baseURL !== undefined ? baseURL + fileName : dynamicRequire(fileName)} /></span>;
+    } else {
+      return <span {...props} className={classNames}>{this.props.children}</span>;
+    }
   },
 });
 
