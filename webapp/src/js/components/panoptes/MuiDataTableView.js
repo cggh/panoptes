@@ -46,6 +46,7 @@ let MuiDataTableView = createReactClass({
     className: PropTypes.string,
     joins: PropTypes.array,
     classes: PropTypes.object,
+    maxRowsPerPage: PropTypes.number,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
   },
@@ -143,23 +144,25 @@ let MuiDataTableView = createReactClass({
     const primaryKeyColumnId = this.tableConfig().primKey;
 
     // Get info on column groups.
-    let columnGroups = {};
+    let columnGroups = {"__none__": {columns: []}};
     for (let i = 0; i < columns.length; i++) {
       let {groupId} = this.propertiesByColumn(columns[i]);
       if (groupId !== undefined) {
         if (groupId in columnGroups) {
           columnGroups[groupId].columns.push(columns[i]);
+
         } else {
           columnGroups[groupId] = {columns: []};
           columnGroups[groupId].columns.push(columns[i]);
+          columnGroups[groupId].name = this.tableConfig().propertyGroupsById[groupId].name;
         }
-        columnGroups[groupId].name = this.tableConfig().propertyGroupsById[groupId].name;
+      } else {
+        columnGroups['__none__'].columns.push(columns[i]);
       }
     }
 
     // To reorder columns, where they share a group with other columns.
     let groupOrderedColumns = [];
-
     if (columns.length > 0) {
       return (
         <div>
@@ -324,7 +327,7 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
     stopRowIndex = undefined;
   }
 
-  // FIXME: What is this for?
+  //This ensures we are fetching in a cache friendly way
   let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
   let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
 
