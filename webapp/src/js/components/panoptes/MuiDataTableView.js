@@ -123,7 +123,7 @@ let MuiDataTableView = createReactClass({
   },
 
   render() {
-    let {className, columns, order, data} = this.props;
+    let {className, columns, order, data, maxRowsPerPage, startRowIndex} = this.props;
     let {loadStatus} = this.state;
 
     if (!this.tableConfig()) {
@@ -134,6 +134,17 @@ let MuiDataTableView = createReactClass({
     if (data === undefined || data === null) {
       return null;
     }
+
+    //Data can be longer due to being cache friendly
+    let stopRowIndex = undefined;
+    if (maxRowsPerPage !== undefined && maxRowsPerPage > 0) {
+      stopRowIndex = startRowIndex + maxRowsPerPage - 1;
+    } else {
+      stopRowIndex = undefined;
+    }
+    let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
+    let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
+    data = data.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStopRowIndex);
 
     // Convert order array to sortOrderDirectionByColumnId
     let sortOrderDirectionByColumnId = {};
