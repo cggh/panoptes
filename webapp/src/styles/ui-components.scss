@@ -54,14 +54,14 @@
       top: 0;
       background: $primary-color;
       color: rgb(255, 255, 255);
-      .icon .bitmap {
+      .icon .image {
         filter: invert(100%);
       }
     }
     .tab.inactive:hover {
       background: $light-primary-color;
       color: rgb(255, 255, 255);
-      .icon .bitmap {
+      .icon .image {
         filter: invert(100%);
       }
     }
@@ -76,7 +76,7 @@
       margin-left:  5px;
       margin-right: 5px;
       opacity: 0.5;
-      .bitmap {
+      .image {
         transform: translate(0px, 3px);
       }
     }
@@ -90,7 +90,7 @@
   position: relative;
   vertical-align: middle;
   font-size: 22px;
-  .bitmap, .image {
+  .image {
     height: 22px;
     filter: hue-rotate(0deg); // Potentially alter the hue of all image icons.
   }
@@ -112,9 +112,9 @@
   opacity: 1;
 }
 
-.icon.inverted-bitmap {
+.icon.inverted-image {
   filter: invert(100%);
-  img.bitmap {
+  img.image {
     vertical-align: middle;
   }
 }
@@ -164,7 +164,7 @@
       line-height: $topbar-height;
       margin-left: 5px;
       margin-right: 5px;
-      .bitmap {
+      .image {
         filter: invert(100%);
         transform: translate(0px, 3px);
       }
@@ -333,7 +333,7 @@
       font-size: 30px;
       line-height: 30px;
       color: $primary-color;
-      .bitmap {
+      .image {
         height: 30px;
       }
     }
