@@ -35,7 +35,7 @@ let Icon = createReactClass({
     if (!name)
       return;
     let classNames = '';
-    if (_startsWith(name, 'bitmap:')) {
+    if (_startsWith(name, 'bitmap:') || _startsWith(name, 'image:')) {
       classNames += 'icon';
     } else {
       classNames += `fa fa-${name} icon`;
@@ -61,17 +61,17 @@ let Icon = createReactClass({
     }
     if (inverse) {
       classNames += ' fa-inverse';
-      if (_startsWith(name, 'bitmap:')) {
-        classNames += ' inverted-bitmap';
+      if (_startsWith(name, 'bitmap:') || _startsWith(name, 'image:')) {
+        classNames += ' inverted-image';
       }
     }
 
     if (className) {
       classNames += ` ${className}`;
     }
-    if (_startsWith(name, 'bitmap:')) {
-      const fileName = name.substring(7);
-      return <span {...props} className={classNames}><img className="bitmap" src={baseURL !== undefined ? baseURL + fileName : dynamicRequire(fileName)} /></span>;
+    if (_startsWith(name, 'bitmap:') || _startsWith(name, 'image:')) {
+      const fileName = _startsWith(name, 'bitmap:') ? name.substring(7) : name.substring(6);
+      return <span {...props} className={classNames}><img className="image" src={baseURL !== undefined ? baseURL + fileName : dynamicRequire(fileName)} /></span>;
     } else {
       return <span {...props} className={classNames}>{this.props.children}</span>;
     }
