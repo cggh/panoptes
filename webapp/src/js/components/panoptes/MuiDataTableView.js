@@ -142,9 +142,13 @@ let MuiDataTableView = createReactClass({
     } else {
       stopRowIndex = undefined;
     }
-    let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
-    let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
-    data = data.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStopRowIndex);
+    debugger;
+
+    if (startRowIndex !== undefined && stopRowIndex !== undefined) {
+      let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
+      let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
+      data = data.slice(startRowIndex - fetchStartRowIndex, stopRowIndex - fetchStopRowIndex);
+    }
 
     // Convert order array to sortOrderDirectionByColumnId
     let sortOrderDirectionByColumnId = {};
