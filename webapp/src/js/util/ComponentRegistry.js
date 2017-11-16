@@ -35,6 +35,8 @@ typeByDisplayName['CardContent'] = CardContent;
 typeByDisplayName['CardMedia'] = CardMedia;
 typeByDisplayName['CardHeader'] = CardHeader;
 import Typography from 'material-ui/Typography';
+Typography.displayName = 'Typography';
+
 typeByDisplayName['Typography'] = Typography;
 import {Tabs, Tab} from 'material-ui/Tabs';
 typeByDisplayName['Tabs'] = Tabs;
