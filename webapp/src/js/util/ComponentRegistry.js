@@ -59,6 +59,8 @@ wrappedListItemText.displayName = "ListItemText";
 typeByDisplayName['ListItemText'] = wrappedListItemText;
 
 import Typography from 'material-ui/Typography';
+Typography.displayName = 'Typography';
+
 typeByDisplayName['Typography'] = Typography;
 
 import {Tabs, Tab} from 'material-ui/Tabs';
