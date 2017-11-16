@@ -142,7 +142,6 @@ let MuiDataTableView = createReactClass({
     } else {
       stopRowIndex = undefined;
     }
-    debugger;
 
     if (startRowIndex !== undefined && stopRowIndex !== undefined) {
       let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
