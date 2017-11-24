@@ -8,7 +8,7 @@ class PageTemplate extends React.Component {
     let {children, bgurl} = this.props;
     return (
       <div className="obs-page-container">
-        <div className="obs-page-backdrop" style={{backgroundImage: `url(/panoptes/Docs/observatory/images/${bgurl})`}} />
+        {/*<div className="obs-page-backdrop" style={{backgroundImage: `url(/panoptes/Docs/observatory/images/${bgurl})`}} />*/}
         <div className="horiz-centering-container vertical stack obs-page-content">
               {children}
         </div>
