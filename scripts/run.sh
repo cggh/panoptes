@@ -28,5 +28,5 @@ if [ -z "$2" ]; then
 else
 	NUM_WORKERS=${2}
 fi
-echo -e "${green}Serving PANOPTES on http://${BIND}/index.html${NC}"
+echo -e "${green}Serving PANOPTES on http://${BIND}/${NC}"
 PYTHONPATH=`pwd`:`pwd`/.. ../panoptes_virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid --timeout 120 -w ${NUM_WORKERS} --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application
