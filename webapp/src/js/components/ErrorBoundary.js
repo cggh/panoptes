@@ -4,7 +4,7 @@ class ErrorBoundary extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { error: null, errorInfo: null };
+    this.state = {error: null, errorInfo: null};
   }
 
   componentDidCatch(error, errorInfo) {
@@ -12,7 +12,7 @@ class ErrorBoundary extends React.Component {
     this.setState({
       error: error,
       errorInfo: errorInfo
-    })
+    });
     // You can also log error messages to an error reporting service here
   }
 
@@ -21,8 +21,8 @@ class ErrorBoundary extends React.Component {
       // Error path
       return (
         <div>
-          <h2>An error has occured</h2>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <h2>An error has occurred.</h2>
+          <details style={{whiteSpace: 'pre-wrap'}}>
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.errorInfo.componentStack}
