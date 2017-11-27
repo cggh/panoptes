@@ -4,7 +4,7 @@ import createReactClass from 'create-react-class';
 import {colours, propertyColour} from 'util/Colours';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin'; // required by ConfigMixin
-
+import Color from 'color';
 let ProportionBar = createReactClass({
   displayName: 'ProportionBar',
 
@@ -36,7 +36,7 @@ let ProportionBar = createReactClass({
 
   render() {
     const {label, numerator, denominator, convertToPercentage, roundToInteger,
-      barHeight, colourTable, colourProperty, numeratorPropertyValue, remainderPropertyValue
+      barHeight, colourTable, colourProperty, numeratorPropertyValue, remainderPropertyValue, loadStatus
     } = this.props;
 
     const formattingFunction = roundToInteger ? (n) => Math.round(n) : (n) => n;
@@ -61,12 +61,12 @@ let ProportionBar = createReactClass({
         rightBarColour = colourFunction(remainderPropertyValue);
       }
     }
-
     // Credit: https://24ways.org/2010/calculating-color-contrast
-    function isHexColourDark(hexColour) {
-      const r = parseInt(hexColour.substr(1, 2), 16);
-      const g = parseInt(hexColour.substr(3, 2), 16);
-      const b = parseInt(hexColour.substr(5, 2), 16);
+    function isHexColourDark(colour) {
+      colour = Color(colour);
+      const r = colour.red();
+      const g = colour.green();
+      const b = colour.blue();
       const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
       return (yiq >= 128) ? false : true;
     }
@@ -75,7 +75,6 @@ let ProportionBar = createReactClass({
     const darkColour = '#101010';
     const leftBarTextColour = isHexColourDark(leftBarColour) ? lightColour : darkColour;
     const rightBarTextColour = isHexColourDark(rightBarColour) ? lightColour : darkColour;
-
     const leftBarStyle = {
       width: numeratorAsPercentage + '%',
       backgroundColor: leftBarColour,
@@ -108,7 +107,8 @@ let ProportionBar = createReactClass({
             <div style={leftBarStyle}>{leftBarText}</div>
             <div style={rightBarStyle}>{rightBarText}</div>
           </div>
-          : <div style={{display: 'inline-block', width: '60%', backgroundColor: colours[7], textAlign: 'center'}}>error</div>
+          : <div style={{display: 'inline-block', width: '60%', backgroundColor: loadStatus === 'loading' ? 'rgba(0,0,0,0.0)': '#7f7f7f', textAlign: 'left'}}>
+            {loadStatus === 'loading' ? 'Loading...' : 'Error'}</div>
         }
         <div style={{display: 'inline-block', width: '10%', textAlign: 'right', paddingLeft: '10px', verticalAlign: 'top'}}>
           {numerator !== undefined ? sampleSizeAsString : null}
