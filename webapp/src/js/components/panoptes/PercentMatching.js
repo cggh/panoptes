@@ -37,7 +37,7 @@ let PercentMatching = createReactClass({
   },
 
   render() {
-    let {all, matching, childNumeratorProp, childDenominatorProp, children} = this.props;
+    let {all, matching, childNumeratorProp, childDenominatorProp, children, loadStatus} = this.props;
     children = filterChildren(this, children);
     if (children !== undefined && childNumeratorProp !== undefined) {
       return React.Children.map(children,
@@ -47,6 +47,7 @@ let PercentMatching = createReactClass({
           return React.cloneElement(child, {
             [childNumeratorProp]: numerator,
             [childDenominatorProp]: denominator,
+            loadStatus
           });
         }
       );
