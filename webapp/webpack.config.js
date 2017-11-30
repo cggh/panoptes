@@ -5,9 +5,10 @@ let autoprefixer = require('autoprefixer');
 let CopyWebpackPlugin = require('copy-webpack-plugin');
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-module.exports = function (env) {
+module.exports = function(env) {
   const nodeEnv = env && env.prod ? 'production' : 'development';
   const isProd = nodeEnv === 'production';
+  const datasetUrlPathPrefix = env && env.DATASET_URL_PATH_PREFIX ? env.DATASET_URL_PATH_PREFIX : '';
 
   const plugins = [
     new webpack.EnvironmentPlugin({
@@ -22,7 +23,11 @@ module.exports = function (env) {
     new CopyWebpackPlugin([
       //Using this method for the favicons - this method should not be used generally, esp in JS where one can require(IMAGE_PATH)
       {from: 'src/images/favicons', to: 'images/favicons'},
-    ])
+    ]),
+    new webpack.DefinePlugin({
+      // Include leading and trailing forward slashes when not empty.
+      'process.env.DATASET_URL_PATH_PREFIX': JSON.stringify(datasetUrlPathPrefix),
+    }),
   ];
 
   if (isProd) {
@@ -109,7 +114,7 @@ module.exports = function (env) {
       publicPath: isProd ? '/panoptes/' : '/'
     },
     node: {
-      fs: "empty" //Needed for handlebars-helper
+      fs: 'empty' //Needed for handlebars-helper
     },
     module: {
       rules: [
@@ -177,8 +182,13 @@ module.exports = function (env) {
 
     devServer: {
       contentBase: 'dist',
-      headers: {"Access-Control-Allow-Origin": "*"},
-      historyApiFallback: true,
+      headers: {'Access-Control-Allow-Origin': '*'},
+      historyApiFallback: {
+        index: '/index.html',
+        rewrites: [
+          {from: /.html$/, to: '/index.html'}
+        ]
+      },
       compress: isProd,
       inline: !isProd,
       // hot: !isProd,
