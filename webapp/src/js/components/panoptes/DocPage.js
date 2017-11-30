@@ -145,7 +145,7 @@ let DocPage = createReactClass({
     return <div className="load-container">
       <HTMLWithComponents className="doc-page" replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       {this.config.user.isManager ?
-        <div className="docpage-edit"  style={{zIndex:'99999'}}>
+        <div className="docpage-edit"  style={{zIndex: '99999'}}>
           <IconButton
             aria-label="Edit"
             className="fa fa-edit"
