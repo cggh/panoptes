@@ -35,6 +35,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const ALLOWED_CHILDREN = [
   'LayersControl',
   'TableMarkersLayer',
+  'TableMarkersLayerCustomPopup',
   'TileLayer',
   'FeatureGroup',
   'Marker',
