@@ -21,7 +21,7 @@ let Button = createReactClass({
     labelStyle: PropTypes.object,
     raised: PropTypes.bool,
     variant: PropTypes.string, //'flat' | 'raised' | 'fab'
-    children: PropTypes.node,
+    children: PropTypes.node
   },
 
   getDefaultProps() {
