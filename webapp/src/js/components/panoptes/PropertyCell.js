@@ -33,11 +33,13 @@ let PropertyCell = createReactClass({
     noLinks: PropTypes.bool,
     prefix: PropTypes.node,
     onClick: PropTypes.func,
-    className: PropTypes.string
+    className: PropTypes.string,
+    nullReplacement: PropTypes.string,
+    nanReplacement: PropTypes.string,
   },
 
   render() {
-    let {prop, value, noLinks, prefix, onClick, className, ...other} = this.props;
+    let {prop, value, noLinks, prefix, onClick, className, nullReplacement, nanReplacement, ...other} = this.props;
     let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
     let descriptionIcon = !noLinks && prop.valueDescriptions && prop.valueDescriptions[value] ?
       <Tooltip placement="bottom"
@@ -46,7 +48,7 @@ let PropertyCell = createReactClass({
         <Icon className="info" name="info-circle"/>
       </Tooltip> :
       null;
-    let content = Formatter(prop, value);
+    let content = Formatter(prop, value, nullReplacement, nanReplacement);
     if (prop.externalUrl && !noLinks) {
       if (prop.valueDisplays) {
         console.error(`Properties cannot have externalUrl and valueDisplays: ${prop.id}`);
