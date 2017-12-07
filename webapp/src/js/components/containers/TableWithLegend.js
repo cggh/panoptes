@@ -72,6 +72,8 @@ let TableWithLegend = createReactClass({
               columns={columns}
               onOrderChange={this.handleOrderChange}
               maxRowsPerPage={maxRowsPerPage}
+              nullReplacement="-"
+              nanReplacement="-"
             />
           </CardContent>
         </Card>
