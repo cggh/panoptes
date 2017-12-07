@@ -36,6 +36,13 @@ let ResistanceMap = createReactClass({
 
   render() {
     let {drug} = this.state;
+
+    let popup = "{{name}} - {{#query 'country_id' table='pf_samples' distinct='true' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}'}}\n" +
+      "                        <QueryResult table=\"countries\" expression='\"name\"' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"country_id\",\"CompValue\":\"{{country_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' />\n" +
+      "                      {{/query}} <br/><strong><QueryResult table=\"pf_samples\" query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' /></strong> <em>P. Falciparum</em> samples from {{name}},\n" +
+      "                        contributed by <strong><QueryResult table=\"pf_samples\" expression='[\"count\", [[\"distinct\", [\"study_id\"]]]]' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' /></strong> studies." +
+      "<br/><ItemLink table='sites' primKey='{{site_id}}'><Button color=\"primary\" raised label='more'></PopupButton></ItemLink>";
+
     return (
       <div className="centering-container">
         <Card>
@@ -63,19 +70,22 @@ let ResistanceMap = createReactClass({
             <div style={{width: '80vw', height: '60vh'}}>
               <Map>
                 <TileLayer/>
-                {drug !== 'sites' ? <TableMarkersLayer showLegend={true}
-                                           table="pf_samples"
-                                           clusterMarkers={true}
-                                           markerColourProperty={`${drug}resistant`}
-                  /> :
+                {drug !== 'sites' ? <TableMarkersLayerCustomPopup showLegend={true}
+                                                                  clickPrimaryKeyProperty="site_id"
+                                                                  table="pf_samples"
+                                                                  clusterMarkers={true}
+                                                                  markerColourProperty={`${drug}resistant`}>
+                    <CustomPopup>
+                      <ItemTemplate flux={this.getFlux()} table="sites">
+                        {popup}
+                      </ItemTemplate>
+                    </CustomPopup>
+                  </TableMarkersLayerCustomPopup>
+                  :
                   <TableMarkersLayerCustomPopup clickPrimaryKeyProperty="site_id" disableOnClickMarker={true} showLegend={true} table="sites" clusterMarkers={false}>
                     <CustomPopup>
                       <ItemTemplate flux={this.getFlux()} table="sites">
-                        {"{{name}} - {{#query 'country_id' table='pf_samples' distinct='true' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}'}}\n" +
-                        "                        <QueryResult table=\"countries\" expression='\"name\"' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"country_id\",\"CompValue\":\"{{country_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' />\n" +
-                        "                      {{/query}} <strong><QueryResult table=\"pf_samples\" query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' /></strong> <em>P. Falciparum</em> samples from {{name}},\n" +
-                        "                        contributed by <strong><QueryResult table=\"pf_samples\" expression='[\"count\", [[\"distinct\", [\"study_id\"]]]]' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' /></strong> studies." +
-                        "<ItemLink table='sites' primKey='{{site_id}}'><Button color=\"primary\" raised label='more'></PopupButton></ItemLink>"}
+                        {popup}
                       </ItemTemplate>
                     </CustomPopup>
                   </TableMarkersLayerCustomPopup>
@@ -89,4 +99,4 @@ let ResistanceMap = createReactClass({
   },
 });
 
-  export default ResistanceMap;
+export default ResistanceMap;
