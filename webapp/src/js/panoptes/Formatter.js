@@ -3,14 +3,18 @@ let JD2DateTime = function(JD) {
   return new Date((JD - 2440587.5) * 24 * 60 * 60 * 1000);
 };
 
-export default function(property, value) {
+export default function(property, value, nullReplacement = 'NULL', nanReplacement = 'NULL') {
 
   if (property.isText) {
     return value === null ? '' : value;
   }
 
-  if (value === null || isNaN(value)) {
-    return 'NULL';
+  if (value === null) {
+    return nullReplacement;
+  }
+
+  if (isNaN(value)) {
+    return nanReplacement;
   }
 
   if (property.isBoolean) {
