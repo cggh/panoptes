@@ -47,6 +47,8 @@ let MuiDataTableView = createReactClass({
     joins: PropTypes.array,
     classes: PropTypes.object,
     maxRowsPerPage: PropTypes.number,
+    nullReplacement: PropTypes.string,
+    nanReplacement: PropTypes.string,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
   },
@@ -123,7 +125,7 @@ let MuiDataTableView = createReactClass({
   },
 
   render() {
-    let {className, columns, order, data, maxRowsPerPage, startRowIndex} = this.props;
+    let {className, columns, order, data, maxRowsPerPage, startRowIndex, nullReplacement, nanReplacement} = this.props;
     let {loadStatus} = this.state;
 
     if (!this.tableConfig()) {
@@ -158,7 +160,7 @@ let MuiDataTableView = createReactClass({
     const primaryKeyColumnId = this.tableConfig().primKey;
 
     // Get info on column groups.
-    let columnGroups = {"__none__": {columns: []}};
+    let columnGroups = {'__none__': {columns: []}};
     for (let i = 0; i < columns.length; i++) {
       let {groupId} = this.propertiesByColumn(columns[i]);
       if (groupId !== undefined) {
@@ -306,6 +308,8 @@ let MuiDataTableView = createReactClass({
                             paddingLeft: '2px',
                             paddingRight: '2px'
                           }}
+                          nullReplacement={nullReplacement}
+                          nanReplacement={nanReplacement}
                         />
                       </TableCell>
                     );
