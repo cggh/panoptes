@@ -24,6 +24,7 @@ let ProportionBar = createReactClass({
     colourProperty: PropTypes.string,
     numeratorPropertyValue: PropTypes.string,
     remainderPropertyValue: PropTypes.string,
+    loadStatus: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -107,7 +108,7 @@ let ProportionBar = createReactClass({
             <div style={leftBarStyle}>{leftBarText}</div>
             <div style={rightBarStyle}>{rightBarText}</div>
           </div>
-          : <div style={{display: 'inline-block', width: '60%', backgroundColor: loadStatus === 'loading' ? 'rgba(0,0,0,0.0)': '#7f7f7f', textAlign: 'left'}}>
+          : <div style={{display: 'inline-block', width: '60%', backgroundColor: loadStatus === 'loading' ? 'rgba(0,0,0,0.0)' : '#7f7f7f', textAlign: 'left'}}>
             {loadStatus === 'loading' ? 'Loading...' : 'Error'}</div>
         }
         <div style={{display: 'inline-block', width: '10%', textAlign: 'right', paddingLeft: '10px', verticalAlign: 'top'}}>
