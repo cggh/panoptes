@@ -279,6 +279,7 @@ let MuiDataTableView = createReactClass({
               <TableRow>
                 {groupOrderedColumns.map((column, columnIndex) => {
                   let columnData = this.propertiesByColumn(column);
+                  console.log(columnData);
                   return (
                     <TableCell
                       key={'column_' + columnIndex}
