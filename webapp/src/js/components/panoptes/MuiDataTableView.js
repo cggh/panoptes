@@ -255,15 +255,19 @@ let MuiDataTableView = createReactClass({
                           }
                         }}
                       >
-                        {columnData.description ? <Tooltip placement="bottom"
-                                 trigger="click"
-                                 overlay={<div className="vertical stack">
-                                   <div className="tooltip-description">
-                                     <HTMLWithComponents>{columnData.description}</HTMLWithComponents>
-                                   </div>
-                                 </div>}>
-                          <Icon style={{paddingLeft: '5px'}} className="info" name="info-circle"/>
-                        </Tooltip> : null}
+                        {columnData.description ?
+                          <Tooltip
+                            placement="bottom"
+                            trigger="click"
+                            overlay={<div className="vertical stack">
+                              <div className="tooltip-description">
+                                <HTMLWithComponents>{columnData.description}</HTMLWithComponents>
+                              </div>
+                            </div>}
+                          >
+                            <Icon style={{paddingLeft: '5px'}} className="info" name="info-circle"/>
+                          </Tooltip> : null
+                        }
                         {columnData.name}
                       </TableSortLabel>
                     </TableCell>
