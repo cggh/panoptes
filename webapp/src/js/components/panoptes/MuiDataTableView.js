@@ -246,26 +246,26 @@ let MuiDataTableView = createReactClass({
                       numeric={columnData.isNumerical}
                       padding={'none'}
                     >
-                        <TableSortLabel
-                          active={sortOrderDirectionByColumnId[columnData.id] !== undefined ? true : false}
-                          direction={sortOrderDirectionByColumnId[columnData.id]}
-                          onClick={(event) => {
-                            if (event.target.className.indexOf('info') == -1) {
-                              this.handleOrderChange(columnData.id)
-                            }
-                          }}
-                        >
-                          {columnData.description ? <Tooltip placement='bottom'
-                                   trigger='click'
-                                   overlay={<div className="vertical stack">
-                                     <div className="tooltip-description">
-                                       <HTMLWithComponents>{columnData.description}</HTMLWithComponents>
-                                     </div>
-                                   </div>}>
-                            <Icon style={{paddingLeft:'5px'}} className="info" name="info-circle"/>
-                          </Tooltip> : null}
-                          {columnData.name}
-                        </TableSortLabel>
+                      <TableSortLabel
+                        active={sortOrderDirectionByColumnId[columnData.id] !== undefined ? true : false}
+                        direction={sortOrderDirectionByColumnId[columnData.id]}
+                        onClick={(event) => {
+                          if (event.target.className.indexOf('info') == -1) {
+                            this.handleOrderChange(columnData.id);
+                          }
+                        }}
+                      >
+                        {columnData.description ? <Tooltip placement="bottom"
+                                 trigger="click"
+                                 overlay={<div className="vertical stack">
+                                   <div className="tooltip-description">
+                                     <HTMLWithComponents>{columnData.description}</HTMLWithComponents>
+                                   </div>
+                                 </div>}>
+                          <Icon style={{paddingLeft: '5px'}} className="info" name="info-circle"/>
+                        </Tooltip> : null}
+                        {columnData.name}
+                      </TableSortLabel>
                     </TableCell>
                   );
                 }, this)}
