@@ -24,7 +24,7 @@ let DocPage = createReactClass({
     ConfigMixin,
     PureRenderMixin,
     FluxMixin,
-    DataFetcherMixin('path')
+    DataFetcherMixin()
   ],
 
   getInitialState() {
@@ -47,8 +47,8 @@ let DocPage = createReactClass({
   },
 
   onConfigChange() {
-    const {path} = this.props;
-    this.handlebars = customHandlebars(this.config);
+    const {path, repaceSelf, updateTitleIcon, replaceable, ...other} = this.props;
+    this.handlebars = customHandlebars(this.config, ...other);
     if (this.config.docs[path]) {
       this.handlebars.compile(this.config.docs[path])({config: this.config})
         .then((rendered) =>
@@ -60,13 +60,13 @@ let DocPage = createReactClass({
   },
 
   fetchData(props, requestContext) {
-    const {path} = props;
+    const {path, repaceSelf, updateTitleIcon, replaceable, ...other} = props;
     if (path !== this.props.path) {
       this.titleFromHTML = 'Loading...';
       this.setState(this.getInitialState());
     }
     if (this.config.docs[path]) {
-      this.handlebars.compile(this.config.docs[path])({config: this.config})
+      this.handlebars.compile(this.config.docs[path])({config: this.config, ...other})
         .then((rendered) => this.setState({
           loadStatus: 'loaded',
           content: rendered
@@ -84,7 +84,7 @@ let DocPage = createReactClass({
     )
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
-      .then((content) => this.handlebars.compile(content)({config: this.config}))
+      .then((content) => this.handlebars.compile(content)({config: this.config, ...other}))
       .then((rendered) => this.setState({
         loadStatus: 'loaded',
         content: rendered
