@@ -22,16 +22,16 @@ let DocLink = createReactClass({
   },
 
   handleClick(e) {
-    let {href, replaceParent} = this.props;
+    let {href, replaceParent, children, ...other} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     e.stopPropagation();
     if (middleClick) {
-      this.getFlux().actions.session.tabOpen(<DocPage path={href} />, false);
+      this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, false);
     } else {
       if (replaceParent) {
         replaceParent(<DocPage path={href} />);
       } else {
-        this.getFlux().actions.session.tabOpen(<DocPage path={href} />, true);
+        this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, true);
       }
     }
   },
