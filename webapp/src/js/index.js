@@ -14,6 +14,7 @@ import Loading from 'components/ui/Loading.js';
 import SessionStore from 'stores/SessionStore';
 import PanoptesStore from 'stores/PanoptesStore';
 import ConfigStore from 'stores/ConfigStore';
+import serialiseComponent from 'util/serialiseComponent';
 
 import SessionActions from 'actions/SessionActions';
 import PanoptesActions from 'actions/PanoptesActions';
@@ -21,6 +22,7 @@ import APIActions from 'actions/APIActions';
 
 import API from 'panoptes/API';
 import InitialConfig from 'panoptes/InitialConfig';
+import DataItemViews from 'panoptes/DataItemViews';
 
 // import Perf from 'react-addons-perf';
 import _filter from 'lodash.filter';
@@ -133,37 +135,41 @@ if (dataset === undefined || dataset === null || dataset === '') {
 
       if (appState === undefined) {
 
-        if (remainingPath !== undefined && remainingPath !== '') {
+        if (remainingPath !== undefined && remainingPath !== '' && remainingPath !== 'index.html') {
           appState = _clone(defaultState);
           if (config.tablesById[datasetURLPathParts[1]] !== undefined) {
             const table = datasetURLPathParts[1];
             const selectedPrimKey = datasetURLPathParts[2];
             if (config.tablesById[table].listView) {
-              appState.session.components.InitialOtherPage.type = 'ListWithActions';
-              appState.session.components.InitialOtherPage.props = {table, selectedPrimKey};
+              appState.session.components.URLTab = {
+                type: 'ListWithActions',
+                props: {table, selectedPrimKey}
+              };
             } else if (selectedPrimKey !== undefined) {
-              // FIXME: Error: Failed to execute 'replaceState' on 'History': Symbol(react.element) could not be cloned.
-              // appState.session.components.InitialOtherPage.type = 'DataItem';
-              // const children = DataItemViews.getViews(config.tablesById[table].dataItemViews, config.tablesById[table].hasGeoCoord);
-              // appState.session.components.InitialOtherPage.props = {table, primKey: selectedPrimKey, children};
-              console.warn('URL not currently supported for table, primKey: ', table, selectedPrimKey);
-              appState.session.components.InitialOtherPage.type = 'DataTableWithActions';
-              appState.session.components.InitialOtherPage.props = {table};
+              const children = DataItemViews.getViews(config.tablesById[table].dataItemViews, config.tablesById[table].hasGeoCoord).map(serialiseComponent);
+              appState.session.components.URLTab = {
+                type: 'DataItem',
+                props: {table, primKey: selectedPrimKey, children}
+              };
             } else {
-              appState.session.components.InitialOtherPage.type = 'DataTableWithActions';
-              appState.session.components.InitialOtherPage.props = {table};
+              appState.session.components.URLTab = {
+                type: 'DataTableWithActions',
+                props: {table}
+              };
             }
-            appState.session.tabs.selectedTab = 'InitialOtherPage';
           } else {
-            appState.session.components.InitialDocPage.props.path = remainingPath;
-            appState.session.tabs.selectedTab = 'InitialDocPage';
+            appState.session.components.URLTab = {
+              type: 'DocPage',
+              props: {path: remainingPath}
+            };
           }
+          appState.session.tabs.components.push('URLTab');
+          appState.session.tabs.selectedTab = 'URLTab';
         } else if (config.settings.initialSessionState !== undefined) {
           appState = {session: config.settings.initialSessionState};
         } else {
           appState = defaultState;
         }
-
       }
 
       //Listen to the stores and update the URL after storing the state, when it changes.
