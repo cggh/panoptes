@@ -49,8 +49,9 @@ let NewComponent = createReactClass({
     numeratorTextColour: PropTypes.string,
     remainderTextColour: PropTypes.string,
     className: PropTypes.string,
-    numberOfTicks: PropTypes.number,
-    includeTickPercentages: PropTypes.bool,
+    numberOfTickLines: PropTypes.number,
+    numberOfTickLabels: PropTypes.number, // Defaults to numberOfTickLines.
+    showTickLabels: PropTypes.bool,
     config: PropTypes.object, // This will be provided via withAPIData
     rowTableData: PropTypes.array, // This will be provided via withAPIData
     numeratorData: PropTypes.array, // This will be provided via withAPIData
@@ -67,8 +68,8 @@ let NewComponent = createReactClass({
       rowHeight: '50px',
       gridLineColour: '#EEEFEF',
       zeroLineColour: '#A0A0A0',
-      numberOfTicks: 10,
-      includeTickPercentages: true,
+      numberOfTickLines: 10,
+      showTickLabels: true,
     };
   },
 
@@ -122,8 +123,9 @@ let NewComponent = createReactClass({
       remainderBarColour,
       numeratorTextColour,
       remainderTextColour,
-      numberOfTicks,
-      includeTickPercentages,
+      numberOfTickLines,
+      numberOfTickLabels,
+      showTickLabels,
     } = this.props;
 
     if (rowTable === undefined) {
@@ -142,34 +144,39 @@ let NewComponent = createReactClass({
         border: 'none',
       };
 
-      const tickWidthPercentage = 100 / numberOfTicks;
-
+      const tickLineWidthPercentage = 100 / numberOfTickLines;
       let tickElements = [];
-      let tickPercentageElements = [];
-      for (let i = 1; i <= numberOfTicks; i++) {
+      for (let i = 1; i <= numberOfTickLines; i++) {
         tickElements.push(
           <div
             style={{
               position: 'relative',
               display: 'table-cell',
-              width: tickWidthPercentage + '%',
+              width: tickLineWidthPercentage + '%',
               borderRight: `solid ${gridLineColour} 1px`,
             }}
           >
             &#8203;
           </div>
         );
+      }
+
+      const amendedNumberOfTickLabels = numberOfTickLabels !== undefined ? numberOfTickLabels : numberOfTickLines;
+
+      const tickLabelWidthPercentage = 100 / amendedNumberOfTickLabels;
+      let tickPercentageElements = [];
+      for (let i = 1; i <= amendedNumberOfTickLabels; i++) {
         tickPercentageElements.push(
           <div
             style={{
               position: 'relative',
               display: 'table-cell',
-              width: tickWidthPercentage + '%',
+              width: tickLabelWidthPercentage + '%',
               textAlign: 'center',
-              left: '' + (tickWidthPercentage / 2) + '%',
+              left: '' + (tickLabelWidthPercentage / 2) + '%',
             }}
           >
-            {i * tickWidthPercentage}%
+            {i * tickLabelWidthPercentage}%
           </div>
         );
       }
@@ -310,7 +317,7 @@ let NewComponent = createReactClass({
                 </TableRow>
               );
             })}
-            {includeTickPercentages ?
+            {showTickLabels ?
               <TableRow
                 key={'row_tickPercentages'}
                 hover={false}
