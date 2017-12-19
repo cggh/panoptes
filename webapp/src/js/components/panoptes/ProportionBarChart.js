@@ -79,13 +79,6 @@ let ProportionBarChart = createReactClass({
     };
   },
 
-  getInitialState() {
-    return {
-      rows: [],
-      loadStatus: 'loaded',
-    };
-  },
-
   // NOTE: copied from ItemLink and re-parameterized
   handleClickItemLink(e, primKey) {
     const {rowTable} = this.props;
