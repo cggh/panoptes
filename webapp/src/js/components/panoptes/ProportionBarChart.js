@@ -28,12 +28,13 @@ let ProportionBarChart = createReactClass({
 
   propTypes: {
     rowTable: PropTypes.string.isRequired,
+    rowTableJoinKeyColumn: PropTypes.string, // Defaults to same name as rowTable primKey.
     rowLabelColumn: PropTypes.string,
     rowTableQuery: PropTypes.string,
     rowTableJoins: PropTypes.array,
     rowTableOrder: PropTypes.array,
     proportionTable: PropTypes.string.isRequired,
-    proportionTableForeignKeyColumn: PropTypes.string, // Defaults to same name as rowTable primKey.
+    proportionTableJoinKeyColumn: PropTypes.string, // Defaults to same name as rowTableJoinKeyColumn.
     proportionTableColourColumn: PropTypes.string,
     proportionTableColourColumnNumeratorValue: PropTypes.string,
     proportionTableColourColumnRemainderValue: PropTypes.string,
@@ -376,18 +377,19 @@ let ProportionBarChart = createReactClass({
 ProportionBarChart = withAPIData(ProportionBarChart, ({config, props}) => {
 
   const {
-    rowTable, rowLabelColumn, rowTableQuery, rowTableJoins, rowTableOrder,
-    proportionTable, proportionTableForeignKeyColumn, numeratorQuery, denominatorQuery,
+    rowTable, rowTableJoinKeyColumn, rowLabelColumn, rowTableQuery, rowTableJoins, rowTableOrder,
+    proportionTable, proportionTableJoinKeyColumn, numeratorQuery, denominatorQuery,
   } = props;
 
   const amendedRowTableQuery = rowTableQuery || (rowTable ? config.tablesById[rowTable].defaultQuery : null) || SQL.nullQuery;
   const amendednumeratorQuery = numeratorQuery || (proportionTable ? config.tablesById[proportionTable].defaultQuery : null) || SQL.nullQuery;
   const amendeddenominatorQuery = denominatorQuery || (proportionTable ? config.tablesById[proportionTable].defaultQuery : null) || SQL.nullQuery;
   const rowTablePrimKeyColumn = config.tablesById[rowTable].primKey;
-  const qualifiedRowTablePrimKeyColumn = rowTable + '.' + rowTablePrimKeyColumn;
-  const amendedProportionTableForeignKeyColumn = proportionTableForeignKeyColumn !== undefined ? proportionTableForeignKeyColumn : rowTablePrimKeyColumn;
-  const qualifiedAmendedProportionTableForeignKeyColumn = proportionTable + '.' + amendedProportionTableForeignKeyColumn;
-  const proportionTableJoins = [{'type': 'INNER', 'foreignTable': rowTable, 'foreignColumn': qualifiedRowTablePrimKeyColumn, 'column': qualifiedAmendedProportionTableForeignKeyColumn}];
+  const amendedRowTableJoinKeyColumn = rowTableJoinKeyColumn !== undefined ? rowTableJoinKeyColumn : rowTablePrimKeyColumn;
+  const qualifiedAmendedRowTablePrimKeyColumn = rowTable + '.' + amendedRowTableJoinKeyColumn;
+  const amendedproportionTableJoinKeyColumn = proportionTableJoinKeyColumn !== undefined ? proportionTableJoinKeyColumn : amendedRowTableJoinKeyColumn;
+  const qualifiedAmendedproportionTableJoinKeyColumn = proportionTable + '.' + amendedproportionTableJoinKeyColumn;
+  const proportionTableJoins = [{'type': 'INNER', 'foreignTable': rowTable, 'foreignColumn': qualifiedAmendedRowTablePrimKeyColumn, 'column': qualifiedAmendedproportionTableJoinKeyColumn}];
 
   return {
     requests: {
@@ -408,11 +410,11 @@ ProportionBarChart = withAPIData(ProportionBarChart, ({config, props}) => {
         args: {
           database: config.dataset,
           table: proportionTable,
-          columns: [{expr: ['count', ['*']], as: 'numerator'}, qualifiedRowTablePrimKeyColumn],
+          columns: [{expr: ['count', ['*']], as: 'numerator'}, qualifiedAmendedRowTablePrimKeyColumn],
           transpose: true,
           query: amendednumeratorQuery,
           joins: proportionTableJoins,
-          groupBy: [qualifiedRowTablePrimKeyColumn]
+          groupBy: [qualifiedAmendedRowTablePrimKeyColumn]
         }
       },
       denominatorData: {
@@ -420,11 +422,11 @@ ProportionBarChart = withAPIData(ProportionBarChart, ({config, props}) => {
         args: {
           database: config.dataset,
           table: proportionTable,
-          columns: [{expr: ['count', ['*']], as: 'denominator'}, qualifiedRowTablePrimKeyColumn],
+          columns: [{expr: ['count', ['*']], as: 'denominator'}, qualifiedAmendedRowTablePrimKeyColumn],
           query: amendeddenominatorQuery,
           transpose: true,
           joins: proportionTableJoins,
-          groupBy: [qualifiedRowTablePrimKeyColumn]
+          groupBy: [qualifiedAmendedRowTablePrimKeyColumn]
         }
       }
     }
