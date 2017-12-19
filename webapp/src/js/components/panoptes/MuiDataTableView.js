@@ -75,9 +75,6 @@ let MuiDataTableView = createReactClass({
     return {
       rows: [],
       loadStatus: 'loaded',
-      width: 0,
-      height: 0,
-      totalRowsCount: 0
     };
   },
 
