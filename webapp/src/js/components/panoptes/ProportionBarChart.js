@@ -17,6 +17,7 @@ import Table, {
 import classNames from 'classnames';
 import Color from 'color';
 import {colours, propertyColour} from 'util/Colours';
+import DocPage from 'panoptes/DocPage';
 
 let ProportionBarChart = createReactClass({
   displayName: 'ProportionBarChart',
@@ -43,6 +44,7 @@ let ProportionBarChart = createReactClass({
     convertProportionsToPercentages: PropTypes.bool,
     roundProportionsToIntegers: PropTypes.bool,
     rowHeight: PropTypes.string,
+    barHeight: PropTypes.string,
     gridLineColour: PropTypes.string,
     zeroLineColour: PropTypes.string,
     numeratorBarColour: PropTypes.string,
@@ -53,6 +55,8 @@ let ProportionBarChart = createReactClass({
     numberOfTickLines: PropTypes.number,
     numberOfTickLabels: PropTypes.number, // Defaults to numberOfTickLines.
     showTickLabels: PropTypes.bool,
+    onClickBehaviour: PropTypes.string,
+    docLinkHref: PropTypes.string,
     config: PropTypes.object, // This will be provided via withAPIData
     rowTableData: PropTypes.array, // This will be provided via withAPIData
     numeratorData: PropTypes.array, // This will be provided via withAPIData
@@ -66,11 +70,12 @@ let ProportionBarChart = createReactClass({
       rowTableJoins: [],
       convertProportionsToPercentages: true,
       roundProportionsToIntegers: true,
-      rowHeight: '50px',
+      rowHeight: '35px',
       gridLineColour: '#EEEFEF',
       zeroLineColour: '#A0A0A0',
       numberOfTickLines: 10,
       showTickLabels: true,
+      onClickBehaviour: 'ItemLink',
     };
   },
 
@@ -81,13 +86,33 @@ let ProportionBarChart = createReactClass({
     };
   },
 
-  handleClick(e, primKey) {
+  // NOTE: copied from ItemLink and re-parameterized
+  handleClickItemLink(e, primKey) {
     const {rowTable} = this.props;
+    const table = rowTable;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (!middleClick) {
       e.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({rowTable, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table, primKey: primKey.toString(), switchTo: !middleClick});
+  },
+
+  // NOTE: copied from DocLink and re-parameterized
+  handleClickDocLink(e) {
+    let {docLinkHref, replaceParent, children, ...other} = this.props;
+    const href = docLinkHref;
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+    e.stopPropagation();
+    if (middleClick) {
+      this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, false);
+    } else {
+      if (replaceParent) {
+        replaceParent(<DocPage path={href} />);
+      } else {
+        //FIXME
+        //this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, true);
+      }
+    }
   },
 
   // Credit: https://24ways.org/2010/calculating-color-contrast
@@ -114,6 +139,7 @@ let ProportionBarChart = createReactClass({
       convertProportionsToPercentages,
       roundProportionsToIntegers,
       rowHeight,
+      barHeight,
       gridLineColour,
       zeroLineColour,
       rowTableData,
@@ -127,6 +153,7 @@ let ProportionBarChart = createReactClass({
       numberOfTickLines,
       numberOfTickLabels,
       showTickLabels,
+      onClickBehaviour,
     } = this.props;
 
     if (rowTable === undefined) {
@@ -150,6 +177,7 @@ let ProportionBarChart = createReactClass({
       for (let i = 1; i <= numberOfTickLines; i++) {
         tickElements.push(
           <div
+            key={'tickElement_' + i}
             style={{
               position: 'relative',
               display: 'table-cell',
@@ -169,6 +197,7 @@ let ProportionBarChart = createReactClass({
       for (let i = 1; i <= amendedNumberOfTickLabels; i++) {
         tickPercentageElements.push(
           <div
+            key={'tickPercentageElement_' + i}
             style={{
               position: 'relative',
               display: 'table-cell',
@@ -218,11 +247,13 @@ let ProportionBarChart = createReactClass({
         backgroundColor: leftBarColour,
         color: leftBarTextColour,
         textAlign: 'right',
+        verticalAlign: 'middle',
       };
       const rightBarStyle = {
         backgroundColor: rightBarColour,
         color: rightBarTextColour,
         textAlign: 'left',
+        verticalAlign: 'middle',
       };
 
       return (
@@ -249,10 +280,17 @@ let ProportionBarChart = createReactClass({
                 leftBarPadding.paddingRight = '3px';
               }
 
+              let onClickHandler = undefined;
+              if (onClickBehaviour === 'ItemLink') {
+                onClickHandler = (e) => this.handleClickItemLink(e, rowPrimKeyValue);
+              } else if (onClickBehaviour === 'DocLink') {
+                onClickHandler = (e) => this.handleClickDocLink(e);
+              }
+
               return (
                 <TableRow
                   key={'row_' + rowPrimKeyValue}
-                  onClick={(e) => this.handleClick(e, rowPrimKeyValue)}
+                  onClick={onClickHandler}
                   style={{
                     cursor: 'pointer',
                     height: rowHeight,
@@ -300,6 +338,7 @@ let ProportionBarChart = createReactClass({
                         position: 'relative',
                         display: 'table',
                         width: '100%',
+                        height: barHeight !== undefined ? barHeight : 'auto',
                       }}
                     >
                       <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
