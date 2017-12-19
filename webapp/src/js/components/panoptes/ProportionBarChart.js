@@ -18,8 +18,8 @@ import classNames from 'classnames';
 import Color from 'color';
 import {colours, propertyColour} from 'util/Colours';
 
-let NewComponent = createReactClass({
-  displayName: 'NewComponent',
+let ProportionBarChart = createReactClass({
+  displayName: 'ProportionBarChart',
 
   mixins: [
     FluxMixin, // required by ConfigMixin
@@ -373,7 +373,7 @@ let NewComponent = createReactClass({
   }
 });
 
-NewComponent = withAPIData(NewComponent, ({config, props}) => {
+ProportionBarChart = withAPIData(ProportionBarChart, ({config, props}) => {
 
   const {
     rowTable, rowLabelColumn, rowTableQuery, rowTableJoins, rowTableOrder,
@@ -433,4 +433,4 @@ NewComponent = withAPIData(NewComponent, ({config, props}) => {
 });
 
 
-export default NewComponent;
+export default ProportionBarChart;
