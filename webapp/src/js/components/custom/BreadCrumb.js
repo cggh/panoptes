@@ -13,7 +13,7 @@ class BreadCrumb extends React.Component {
     children = children || [];
     if (children.length === undefined) children = [children];
 
-    b === 'geography' ? children.unshift(<DocLink href="geography.html">Geography</DocLink>) :  null;
+    b === 'regions' ? children.unshift(<DocLink href="regions.html">Regions</DocLink>) :  null;
     b === 'drugs' ? children.unshift(<DocLink href="drugs.html">Drugs</DocLink>) :  null;
     b === 'genes' ? children.unshift(<DocLink href="genes.html">Genes</DocLink>) :  null;
     b === 'about' ? children.unshift(<DocLink href="about.html">About</DocLink>) :  null;
