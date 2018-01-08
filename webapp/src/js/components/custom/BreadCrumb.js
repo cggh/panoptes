@@ -16,6 +16,8 @@ class BreadCrumb extends React.Component {
     b === 'geography' ? children.unshift(<DocLink href="geography.html">Geography</DocLink>) :  null;
     b === 'drugs' ? children.unshift(<DocLink href="drugs.html">Drugs</DocLink>) :  null;
     b === 'genes' ? children.unshift(<DocLink href="genes.html">Genes</DocLink>) :  null;
+    b === 'about' ? children.unshift(<DocLink href="about.html">About</DocLink>) :  null;
+    b === 'technical' ? children.unshift(<DocLink href="technical.html">Publications and Reports</DocLink>) :  null;
 
     a === 'pf' ? children.unshift(<DocLink href="pf.html">Plasmodium falciparum</DocLink>) :  null;
     a === 'pv' ? children.unshift(<DocLink href="pv.html">Plasmodium vivax</DocLink>) :  null;
