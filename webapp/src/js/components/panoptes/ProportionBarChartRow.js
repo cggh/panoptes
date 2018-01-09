@@ -81,7 +81,7 @@ let ProportionBarChartRow = createReactClass({
 
   // NOTE: copied from DocLink and re-parameterized
   handleClickDocLink(e) {
-    let {docLinkHref, replaceParent, children, ...other} = this.props;
+    let {docLinkHref, replaceParent, children, config, ...other} = this.props;
     const href = docLinkHref;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     e.stopPropagation();
@@ -91,8 +91,7 @@ let ProportionBarChartRow = createReactClass({
       if (replaceParent) {
         replaceParent(<DocPage path={href} />);
       } else {
-        //FIXME
-        //this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, true);
+        this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, true);
       }
     }
   },
