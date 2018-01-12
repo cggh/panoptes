@@ -27,7 +27,8 @@ let TableWithLegend = createReactClass({
     children: PropTypes.node,
     classes: PropTypes.object,
     disableMultipleColumnOrder: PropTypes.bool,
-    maxRowsPerPage: PropTypes.number
+    maxRowsPerPage: PropTypes.number,
+    onClickBehaviour: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -56,7 +57,7 @@ let TableWithLegend = createReactClass({
   },
 
   render() {
-    let {table, query, order, columns, children, classes, maxRowsPerPage} = this.props;
+    let {table, query, order, columns, children, classes, maxRowsPerPage, onClickBehaviour} = this.props;
     order = this.state.order || order;
     query = this.getDefinedQuery(query, table);
 
@@ -74,6 +75,7 @@ let TableWithLegend = createReactClass({
               maxRowsPerPage={maxRowsPerPage}
               nullReplacement="-"
               nanReplacement="-"
+              onClickBehaviour={onClickBehaviour}
             />
           </CardContent>
         </Card>
