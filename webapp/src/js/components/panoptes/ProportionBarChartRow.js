@@ -30,7 +30,6 @@ let ProportionBarChartRow = createReactClass({
     rowPrimKeyValue: PropTypes.string.isRequired,
     rowLabel: PropTypes.string.isRequired,
     proportionTable: PropTypes.string.isRequired,
-    proportionTableJoinKeyColumn: PropTypes.string, // Defaults to same name as rowTableJoinKeyColumn.
     proportionTableColourColumn: PropTypes.string,
     proportionTableColourColumnNumeratorValue: PropTypes.string,
     proportionTableColourColumnRemainderValue: PropTypes.string,
@@ -52,8 +51,8 @@ let ProportionBarChartRow = createReactClass({
     onClickBehaviour: PropTypes.string,
     docLinkHref: PropTypes.string,
     config: PropTypes.object, // This will be provided via withAPIData
-    numeratorData: PropTypes.array, // This will be provided via withAPIData
-    denominatorData: PropTypes.array, // This will be provided via withAPIData
+    numeratorData: PropTypes.object, // This will be provided via withAPIData
+    denominatorData: PropTypes.object, // This will be provided via withAPIData
   },
 
   getDefaultProps() {
@@ -65,6 +64,8 @@ let ProportionBarChartRow = createReactClass({
       zeroLineColour: '#A0A0A0',
       numberOfTickLines: 10,
       onClickBehaviour: 'ItemLink',
+      proportionTableJoins: [],
+      proportionTableGroupByColumns: [],
     };
   },
 
@@ -199,8 +200,8 @@ let ProportionBarChartRow = createReactClass({
 
       //////////////////////
 
-      const numerator = numeratorData.numerator !== undefined ? numeratorData.numerator : 0;
-      const denominator = denominatorData.denominator;
+      const numerator = numeratorData.numerator !== undefined ? numeratorData.numerator[0] : 0;
+      const denominator = denominatorData.denominator[0];
       const formattingFunction = roundProportionsToIntegers ? (n) => Math.round(n) : (n) => n;
       const numeratorAsPercentage = Number(formattingFunction((numerator / denominator) * 100));
       const proportionAsString = convertProportionsToPercentages ? numeratorAsPercentage + '%' : formattingFunction(numerator) + '/' + formattingFunction(denominator);
