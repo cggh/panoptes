@@ -50,6 +50,7 @@ let ProportionBarChartRow = createReactClass({
     showTickLabels: PropTypes.bool,
     onClickBehaviour: PropTypes.string,
     docLinkHref: PropTypes.string,
+    sampleSizeWarningMinimum: PropTypes.number,
     config: PropTypes.object, // This will be provided via withAPIData
     numeratorData: PropTypes.object, // This will be provided via withAPIData
     denominatorData: PropTypes.object, // This will be provided via withAPIData
@@ -66,6 +67,7 @@ let ProportionBarChartRow = createReactClass({
       onClickBehaviour: 'ItemLink',
       proportionTableJoins: [],
       proportionTableGroupByColumns: [],
+      sampleSizeWarningMinimum: 200,
     };
   },
 
@@ -133,6 +135,7 @@ let ProportionBarChartRow = createReactClass({
       remainderTextColour,
       numberOfTickLines,
       onClickBehaviour,
+      sampleSizeWarningMinimum,
     } = this.props;
 
     if (numeratorData === undefined || denominatorData === undefined) {
@@ -232,6 +235,7 @@ let ProportionBarChartRow = createReactClass({
           style={{
             cursor: 'pointer',
             height: rowHeight,
+            opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
           }}
           hover={true}
         >
