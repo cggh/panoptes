@@ -51,6 +51,7 @@ let ProportionBarChart = createReactClass({
     showTickLabels: PropTypes.bool,
     onClickBehaviour: PropTypes.string,
     docLinkHref: PropTypes.string,
+    sampleSizeWarningMinimum: PropTypes.number,
     config: PropTypes.object, // This will be provided via withAPIData
     rowTableData: PropTypes.array, // This will be provided via withAPIData
   },
@@ -58,14 +59,6 @@ let ProportionBarChart = createReactClass({
   getDefaultProps() {
     return {
       rowLabelColumn: 'name',
-      convertProportionsToPercentages: true,
-      roundProportionsToIntegers: true,
-      rowHeight: '35px',
-      gridLineColour: '#EEEFEF',
-      zeroLineColour: '#A0A0A0',
-      numberOfTickLines: 10,
-      showTickLabels: true,
-      onClickBehaviour: 'ItemLink',
     };
   },
 
@@ -98,6 +91,7 @@ let ProportionBarChart = createReactClass({
       rowLabelColumn,
       rowTableJoinKeyColumn,
       proportionTableJoinKeyColumn,
+      sampleSizeWarningMinimum,
     } = this.props;
 
     if (rowTable === undefined) {
@@ -191,6 +185,7 @@ let ProportionBarChart = createReactClass({
                 showTickLabels={showTickLabels}
                 onClickBehaviour={onClickBehaviour}
                 docLinkHref={docLinkHref}
+                sampleSizeWarningMinimum={sampleSizeWarningMinimum}
               />
             );
           })}
