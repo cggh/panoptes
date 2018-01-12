@@ -52,6 +52,7 @@ let MuiDataTableView = createReactClass({
     maxRowsPerPage: PropTypes.number,
     nullReplacement: PropTypes.string,
     nanReplacement: PropTypes.string,
+    onClickBehaviour: PropTypes.string,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
   },
@@ -67,7 +68,8 @@ let MuiDataTableView = createReactClass({
       startRowIndex: 0,
       columns: [],
       columnWidths: {},
-      joins: []
+      joins: [],
+      onClickBehaviour: 'dataItemPopup',
     };
   },
 
@@ -115,7 +117,7 @@ let MuiDataTableView = createReactClass({
     }
   },
 
-  handleClick(e, primKey) {
+  handleClickDataItemPopup(e, primKey) {
     let {table} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (!middleClick) {
@@ -125,7 +127,7 @@ let MuiDataTableView = createReactClass({
   },
 
   render() {
-    let {className, columns, order, data, maxRowsPerPage, startRowIndex, nullReplacement, nanReplacement} = this.props;
+    let {className, columns, order, data, maxRowsPerPage, startRowIndex, nullReplacement, nanReplacement, onClickBehaviour} = this.props;
     let {loadStatus} = this.state;
 
     if (!this.tableConfig()) {
@@ -273,64 +275,72 @@ let MuiDataTableView = createReactClass({
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((row, rowIndex) =>
-                <TableRow
-                  hover
-                  key={'row_' + rowIndex}
-                  style={{cursor: 'pointer'}}
-                  onClick={(e) => this.handleClick(e, row[primaryKeyColumnId])}
-                >
-                  {groupOrderedColumns.map((column, columnIndex) => {
-                    const columnData = this.propertiesByColumn(column);
-                    let {maxVal, minVal, alignment, valueColours, showBar} = columnData;
-                    let cellData = row[columnData.id];
+              {data.map((row, rowIndex) => {
 
-                    let background = 'inherit';
-                    if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
-                      cellData = parseFloat(cellData);
-                      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
-                      background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
-                    } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
-                      let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
-                      background = Color(MAX_COLOR).lighten(0.3 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
-                    }
-                    if (valueColours) {
-                      let col = valueColours[cellData] || valueColours['_other_'];
-                      if (col) {
-                        col = Color(col).lighten(0.3);
-                        if (rowIndex % 2)
-                          col.darken(0.1);
+                let onClickHandler = undefined;
+                if (onClickBehaviour === 'dataItemPopup') {
+                  onClickHandler = (e) => this.handleClickDataItemPopup(e, row[primaryKeyColumnId]);
+                }
 
-                        background = col.string();
+                return (
+                  <TableRow
+                    hover
+                    key={'row_' + rowIndex}
+                    style={{cursor: 'pointer'}}
+                    onClick={onClickHandler}
+                  >
+                    {groupOrderedColumns.map((column, columnIndex) => {
+                      const columnData = this.propertiesByColumn(column);
+                      let {maxVal, minVal, alignment, valueColours, showBar} = columnData;
+                      let cellData = row[columnData.id];
+
+                      let background = 'inherit';
+                      if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                        cellData = parseFloat(cellData);
+                        let percent = 100 * (cellData - minVal) / (maxVal - minVal);
+                        background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
+                      } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                        let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
+                        background = Color(MAX_COLOR).lighten(0.3 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
                       }
-                    }
+                      if (valueColours) {
+                        let col = valueColours[cellData] || valueColours['_other_'];
+                        if (col) {
+                          col = Color(col).lighten(0.3);
+                          if (rowIndex % 2)
+                            col.darken(0.1);
 
-                    return (
-                      <TableCell
-                        key={'cell_' + rowIndex + '_' + columnIndex}
-                        numeric={columnData.isNumerical}
-                        padding={'none'}
-                        style={{
-                          textAlign: alignment
-                        }}
-                      >
-                        <PropertyCell
-                          noLinks={true}
-                          prop={columnData}
-                          value={cellData}
+                          background = col.string();
+                        }
+                      }
+
+                      return (
+                        <TableCell
+                          key={'cell_' + rowIndex + '_' + columnIndex}
+                          numeric={columnData.isNumerical}
+                          padding={'none'}
                           style={{
-                            background,
-                            paddingLeft: '2px',
-                            paddingRight: '2px'
+                            textAlign: alignment
                           }}
-                          nullReplacement={nullReplacement}
-                          nanReplacement={nanReplacement}
-                        />
-                      </TableCell>
-                    );
-                  }, this)}
-                </TableRow>
-              )}
+                        >
+                          <PropertyCell
+                            noLinks={true}
+                            prop={columnData}
+                            value={cellData}
+                            style={{
+                              background,
+                              paddingLeft: '2px',
+                              paddingRight: '2px'
+                            }}
+                            nullReplacement={nullReplacement}
+                            nanReplacement={nanReplacement}
+                          />
+                        </TableCell>
+                      );
+                    }, this)}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
           <Loading status={loadStatus}/>
