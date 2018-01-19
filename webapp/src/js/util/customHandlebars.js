@@ -15,13 +15,17 @@ const customHandlebars = ({dataset, handlebars}) => {
     for (let i = 0; i < arguments.length - 1; i++) {
       columns.push(arguments[i]);
     }
-    let {fn, inverse, hash} = options;
+    let {fn, inverse, hash, data} = options;
     let {table, query, orderBy, distinct} = hash;
+    if (data) {
+      data = hb.createFrame(data);
+    }
     query = query || SQL.nullQuery;
     orderBy = orderBy || null;
     distinct = distinct === 'true' ? true : false;
-    table = Handlebars.compile(table)(this);
-    query = Handlebars.compile(query)(this);
+    table = Handlebars.compile(table)(this, {data});
+    query = Handlebars.compile(query)(this, {data});
+
     if (orderBy) {
       try {
         orderBy = JSON.parse(Handlebars.compile(orderBy)(this));
