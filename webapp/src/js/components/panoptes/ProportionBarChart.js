@@ -92,6 +92,7 @@ let ProportionBarChart = createReactClass({
       rowTableJoinKeyColumn,
       proportionTableJoinKeyColumn,
       sampleSizeWarningMinimum,
+      ...other
     } = this.props;
 
     if (rowTable === undefined) {
@@ -186,6 +187,7 @@ let ProportionBarChart = createReactClass({
                 onClickBehaviour={onClickBehaviour}
                 docLinkHref={docLinkHref}
                 sampleSizeWarningMinimum={sampleSizeWarningMinimum}
+                {...other}
               />
             );
           })}
