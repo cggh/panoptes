@@ -34,7 +34,7 @@
   "scripts": {
     "test": "jest",
     "dev": "webpack-dev-server --env.DATASET_URL_PATH_PREFIX=/",
-    "build": "webpack --env.prod=true --display-optimization-bailout",
+    "build": "webpack --env.prod=true --env.DATASET_URL_PATH_PREFIX=/panoptes/ --display-optimization-bailout",
     "serveprod": "webpack-dev-server --env.prod=true"
   },
   "jest": {
