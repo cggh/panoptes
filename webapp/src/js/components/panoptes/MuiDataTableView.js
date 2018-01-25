@@ -16,17 +16,16 @@ import Table, {
 } from 'material-ui/Table';
 import Icon from 'ui/Icon';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
-
-// Mixins
-import PureRenderMixin from 'mixins/PureRenderMixin';
-import FluxMixin from 'mixins/FluxMixin';
-import ConfigMixin from 'mixins/ConfigMixin';
-
 import SQL from 'panoptes/SQL';
 import resolveJoins from 'panoptes/resolveJoins';
 import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
+
+// Mixins
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 
 const MAX_COLOR = '#f3a891';
 
@@ -53,8 +52,12 @@ let MuiDataTableView = createReactClass({
     nullReplacement: PropTypes.string,
     nanReplacement: PropTypes.string,
     onClickBehaviour: PropTypes.string,
+    onClickComponent: PropTypes.string,
+    onClickComponentProps: PropTypes.string,
+    onClickComponentTemplateDocPath: PropTypes.string,
     config: PropTypes.object, // This will be provided via withAPIData
-    data: PropTypes.array // This will be provided via withAPIData
+    data: PropTypes.array, // This will be provided via withAPIData
+    onClickComponentTemplate: PropTypes.string, // This will be provided via withAPIData
   },
 
   // NB: We want to default to the tableConfig().defaultQuery, if there is one
@@ -117,17 +120,36 @@ let MuiDataTableView = createReactClass({
     }
   },
 
-  handleClickDataItemPopup(e, primKey) {
-    let {table} = this.props;
+  handleClick(e, primKey) {
+    const {table, onClickBehaviour, onClickComponent, onClickComponentProps, onClickComponentTemplate} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (!middleClick) {
       e.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table, primKey: primKey.toString(), switchTo: !middleClick});
+    const switchTo = !middleClick;
+
+    let onClickComponentPropsJSON = onClickComponentProps !== undefined ? JSON.parse(onClickComponentProps) : {};
+    // Default to using the clicked table and the clicked row primKey.
+    onClickComponentPropsJSON.table = onClickComponentPropsJSON.table === undefined ? table : onClickComponentPropsJSON.table;
+    onClickComponentPropsJSON.primKey = onClickComponentPropsJSON.primKey === undefined ? primKey : onClickComponentPropsJSON.primKey;
+
+    if (onClickBehaviour === 'dataItemPopup') {
+      this.getFlux().actions.panoptes.dataItemPopup({table, primKey: primKey.toString(), switchTo});
+    } else if (onClickBehaviour === 'tab') {
+      this.getFlux().actions.session.tabOpen(React.createElement(onClickComponent, onClickComponentPropsJSON, onClickComponentTemplate), switchTo);
+    } else if (onClickBehaviour === 'tooltip') {
+
+      //TODO: toolip
+      this.getFlux().actions.session.tabOpen(React.createElement(onClickComponent, onClickComponentPropsJSON, onClickComponentTemplate), switchTo);
+
+    } else {
+      console.error('Unhandled onClickBehaviour: ', onClickBehaviour);
+    }
   },
 
+
   render() {
-    let {className, columns, order, data, maxRowsPerPage, startRowIndex, nullReplacement, nanReplacement, onClickBehaviour} = this.props;
+    let {className, columns, order, data, maxRowsPerPage, startRowIndex, nullReplacement, nanReplacement} = this.props;
     let {loadStatus} = this.state;
 
     if (!this.tableConfig()) {
@@ -138,6 +160,7 @@ let MuiDataTableView = createReactClass({
     if (data === undefined || data === null) {
       return null;
     }
+
 
     //Data can be longer due to being cache friendly
     let stopRowIndex = undefined;
@@ -276,18 +299,13 @@ let MuiDataTableView = createReactClass({
             </TableHead>
             <TableBody>
               {data.map((row, rowIndex) => {
-
-                let onClickHandler = undefined;
-                if (onClickBehaviour === 'dataItemPopup') {
-                  onClickHandler = (e) => this.handleClickDataItemPopup(e, row[primaryKeyColumnId]);
-                }
-
+                const primKey = row[primaryKeyColumnId];
                 return (
                   <TableRow
                     hover
-                    key={'row_' + rowIndex}
+                    key={'row_' + primKey}
                     style={{cursor: 'pointer'}}
-                    onClick={onClickHandler}
+                    onClick={(e) => this.handleClick(e, primKey)}
                   >
                     {groupOrderedColumns.map((column, columnIndex) => {
                       const columnData = this.propertiesByColumn(column);
@@ -359,7 +377,7 @@ let MuiDataTableView = createReactClass({
 
 MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
 
-  let {table, columns, order, startRowIndex, query, maxRowsPerPage, joins} = props;
+  let {table, columns, order, startRowIndex, query, maxRowsPerPage, joins, onClickComponentTemplateDocPath} = props;
 
   query = query || (table ? config.tablesById[table].defaultQuery : null) || SQL.nullQuery;
 
@@ -389,6 +407,12 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
           joins,
           orderBy: order
         }, config)
+      },
+      onClickComponentTemplate: {
+        method: 'staticContent',
+        args: {
+          url: `/panoptes/Docs/${config.dataset}/${onClickComponentTemplateDocPath}`
+        }
       }
     }
   };
