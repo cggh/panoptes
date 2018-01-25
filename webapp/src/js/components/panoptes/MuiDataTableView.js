@@ -1,10 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
-// import Tooltip from 'material-ui/Tooltip'; // NOTE: rc-tooltip is incompatible here
 import Tooltip from 'rc-tooltip';
+//import Tooltip from 'material-ui/Tooltip';
+// NOTE: material-ui/Tooltip doesn't have a native trigger="click" equivalent
+// and its sides are sometimes obscured. It also appears smaller, by default.
+// For other differences between the two Tooltips compare:
+// https://material-ui-1dab0.firebaseapp.com/api/tooltip/
+// https://github.com/react-component/tooltip
 import _forEach from 'lodash.foreach';
 import _filter from 'lodash.filter';
 import Table, {
@@ -21,6 +27,9 @@ import resolveJoins from 'panoptes/resolveJoins';
 import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
+
+//FIXME: Allow any component for onClickComponent in onClickBehaviour tooltip.
+import ItemTemplate from 'panoptes/ItemTemplate';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -120,36 +129,39 @@ let MuiDataTableView = createReactClass({
     }
   },
 
-  handleClick(e, primKey) {
-    const {table, onClickBehaviour, onClickComponent, onClickComponentProps, onClickComponentTemplate} = this.props;
+  handleClick(e, primKey, onClickReactElement) {
+    const {table, onClickBehaviour} = this.props;
+
+    if (onClickBehaviour === 'tooltip') {
+      // tooltips are handled inline.
+      return;
+    }
+
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (!middleClick) {
       e.stopPropagation();
     }
     const switchTo = !middleClick;
 
-    let onClickComponentPropsJSON = onClickComponentProps !== undefined ? JSON.parse(onClickComponentProps) : {};
-    // Default to using the clicked table and the clicked row primKey.
-    onClickComponentPropsJSON.table = onClickComponentPropsJSON.table === undefined ? table : onClickComponentPropsJSON.table;
-    onClickComponentPropsJSON.primKey = onClickComponentPropsJSON.primKey === undefined ? primKey : onClickComponentPropsJSON.primKey;
-
     if (onClickBehaviour === 'dataItemPopup') {
       this.getFlux().actions.panoptes.dataItemPopup({table, primKey: primKey.toString(), switchTo});
     } else if (onClickBehaviour === 'tab') {
-      this.getFlux().actions.session.tabOpen(React.createElement(onClickComponent, onClickComponentPropsJSON, onClickComponentTemplate), switchTo);
-    } else if (onClickBehaviour === 'tooltip') {
-
-      //TODO: toolip
-      this.getFlux().actions.session.tabOpen(React.createElement(onClickComponent, onClickComponentPropsJSON, onClickComponentTemplate), switchTo);
-
+      this.getFlux().actions.session.tabOpen(onClickReactElement, switchTo);
     } else {
       console.error('Unhandled onClickBehaviour: ', onClickBehaviour);
     }
   },
 
+  beef(ham) {
+    return ham;
+  },
 
   render() {
-    let {className, columns, order, data, maxRowsPerPage, startRowIndex, nullReplacement, nanReplacement} = this.props;
+    let {
+      className, columns, order, data, maxRowsPerPage, startRowIndex,
+      nullReplacement, nanReplacement, table,
+      onClickBehaviour, onClickComponent, onClickComponentProps, onClickComponentTemplate
+    } = this.props;
     let {loadStatus} = this.state;
 
     if (!this.tableConfig()) {
@@ -300,12 +312,25 @@ let MuiDataTableView = createReactClass({
             <TableBody>
               {data.map((row, rowIndex) => {
                 const primKey = row[primaryKeyColumnId];
-                return (
+
+                let onClickComponentPropsJSON = onClickComponentProps !== undefined ? JSON.parse(onClickComponentProps) : {};
+                // Default to using the clicked table and the clicked row primKey.
+                onClickComponentPropsJSON.table = onClickComponentPropsJSON.table === undefined ? table : onClickComponentPropsJSON.table;
+                onClickComponentPropsJSON.primKey = onClickComponentPropsJSON.primKey === undefined ? primKey : onClickComponentPropsJSON.primKey;
+                const onClickReactElement = onClickComponent !== undefined ? React.createElement(onClickComponent, onClickComponentPropsJSON, onClickComponentTemplate) : undefined;
+
+                // FIXME: Allow any component.
+                if (onClickBehaviour === 'tooltip' && onClickComponent !== 'ItemTemplate') {
+                  console.error('onClickBehaviour tooltip currently only supports onClickComponent ItemTemplate, not: ', onClickComponent);
+                }
+                const tooltipReactElement = onClickComponent === 'ItemTemplate' ? React.createElement(ItemTemplate, onClickComponentPropsJSON, onClickComponentTemplate) : undefined;
+
+                const rowComponent =
                   <TableRow
                     hover
                     key={'row_' + primKey}
                     style={{cursor: 'pointer'}}
-                    onClick={(e) => this.handleClick(e, primKey)}
+                    onClick={(e) => this.handleClick(e, primKey, onClickReactElement)}
                   >
                     {groupOrderedColumns.map((column, columnIndex) => {
                       const columnData = this.propertiesByColumn(column);
@@ -355,9 +380,26 @@ let MuiDataTableView = createReactClass({
                           />
                         </TableCell>
                       );
+
                     }, this)}
                   </TableRow>
-                );
+                ;
+
+                if (onClickBehaviour === 'tooltip') {
+                  return (
+                    <Tooltip
+                      key={'row_' + primKey}
+                      trigger="click"
+                      placement="top"
+                      overlay={tooltipReactElement}
+                    >
+                      {rowComponent}
+                    </Tooltip>
+                  );
+                } else {
+                  return rowComponent;
+                }
+
               })}
             </TableBody>
           </Table>
