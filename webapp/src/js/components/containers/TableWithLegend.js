@@ -7,6 +7,7 @@ import SQL from 'panoptes/SQL';
 import MuiDataTableView from 'panoptes/MuiDataTableView';
 import Card, {CardContent} from 'material-ui/Card';
 import {withStyles} from 'material-ui/styles';
+import filterChildren from 'util/filterChildren';
 
 const styles = (theme) => ({
   card: {
@@ -24,11 +25,14 @@ let TableWithLegend = createReactClass({
     order: PropTypes.array,
     columns: PropTypes.array,
     columnWidths: PropTypes.object,
-    children: PropTypes.node,
     classes: PropTypes.object,
     disableMultipleColumnOrder: PropTypes.bool,
     maxRowsPerPage: PropTypes.number,
+    children: PropTypes.node,
     onClickBehaviour: PropTypes.string,
+    onClickComponent: PropTypes.string,
+    onClickComponentProps: PropTypes.string,
+    onClickComponentTemplateDocPath: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -57,15 +61,28 @@ let TableWithLegend = createReactClass({
   },
 
   render() {
-    let {table, query, order, columns, children, classes, maxRowsPerPage, onClickBehaviour} = this.props;
+    let {
+      table,
+      query,
+      order,
+      columns,
+      children,
+      classes,
+      maxRowsPerPage,
+      onClickBehaviour,
+      onClickComponent,
+      onClickComponentProps,
+      onClickComponentTemplateDocPath,
+    } = this.props;
     order = this.state.order || order;
     query = this.getDefinedQuery(query, table);
+    const filteredChildren = filterChildren(this, React.Children.toArray(children));
 
     return (
       <div className="centering-container">
         <Card className={classes.card}>
           <CardContent>
-            {children}
+            {filteredChildren}
             <MuiDataTableView
               table={table}
               query={query}
@@ -76,6 +93,9 @@ let TableWithLegend = createReactClass({
               nullReplacement="-"
               nanReplacement="-"
               onClickBehaviour={onClickBehaviour}
+              onClickComponent={onClickComponent}
+              onClickComponentProps={onClickComponentProps}
+              onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
             />
           </CardContent>
         </Card>
