@@ -42,7 +42,7 @@ let ItemTemplate = createReactClass({
   propTypes: {
     className: PropTypes.string,
     innerClassName: PropTypes.string,
-    children: PropTypes.string.isRequired,
+    children: PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired,
     table: PropTypes.string.isRequired,
     primKey: PropTypes.string.isRequired,
     immediate: PropTypes.bool,
@@ -71,6 +71,7 @@ let ItemTemplate = createReactClass({
 
   fetchData(props, requestContext) {
     let {table, primKey, children, data} = props;
+    children = children instanceof Array ? children.join('') : children;
     if (data) {
       let result = this.handlebars.compile(children)({...data, config: this.config});
       if (result.then) {
