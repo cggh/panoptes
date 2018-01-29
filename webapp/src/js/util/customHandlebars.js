@@ -16,7 +16,7 @@ const customHandlebars = ({dataset, handlebars}) => {
       columns.push(arguments[i]);
     }
     let {fn, inverse, hash, data} = options;
-    let {table, query, orderBy, distinct, joins, groupBy} = hash;
+    let {table, query, orderBy, distinct, joins, groupBy, start, stop} = hash;
     if (data) {
       data = hb.createFrame(data);
     }
@@ -29,6 +29,8 @@ const customHandlebars = ({dataset, handlebars}) => {
     table = Handlebars.compile(table)(this, {data});
     query = Handlebars.compile(query)(this, {data});
     joins = Handlebars.compile(joins)(this, {data});
+    start = Handlebars.compile(start)(this, {data});
+    stop = Handlebars.compile(stop)(this, {data});
 
     // FIXME: Requires explicit table.column syntax to work. (2018-01-29)
     // Ideally, foreignColumn should implicitly belong to foreignTable
@@ -56,6 +58,16 @@ const customHandlebars = ({dataset, handlebars}) => {
       groupBy = []; // API attempts groupBy.join('~')
     }
 
+    // API asserts (_isNumber(start) && _isNumber(stop)), which would fail for strings.
+    const startParsed = parseInt(start);
+    const stopParsed = parseInt(stop);
+    if (Number.isNaN(startParsed)) {
+      throw Error(`start should be a parsable integer, e.g. 1 or '2', but is currently: ${start}`);
+    }
+    if (Number.isNaN(stopParsed)) {
+      throw Error(`stop should be a parsable integer, e.g. 1 or '2', but is currently: ${stop}`);
+    }
+
     let queryAPIargs = {
       database: dataset,
       table,
@@ -65,7 +77,9 @@ const customHandlebars = ({dataset, handlebars}) => {
       query,
       transpose: true, //We want rows, not columns
       joins: joinsJSON,
-      groupBy
+      groupBy,
+      start: startParsed,
+      stop: stopParsed
     };
     return LRUCache.get(
       `query${JSON.stringify(queryAPIargs)}`,
