@@ -16,12 +16,13 @@ const customHandlebars = ({dataset, handlebars}) => {
       columns.push(arguments[i]);
     }
     let {fn, inverse, hash, data} = options;
-    let {table, query, orderBy, distinct, joins} = hash;
+    let {table, query, orderBy, distinct, joins, groupBy} = hash;
     if (data) {
       data = hb.createFrame(data);
     }
     query = query || SQL.nullQuery;
     orderBy = orderBy || null;
+    groupBy = groupBy || null;
     distinct = distinct === 'true' ? true : false;
     joins = joins || '';
 
@@ -39,11 +40,22 @@ const customHandlebars = ({dataset, handlebars}) => {
       try {
         orderBy = JSON.parse(Handlebars.compile(orderBy)(this));
       } catch (e) {
-        throw Error(`orderBy should be a list of columns e.g. [['asc', 'col1'], ['desc', 'col2']] is currently: ${Handlebars.compile(orderBy)(this)}`);
+        throw Error(`orderBy should be a list of columns e.g. [["asc", "col1"], ["desc", "col2"]] is currently: ${Handlebars.compile(orderBy)(this)}`);
       }
     } else {
       orderBy = '';
     }
+
+    if (groupBy) {
+      try {
+        groupBy = JSON.parse(Handlebars.compile(groupBy)(this));
+      } catch (e) {
+        throw Error(`groupBy should be a list of columns, e.g. ["foo", "bar"], but is currently: ${Handlebars.compile(groupBy)(this)}`);
+      }
+    } else {
+      groupBy = '';
+    }
+
     let queryAPIargs = {
       database: dataset,
       table,
@@ -52,7 +64,8 @@ const customHandlebars = ({dataset, handlebars}) => {
       distinct,
       query,
       transpose: true, //We want rows, not columns
-      joins: joinsJSON
+      joins: joinsJSON,
+      groupBy
     };
     return LRUCache.get(
       `query${JSON.stringify(queryAPIargs)}`,
