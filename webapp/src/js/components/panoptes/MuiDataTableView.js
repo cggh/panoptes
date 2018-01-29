@@ -28,6 +28,7 @@ import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
 
+
 //FIXME: Allow any component for onClickComponent in onClickBehaviour tooltip.
 import ItemTemplate from 'panoptes/ItemTemplate';
 
