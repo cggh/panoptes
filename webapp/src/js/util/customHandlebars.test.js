@@ -89,3 +89,17 @@ test('query with inner join', () => {
   return template(templateData).then((data) =>
     expect(data).toBe('test Entry:0,blue,small Entry:1,red,big'));
 });
+
+test('query with groupBy', () => {
+  API.query.mockClear();
+  let template = hb.compile('test{{#query table="table3" groupBy=\'["colour", "size"]\'}} Entry:{{@index}},{{colour}},{{size}}{{/query}}');
+  return template(templateData).then((data) =>
+    expect(data).toBe('test Entry:0,blue,small Entry:1,red,big'));
+});
+
+test('query with start and stop', () => {
+  API.query.mockClear();
+  let template = hb.compile('test{{#query table="table3" start="2" stop="2"}} Entry:{{@index}},{{colour}},{{size}}{{/query}}');
+  return template(templateData).then((data) =>
+    expect(data).toBe('test Entry:0,blue,small Entry:1,red,big'));
+});
