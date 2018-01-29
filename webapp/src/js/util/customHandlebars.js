@@ -53,7 +53,7 @@ const customHandlebars = ({dataset, handlebars}) => {
         throw Error(`groupBy should be a list of columns, e.g. ["foo", "bar"], but is currently: ${Handlebars.compile(groupBy)(this)}`);
       }
     } else {
-      groupBy = '';
+      groupBy = []; // API attempts groupBy.join('~')
     }
 
     let queryAPIargs = {
