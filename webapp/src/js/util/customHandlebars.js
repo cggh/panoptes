@@ -16,15 +16,24 @@ const customHandlebars = ({dataset, handlebars}) => {
       columns.push(arguments[i]);
     }
     let {fn, inverse, hash, data} = options;
-    let {table, query, orderBy, distinct} = hash;
+    let {table, query, orderBy, distinct, joins} = hash;
     if (data) {
       data = hb.createFrame(data);
     }
     query = query || SQL.nullQuery;
     orderBy = orderBy || null;
     distinct = distinct === 'true' ? true : false;
+    joins = joins || '';
+
     table = Handlebars.compile(table)(this, {data});
     query = Handlebars.compile(query)(this, {data});
+    joins = Handlebars.compile(joins)(this, {data});
+
+    // FIXME: Requires explicit table.column syntax to work. (2018-01-29)
+    // Ideally, foreignColumn should implicitly belong to foreignTable
+    // and column should implicitly belong to table, without qualificiation.
+    // {{#query 'pf_resgenes.gene_id' 'name' 'short_description' 'start' table='pf_resgenes' joins='[{"type": "INNER", "foreignTable": "pf_genes", "foreignColumn": "pf_genes.gene_id", "column": "pf_resgenes.gene_id"}]'}}
+    const joinsJSON = joins !== '' ? JSON.parse(joins) : {};
 
     if (orderBy) {
       try {
@@ -42,7 +51,8 @@ const customHandlebars = ({dataset, handlebars}) => {
       orderBy,
       distinct,
       query,
-      transpose: true //We want rows, not columns
+      transpose: true, //We want rows, not columns
+      joins: joinsJSON
     };
     return LRUCache.get(
       `query${JSON.stringify(queryAPIargs)}`,
@@ -97,4 +107,3 @@ const customHandlebars = ({dataset, handlebars}) => {
 
 
 export default customHandlebars;
-
