@@ -29,6 +29,7 @@ import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
 import calculateSize from 'calculate-size';
 
+
 //FIXME: Allow any component for onClickComponent in onClickBehaviour tooltip.
 import ItemTemplate from 'panoptes/ItemTemplate';
 
