@@ -14,6 +14,9 @@ import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import templateFieldsUsed from 'util/templateFieldsUsed';
 import _map from 'lodash.map';
+import _keys from 'lodash.keys';
+import _forEach from 'lodash.foreach';
+import resolveJoins from 'panoptes/resolveJoins';
 
 // Panoptes components
 import API from 'panoptes/API';
@@ -92,8 +95,18 @@ let ItemTemplate = createReactClass({
       childField[rel.childTable.id] = rel.childPropId;
     });
 
+    //Also the parent tables, and their possible columns that can be referred to
+    relations = this.config.tablesById[table].relationsChildOf;
+    let possibleParentTables = {};
+    relations.forEach((rel) => {
+      possibleParentTables[rel.parentTable.id] = _keys(rel.parentTable.propertiesById);
+    });
+    let usedParentTables = templateFieldsUsed(children, [], possibleParentTables);
+
+
     // Determine which childTables are actually used in the raw template.
     let usedChildTables = templateFieldsUsed(children, possibleChildTables);
+
     // Compose all the column specs for each table using the config data.
     let columnSpecsByTable = {};
     for (let i = 0, len = usedChildTables.length; i < len; i++) {
@@ -105,6 +118,8 @@ let ItemTemplate = createReactClass({
         columnSpecsByTable[usedChildTable].push(property);
       }
     }
+
+
     requestContext.request(
       (componentCancellation) => {
         // Add API calls for the used child tables onto an array of promises.
@@ -126,18 +141,20 @@ let ItemTemplate = createReactClass({
         });
 
         // Push the API call for the data item record onto the array of promises.
-        let APIargs = {
+        let APIargs = resolveJoins({
           database: this.config.dataset,
           table,
-          columns: _map(this.config.tablesById[table].properties, 'id'),
-          primKey: this.config.tablesById[table].primKey,
-          primKeyValue: primKey
-        };
+          columns: _map(this.config.tablesById[table].properties, 'id').concat(usedParentTables),
+          transpose: true,
+          query: SQL.WhereClause.encode(
+            SQL.WhereClause.CompareFixed(this.config.tablesById[table].primKey, '=', primKey)
+          ),
+        }, this.config);
         promises.push(
           LRUCache.get(
-            `fetchSingleRecord${JSON.stringify(APIargs)}`,
+            `query${JSON.stringify(APIargs)}`,
             (cacheCancellation) =>
-              API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
+              API.query({cancellation: cacheCancellation, ...APIargs}),
             componentCancellation
           )
         );
@@ -147,6 +164,21 @@ let ItemTemplate = createReactClass({
       })
       .then((data) => {
         let templateData = data.pop();
+        //Only expecting one row as we queried on primKey
+        if (templateData.length === 1) {
+          templateData = templateData[0];
+        } else {
+          templateData = {};
+        }
+        //For data from parent tables we need pack it into objects for handlebars
+        _forEach(templateData, (value, key) => {
+          if(key.indexOf('.') !== -1) {
+            let [table, col] = key.split('.');
+            templateData[table] = templateData[table] || {};
+            templateData[table][col] = value;
+          }
+        });
+        //The remaining data is for child tables
         usedChildTables.map((tableName, index) => templateData[tableName] = data[index]);
         return templateData;
       })

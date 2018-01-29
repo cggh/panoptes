@@ -112,3 +112,14 @@ tableBasedSummaryValues:
   blockSizeMin: 20                  # Minimum block size used by the multiresolution summariser (in bp)
   blockSizeMax: 50000               # Maximum block size used by the multiresolution summariser (in bp)
   channelColor: rgb(0,100,0)        # Colour used to display this genome browser track
+
+dataItemViews:
+- type: Overview                                       # Specifies the default view of all fields
+  name: Overview
+- type: Template                                       # Add a template based view
+  name: Details
+  content: |
+    <h4>{{key}}</h4>
+    {{Contributor_ID}}
+    <p>An example of using a column from a related table:</p>
+    <p>Site Name: {{samplingsites.SiteID}},{{samplingsites.Country}}</p>

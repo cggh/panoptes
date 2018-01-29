@@ -307,6 +307,7 @@ let DataTableView = createReactClass({
 
                 let columnData = this.propertiesByColumn(column);
                 let {id, isPrimKey} = columnData;
+                let colTable = columnData.tableId;
                 let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
                 let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
                 return (
@@ -342,7 +343,8 @@ let DataTableView = createReactClass({
 
                       let background = 'inherit';
                       let {maxVal, minVal, valueColours, showBar, alignment} = columnData;
-                      let cellData = rows[rowIndex][id];
+                      //Qualify foreign names
+                      let cellData = rows[rowIndex][colTable === table ? id : `${colTable}.${id}`];
                       if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                         cellData = parseFloat(cellData);
                         let percent = 100 * (cellData - minVal) / (maxVal - minVal);
