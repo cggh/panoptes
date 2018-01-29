@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
@@ -13,6 +12,7 @@ import Tooltip from 'rc-tooltip';
 // https://github.com/react-component/tooltip
 import _forEach from 'lodash.foreach';
 import _filter from 'lodash.filter';
+import _clone from 'lodash.clone';
 import Table, {
   TableBody,
   TableCell,
@@ -27,6 +27,7 @@ import resolveJoins from 'panoptes/resolveJoins';
 import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
+
 
 //FIXME: Allow any component for onClickComponent in onClickBehaviour tooltip.
 import ItemTemplate from 'panoptes/ItemTemplate';
@@ -62,7 +63,7 @@ let MuiDataTableView = createReactClass({
     nanReplacement: PropTypes.string,
     onClickBehaviour: PropTypes.string,
     onClickComponent: PropTypes.string,
-    onClickComponentProps: PropTypes.string,
+    onClickComponentProps: PropTypes.object,
     onClickComponentTemplateDocPath: PropTypes.string,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array, // This will be provided via withAPIData
@@ -313,8 +314,12 @@ let MuiDataTableView = createReactClass({
               {data.map((row, rowIndex) => {
                 const primKey = row[primaryKeyColumnId];
 
-                let onClickComponentPropsJSON = onClickComponentProps !== undefined ? JSON.parse(onClickComponentProps) : {};
-                // Default to using the clicked table and the clicked row primKey.
+                // NOTE: onClickComponentProps should have been converted automatically
+                // from a string (element attribute value in template) to a JSON object.
+                // NOTE: Need to clone onClickComponentProps,
+                // otherwise primKey will remain set to the first primKey, as though it had been specified explicitly.
+                let onClickComponentPropsJSON = onClickComponentProps !== undefined ? _clone(onClickComponentProps) : {};
+                // Default to using the clicked table and the clicked row primKey (otherwise use the value provided via onClickComponentProps).
                 onClickComponentPropsJSON.table = onClickComponentPropsJSON.table === undefined ? table : onClickComponentPropsJSON.table;
                 onClickComponentPropsJSON.primKey = onClickComponentPropsJSON.primKey === undefined ? primKey : onClickComponentPropsJSON.primKey;
                 const onClickReactElement = onClickComponent !== undefined ? React.createElement(onClickComponent, onClickComponentPropsJSON, onClickComponentTemplate) : undefined;
