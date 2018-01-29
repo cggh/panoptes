@@ -82,6 +82,10 @@ test('can use a handlebars helper', () => {
   });
 });
 
-
-
-
+// NOTE: This isn't a test of the join, only the handlebars syntax parsing.
+test('query with inner join', () => {
+  API.query.mockClear();
+  let template = hb.compile('test{{#query table="table3" joins=\'[{"type": "INNER", "foreignTable": "table4", "foreignColumn": "id", "column": "id"}]\'}} Entry:{{@index}},{{colour}},{{size}}{{/query}}');
+  return template(templateData).then((data) =>
+    expect(data).toBe('test Entry:0,blue,small Entry:1,red,big'));
+});
