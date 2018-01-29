@@ -21,24 +21,23 @@ const customHandlebars = ({dataset, handlebars}) => {
       data = hb.createFrame(data);
     }
     query = query || SQL.nullQuery;
-    orderBy = orderBy || null;
-    groupBy = groupBy || null;
     distinct = distinct === 'true' ? true : false;
-    joins = joins || '';
 
-    table = Handlebars.compile(table)(this, {data});
-    query = Handlebars.compile(query)(this, {data});
-    joins = Handlebars.compile(joins)(this, {data});
-    start = Handlebars.compile(start)(this, {data});
-    stop = Handlebars.compile(stop)(this, {data});
+    // NOTE: "You must pass a string or Handlebars AST to Handlebars.compile."
+    // Except undefined is acceptable.
+    table = typeof table === 'string' ? Handlebars.compile(table)(this, {data}) : undefined;
+    query = typeof query === 'string' ? Handlebars.compile(query)(this, {data}) : undefined;
+    joins = typeof joins === 'string' ? Handlebars.compile(joins)(this, {data}) : undefined;
+    start = typeof start === 'string' ? Handlebars.compile(start)(this, {data}) : undefined;
+    stop = typeof stop === 'string' ? Handlebars.compile(stop)(this, {data}) : undefined;
 
     // FIXME: Requires explicit table.column syntax to work. (2018-01-29)
     // Ideally, foreignColumn should implicitly belong to foreignTable
     // and column should implicitly belong to table, without qualificiation.
     // {{#query 'pf_resgenes.gene_id' 'name' 'short_description' 'start' table='pf_resgenes' joins='[{"type": "INNER", "foreignTable": "pf_genes", "foreignColumn": "pf_genes.gene_id", "column": "pf_resgenes.gene_id"}]'}}
-    const joinsJSON = joins !== '' ? JSON.parse(joins) : {};
+    const joinsJSON = joins !== undefined ? JSON.parse(joins) : {};
 
-    if (orderBy) {
+    if (typeof orderBy === 'string') {
       try {
         orderBy = JSON.parse(Handlebars.compile(orderBy)(this));
       } catch (e) {
@@ -48,7 +47,7 @@ const customHandlebars = ({dataset, handlebars}) => {
       orderBy = '';
     }
 
-    if (groupBy) {
+    if (typeof groupBy === 'string') {
       try {
         groupBy = JSON.parse(Handlebars.compile(groupBy)(this));
       } catch (e) {
@@ -59,13 +58,19 @@ const customHandlebars = ({dataset, handlebars}) => {
     }
 
     // API asserts (_isNumber(start) && _isNumber(stop)), which would fail for strings.
-    const startParsed = parseInt(start);
-    const stopParsed = parseInt(stop);
-    if (Number.isNaN(startParsed)) {
-      throw Error(`start should be a parsable integer, e.g. 1 or '2', but is currently: ${start}`);
+    let startParsed = undefined;
+    if (start !== undefined) {
+      startParsed = parseInt(start);
+      if (Number.isNaN(startParsed)) {
+        throw Error(`start should be a parsable integer, e.g. 1 or '2', but is currently: ${start}`);
+      }
     }
-    if (Number.isNaN(stopParsed)) {
-      throw Error(`stop should be a parsable integer, e.g. 1 or '2', but is currently: ${stop}`);
+    let stopParsed = undefined;
+    if (stop !== undefined) {
+      stopParsed = parseInt(stop);
+      if (Number.isNaN(stopParsed)) {
+        throw Error(`stop should be a parsable integer, e.g. 1 or '2', but is currently: ${stop}`);
+      }
     }
 
     let queryAPIargs = {
