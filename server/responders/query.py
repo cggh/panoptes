@@ -13,7 +13,7 @@ from DQXDbTools import desciptionToDType
 
 import config
 from cache import getCache
-from columnDecode import decode
+from columnDecode import decode, name
 from gzipstream import gzip
 from dates import datetimeToJulianDay
 
@@ -42,7 +42,8 @@ def handler(start_response, requestData):
     query = content['query']
     orderBy = json.loads(content.get('orderBy', '[]'))
     distinct = content.get('distinct', 'false') == 'true'
-    columns = map(decode, json.loads(content['columns']))
+    rawColumns = json.loads(content['columns'])
+    columns = map(decode, rawColumns)
     groupBy = content.get('groupBy', None)
     database = content['database']
     startRow, endRow = None, None
@@ -97,19 +98,20 @@ def handler(start_response, requestData):
             if DQXDbTools.LogRequests:
                 DQXUtils.LogServer('###QRY:'+sqlQuery)
                 DQXUtils.LogServer('###PARAMS:'+str(whereClause.queryparams))
-
             cur.execute(sqlQuery, whereClause.queryparams)
             rows = cur.fetchall()
             result = {}
-            for i, desc in enumerate(cur.description):
+            for rawCol, (i, desc) in zip(rawColumns, enumerate(cur.description)):
+                #Figure out the name we should return for the column - by deafult monet doesn't qualify names
+                col_name = name(rawCol, desc[0])
                 dtype = desciptionToDType(desc[1])
                 if dtype in ['i1', 'i2', 'i4', 'S']:
                     null_value = NULL_VALUES[dtype]
-                    result[desc[0]] = np.array([(row[i].encode('ascii', 'replace') if dtype == 'S' else row[i]) if row[i] is not None else null_value for row in rows], dtype=dtype)
+                    result[col_name] = np.array([(row[i].encode('ascii', 'replace') if dtype == 'S' else row[i]) if row[i] is not None else null_value for row in rows], dtype=dtype)
                 elif desc[1] == 'timestamp':
-                    result[desc[0]] = np.array([datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
+                    result[col_name] = np.array([datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
                 else:
-                    result[desc[0]] = np.array([row[i] for row in rows], dtype=dtype)
+                    result[col_name] = np.array([row[i] for row in rows], dtype=dtype)
             data = gzip(data=''.join(arraybuffer.encode_array_set(result.items())))
             if cacheData:
                 cache[cacheKey] = data

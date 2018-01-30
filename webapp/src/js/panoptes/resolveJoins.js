@@ -10,12 +10,6 @@ export default function resolveJoins(queryAPIargs, config) {
         join.foreignColumn = `${join.foreignTable}.${join.foreignColumn}`;
       }
     }
-    // Assume that unqualified columns in the list belong to queryAPIargs.table
-    for (let i = 0; i < queryAPIargs.columns.length; i++) {
-      if (queryAPIargs.columns[i].indexOf('.') === -1) {
-        queryAPIargs.columns[i] = `${queryAPIargs.table}.${queryAPIargs.columns[i]}`;
-      }
-    }
   } else {
     // Extract implicit joins; joins implied by columns belonging to other tables.
     queryAPIargs.joins = [];
@@ -49,6 +43,16 @@ export default function resolveJoins(queryAPIargs, config) {
     if (queryAPIargs.joins.length === 0) {
       queryAPIargs.joins = undefined;
     }
+  }
+  //If we have any joins then qualify the unqualified names as belonging to the root table - alias them so this is transparent to calling code.
+  if (queryAPIargs.joins && queryAPIargs.joins.length !== 0) {
+    queryAPIargs.columns = queryAPIargs.columns.map((column) => {
+      if (column.indexOf('.') === -1) {
+        return {expr: `${queryAPIargs.table}.${column}`, as: column};
+      } else {
+        return column;
+      }
+    })
   }
   return queryAPIargs;
 }

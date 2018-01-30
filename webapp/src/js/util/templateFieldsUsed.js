@@ -1,13 +1,13 @@
 import Handlebars from 'handlebars';
 import _uniq from 'lodash.uniq';
 import _map from 'lodash.map';
+import _forEach from 'lodash.foreach';
 import _isFunction from 'lodash.isfunction';
 
-export default function(template, possibleTables) {
+export default function(template, possibleTables, possibleParentTablesAndFields) {
 
   // For the given template, return the list of fields actually used in the template.
   // Note: only goes one level deep in terms of child fields - it will go deep for "if"s
-
   // Create a separate Handlebars instance.
   let hb = Handlebars.create();
 
@@ -86,6 +86,15 @@ export default function(template, possibleTables) {
       usedFields.push(field);
     };
   });
+  if (possibleParentTablesAndFields) {
+    _forEach(possibleParentTablesAndFields, (fields, tableName) => {
+        let fieldTracers = {};
+        _forEach(fields, (field) =>
+          fieldTracers[field] = () => usedFields.push(`${tableName}.${field}`));
+        tracers[tableName] = fieldTracers;
+      }
+    );
+  }
 
   // Compile the template.
   let compiledTemplate = hb.compile(template);

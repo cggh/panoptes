@@ -26,3 +26,12 @@ def decode(column):
         return _decode(column)
     elif isinstance(column, object):
         return _decode(column['expr']) + ' AS ' + DBCOLESC(column['as'])
+
+
+def name(column, descName):
+    if isinstance(column, (str, unicode)):
+        return str(column)
+    if isinstance(column, (int, float, list, tuple)):
+        return str(descName)
+    elif isinstance(column, object):
+        return str(column['as'])
