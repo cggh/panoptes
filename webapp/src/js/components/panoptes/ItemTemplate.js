@@ -50,11 +50,11 @@ let ItemTemplate = createReactClass({
   },
 
   componentWillMount() {
-    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars: this.props.immediate ? Handlebars : null});
+    this.handlebars = customHandlebars({...this.config, handlebars: this.props.immediate ? Handlebars : null});
   },
 
   onConfigChange() {
-    this.handlebars = customHandlebars({dataset: this.config.dataset, handlebars: this.props.immediate ? Handlebars : null});
+    this.handlebars = customHandlebars({...this.config, handlebars: this.props.immediate ? Handlebars : null});
   },
 
   getDefaultProps() {
