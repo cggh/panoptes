@@ -22,7 +22,11 @@
               {{/query}}<br/>
             {{/query}}
         </p>
-
+        <p>Here is an example of a template being filled for each row of a query, with an implicit join:<br/>
+            {{#query 'key' 'samplingsites.Country' table='samples'}}
+              {{key}}:{{samplingsites.Country}},
+            {{/query}}
+        </p>
         <p>Some buttons that open popups or tabs:</p>
         <PopupButton target="tab" label="Table of Samples" icon="table">
             <DataTableWithActions table="samples"/>

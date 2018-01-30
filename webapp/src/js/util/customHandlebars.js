@@ -5,9 +5,11 @@ import SQL from 'panoptes/SQL';
 import LRUCache from 'util/LRUCache';
 import Q from 'q';
 import _map from 'lodash.map';
+import _forEach from 'lodash.foreach';
 import handlebarsHelpers from 'handlebars-helpers';
+import resolveJoins from 'panoptes/resolveJoins';
 
-const customHandlebars = ({dataset, handlebars}) => {
+const customHandlebars = ({dataset, tablesById, handlebars}) => {
   let hb = handlebars || promisedHandlebars(Handlebars);
   hb.registerHelper('query', function() {
     let columns = [];
@@ -31,11 +33,7 @@ const customHandlebars = ({dataset, handlebars}) => {
     start = typeof start === 'string' ? Handlebars.compile(start)(this, {data}) : undefined;
     stop = typeof stop === 'string' ? Handlebars.compile(stop)(this, {data}) : undefined;
 
-    // FIXME: Requires explicit table.column syntax to work. (2018-01-29)
-    // Ideally, foreignColumn should implicitly belong to foreignTable
-    // and column should implicitly belong to table, without qualificiation.
-    // {{#query 'pf_resgenes.gene_id' 'name' 'short_description' 'start' table='pf_resgenes' joins='[{"type": "INNER", "foreignTable": "pf_genes", "foreignColumn": "pf_genes.gene_id", "column": "pf_resgenes.gene_id"}]'}}
-    const joinsJSON = joins !== undefined ? JSON.parse(joins) : {};
+    const joinsJSON = joins !== undefined ? JSON.parse(joins) : undefined;
 
     if (typeof orderBy === 'string') {
       try {
@@ -86,6 +84,7 @@ const customHandlebars = ({dataset, handlebars}) => {
       start: startParsed,
       stop: stopParsed
     };
+    queryAPIargs = resolveJoins(queryAPIargs, {tablesById});
     return LRUCache.get(
       `query${JSON.stringify(queryAPIargs)}`,
       (cacheCancellation) =>
@@ -99,6 +98,15 @@ const customHandlebars = ({dataset, handlebars}) => {
             data = hb.createFrame(options.data);
           }
           return Promise.all(_map(rows, (row, index) => {
+            //We need to unpack data from related tables
+            _forEach(row, (value, key) => {
+              if(key.indexOf('.') !== -1) {
+                let [table, col] = key.split('.');
+                row[table] = row[table] || {};
+                row[table][col] = value;
+              }
+            });
+
             if (data) {
               data.index = index;
               data.first = index === 0;
