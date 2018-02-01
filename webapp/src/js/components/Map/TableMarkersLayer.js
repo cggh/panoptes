@@ -1,9 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
-
 import createReactClass from 'create-react-class';
-
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -12,13 +9,13 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Lodash
 import _isEmpty from 'lodash.isempty';
-
 import _sum from 'lodash.sum';
 import _filter from 'lodash.filter';
 import _map from 'lodash.map';
 import _forEach from 'lodash.foreach';
 import _keys from 'lodash.keys';
 import _countBy from 'lodash.countby';
+import _clone from 'lodash.clone';
 
 // Panoptes
 import API from 'panoptes/API';
@@ -40,6 +37,8 @@ import PropertyLegend from 'panoptes/PropertyLegend';
 import MapControlComponent from 'Map/MapControlComponent';
 import filterChildren from 'util/filterChildren';
 import ItemLink from 'panoptes/ItemLink';
+import ItemTemplate from 'panoptes/ItemTemplate';
+import Template from 'Template';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
@@ -54,7 +53,7 @@ let TableMarkersLayer = createReactClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('highlight', 'primKey', 'query', 'table', 'markerColourProperty')
+    DataFetcherMixin('highlight', 'primKey', 'query', 'table', 'markerColourProperty', 'onClickComponentTemplateDocPath')
   ],
 
   //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
@@ -81,13 +80,20 @@ let TableMarkersLayer = createReactClass({
     clusterMarkers: PropTypes.bool,
     clickTable: PropTypes.string,
     clickPrimaryKeyProperty: PropTypes.string,
-    children: PropTypes.node
+    children: PropTypes.node,
+    onClickSingleBehaviour: PropTypes.string,
+    onClickSingleComponent: PropTypes.string,
+    onClickSingleComponentProps: PropTypes.object,
+    onClickSingleComponentTemplateDocPath: PropTypes.string,
+    onClickClusterBehaviour: PropTypes.string,
+    onClickClusterComponent: PropTypes.string,
+    onClickClusterComponentProps: PropTypes.object,
+    onClickClusterComponentTemplateDocPath: PropTypes.string,
   },
 
   childContextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object,
-    onClickMarker: PropTypes.func
   },
 
   getChildContext() {
@@ -107,52 +113,54 @@ let TableMarkersLayer = createReactClass({
     return {
       showLegend: true,
       disableOnClickMarker: false,
-      clusterMarkers: true
+      clusterMarkers: true,
+      onClickSingleBehaviour: 'dataItemPopup',
+      onClickClusterBehaviour: 'popup',
     };
   },
 
   // Event handlers
-  handleClickSingleMarker(e, payload) {
-    let {table, primKey} = payload;
+  handleClickSingleMarker(e, onClickSingleProps, onClickSingleReactElement) {
+
+    const {onClickSingleBehaviour} = this.props;
+
+    if (onClickSingleBehaviour === 'tooltip') {
+      // tooltips are handled inline.
+      console.error('Tried to handle a tooltip onClick via handleClickSingleMarker');
+      return;
+    }
+
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table, primKey, switchTo: !middleClick});
+    const switchTo = !middleClick;
+
+    if (onClickSingleBehaviour === 'dataItemPopup') {
+      this.getFlux().actions.panoptes.dataItemPopup({table: onClickSingleProps.table, primKey: onClickSingleProps.primKey, switchTo});
+    } else if (onClickSingleBehaviour === 'tab') {
+      this.getFlux().actions.session.tabOpen(onClickSingleReactElement, switchTo);
+    } else {
+      console.error('Unhandled onClickSingleBehaviour: ', onClickSingleBehaviour);
+    }
   },
 
-  handleClickClusterMarker(e, payload) {
-    let {table, originalLat, originalLng, latProperty, lngProperty} = payload;
+  handleClickClusterMarker(e, onClickClusterReactElement) {
+
+    const {onClickClusterBehaviour} = this.props;
+
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    let switchTo = !middleClick;
+    const switchTo = !middleClick;
 
-    if (this.config.tablesById[table].listView) {
-      this.getFlux().actions.session.popupOpen(<ListWithActions table={table} />, switchTo);
+    if (onClickClusterBehaviour === 'popup') {
+      this.getFlux().actions.session.popupOpen(onClickClusterReactElement, switchTo);
+    } else if (onClickClusterBehaviour === 'tab') {
+      this.getFlux().actions.session.tabOpen(onClickClusterReactElement, switchTo);
     } else {
-
-      let encodedPopupQuery = undefined;
-
-      let positionQuery = SQL.WhereClause.AND([
-        SQL.WhereClause.CompareFixed(latProperty, '=', originalLat),
-        SQL.WhereClause.CompareFixed(lngProperty, '=', originalLng)
-      ]);
-
-      let baseQueryDecoded = SQL.WhereClause.decode(this.props.query);
-      if (baseQueryDecoded.isTrivial) {
-        positionQuery.isRoot = true;
-        encodedPopupQuery = SQL.WhereClause.encode(positionQuery);
-      } else {
-        let newAND = SQL.WhereClause.Compound('AND');
-        newAND.addComponent(baseQueryDecoded);
-        newAND.addComponent(positionQuery);
-        newAND.isRoot = true;
-        encodedPopupQuery = SQL.WhereClause.encode(newAND);
-      }
-
-      this.getFlux().actions.session.popupOpen(<DataTableWithActions key={`${table}_${encodedPopupQuery}`} table={table} query={encodedPopupQuery}/>, switchTo);
+      console.error('Unhandled onClickClusterBehaviour: ', onClickClusterBehaviour);
     }
   },
 
@@ -164,7 +172,11 @@ let TableMarkersLayer = createReactClass({
 
   fetchData(props, requestContext) {
 
-    let {highlight, primKey, table, query, markerColourProperty, clickPrimaryKeyProperty} = props;
+    let {
+      highlight, primKey, table, query, markerColourProperty,
+      clickPrimaryKeyProperty, onClickSingleComponentTemplateDocPath,
+      onClickClusterComponentTemplateDocPath
+    } = props;
     let {changeLayerStatus} = this.context;
 
     if (table !== this.props.table ||
@@ -205,7 +217,7 @@ let TableMarkersLayer = createReactClass({
 
     // If no highlight has been specified, but a primKey has been then convert primKey to a highlight.
     if (highlight === undefined && primKey !== undefined) {
-      highlight =  `${locationPrimKeyProperty}:${primKey}`;
+      highlight = `${locationPrimKeyProperty}:${primKey}`;
     }
 
     // TODO: check highlight looks like "highlightField:highlightValue"
@@ -228,29 +240,67 @@ let TableMarkersLayer = createReactClass({
       }
     }
 
+    // Get all markers using the specified table.
+    let locationAPIargs = {
+      columns: Array.from(locationColumns),
+      database: this.config.dataset,
+      query: this.getDefinedQuery(query, table),
+      table: tableConfig.id,
+      transpose: true
+    };
+
+    let onClickSingleTemplateAPIargs = {
+      url: `/panoptes/Docs/${this.config.dataset}/${onClickSingleComponentTemplateDocPath}`
+    };
+
+    let onClickClusterTemplateAPIargs = {
+      url: `/panoptes/Docs/${this.config.dataset}/${onClickClusterComponentTemplateDocPath}`
+    };
+
     requestContext.request(
       (componentCancellation) => {
 
-        // Get all markers using the specified table.
-        let locationAPIargs = {
-          columns: Array.from(locationColumns),
-          database: this.config.dataset,
-          query: this.getDefinedQuery(query, table),
-          table: tableConfig.id,
-          transpose: true
-        };
+        let promises = [
+          LRUCache.get(
+            `query${JSON.stringify(locationAPIargs)}`, (cacheCancellation) =>
+              API.query({
+                cancellation: cacheCancellation,
+                ...locationAPIargs
+              }),
+            componentCancellation
+          )
+        ];
 
-        return LRUCache.get(
-          `query${JSON.stringify(locationAPIargs)}`, (cacheCancellation) =>
-            API.query({
-              cancellation: cacheCancellation,
-              ...locationAPIargs
-            }),
-          componentCancellation
-        );
+        // Don't make these calls unnecessarily.
+        if (onClickSingleComponentTemplateDocPath !== undefined) {
+          promises.push(
+            LRUCache.get(
+              `staticContent${JSON.stringify(onClickSingleTemplateAPIargs)}`, (cacheCancellation) =>
+                API.staticContent({
+                  cancellation: cacheCancellation,
+                  ...onClickSingleTemplateAPIargs
+                }),
+              componentCancellation
+            )
+          );
+        }
+        if (onClickClusterComponentTemplateDocPath !== undefined) {
+          promises.push(
+            LRUCache.get(
+              `staticContent${JSON.stringify(onClickClusterTemplateAPIargs)}`, (cacheCancellation) =>
+                API.staticContent({
+                  cancellation: cacheCancellation,
+                  ...onClickClusterTemplateAPIargs
+                }),
+              componentCancellation
+            )
+          );
+        }
 
-      })
-      .then((data) => {
+        return Promise.all(promises);
+      }
+    )
+      .then(([data, onClickComponentTemplate]) => {
 
         let markers = []; // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
         let markersGroupedByLocation = {};
@@ -321,7 +371,7 @@ let TableMarkersLayer = createReactClass({
           markersGroupedByLocation[location].push(marker);
         }
 
-        this.setState({markersGroupedByLocation, minValue, maxValue});
+        this.setState({markersGroupedByLocation, minValue, maxValue, onClickComponentTemplate});
         changeLayerStatus({loadStatus: 'loaded', bounds: CalcMapBounds.calcMapBounds(markers)});
 
       })
@@ -337,13 +387,33 @@ let TableMarkersLayer = createReactClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker, clusterMarkers, children, clickPrimaryKeyProperty, clickTable} = this.props;
+    let {
+      markerColourProperty, table, showLegend, maxLegendItems,
+      disableOnClickMarker, clusterMarkers, children, clickPrimaryKeyProperty,
+      clickTable,
+      onClickSingleBehaviour,
+      onClickSingleComponent,
+      onClickSingleComponentProps,
+      onClickClusterBehaviour,
+      onClickClusterComponent,
+      onClickClusterComponentProps,
+    } = this.props;
 
-    let {markersGroupedByLocation, minValue, maxValue} = this.state;
+    let {markersGroupedByLocation, minValue, maxValue, onClickClusterComponentTemplate, onClickSingleComponentTemplate} = this.state;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     if (_isEmpty(markersGroupedByLocation)) {
       return null;
+    }
+
+    // NOTE: clickPrimaryKeyProperty should probably be deprecated, but is still supported here.
+    // Change default onClickSingleBehaviour if clickPrimaryKeyProperty is defined.
+    if (clickPrimaryKeyProperty !== undefined) {
+      onClickSingleBehaviour = 'tooltip';
+      // Default to using table for clickTable.
+      if (clickTable === undefined) {
+        clickTable = table;
+      }
     }
 
     let markerColourPropertyIsNumerical = false;
@@ -354,7 +424,7 @@ let TableMarkersLayer = createReactClass({
       markerColourPropertyIsCategorical = this.config.tablesById[table].propertiesById[markerColourProperty].isCategorical;
     }
 
-    let clusteredMarkers = [];
+    let markers = [];
     const uniqueValues = {};
 
     for (let location in markersGroupedByLocation) {
@@ -396,7 +466,7 @@ let TableMarkersLayer = createReactClass({
         // at least not to the fillColour of the bins,
         // because each bin represents a range of values.
 
-        clusteredMarkers.push({
+        markers.push({
           clusterType: 'histogram',
           chartDataTable: table,
           key: location,
@@ -444,7 +514,7 @@ let TableMarkersLayer = createReactClass({
           });
         }
 
-        clusteredMarkers.push({
+        markers.push({
           clusterType: 'pieChart',
           chartDataTable: table,
           key: location,
@@ -466,14 +536,14 @@ let TableMarkersLayer = createReactClass({
       }
 
     }
-    if (clusteredMarkers.length > 0) {
+    if (markers.length > 0) {
 
       // NB: Copied from PieChartMarkersLayer
       let size = map.getSize();
       let bounds = map.getBounds();
       let pixelArea = size.x * size.y;
       let pieAreaSum = _sum(_map(
-        _filter(clusteredMarkers, (marker) => {
+        _filter(markers, (marker) => {
           let {lat, lng} = marker;
           return bounds.contains([lat, lng]);
         }),
@@ -484,7 +554,7 @@ let TableMarkersLayer = createReactClass({
         lengthRatio = Math.sqrt(0.05 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
-      _forEach(clusteredMarkers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
+      _forEach(markers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
       return (
         <FeatureGroup
           layerContainer={layerContainer}
@@ -502,7 +572,7 @@ let TableMarkersLayer = createReactClass({
             : null
           }
           {clusterMarkers ?
-            <GeoLayouter nodes={clusteredMarkers}>
+            <GeoLayouter nodes={markers}>
               {
                 (renderNodes) =>
                   <FeatureGroup>
@@ -556,18 +626,86 @@ let TableMarkersLayer = createReactClass({
                             console.error('Unhandled marker.clusterType: %o', marker.clusterType);
                           }
 
+                          let key = undefined;
+                          let query = undefined;
+                          if (onClickClusterComponent === undefined) {
+
+                            // If no onClickClusterComponent has been defined,
+                            // then use the table's listView to determine the default component,
+                            // i.e. whether to use ListWithActions or DataTableWithActions.
+
+                            if (this.config.tablesById[table].listView) {
+                              onClickClusterComponent = 'ListWithActions';
+                            } else {
+                              onClickClusterComponent = 'DataTableWithActions';
+                            }
+                          }
+
+                          if (onClickClusterComponent === 'DataTableWithActions') {
+
+                            // Compose the default key and query for DataTableWithActions
+                            // NOTE: these may be overridden via onClickClusterComponentProps
+
+                            let positionQuery = SQL.WhereClause.AND([
+                              SQL.WhereClause.CompareFixed(marker.latProperty, '=', marker.originalLat),
+                              SQL.WhereClause.CompareFixed(marker.lngProperty, '=', marker.originalLng)
+                            ]);
+
+                            let encodedPopupQuery = undefined;
+                            let baseQueryDecoded = SQL.WhereClause.decode(this.props.query);
+                            if (baseQueryDecoded.isTrivial) {
+                              positionQuery.isRoot = true;
+                              encodedPopupQuery = SQL.WhereClause.encode(positionQuery);
+                            } else {
+                              let newAND = SQL.WhereClause.Compound('AND');
+                              newAND.addComponent(baseQueryDecoded);
+                              newAND.addComponent(positionQuery);
+                              newAND.isRoot = true;
+                              encodedPopupQuery = SQL.WhereClause.encode(newAND);
+                            }
+                            key = `${table}_${encodedPopupQuery}`;
+                            query = encodedPopupQuery;
+                          }
+
+                          // NOTE: onClickClusterComponentProps should have been converted automatically
+                          // from a string (element attribute value in template) to a JSON object.
+                          // NOTE: Need to clone onClickClusterComponentProps,
+                          // otherwise properties will remain set to the defaults, as though they had been specified explicitly.
+                          const onClickClusterComponentPropsJSON = onClickClusterComponentProps !== undefined ? _clone(onClickClusterComponentProps) : {};
+
+                          const onClickClusterComponentDefaultProps = {
+                            table: marker.table,
+                            originalLat: marker.originalLat,
+                            originalLng: marker.originalLng,
+                            latProperty: marker.latProperty,
+                            lngProperty: marker.lngProperty,
+                            key,
+                            query,
+                            flux: this.getFlux(),
+                          };
+
+                          const onClickClusterComponentMergedProps = {...onClickClusterComponentDefaultProps, ...onClickClusterComponentPropsJSON};
+                          const onClickClusterReactElement = onClickClusterComponent !== undefined ? React.createElement(onClickClusterComponent, onClickClusterComponentMergedProps, onClickClusterComponentTemplate) : undefined;
+
+                          let onClickClusterTooltipReactElement = undefined;
+                          if (onClickClusterBehaviour === 'tooltip' && onClickClusterComponent === 'DataTableWithActions') {
+                            onClickClusterTooltipReactElement = React.createElement(DataTableWithActions, onClickClusterComponentMergedProps, onClickClusterComponentTemplate);
+                          } else if (onClickClusterBehaviour === 'tooltip' && onClickClusterComponent === 'ListWithActions') {
+                            onClickClusterTooltipReactElement = React.createElement(ListWithActions, onClickClusterComponentMergedProps, onClickClusterComponentTemplate);
+                          } else if (onClickClusterBehaviour === 'tooltip' && onClickClusterComponent === 'Template') {
+                            onClickClusterTooltipReactElement = React.createElement(Template, onClickClusterComponentMergedProps, onClickClusterComponentTemplate);
+                          } else if (onClickClusterBehaviour === 'tooltip') {
+                            // FIXME: Allow any other components.
+                            console.error('onClickClusterBehaviour tooltip currently only supports onClickClusterComponent DataTableWithActions and ListWithActions, not: ', onClickClusterComponent);
+                          }
+
                           return (
                             <ComponentMarker
                               key={`ComponentMarker_${i}`}
                               position={{lat: marker.lat, lng: marker.lng}}
-                              onClick={disableOnClickMarker ? null : (e) => this.handleClickClusterMarker(e, {
-                                table: marker.table,
-                                originalLat: marker.originalLat,
-                                originalLng: marker.originalLng,
-                                latProperty: marker.latProperty,
-                                lngProperty: marker.lngProperty
-                              })}
+                              onClick={disableOnClickMarker ? null : (e) => this.handleClickClusterMarker(e, onClickClusterReactElement)}
                               zIndexOffset={0}
+                              popup={onClickClusterTooltipReactElement}
                             >
                               {clusterComponent}
                             </ComponentMarker>
@@ -592,30 +730,61 @@ let TableMarkersLayer = createReactClass({
             :
             <FeatureGroup>
               {
-                clusteredMarkers.map(
-                  (marker, i) =>
+                markers.map(
+                  (marker, i) => {
+
+                    // NOTE: onClickSingleComponentProps should have been converted automatically
+                    // from a string (element attribute value in template) to a JSON object.
+                    // NOTE: Need to clone onClickSingleComponentProps,
+                    // otherwise properties will remain set to the defaults, as though they had been specified explicitly.
+                    const onClickSingleComponentPropsJSON = onClickSingleComponentProps !== undefined ? _clone(onClickSingleComponentProps) : {};
+
+                    const onClickSingleComponentDefaultProps = {
+                      table: marker.table,
+                      primKey: marker.primKey,
+                      originalLat: marker.originalLat,
+                      originalLng: marker.originalLng,
+                      latProperty: marker.latProperty,
+                      lngProperty: marker.lngProperty,
+                      flux: this.getFlux(),
+                    };
+
+                    const onClickSingleComponentMergedProps = {...onClickSingleComponentDefaultProps, ...onClickSingleComponentPropsJSON};
+                    const onClickSingleReactElement = onClickSingleComponent !== undefined ? React.createElement(onClickSingleComponent, onClickSingleComponentMergedProps, onClickSingleComponentTemplate) : undefined;
+
+                    let onClickSingleTooltipReactElement = undefined;
+                    if (onClickSingleBehaviour === 'tooltip' && onClickSingleComponent === undefined && clickPrimaryKeyProperty !== undefined) {
+                      // Default to set of ItemLinks
+                      onClickSingleTooltipReactElement = (
+                        <span>
+                          {_map(marker.clickPrimKeyBreakdown, (val, key) =>
+                            <div><ItemLink flux={this.getFlux()} table={clickTable} primKey={key} />: {val} {this.config.tablesById[marker.table]['capName' + (val > 1 ? 'Plural' : 'Single')]}</div>
+                          )}
+                        </span>
+                      );
+                    } else if (onClickSingleBehaviour === 'tooltip' && onClickSingleComponent === 'ItemTemplate') {
+                      onClickSingleTooltipReactElement = React.createElement(ItemTemplate, onClickSingleComponentMergedProps, onClickSingleComponentTemplate);
+                    } else if (onClickSingleBehaviour === 'tooltip') {
+                      // FIXME: Allow any component.
+                      // TODO: clickTable and clickPrimaryKeyProperty should probably be deprecated in favour of templated tooltips.
+                      console.error('onClickSingleBehaviour tooltip currently only supports onClickSingleComponent ItemTemplate or undefined-with-clickPrimaryKeyProperty, not: ', onClickSingleComponent, clickPrimaryKeyProperty);
+                    }
+
+                    return (
                       <ComponentMarker
                         key={`ComponentMarker_${i}`}
                         position={{lat: marker.lat, lng: marker.lng}}
-                        onClick={disableOnClickMarker || clickPrimaryKeyProperty ? null : (e) => this.handleClickClusterMarker(e, {
-                          table: marker.table,
-                          originalLat: marker.originalLat,
-                          originalLng: marker.originalLng,
-                          latProperty: marker.latProperty,
-                          lngProperty: marker.lngProperty
-                        })}
+                        onClick={disableOnClickMarker || clickPrimaryKeyProperty ? null : (e) => this.handleClickSingleMarker(e,
+                          onClickSingleComponentMergedProps,
+                          onClickSingleReactElement
+                        )}
                         zIndexOffset={0}
-                        popup={
-                          <span>
-                            {_map(marker.clickPrimKeyBreakdown, (val, key) => {
-                              return <div><ItemLink flux={this.getFlux()} table={clickTable} primKey={key} />: {val} {this.config.tablesById[marker.table]['capName' + (val > 1 ? 'Plural' : 'Single')]}</div>
-                            })}
-                          </span>
-                        }
+                        popup={onClickSingleTooltipReactElement}
                       >
                         {children}
                       </ComponentMarker>
-                    )
+                    );
+                  })
               }
             </FeatureGroup>
           }
