@@ -410,24 +410,6 @@ function query(options) {
   let {database, table, columns, query, orderBy, groupBy,
     start, stop, distinct, transpose, randomSample, cache, typedArrays, joins} = {...defaults, ...options};
 
-  let ambiguousColumnNames = [];
-  let columnNameSet = new Set();
-  for (let i = 0; i < columns.length; i++) {
-    let column = columns[i];
-    if (typeof column !== 'string') {
-      continue;
-    }
-    let columnName = column.indexOf('.') !== -1 ? column.split('.')[1] : column;
-    if (columnNameSet.has(columnName)) {
-      ambiguousColumnNames.push(columnName);
-    }
-    columnNameSet.add(columnName);
-  }
-
-  if (ambiguousColumnNames.length > 0 && joins.length > 0) {
-    throw Error(`Ambiguous column names are not yet supported: ${ambiguousColumnNames}.`);
-  }
-
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,
