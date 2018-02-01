@@ -28,7 +28,6 @@ import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
 
-
 //FIXME: Allow any component for onClickComponent in onClickBehaviour tooltip.
 import ItemTemplate from 'panoptes/ItemTemplate';
 
@@ -151,10 +150,6 @@ let MuiDataTableView = createReactClass({
     } else {
       console.error('Unhandled onClickBehaviour: ', onClickBehaviour);
     }
-  },
-
-  beef(ham) {
-    return ham;
   },
 
   render() {
@@ -318,17 +313,23 @@ let MuiDataTableView = createReactClass({
                 // from a string (element attribute value in template) to a JSON object.
                 // NOTE: Need to clone onClickComponentProps,
                 // otherwise primKey will remain set to the first primKey, as though it had been specified explicitly.
-                let onClickComponentPropsJSON = onClickComponentProps !== undefined ? _clone(onClickComponentProps) : {};
-                // Default to using the clicked table and the clicked row primKey (otherwise use the value provided via onClickComponentProps).
-                onClickComponentPropsJSON.table = onClickComponentPropsJSON.table === undefined ? table : onClickComponentPropsJSON.table;
-                onClickComponentPropsJSON.primKey = onClickComponentPropsJSON.primKey === undefined ? primKey : onClickComponentPropsJSON.primKey;
-                const onClickReactElement = onClickComponent !== undefined ? React.createElement(onClickComponent, onClickComponentPropsJSON, onClickComponentTemplate) : undefined;
+                const onClickComponentPropsJSON = onClickComponentProps !== undefined ? _clone(onClickComponentProps) : {};
+
+                // Default to using the clicked table and the clicked row primKey,
+                // otherwise use the value provided via onClickComponentProps.
+                const onClickComponentDefaultProps = {
+                  table,
+                  primKey,
+                };
+
+                const onClickComponentMergedProps = {...onClickComponentDefaultProps, ...onClickComponentPropsJSON};
+                const onClickReactElement = onClickComponent !== undefined ? React.createElement(onClickComponent, onClickComponentMergedProps, onClickComponentTemplate) : undefined;
 
                 // FIXME: Allow any component.
                 if (onClickBehaviour === 'tooltip' && onClickComponent !== 'ItemTemplate') {
                   console.error('onClickBehaviour tooltip currently only supports onClickComponent ItemTemplate, not: ', onClickComponent);
                 }
-                const tooltipReactElement = onClickComponent === 'ItemTemplate' ? React.createElement(ItemTemplate, onClickComponentPropsJSON, onClickComponentTemplate) : undefined;
+                const tooltipReactElement = onClickComponent === 'ItemTemplate' ? React.createElement(ItemTemplate, onClickComponentMergedProps, onClickComponentTemplate) : undefined;
 
                 const rowComponent =
                   <TableRow
@@ -439,30 +440,34 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
   let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
   let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
 
-  return {
-    requests: {
-      data: {
-        method: 'query',
-        args: resolveJoins({
-          database: config.dataset,
-          table,
-          columns: columns.concat([config.tablesById[table].primKey]),
-          query,
-          transpose: true,
-          start: fetchStartRowIndex,
-          stop: fetchStopRowIndex,
-          joins,
-          orderBy: order
-        }, config)
-      },
-      onClickComponentTemplate: {
-        method: 'staticContent',
-        args: {
-          url: `/panoptes/Docs/${config.dataset}/${onClickComponentTemplateDocPath}`
-        }
-      }
+  let requests = {
+    data: {
+      method: 'query',
+      args: resolveJoins({
+        database: config.dataset,
+        table,
+        columns: columns.concat([config.tablesById[table].primKey]),
+        query,
+        transpose: true,
+        start: fetchStartRowIndex,
+        stop: fetchStopRowIndex,
+        joins,
+        orderBy: order
+      }, config)
     }
   };
+
+  // Don't make this call unnecessarily.
+  if (onClickComponentTemplateDocPath !== undefined) {
+    requests.onClickComponentTemplate = {
+      method: 'staticContent',
+      args: {
+        url: `/panoptes/Docs/${config.dataset}/${onClickComponentTemplateDocPath}`
+      }
+    };
+  }
+
+  return requests;
 
 });
 
