@@ -28,7 +28,7 @@ export default class DivIcon extends MapLayer {
   }
 
   static defaultProps = {
-      onClick: () => null
+    onClick: () => null
   };
 
 
