@@ -38,7 +38,7 @@ import MapControlComponent from 'Map/MapControlComponent';
 import filterChildren from 'util/filterChildren';
 import ItemLink from 'panoptes/ItemLink';
 import ItemTemplate from 'panoptes/ItemTemplate';
-import Template from 'Template';
+import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
@@ -148,6 +148,12 @@ let TableMarkersLayer = createReactClass({
   handleClickClusterMarker(e, onClickClusterReactElement) {
 
     const {onClickClusterBehaviour} = this.props;
+
+    if (onClickClusterBehaviour === 'tooltip') {
+      // tooltips are handled inline.
+      console.error('Tried to handle a tooltip onClick via handleClickSingleMarker');
+      return;
+    }
 
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
@@ -283,7 +289,11 @@ let TableMarkersLayer = createReactClass({
               componentCancellation
             )
           );
+        } else {
+          // We need to maintain the order of promises. FIXME?
+          promises.push(undefined);
         }
+
         if (onClickClusterComponentTemplateDocPath !== undefined) {
           promises.push(
             LRUCache.get(
@@ -295,12 +305,15 @@ let TableMarkersLayer = createReactClass({
               componentCancellation
             )
           );
+        } else {
+          // We need to maintain the order of promises. FIXME?
+          promises.push(undefined);
         }
 
         return Promise.all(promises);
       }
     )
-      .then(([data, onClickComponentTemplate]) => {
+      .then(([data, onClickSingleComponentTemplate, onClickClusterComponentTemplate]) => {
 
         let markers = []; // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
         let markersGroupedByLocation = {};
@@ -371,7 +384,7 @@ let TableMarkersLayer = createReactClass({
           markersGroupedByLocation[location].push(marker);
         }
 
-        this.setState({markersGroupedByLocation, minValue, maxValue, onClickComponentTemplate});
+        this.setState({markersGroupedByLocation, minValue, maxValue, onClickSingleComponentTemplate, onClickClusterComponentTemplate});
         changeLayerStatus({loadStatus: 'loaded', bounds: CalcMapBounds.calcMapBounds(markers)});
 
       })
@@ -692,25 +705,24 @@ let TableMarkersLayer = createReactClass({
                             onClickClusterTooltipReactElement = React.createElement(DataTableWithActions, onClickClusterComponentMergedProps, onClickClusterComponentTemplate);
                           } else if (onClickClusterBehaviour === 'tooltip' && onClickClusterComponent === 'ListWithActions') {
                             onClickClusterTooltipReactElement = React.createElement(ListWithActions, onClickClusterComponentMergedProps, onClickClusterComponentTemplate);
-                          } else if (onClickClusterBehaviour === 'tooltip' && onClickClusterComponent === 'Template') {
-                            onClickClusterTooltipReactElement = React.createElement(Template, onClickClusterComponentMergedProps, onClickClusterComponentTemplate);
+                          } else if (onClickClusterBehaviour === 'tooltip' && onClickClusterComponent === 'HandlebarsWithComponents') {
+                            onClickClusterTooltipReactElement = React.createElement(HandlebarsWithComponents, onClickClusterComponentMergedProps, onClickClusterComponentTemplate);
                           } else if (onClickClusterBehaviour === 'tooltip') {
                             // FIXME: Allow any other components.
-                            console.error('onClickClusterBehaviour tooltip currently only supports onClickClusterComponent DataTableWithActions and ListWithActions, not: ', onClickClusterComponent);
+                            console.error('onClickClusterBehaviour tooltip currently only supports onClickClusterComponent DataTableWithActions, ListWithActions and HandlebarsWithComponents, not: ', onClickClusterComponent);
                           }
 
                           return (
                             <ComponentMarker
                               key={`ComponentMarker_${i}`}
                               position={{lat: marker.lat, lng: marker.lng}}
-                              onClick={disableOnClickMarker ? null : (e) => this.handleClickClusterMarker(e, onClickClusterReactElement)}
+                              onClick={disableOnClickMarker || onClickClusterBehaviour === 'tooltip' ? null : (e) => this.handleClickClusterMarker(e, onClickClusterReactElement)}
                               zIndexOffset={0}
-                              popup={onClickClusterTooltipReactElement}
+                              popup={onClickClusterBehaviour === 'tooltip' ? onClickClusterTooltipReactElement : null}
                             >
                               {clusterComponent}
                             </ComponentMarker>
                           );
-
 
                         }
                       ).concat(
@@ -767,7 +779,7 @@ let TableMarkersLayer = createReactClass({
                     } else if (onClickSingleBehaviour === 'tooltip') {
                       // FIXME: Allow any component.
                       // TODO: clickTable and clickPrimaryKeyProperty should probably be deprecated in favour of templated tooltips.
-                      console.error('onClickSingleBehaviour tooltip currently only supports onClickSingleComponent ItemTemplate or undefined-with-clickPrimaryKeyProperty, not: ', onClickSingleComponent, clickPrimaryKeyProperty);
+                      console.error('onClickSingleBehaviour tooltip currently only supports onClickSingleComponent ItemTemplate or undefined with clickPrimaryKeyProperty. (onClickSingleComponent, clickPrimaryKeyProperty): ', onClickSingleComponent, clickPrimaryKeyProperty);
                     }
 
                     return (
@@ -779,7 +791,7 @@ let TableMarkersLayer = createReactClass({
                           onClickSingleReactElement
                         )}
                         zIndexOffset={0}
-                        popup={onClickSingleTooltipReactElement}
+                        popup={onClickSingleBehaviour === 'tooltip' ? onClickSingleTooltipReactElement : null}
                       >
                         {children}
                       </ComponentMarker>
