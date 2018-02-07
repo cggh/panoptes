@@ -11,16 +11,26 @@ import resolveJoins from 'panoptes/resolveJoins';
 
 const customHandlebars = ({dataset, tablesById, handlebars}) => {
   let hb = handlebars || promisedHandlebars(Handlebars);
+  hb.registerHelper('concat', function() {
+    // Credit: https://gist.github.com/adg29/f312d6fab93652944a8a1026142491b1
+    let str = '';
+    for (let arg in arguments){
+      if (typeof arguments[arg] === 'string') {
+        str += arguments[arg];
+      }
+    }
+    return str;
+  });
   hb.registerHelper('query', function() {
     let columns = [];
     let options = arguments[arguments.length - 1];
-    for (let i = 0; i < arguments.length - 1; i++) {
-      columns.push(arguments[i]);
-    }
     let {fn, inverse, hash, data} = options;
     let {table, query, orderBy, distinct, joins, groupBy, start, stop} = hash;
     if (data) {
       data = hb.createFrame(data);
+    }
+    for (let i = 0; i < arguments.length - 1; i++) {
+      columns.push(Handlebars.compile(arguments[i])(this, {data}));
     }
     query = query || SQL.nullQuery;
     distinct = distinct === 'true' ? true : false;
@@ -37,9 +47,9 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
 
     if (typeof orderBy === 'string') {
       try {
-        orderBy = JSON.parse(Handlebars.compile(orderBy)(this));
+        orderBy = JSON.parse(Handlebars.compile(orderBy)(this, {data}));
       } catch (e) {
-        throw Error(`orderBy should be a list of columns e.g. [["asc", "col1"], ["desc", "col2"]] is currently: ${Handlebars.compile(orderBy)(this)}`);
+        throw Error(`Handlebars query orderBy should be a list of columns, e.g. [["asc", "col1"], ["desc", "col2"]], but it is currently: ${Handlebars.compile(orderBy)(this)}`);
       }
     } else {
       orderBy = '';
@@ -47,9 +57,9 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
 
     if (typeof groupBy === 'string') {
       try {
-        groupBy = JSON.parse(Handlebars.compile(groupBy)(this));
+        groupBy = JSON.parse(Handlebars.compile(groupBy)(this, {data}));
       } catch (e) {
-        throw Error(`groupBy should be a list of columns, e.g. ["foo", "bar"], but is currently: ${Handlebars.compile(groupBy)(this)}`);
+        throw Error(`Handlebars query groupBy should be a list of columns, e.g. ["foo", "bar"], but it is currently: ${Handlebars.compile(groupBy)(this)}`);
       }
     } else {
       groupBy = []; // API attempts groupBy.join('~')
@@ -60,14 +70,14 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
     if (start !== undefined) {
       startParsed = parseInt(start);
       if (Number.isNaN(startParsed)) {
-        throw Error(`start should be a parsable integer, e.g. 1 or '2', but is currently: ${start}`);
+        throw Error(`Handlebars query start should be a parsable integer, e.g. 1 or '2', but it is currently: ${start}`);
       }
     }
     let stopParsed = undefined;
     if (stop !== undefined) {
       stopParsed = parseInt(stop);
       if (Number.isNaN(stopParsed)) {
-        throw Error(`stop should be a parsable integer, e.g. 1 or '2', but is currently: ${stop}`);
+        throw Error(`Handlebars query stop should be a parsable integer, e.g. 1 or '2', but is currently: ${stop}`);
       }
     }
 
@@ -100,7 +110,7 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
           return Promise.all(_map(rows, (row, index) => {
             //We need to unpack data from related tables
             _forEach(row, (value, key) => {
-              if(key.indexOf('.') !== -1) {
+              if (key.indexOf('.') !== -1) {
                 let [table, col] = key.split('.');
                 row[table] = row[table] || {};
                 row[table][col] = value;
