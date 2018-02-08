@@ -14,7 +14,7 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
   hb.registerHelper('concat', function() {
     // Credit: https://gist.github.com/adg29/f312d6fab93652944a8a1026142491b1
     let str = '';
-    for (let arg in arguments){
+    for (let arg in arguments) {
       if (typeof arguments[arg] === 'string') {
         str += arguments[arg];
       }
@@ -25,7 +25,7 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
     let columns = [];
     let options = arguments[arguments.length - 1];
     let {fn, inverse, hash, data} = options;
-    let {table, query, orderBy, distinct, joins, groupBy, start, stop} = hash;
+    let {table, query, orderBy, distinct, joins, groupBy, start, stop, expression} = hash;
     if (data) {
       data = hb.createFrame(data);
     }
@@ -43,7 +43,27 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
     start = typeof start === 'string' ? Handlebars.compile(start)(this, {data}) : undefined;
     stop = typeof stop === 'string' ? Handlebars.compile(stop)(this, {data}) : undefined;
 
-    const joinsJSON = joins !== undefined ? JSON.parse(joins) : undefined;
+    if (typeof joins === 'string') {
+      try {
+        joins = JSON.parse(joins);
+      } catch (e) {
+        throw Error(`Handlebars query joins is not JSON-parsable: ${Handlebars.compile(joins)(this)}`);
+      }
+    } else {
+      joins = undefined;
+    }
+
+    if (typeof expression === 'string') {
+      try {
+        // TODO: Support handlebars in expression.
+        expression = JSON.parse(expression);
+        columns.push({expr: expression, as: 'expression'});
+      } catch (e) {
+        throw Error(`Handlebars query expression is not JSON-parsable: ${Handlebars.compile(expression)(this)}`);
+      }
+    } else {
+      expression = undefined;
+    }
 
     if (typeof orderBy === 'string') {
       try {
@@ -89,7 +109,7 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
       distinct,
       query,
       transpose: true, //We want rows, not columns
-      joins: joinsJSON,
+      joins,
       groupBy,
       start: startParsed,
       stop: stopParsed
