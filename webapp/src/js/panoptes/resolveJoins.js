@@ -3,10 +3,10 @@ export default function resolveJoins(queryAPIargs, config) {
     // If there are joins, make sure we qualify each column name to avoid ambiguity.
     for (let i = 0; i < queryAPIargs.joins.length; i++) {
       let join = queryAPIargs.joins[i];
-      if (join.column.indexOf('.') === -1) {
+      if (typeof join.column === 'string' && join.column.indexOf('.') === -1) {
         join.column = `${queryAPIargs.table}.${join.column}`;
       }
-      if (join.foreignColumn.indexOf('.') === -1) {
+      if (typeof join.foreignColumn === 'string' && join.foreignColumn.indexOf('.') === -1) {
         join.foreignColumn = `${join.foreignTable}.${join.foreignColumn}`;
       }
     }
@@ -16,9 +16,9 @@ export default function resolveJoins(queryAPIargs, config) {
     let foreignTables = [];
     for (let i = 0; i < queryAPIargs.columns.length; i++) {
       let column = queryAPIargs.columns[i];
-      if (column.indexOf('.') !== -1) {
+      if (typeof column === 'string' && column.indexOf('.') !== -1) {
         let [tableId] = column.split('.');
-        if (tableId !== queryAPIargs.table && foreignTables.indexOf(tableId) === -1) {
+        if (tableId !== queryAPIargs.table && typeof foreignTables === 'string' && foreignTables.indexOf(tableId) === -1) {
           let relation = undefined;
           for (let j = 0; j < config.tablesById[queryAPIargs.table].relationsChildOf.length; j++) {
             if (config.tablesById[queryAPIargs.table].relationsChildOf[j].tableId === tableId) {
@@ -47,12 +47,12 @@ export default function resolveJoins(queryAPIargs, config) {
   //If we have any joins then qualify the unqualified names as belonging to the root table - alias them so this is transparent to calling code.
   if (queryAPIargs.joins && queryAPIargs.joins.length !== 0) {
     queryAPIargs.columns = queryAPIargs.columns.map((column) => {
-      if (column.indexOf('.') === -1) {
+      if (typeof column === 'string' && column.indexOf('.') === -1) {
         return {expr: `${queryAPIargs.table}.${column}`, as: column};
       } else {
         return column;
       }
-    })
+    });
   }
   return queryAPIargs;
 }
