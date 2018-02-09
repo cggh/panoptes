@@ -237,7 +237,6 @@ let ProportionBarChartRow = createReactClass({
           style={{
             cursor: 'pointer',
             height: rowHeight,
-            opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
           }}
           hover={true}
         >
@@ -250,6 +249,7 @@ let ProportionBarChartRow = createReactClass({
               whiteSpace: 'normal',
               wordWrap: 'break-word',
               height: rowHeight,
+              opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
             }}
             padding="none"
           >
@@ -283,6 +283,7 @@ let ProportionBarChartRow = createReactClass({
                 display: 'table',
                 width: '100%',
                 height: barHeight !== undefined ? barHeight : 'auto',
+                opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
               }}
             >
               <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
@@ -293,6 +294,7 @@ let ProportionBarChartRow = createReactClass({
             style={{
               ...cellStyle,
               textAlign: 'right',
+              opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
             }}
             padding="none"
           >
