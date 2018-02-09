@@ -39,7 +39,7 @@ let PercentMatching = createReactClass({
   render() {
     let {all, matching, childNumeratorProp, childDenominatorProp, children, loadStatus} = this.props;
     children = filterChildren(this, children);
-    if (children !== undefined && childNumeratorProp !== undefined) {
+    if (children !== undefined && children !== null && childNumeratorProp !== undefined) {
       return React.Children.map(children,
         (child) => {
           const numerator = matching !== undefined ? matching.result[0] : undefined;
