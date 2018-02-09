@@ -340,7 +340,6 @@ let ProportionBarChartRow = createReactClass({
           style={{
             cursor: 'pointer',
             height: rowHeight,
-            opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
           }}
           hover={true}
         >
