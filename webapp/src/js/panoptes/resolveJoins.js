@@ -17,11 +17,17 @@ export default function resolveJoins(queryAPIargs, config) {
     for (let i = 0; i < queryAPIargs.columns.length; i++) {
       let column = queryAPIargs.columns[i];
       if (typeof column === 'string' && column.indexOf('.') !== -1) {
+        // Get the tableId from the qualified column Id.
         let [tableId] = column.split('.');
-        if (tableId !== queryAPIargs.table && typeof foreignTables === 'string' && foreignTables.indexOf(tableId) === -1) {
+        // If the column's table Id isn't the native table
+        // and if column's table Id isn't already in our list of foreignTables...
+        if (tableId !== queryAPIargs.table && foreignTables.indexOf(tableId) === -1) {
           let relation = undefined;
+          // For all of the relations of the native table...
           for (let j = 0; j < config.tablesById[queryAPIargs.table].relationsChildOf.length; j++) {
+            // If there is a relation that matches the column's table Id...
             if (config.tablesById[queryAPIargs.table].relationsChildOf[j].tableId === tableId) {
+              // Set the relation to the relation matching the columns table Id.
               relation = config.tablesById[queryAPIargs.table].relationsChildOf[j];
               break;
             }
