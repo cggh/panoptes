@@ -21,6 +21,15 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
     }
     return str;
   });
+  hb.registerHelper('eval', function() {
+    let text = arguments[0];
+    let options = arguments[arguments.length - 1];
+    let {data} = options;
+    if (data) {
+      data = hb.createFrame(data);
+    }
+    return typeof text === 'string' ? Handlebars.compile(text)(this, {data}) : undefined;
+  });
   hb.registerHelper('query', function() {
     let columns = [];
     let options = arguments[arguments.length - 1];
