@@ -25,6 +25,7 @@ let ProportionBarChart = createReactClass({
     rowTable: PropTypes.string.isRequired,
     rowTableJoinKeyColumn: PropTypes.string, // Defaults to same name as rowTable primKey.
     rowLabelColumn: PropTypes.string,
+    rowLabelStyle: PropTypes.object,
     rowTableQuery: PropTypes.string,
     rowTableJoins: PropTypes.array,
     rowTableOrder: PropTypes.array,
@@ -89,6 +90,7 @@ let ProportionBarChart = createReactClass({
       denominatorQuery,
       docLinkHref,
       rowLabelColumn,
+      rowLabelStyle,
       rowTableJoinKeyColumn,
       proportionTableJoinKeyColumn,
       sampleSizeWarningMinimum,
@@ -165,6 +167,7 @@ let ProportionBarChart = createReactClass({
                 rowTable={rowTable}
                 rowPrimKeyValue={rowPrimKeyValue}
                 rowLabel={row[rowLabelColumn]}
+                rowLabelStyle={rowLabelStyle}
                 proportionTable={proportionTable}
                 proportionTableColourColumn={proportionTableColourColumn}
                 proportionTableColourColumnNumeratorValue={proportionTableColourColumnNumeratorValue}
