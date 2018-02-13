@@ -28,7 +28,7 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
     if (data) {
       data = hb.createFrame(data);
     }
-    return typeof text === 'string' ? Handlebars.compile(text)(this, {data}) : undefined;
+    return typeof text === 'string' ? hb.compile(text)(this, {data}) : undefined;
   });
   hb.registerHelper('query', function() {
     let columns = [];
