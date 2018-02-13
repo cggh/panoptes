@@ -29,6 +29,7 @@ let ProportionBarChartRow = createReactClass({
     rowTable: PropTypes.string.isRequired,
     rowPrimKeyValue: PropTypes.string.isRequired,
     rowLabel: PropTypes.string.isRequired,
+    rowLabelStyle: PropTypes.object,
     proportionTable: PropTypes.string.isRequired,
     proportionTableColourColumn: PropTypes.string,
     proportionTableColourColumnNumeratorValue: PropTypes.string,
@@ -68,6 +69,7 @@ let ProportionBarChartRow = createReactClass({
       proportionTableJoins: [],
       proportionTableGroupByColumns: [],
       sampleSizeWarningMinimum: 200,
+      rowLabelStyle: {margin: 0, padding: 0}
     };
   },
 
@@ -118,6 +120,7 @@ let ProportionBarChartRow = createReactClass({
     const {
       rowPrimKeyValue,
       rowLabel,
+      rowLabelStyle,
       proportionTable,
       proportionTableColourColumn,
       proportionTableColourColumnNumeratorValue,
@@ -250,8 +253,8 @@ let ProportionBarChartRow = createReactClass({
               wordWrap: 'break-word',
               height: rowHeight,
               opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
+              ...rowLabelStyle
             }}
-            padding="none"
           >
             {rowLabel}
           </TableCell>
