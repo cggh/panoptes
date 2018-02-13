@@ -20,24 +20,34 @@ let QueryResult = createReactClass({
     expression: PropTypes.string,
     table: PropTypes.string.isRequired,
     formatNumber: PropTypes.string,
-    distinct: PropTypes.bool
+    distinct: PropTypes.bool,
+    singular: PropTypes.string,
+    plural: PropTypes.string,
+    boldNumber: PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
-      expression: JSON.stringify(['count', ['*']])
+      expression: JSON.stringify(['count', ['*']]),
+      boldNumber: true
     };
   },
 
   render() {
-    let {formatNumber, data} = this.props;
+    let {formatNumber, data, plural, singular, boldNumber} = this.props;
     if (!_isUndefined(data) && !_isUndefined(formatNumber)) {
       data = format(formatNumber)(data.result[0]);
     } else if (!_isUndefined(data) && data) {
       data = data.result[0];
     }
-    return <span>{data ? data : '...'}</span>;
+    if (!plural || !singular) {
+      return boldNumber ? <strong>{data ? data : '...'}</strong> : <span>{data ? data : '...'}</span>;
+    } else {
+      return <span>
+        {boldNumber ? <strong>{data ? data : '...'}</strong> : <span>{data ? data : '...'}</span>} {data === 1 ? singular : plural}
+      </span>
+    }
   },
 });
 
