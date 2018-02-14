@@ -25,7 +25,7 @@ let ObsListItem = createReactClass({
   render() {
     let {children, table, primKey, href, download, ...other} = this.props;
     if (!download) {
-      if (href && href.indexOf('://') === -1) {
+      if (!href || (href && href.indexOf('://') === -1)) {
         //Internal link
         return (
           <ListItem button onClick={(e) => {
