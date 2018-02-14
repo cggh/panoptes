@@ -10,7 +10,7 @@ import IconButton from 'material-ui/IconButton';
 import classnames from 'classnames';
 
 const ALLOWED_CHILDREN = [
-  'Typography',
+  'Typography', 'CardHeader', 'CardContent', 'ExpandingCardCollapse', 'ExpandingCardActions'
 ];
 
 const styles = (theme) => ({
@@ -58,13 +58,56 @@ let ExpandingCard = createReactClass({
   render() {
     let {title, subheader, children, classes} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
+
+    // Style 1: title and subheader props with Typography children.
+    // Style 2: Optional children CardHeader, CardMedia, CardContent,
+    // ExpandingCardActions, ExpandingCardCollapse
+
+    let staticContent = undefined;
+    let collapsableContent = undefined;
+    let typographies = [];
+    let expandingCardCollapse = undefined;
+    let expandingCardActions = undefined;
+    let otherChildren = [];
+    for (let i = 0; i < children.length; i++) {
+
+      let child  = children[i];
+
+      if (child.type.displayName === 'Typography') {
+        typographies.push(child);
+      } else if (child.type.displayName === 'ExpandingCardCollapse') {
+        if (expandingCardCollapse !== undefined) {
+          console.error('ExpandingCard does not handle more than one ExpandingCardCollapse child.');
+          return;
+        }
+        expandingCardCollapse = child.props.children;
+      } else if (child.type.displayName === 'ExpandingCardActions') {
+        if (expandingCardActions !== undefined) {
+          console.error('ExpandingCard does not handle more than one ExpandingCardActions child.');
+          return;
+        }
+        expandingCardActions = child.props.children;
+      } else {
+        otherChildren.push(child);
+      }
+
+    }
+
+    let cardActionsContent = undefined;
+    if (typographies.length > 0) {
+      collapsableContent = <CardContent>{typographies}</CardContent>;
+      cardActionsContent = <CardHeader title={title} subheader={subheader}/>;
+    } else {
+      collapsableContent = expandingCardCollapse;
+      cardActionsContent = expandingCardActions;
+      staticContent = otherChildren;
+    }
+
     return (
       <Card className={classes.card}>
+        {staticContent}
         <CardActions disableActionSpacing className={classes.cardActions}>
-          <CardHeader
-            title={title}
-            subheader={subheader}
-          />
+          {cardActionsContent}
           <div className={classes.flexGrow} />
           <IconButton
             className={classnames(classes.expand, {
@@ -78,9 +121,7 @@ let ExpandingCard = createReactClass({
           </IconButton>
         </CardActions>
         <Collapse in={this.state.expanded} transitionDuration="auto" unmountOnExit>
-          <CardContent>
-            {children}
-          </CardContent>
+          {collapsableContent}
         </Collapse>
       </Card>
     );
