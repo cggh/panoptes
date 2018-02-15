@@ -79,26 +79,28 @@ let TableWithLegend = createReactClass({
     const filteredChildren = filterChildren(this, React.Children.toArray(children));
 
     return (
-      <div className="centering-container">
-        <Card className={classes.card}>
+      <div className="horiz-centering-container vertical stack obs-page-content">
+        <Card className={classes.card} style={{marginBottom: '15px'}}>
           <CardContent>
             {filteredChildren}
-            <MuiDataTableView
-              table={table}
-              query={query}
-              order={order}
-              columns={columns}
-              onOrderChange={this.handleOrderChange}
-              maxRowsPerPage={maxRowsPerPage}
-              nullReplacement="-"
-              nanReplacement="-"
-              onClickBehaviour={onClickBehaviour}
-              onClickComponent={onClickComponent}
-              onClickComponentProps={onClickComponentProps}
-              onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
-            />
           </CardContent>
         </Card>
+        <div className="grow" style={{width: '650px'}}>
+          <MuiDataTableView
+            table={table}
+            query={query}
+            order={order}
+            columns={columns}
+            onOrderChange={this.handleOrderChange}
+            maxRowsPerPage={maxRowsPerPage}
+            nullReplacement="-"
+            nanReplacement="-"
+            onClickBehaviour={onClickBehaviour}
+            onClickComponent={onClickComponent}
+            onClickComponentProps={onClickComponentProps}
+            onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
+          />
+        </div>
       </div>
     );
   },

@@ -57,6 +57,7 @@ let withAPIData = (WrappedComponent, APIArgsFromProps) => createReactClass({
     if (_isEqual(this.lastAPIArgs, APIArgSet.requests)) {
       return;
     }
+    this.setState({loadStatus: 'loading'});
     this.lastAPIArgs = APIArgSet.requests;
     const keys = _keys(APIArgSet.requests);
     const values = _values(APIArgSet.requests);
