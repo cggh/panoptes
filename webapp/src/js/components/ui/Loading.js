@@ -11,14 +11,15 @@ let Loading = createReactClass({
 
   propTypes: {
     status: PropTypes.string.isRequired,
+    long: PropTypes.bool,
     children: PropTypes.any
   },
 
   render() {
-    let {status} = this.props;
+    let {status, long} = this.props;
     if (status == 'loading')
       return (
-        <div className="loading-container show">
+        <div className={`${long ? 'loading-container-long ' : ''}loading-container show`}>
           <div className="spinner load-icon" />
           {this.props.children}
         </div>
@@ -26,7 +27,7 @@ let Loading = createReactClass({
 
     if (status == 'loading-hide')
       return (
-        <div className="loading-container show hide-content">
+        <div className={`${long ? 'loading-container-long ' : ''}loading-container show hide-content`}>
           <div className="spinner load-icon" />
           <div className="error-text">{this.props.children}</div>
         </div>
