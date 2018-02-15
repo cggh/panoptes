@@ -72,7 +72,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
 } else {
 
   ReactDOM.render(
-    <div><Loading status="loading-hide">Loading {dataset}...</Loading></div>,
+    <Loading status="loading-hide" />,
     document.getElementById('main')
   );
 
@@ -284,8 +284,8 @@ if (dataset === undefined || dataset === null || dataset === '') {
       );
       ReactDOM.render(
         <div>
-          <Loading status="done"/>
           {React.createElement(ComponentRegistry(config.settings.topLevelComponent), {flux})}
+          <Loading status="done"/>
         </div>
         , document.getElementById('main')
       );
