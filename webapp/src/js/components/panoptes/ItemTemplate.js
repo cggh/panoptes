@@ -214,7 +214,6 @@ let ItemTemplate = createReactClass({
           {rendered}
         </HTMLWithComponents>
           : null}
-        <Loading status={loadStatus}/>
       </span>
     );
   },
