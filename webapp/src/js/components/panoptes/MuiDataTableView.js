@@ -154,11 +154,10 @@ let MuiDataTableView = createReactClass({
 
   render() {
     let {
-      className, columns, order, data, maxRowsPerPage, startRowIndex,
+      className, columns, order, data, loadStatus, maxRowsPerPage, startRowIndex,
       nullReplacement, nanReplacement, table,
       onClickBehaviour, onClickComponent, onClickComponentProps, onClickComponentTemplate
     } = this.props;
-    let {loadStatus} = this.state;
 
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -166,7 +165,11 @@ let MuiDataTableView = createReactClass({
     }
 
     if (data === undefined || data === null) {
-      return null;
+      return (
+        <div className={classNames('load-container', className)}>
+          <Loading long={true} status={loadStatus} />
+        </div>
+      );
     }
 
 
@@ -214,7 +217,7 @@ let MuiDataTableView = createReactClass({
     let groupOrderedColumns = [];
     if (columns.length > 0) {
       return (
-        <div>
+        <div style={{position: 'relative'}} className={classNames(className)}>
           <Table>
             <TableHead>
               {Object.keys(columnGroups).length ?
@@ -409,7 +412,7 @@ let MuiDataTableView = createReactClass({
               })}
             </TableBody>
           </Table>
-          <Loading status={loadStatus}/>
+          <Loading long={true} status={loadStatus}/>
         </div>
       );
     } else {
@@ -466,7 +469,6 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
       }
     };
   }
-
   return {requests};
 
 });
