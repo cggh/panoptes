@@ -36,7 +36,7 @@ let PropertyLegend = createReactClass({
       let valueColoursKeys = Object.keys(propConfig.valueColours);
       legendElements = _map(valueColoursKeys.sort(),
         (key) => (
-          <LegendElement key={key} name={key === '_other_' ? 'Other' : (propConfig.valueDisplays !== undefined ? propConfig.valueDisplays[key] : key)} colour={propConfig.valueColours[key]} />
+          knownValues !== undefined && knownValues.indexOf(key) === -1 ? null : <LegendElement key={key} name={key === '_other_' ? 'Other' : (propConfig.valueDisplays !== undefined ? propConfig.valueDisplays[key] : key)} colour={propConfig.valueColours[key]} />
         )
       );
     } else if (propConfig.isBoolean) {
