@@ -153,7 +153,6 @@ let DocPage = createReactClass({
           />
         </div>
         : null}
-      <Loading status={loadStatus}/>
     </div>;
   },
 });

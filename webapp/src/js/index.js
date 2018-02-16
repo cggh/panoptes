@@ -72,7 +72,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
 } else {
 
   ReactDOM.render(
-    <div><Loading status="loading-hide">Loading {dataset}...</Loading></div>,
+    <Loading status="loading-hide" />,
     document.getElementById('main')
   );
 
@@ -300,8 +300,8 @@ if (dataset === undefined || dataset === null || dataset === '') {
 
       ReactDOM.render(
         <div>
-          <Loading status="done"/>
           <Panoptes flux={flux}/>
+          <Loading status="done"/>
         </div>
         , document.getElementById('main')
       );
