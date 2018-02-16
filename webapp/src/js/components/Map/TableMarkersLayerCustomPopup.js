@@ -84,7 +84,8 @@ let TableMarkersLayerCustomPopup = createReactClass({
     clusterMarkers: PropTypes.bool,
     clickTable: PropTypes.string,
     clickPrimaryKeyProperty: PropTypes.string,
-    children: PropTypes.node
+    children: PropTypes.node,
+    knownLegendValues: PropTypes.array,
   },
 
   childContextTypes: {
@@ -341,7 +342,11 @@ let TableMarkersLayerCustomPopup = createReactClass({
   render() {
 
     let {crs, layerContainer, map} = this.context;
-    let {markerColourProperty, table, showLegend, maxLegendItems, disableOnClickMarker, clusterMarkers, children, clickPrimaryKeyProperty, clickTable} = this.props;
+    let {
+      markerColourProperty, table, showLegend, maxLegendItems,
+      disableOnClickMarker, clusterMarkers, children, clickPrimaryKeyProperty,
+      clickTable, knownLegendValues
+    } = this.props;
 
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
@@ -489,6 +494,7 @@ let TableMarkersLayerCustomPopup = createReactClass({
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(clusteredMarkers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
+
       return (
         <FeatureGroup
           layerContainer={layerContainer}
@@ -499,7 +505,7 @@ let TableMarkersLayerCustomPopup = createReactClass({
               <PropertyLegend
                 property={markerColourProperty}
                 table={table}
-                knownValues={_keys(uniqueValues)}
+                knownValues={knownLegendValues !== undefined ? knownLegendValues : _keys(uniqueValues)}
                 maxLegendItems={maxLegendItems}
               />
             </MapControlComponent>
