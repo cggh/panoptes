@@ -23,11 +23,12 @@ let PropertyLegend = createReactClass({
     knownValues: PropTypes.array,
     min: PropTypes.number,
     max: PropTypes.number,
-    maxLegendItems: PropTypes.number
+    maxLegendItems: PropTypes.number,
+    propertyName: PropTypes.string,
   },
 
   render() {
-    let {table, property, knownValues, min, max, maxLegendItems} = this.props;
+    let {table, property, knownValues, min, max, maxLegendItems, propertyName} = this.props;
     if (!table || !property) return null;
     const propConfig = this.config.tablesById[table].propertiesById[property];
     const colourFunc = propertyColour(propConfig);
@@ -71,7 +72,7 @@ let PropertyLegend = createReactClass({
     }
 
     return <div className="legend">
-      <div className="legend-element">{propConfig.name}:</div>
+      <div className="legend-element">{propertyName !== undefined ? propertyName : propConfig.name}:</div>
       {maxLegendItems === undefined || (maxLegendItems !== undefined && legendElements.length < maxLegendItems) ?
         legendElements
         : legendElements.slice(0, maxLegendItems).concat([<div key="more" className="legend-element">+{legendElements.length - maxLegendItems} more</div>])
