@@ -90,6 +90,7 @@ let TableMarkersLayer = createReactClass({
     onClickClusterComponentProps: PropTypes.object,
     onClickClusterComponentTemplateDocPath: PropTypes.string,
     knownLegendValues: PropTypes.array,
+    legendPropertyName: PropTypes.string,
   },
 
   childContextTypes: {
@@ -411,7 +412,8 @@ let TableMarkersLayer = createReactClass({
       onClickClusterBehaviour,
       onClickClusterComponent,
       onClickClusterComponentProps,
-      knownLegendValues
+      knownLegendValues,
+      legendPropertyName
     } = this.props;
 
     let {markersGroupedByLocation, minValue, maxValue, onClickClusterComponentTemplate, onClickSingleComponentTemplate} = this.state;
@@ -582,6 +584,7 @@ let TableMarkersLayer = createReactClass({
                 table={table}
                 knownValues={knownLegendValues !== undefined ? knownLegendValues : _keys(uniqueValues)}
                 maxLegendItems={maxLegendItems}
+                propertyName={legendPropertyName}
               />
             </MapControlComponent>
             : null
