@@ -21,7 +21,6 @@
           -webkit-transform-origin: 35.918px;
         }
       }
-
       @keyframes grow-right {
         from {
           transform: scaleX(0.05);
