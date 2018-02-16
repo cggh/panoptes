@@ -86,6 +86,7 @@ let TableMarkersLayerCustomPopup = createReactClass({
     clickPrimaryKeyProperty: PropTypes.string,
     children: PropTypes.node,
     knownLegendValues: PropTypes.array,
+    legendPropertyName: PropTypes.string,
   },
 
   childContextTypes: {
@@ -345,7 +346,7 @@ let TableMarkersLayerCustomPopup = createReactClass({
     let {
       markerColourProperty, table, showLegend, maxLegendItems,
       disableOnClickMarker, clusterMarkers, children, clickPrimaryKeyProperty,
-      clickTable, knownLegendValues
+      clickTable, knownLegendValues, legendPropertyName
     } = this.props;
 
     let {markersGroupedByLocation, minValue, maxValue} = this.state;
@@ -507,6 +508,7 @@ let TableMarkersLayerCustomPopup = createReactClass({
                 table={table}
                 knownValues={knownLegendValues !== undefined ? knownLegendValues : _keys(uniqueValues)}
                 maxLegendItems={maxLegendItems}
+                propertyName={legendPropertyName}
               />
             </MapControlComponent>
             : null
