@@ -469,6 +469,7 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
       }
     };
   }
+
   return {requests};
 
 });
