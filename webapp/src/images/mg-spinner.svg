@@ -6,13 +6,9 @@
           -webkit-transform: scaleX(.05);
           transform: scaleX(.05)
         }
-        50% {
+        to {
           -webkit-transform: scale(1);
           transform: scale(1)
-        }
-        to {
-          -webkit-transform: scaleX(.05);
-          transform: scaleX(.05)
         }
       }
 
@@ -21,18 +17,14 @@
           -webkit-transform: scaleX(.05);
           transform: scaleX(.05)
         }
-        50% {
+        to {
           -webkit-transform: scale(1);
           transform: scale(1)
         }
-        to {
-          -webkit-transform: scaleX(.05);
-          transform: scaleX(.05)
-        }
       }
       .logo-bar{
-        -webkit-animation: sweep 2s infinite ease;
-        animation: sweep 2s infinite ease
+        -webkit-animation: sweep 2s infinite ease-out;
+        animation: sweep 2s infinite ease-out;
       }
 
       @-webkit-keyframes intro {
