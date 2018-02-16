@@ -74,7 +74,8 @@ let ResistanceMap = createReactClass({
                                                                   clickPrimaryKeyProperty="site_id"
                                                                   table="pf_samples"
                                                                   clusterMarkers={true}
-                                                                  markerColourProperty={`${drug}resistant`}>
+                                                                  markerColourProperty={`${drug}resistant`}
+                                                                  knownLegendValues={['yes', 'no', 'maybe']}>
                     <CustomPopup>
                       <ItemTemplate flux={this.getFlux()} table="sites">
                         {popup}
