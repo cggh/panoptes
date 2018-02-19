@@ -123,7 +123,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
             }
           },
           tabs: {
-            components: ['FirstTab', 'InitialDocPage', 'InitialOtherPage'] ,
+            components: ['FirstTab', 'InitialDocPage', 'InitialOtherPage'],
             selectedTab: 'FirstTab',
             unclosableTabs: ['FirstTab'],
             unreplaceableTabs: ['FirstTab']
