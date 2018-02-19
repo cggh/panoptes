@@ -44,9 +44,8 @@ $usual-text-size: 14px;
 }
 
 .obs-leader {
-  max-width: 80%;
+  max-width: $card-max-width;
   font-size: 25px;
-  padding: 25px;
   text-align: center;
   background: rgba(255,255,255,0.6);
   margin-bottom: 20px;
