@@ -36,11 +36,14 @@ import 'main.scss';
 const drawerWidth = 280;
 const iconColour = '#69B3E4';
 
-const styles = {
+const styles = (theme) => ({
   list: {
     width: drawerWidth,
   },
-};
+  nested: {
+    paddingLeft: theme.spacing.unit * 5,
+  },
+});
 
 let Header = createReactClass({
   displayName: 'Header',
@@ -126,7 +129,7 @@ let Header = createReactClass({
             onBackdropClick={this.handleCloseDrawer}
           >
             <div className={classes.list}>
-              <div style={{textAlign: 'center', marginTop: '10px', cursor: 'pointer'}}>
+              <div style={{textAlign: 'center', marginTop: '10px', marginBottom: '10px', cursor: 'pointer'}}>
                 <img src={logo} onClick={this.handleCloseDrawer}/>
               </div>
               <List component="nav">
@@ -148,6 +151,32 @@ let Header = createReactClass({
                   </ListItemIcon>
                   <ListItemText primary="P. falciparum" />
                 </ListItem>
+                <List component="div" disablePadding>
+                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="regions.html"/>))}>
+                    <ListItemIcon>
+                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:map.svg" />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Regions" />
+                  </ListItem>
+                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="drugs.html"/>))}>
+                    <ListItemIcon>
+                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:drug01.svg" />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Drugs" />
+                  </ListItem>
+                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="genes.html"/>))}>
+                    <ListItemIcon>
+                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:gene01.svg" />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Genes" />
+                  </ListItem>
+                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="about.html"/>))}>
+                    <ListItemIcon>
+                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:table01.svg" />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Data" />
+                  </ListItem>
+                </List>
                 {this.config.user.isManager ?
                   [
                     <Divider key="Divider1" />,
