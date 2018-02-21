@@ -13,28 +13,16 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Panoptes
 import Modal from 'ui/Modal';
-import Copy from 'ui/Copy';
-import Confirm from 'ui/Confirm';
 import SessionComponent from 'panoptes/SessionComponent';
-import HTMLWithComponents from 'panoptes/HTMLWithComponents';
-import EmptyTab from 'containers/EmptyTab';
-import DatasetManagerActions from 'components/DatasetManagerActions';
-
+import Header from 'Header';
 
 // Material UI
 import createPalette from 'material-ui/styles/createPalette';
 import createTypography from 'material-ui/styles/createTypography';
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {withTheme} from 'material-ui/styles';
-import {blue, pink, deepOrange, blueGrey} from 'material-ui/colors';
-import AppBar from 'material-ui/AppBar';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
-import IconButton from 'material-ui/IconButton';
-import MenuIcon from 'material-ui-icons/Menu';
-import Menu, { MenuItem } from 'material-ui/Menu';
-import MoreVert from 'material-ui-icons/MoreVert';
-import Tabs, { Tab } from 'material-ui/Tabs';
+import {deepOrange, blueGrey} from 'material-ui/colors';
+import Tabs, {Tab} from 'material-ui/Tabs';
 
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
@@ -74,7 +62,7 @@ const muiTheme = createMuiTheme({
         backgroundColor: 'white'
       }
     }
-  }
+  },
 });
 
 let Panoptes = createReactClass({
@@ -93,10 +81,8 @@ let Panoptes = createReactClass({
   componentDidMount() {
     let store = this.getFlux().store('SessionStore');
     store.on('notify',
-      () => this.refs.notificationSystem.addNotification(
+      () => this.notificationSystem.addNotification(
         _assign(store.getLastNotification(), {position: 'tc'})));
-    //We don't need this as it will come to us in page load json
-    //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
     console.info('Theme: %o', this.props.theme);
   },
 
@@ -136,16 +122,16 @@ let Panoptes = createReactClass({
       actions.tabSwitch('FirstTab');
     }
     if (index === 1) {
-      actions.tabSwitch(docPages[docPages.length-1]);
+      actions.tabSwitch(docPages[docPages.length - 1]);
     }
     if (index === 2) {
-      actions.tabSwitch(others[others.length-1]);
+      actions.tabSwitch(others[others.length - 1]);
     }
   },
 
   render() {
     let actions = this.getFlux().actions.session;
-    let {tabs, popups, modal, components} = this.state;
+    let {tabs, modal, components} = this.state;
     let config = this.config;
     tabs = tabs.toJS();
     components = components.toJS();
@@ -153,12 +139,12 @@ let Panoptes = createReactClass({
     let docPages = [];
     let others = [];
     tabs.components.forEach((component) => {
-      (this.isDocPage(components[component]) ? docPages : others).push(component)
+      (this.isDocPage(components[component]) ? docPages : others).push(component);
     });
     let tabIndex = 0;
     let selectedDocPage = 'InitialDocPage';
     let selectedOther = 'InitialOther';
-    if (tabs.selectedTab !== "FirstTab" && docPages.indexOf(tabs.selectedTab) >= 0) {
+    if (tabs.selectedTab !== 'FirstTab' && docPages.indexOf(tabs.selectedTab) >= 0) {
       tabIndex = 1;
       selectedDocPage = tabs.selectedTab;
     }
@@ -175,7 +161,13 @@ let Panoptes = createReactClass({
               <div className="spinner" />
             </div>
             <div className="page">
-              <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
+              <Header
+                dataset={config.dataset}
+                name={config.settings.nameBanner}
+                logo={initialConfig.logo}
+                tabs={tabs}
+                components={components}
+              />
               <Tabs
                 onChange={this.handleChangeTab}
                 value={tabIndex}
@@ -189,16 +181,16 @@ let Panoptes = createReactClass({
               </Tabs>
               {tabIndex === 0 ?
                 <div className="body scroll-within">
-                  <SessionComponent key="FirstTab" compId={"FirstTab"} />
-                </div> :null}
+                  <SessionComponent key="FirstTab" compId={'FirstTab'} />
+                </div> : null}
               {tabIndex === 1 ?
                 <div className="body scroll-within">
                   <SessionComponent key={selectedDocPage} compId={selectedDocPage} />
-                </div>:null}
+                </div> : null}
               {tabIndex === 2 ?
                 <div className="body scroll-within">
                   <SessionComponent key={selectedOther} compId={selectedOther} />
-                </div>:null}
+                </div> : null}
             </div>
             <Modal visible={!!modal}
               onClose={actions.modalClose}>
@@ -206,105 +198,10 @@ let Panoptes = createReactClass({
                 React.cloneElement(modal, {setProps: actions.modalSetProps})
                 : null}
             </Modal>
-            <NotificationSystem ref="notificationSystem"/>
+            <NotificationSystem ref={(input) => { this.notificationSystem = input; }}/>
           </div>
         </MuiThemeProvider>
       </DetectResize>
-    );
-  },
-});
-
-let Header = createReactClass({
-  displayName: 'Header',
-
-  mixins: [
-    PureRenderMixin,
-    ConfigMixin,
-    FluxMixin,
-  ],
-
-  propTypes: {
-    dataset: PropTypes.string,
-    name: PropTypes.string,
-    logo: PropTypes.string
-  },
-
-  getInitialState() {
-    return {
-      anchorEl: null,
-      open: false
-    }
-  },
-
-  handleClick(event) {
-    this.setState({ open: true, anchorEl: event.currentTarget });
-  },
-
-  handleRequestClose() {
-    this.setState({ open: false });
-  },
-
-  handlePageLinkClick() {
-    let introContent = 'Here\'s the link for this page, which you can copy and paste elsewhere: ';
-    let selectedContent = window.location.href;
-    this.getFlux().actions.session.modalOpen(<Copy title="Page Link" introContent={introContent} selectedContent={selectedContent}/>);
-  },
-
-  handleSaveInitialSession() {
-    let state = this.getFlux().store('SessionStore').getState().toJS();
-    this.getFlux().actions.session.modalOpen(<Confirm
-      title="Initial view"
-      message="Save current app state as initial view for all users?"
-      onConfirm={() => this.getFlux().actions.api.modifyConfig(
-        {
-          dataset: this.config.dataset,
-          path: 'settings.initialSessionState',
-          action: 'replace',
-          content: state,
-        }
-      )}
-    />);
-  },
-
-  render() {
-    let {dataset, name, logo} = this.props;
-    let actions = this.getFlux().actions;
-    return (
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton color="contrast" aria-label="Menu">
-            <MenuIcon />
-          </IconButton>
-          <Typography type="title" color="inherit" onClick={() => actions.session.tabSwitch('FirstTab')}>
-            {<span><img className="top-bar-logo" src={logo}/><HTMLWithComponents className="top-bar-title">{name}</HTMLWithComponents></span>}
-          </Typography>
-          {this.config.user.isManager ? [<IconButton
-            key="1"
-            style={{color: 'white'}}
-            aria-label="More"
-            aria-owns={this.state.open ? 'long-menu' : null}
-            aria-haspopup="true"
-            onClick={this.handleClick}
-          >
-            <MoreVert />
-          </IconButton>,
-          <Menu
-            key="2"
-            id="long-menu"
-            anchorEl={this.state.anchorEl}
-            open={this.state.open}
-            onRequestClose={this.handleRequestClose}
-          >
-            <MenuItem selected={false} onClick={() => (this.handleRequestClose(), actions.session.tabOpen(<DatasetManagerActions />))}>Admin</MenuItem>
-            <MenuItem selected={false} onClick={() => (this.handleRequestClose(), actions.session.tabOpen(<EmptyTab />))}>Table/View list</MenuItem>
-            <MenuItem selected={false} onClick={() => (this.handleRequestClose(), window.location.href = this.config.cas.logout)}>Sign out</MenuItem>
-          </Menu>] : this.config.cas.service ? <Button color="primary">
-            <a style={{textDecoration:"inherit", color:'white'}} href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
-          </Button>: null
-          }
-
-        </Toolbar>
-      </AppBar>
     );
   },
 });
