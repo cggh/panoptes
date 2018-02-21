@@ -83,6 +83,8 @@ let Panoptes = createReactClass({
     store.on('notify',
       () => this.notificationSystem.addNotification(
         _assign(store.getLastNotification(), {position: 'tc'})));
+    //We don't need this as it will come to us in page load json
+    //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
     console.info('Theme: %o', this.props.theme);
   },
 
