@@ -109,7 +109,7 @@ let Header = createReactClass({
     const {drawerIsOpen} = this.state;
     return (
       <AppBar position="static">
-        <Toolbar disableGutters={!drawerIsOpen}>
+        <Toolbar>
           <IconButton
             style={{color: '#36454F'}}
             aria-label="open drawer"
