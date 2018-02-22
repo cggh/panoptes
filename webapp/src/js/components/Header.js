@@ -28,6 +28,9 @@ import ExitToAppIcon from 'material-ui-icons/ExitToApp';
 import Divider from 'material-ui/Divider';
 import Drawer from 'material-ui/Drawer';
 import List, {ListItem} from 'material-ui/List';
+import Collapse from 'material-ui/transitions/Collapse';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
 
 import 'font-awesome.css';
 import 'ui-components.scss';
@@ -41,7 +44,10 @@ const styles = (theme) => ({
     width: drawerWidth,
   },
   nested: {
-    paddingLeft: theme.spacing.unit * 5,
+    paddingLeft: theme.spacing.unit * 4,
+  },
+  nested2: {
+    paddingLeft: theme.spacing.unit * 6,
   },
 });
 
@@ -65,6 +71,8 @@ let Header = createReactClass({
   getInitialState() {
     return {
       drawerIsOpen: false,
+      guidebooksIsExpanded: true,
+      pfIsExpanded: true,
     };
   },
 
@@ -74,6 +82,10 @@ let Header = createReactClass({
 
   handleCloseDrawer() {
     this.setState({drawerIsOpen: false});
+  },
+
+  handleToggleExpand(stateToToggle) {
+    this.setState({[stateToToggle]: !this.state[stateToToggle]});
   },
 
   // NOTE: Copied from Panoptes.js
@@ -109,7 +121,7 @@ let Header = createReactClass({
   render() {
     let {logo, classes} = this.props;
     let actions = this.getFlux().actions;
-    const {drawerIsOpen} = this.state;
+    const {drawerIsOpen, guidebooksIsExpanded, pfIsExpanded} = this.state;
     return (
       <AppBar position="static">
         <Toolbar disableGutters={true} style={{marginLeft: '12px', marginRight: '12px'}}>
@@ -143,40 +155,56 @@ let Header = createReactClass({
                   <ListItemIcon>
                     <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:guidebook.svg" />
                   </ListItemIcon>
-                  <ListItemText primary="Guidebook" />
+                  <ListItemText primary="Guidebooks" />
+                  {guidebooksIsExpanded ? <ExpandLess onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('guidebooksIsExpanded'))}/> : <ExpandMore onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('guidebooksIsExpanded'))}/>}
                 </ListItem>
-                <ListItem button onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="pf.html"/>))}>
+                <Collapse in={guidebooksIsExpanded} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="news.html"/>))}>
+                      <ListItemIcon>
+                        <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:stories-news.svg" />
+                      </ListItemIcon>
+                      <ListItemText primary="Articles" />
+                    </ListItem>
+                  </List>
+                  <List component="div" disablePadding>
+                    <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="pf.html"/>))}>
+                      <ListItemIcon>
+                        <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:plasmodium-falciparum.svg" />
+                      </ListItemIcon>
+                      <ListItemText primary="P. falciparum" />
+                      {pfIsExpanded ? <ExpandLess onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('pfIsExpanded'))}/> : <ExpandMore onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('pfIsExpanded'))}/>}
+                    </ListItem>
+                  </List>
+                  <Collapse in={pfIsExpanded} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      <ListItem button className={classes.nested2} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="regions.html"/>))}>
+                        <ListItemIcon>
+                          <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:map.svg" />
+                        </ListItemIcon>
+                        <ListItemText inset primary="Regions" />
+                      </ListItem>
+                      <ListItem button className={classes.nested2} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="drugs.html"/>))}>
+                        <ListItemIcon>
+                          <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:drug01.svg" />
+                        </ListItemIcon>
+                        <ListItemText inset primary="Drugs" />
+                      </ListItem>
+                      <ListItem button className={classes.nested2} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="genes.html"/>))}>
+                        <ListItemIcon>
+                          <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:gene01.svg" />
+                        </ListItemIcon>
+                        <ListItemText inset primary="Genes" />
+                      </ListItem>
+                    </List>
+                  </Collapse>
+                </Collapse>
+                <ListItem button onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="about.html"/>))}>
                   <ListItemIcon>
-                    <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:plasmodium-falciparum.svg" />
+                    <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:table01.svg" />
                   </ListItemIcon>
-                  <ListItemText primary="P. falciparum" />
+                  <ListItemText inset primary="Data" />
                 </ListItem>
-                <List component="div" disablePadding>
-                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="regions.html"/>))}>
-                    <ListItemIcon>
-                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:map.svg" />
-                    </ListItemIcon>
-                    <ListItemText inset primary="Regions" />
-                  </ListItem>
-                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="drugs.html"/>))}>
-                    <ListItemIcon>
-                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:drug01.svg" />
-                    </ListItemIcon>
-                    <ListItemText inset primary="Drugs" />
-                  </ListItem>
-                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="genes.html"/>))}>
-                    <ListItemIcon>
-                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:gene01.svg" />
-                    </ListItemIcon>
-                    <ListItemText inset primary="Genes" />
-                  </ListItem>
-                  <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="about.html"/>))}>
-                    <ListItemIcon>
-                      <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:table01.svg" />
-                    </ListItemIcon>
-                    <ListItemText inset primary="Data" />
-                  </ListItem>
-                </List>
                 {this.config.user.isManager ?
                   [
                     <Divider key="Divider1" />,
