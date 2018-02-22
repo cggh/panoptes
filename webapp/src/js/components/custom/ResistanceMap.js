@@ -1,24 +1,16 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Card, {CardContent, CardHeader} from 'material-ui/Card';
-import Typography from 'material-ui/Typography'
-import filterChildren from 'util/filterChildren';
+import Typography from 'material-ui/Typography';
 import Map from 'components/Map/Map';
-import ItemTemplate from 'components/panoptes/ItemTemplate';
 import TileLayer from 'components/Map/TileLayer';
 import TableMarkersLayer from 'components/Map/TableMarkersLayer';
-import TableMarkersLayerCustomPopup from 'components/Map/TableMarkersLayerCustomPopup';
-import CustomPopup from 'components/Map/CustomPopup';
-import { FormLabel, FormControl, FormControlLabel, FormHelperText } from 'material-ui/Form';
-import Radio, { RadioGroup } from 'material-ui/Radio';
+import {FormControl, FormControlLabel} from 'material-ui/Form';
+import Radio, {RadioGroup} from 'material-ui/Radio';
 import FluxMixin from 'mixins/FluxMixin';
 
 let ResistanceMap = createReactClass({
   displayName: 'ResistanceMap',
-
-  propTypes: {
-  },
 
   mixins: [
     FluxMixin,
@@ -70,27 +62,28 @@ let ResistanceMap = createReactClass({
             <div style={{width: '80vw', height: '60vh'}}>
               <Map>
                 <TileLayer/>
-                {drug !== 'sites' ? <TableMarkersLayerCustomPopup showLegend={true}
-                                                                  clickPrimaryKeyProperty="site_id"
-                                                                  table="pf_samples"
-                                                                  clusterMarkers={true}
-                                                                  markerColourProperty={`${drug}resistant`}
-                                                                  knownLegendValues={['yes', 'no', 'maybe']}
-                                                                  legendPropertyName="Resistance type">
-                    <CustomPopup>
-                      <ItemTemplate flux={this.getFlux()} table="sites">
-                        {popup}
-                      </ItemTemplate>
-                    </CustomPopup>
-                  </TableMarkersLayerCustomPopup>
+                {drug !== 'sites' ?
+                  <TableMarkersLayer
+                    showLegend={true}
+                    clickPrimaryKeyProperty="site_id"
+                    table="pf_samples"
+                    clusterMarkers={true}
+                    markerColourProperty={`${drug}resistant`}
+                    knownLegendValues={['yes', 'no', 'maybe']}
+                    legendPropertyName="Resistance type"
+                    onClickClusterBehaviour="tooltip"
+                    onClickClusterComponent="HandlebarsWithComponents"
+                    onClickClusterComponentTemplateDocPath="templates/ResistanceMapOnClickClusterTooltip.html"
+                  />
                   :
-                  <TableMarkersLayerCustomPopup clickPrimaryKeyProperty="site_id" disableOnClickMarker={true} showLegend={true} table="sites" clusterMarkers={false}>
-                    <CustomPopup>
-                      <ItemTemplate flux={this.getFlux()} table="sites">
-                        {popup}
-                      </ItemTemplate>
-                    </CustomPopup>
-                  </TableMarkersLayerCustomPopup>
+                  <TableMarkersLayer
+                    clickPrimaryKeyProperty="site_id"
+                    table="sites"
+                    clusterMarkers={false}
+                    onClickSingleBehaviour="tooltip"
+                    onClickSingleComponent="ItemTemplate"
+                    onClickSingleComponentTemplateDocPath="templates/ResistanceMapOnClickSingleTooltip.html"
+                  />
                 }
 
               </Map>
