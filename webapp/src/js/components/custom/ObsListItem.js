@@ -18,12 +18,13 @@ let ObsListItem = createReactClass({
     table: PropTypes.string,
     primKey: PropTypes.string,
     href: PropTypes.string,
-    download: PropTypes.bool
+    download: PropTypes.bool,
+    target: PropTypes.string,
   },
 
 
   render() {
-    let {children, table, primKey, href, download, ...other} = this.props;
+    let {children, table, primKey, href, download, target, ...other} = this.props;
     if (!download) {
       if (!href || (href && href.indexOf('://') === -1)) {
         //Internal link
@@ -53,7 +54,7 @@ let ObsListItem = createReactClass({
     } else {
       // This path prefix isn't determined by process.env.DATASET_URL_PATH_PREFIX
       return (
-        <a style={{textDecoration:'none'}} href={`/panoptes/Docs/${this.config.dataset}/${href}`}>
+        <a style={{textDecoration:'none'}} href={`/panoptes/Docs/${this.config.dataset}/${href}`} target={target}>
           <ListItem button {...other}>
             {children}
           </ListItem>
