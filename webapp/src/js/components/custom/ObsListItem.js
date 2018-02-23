@@ -51,8 +51,9 @@ let ObsListItem = createReactClass({
         </a>);
       }
     } else {
+      // This path prefix isn't determined by process.env.DATASET_URL_PATH_PREFIX
       return (
-        <a style={{textDecoration:'none'}} href={`${process.env.DATASET_URL_PATH_PREFIX}Docs/${this.config.dataset}/${href}`}>
+        <a style={{textDecoration:'none'}} href={`/panoptes/Docs/${this.config.dataset}/${href}`}>
           <ListItem button {...other}>
             {children}
           </ListItem>
