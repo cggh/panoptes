@@ -3,7 +3,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
-import Icon from 'ui/Icon';
 import Button from 'ui/Button';
 import filterChildren from 'util/filterChildren';
 import _isArray from 'lodash.isarray';
