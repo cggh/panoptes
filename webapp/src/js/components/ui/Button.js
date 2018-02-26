@@ -4,6 +4,7 @@ import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import {default as MuiButton} from 'material-ui/Button';
 import Icon from 'ui/Icon';
+import _clone from 'lodash/clone';
 
 let Button = createReactClass({
   displayName: 'Button',
@@ -18,7 +19,9 @@ let Button = createReactClass({
     iconName: PropTypes.string,
     iconInverse: PropTypes.bool,
     labelStyle: PropTypes.object,
-    raised: PropTypes.bool
+    raised: PropTypes.bool,
+    variant: PropTypes.string, //'flat' | 'raised' | 'fab'
+    children: PropTypes.node,
   },
 
   getDefaultProps() {
@@ -28,7 +31,7 @@ let Button = createReactClass({
   },
 
   render() {
-    const {label, icon, iconName, iconInverse, labelStyle, ...otherProps} = this.props;
+    const {label, icon, iconName, iconInverse, labelStyle, children, ...otherProps} = this.props;
 
     let iconComponent = undefined;
     if (icon !== undefined) {
@@ -37,7 +40,7 @@ let Button = createReactClass({
       iconComponent = <Icon fixedWidth={true} name={iconName} inverse={iconInverse} />;
     }
 
-    let labelStylePlus = labelStyle;
+    let labelStylePlus = _clone(labelStyle); // Because labelStyle is const. This prevents TypeError: Cannot assign to read only property 'marginLeft' of object '#<Object>'
     if (iconComponent !== undefined) {
       if (labelStylePlus !== undefined) {
         labelStylePlus.marginLeft = '0.5em';
@@ -46,12 +49,20 @@ let Button = createReactClass({
       }
     }
 
-    return (
-      <MuiButton {...otherProps}>
-        {iconComponent}
-        {label !== undefined ? <span style={labelStylePlus}>{label}</span> : null}
-      </MuiButton>
-    );
+    if (children) {
+      return (
+        <MuiButton label={label} {...otherProps}>
+          {children}
+        </MuiButton>
+      );
+    } else {
+      return (
+        <MuiButton {...otherProps}>
+          {iconComponent}
+          {label !== undefined ? <span style={labelStylePlus}>{label}</span> : null}
+        </MuiButton>
+      );
+    }
   },
 });
 
