@@ -114,7 +114,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
             InitialDocPage: {
               type: 'DocPage',
               props: {
-                path: 'guidebook.html'
+                path: 'pf.html'
               }
             },
             InitialOtherPage: {
