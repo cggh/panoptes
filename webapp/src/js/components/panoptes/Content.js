@@ -2,8 +2,9 @@ import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import _isArray from 'lodash.isarray';
 import filterChildren from 'util/filterChildren';
+import PropTypes from 'prop-types';
 
-//Child of CustomButton, ToggleBox
+//Child of CustomButton, ToggleBox, PopupButton
 
 let Content = createReactClass({
   displayName: 'Content',
@@ -11,6 +12,10 @@ let Content = createReactClass({
   mixins: [
     PureRenderMixin,
   ],
+
+  propTypes: {
+    children: PropTypes.node,
+  },
 
   render() {
     let {children} = this.props;
