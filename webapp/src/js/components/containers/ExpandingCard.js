@@ -77,14 +77,12 @@ let ExpandingCard = createReactClass({
         typographies.push(child);
       } else if (child.type.displayName === 'ExpandingCardCollapse') {
         if (expandingCardCollapse !== undefined) {
-          console.error('ExpandingCard does not handle more than one ExpandingCardCollapse child.');
-          return;
+          throw Error('ExpandingCard does not handle more than one ExpandingCardCollapse child.');
         }
         expandingCardCollapse = child.props.children;
       } else if (child.type.displayName === 'ExpandingCardActions') {
         if (expandingCardActions !== undefined) {
-          console.error('ExpandingCard does not handle more than one ExpandingCardActions child.');
-          return;
+          throw Error('ExpandingCard does not handle more than one ExpandingCardActions child.');
         }
         expandingCardActions = child.props.children;
       } else {
