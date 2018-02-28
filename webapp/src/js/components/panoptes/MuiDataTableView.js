@@ -283,7 +283,7 @@ let MuiDataTableView = createReactClass({
                         active={sortOrderDirectionByColumnId[columnData.id] !== undefined ? true : false}
                         direction={sortOrderDirectionByColumnId[columnData.id]}
                         onClick={(event) => {
-                          if (event.target.className.indexOf('info') == -1) {
+                          if (typeof event.target.className !== 'string' || (typeof event.target.className === 'string' && event.target.className.indexOf('info') == -1)) {
                             this.handleOrderChange(columnData.id);
                           }
                         }}
