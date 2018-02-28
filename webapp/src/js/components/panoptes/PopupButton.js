@@ -5,7 +5,6 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import Button from 'ui/Button';
 import filterChildren from 'util/filterChildren';
-import _isArray from 'lodash.isarray';
 
 let PopupButton = createReactClass({
   displayName: 'PopupButton',
@@ -17,50 +16,110 @@ let PopupButton = createReactClass({
 
   propTypes: {
     label: PropTypes.string,
-    icon: PropTypes.string,
+    icon: PropTypes.string, // i.e. iconName in Button
     children: PropTypes.node,
-    target: PropTypes.string
+    target: PropTypes.string,
+    iconComponent: PropTypes.element, // i.e. icon in Button
+    variant: PropTypes.string, //'flat' | 'raised' | 'fab'
+    style: PropTypes.object,
+    color: PropTypes.string,
+    labelStyle: PropTypes.object,
+    iconInverse: PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
       label: 'Untitled',
       icon: 'circle',
-      target: 'popup'
+      target: 'popup',
+      variant: 'raised',
+      color: 'primary',
+      labelStyle: {textTransform: 'inherit'},
+      iconInverse: true,
     };
   },
 
-  handleClick(e) {
+  handleClick(e, popupContent) {
     e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front
-    let {children, target} = this.props;
+    let {target} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (target === 'tab') {
-      this.getFlux().actions.session.tabOpen(filterChildren(this, children), !middleClick);
+      this.getFlux().actions.session.tabOpen(popupContent, !middleClick);
     } else {
-      this.getFlux().actions.session.popupOpen(filterChildren(this, children), !middleClick);
+      this.getFlux().actions.session.popupOpen(popupContent, !middleClick);
     }
   },
 
   render() {
-    let {children, label, icon} = this.props;
-    children = filterChildren(this, children);
-    if (_isArray(children)) {
-      throw Error('PopupButton can only have one child');
-    }
+    let {children, label, icon, iconComponent, variant, style, color, labelStyle, iconInverse} = this.props;
+    children = React.Children.toArray(filterChildren(this, children)); // Want array when 1 child.
+
+    // Don't want to set in prop default, because want to merge style.
+    const defaultStyle = {
+      margin: '8px 8px 0px 0px', color: 'white'
+    };
+
     if (!children) {
-      throw Error('PopupButton can only have one child not none');
+      throw Error('PopupButton has no children. Requires either one child (popup content) or one Label and one Content child.');
     }
 
-    return <Button
-      raised
-      style={{margin: '7px', color: 'white'}}
-      label={label}
-      color="primary"
-      iconName={icon ? icon : undefined}
-      iconInverse={true}
-      labelStyle={{textTransform: 'inherit'}}
-      onClick={this.handleClick}
-    />;
+    let popupLabel = undefined;
+    let popupContent = undefined;
+    let otherChildren = [];
+    for (let i = 0; i < children.length; i++) {
+      let child  = children[i];
+      if (child.type.displayName === 'Label') {
+        if (popupLabel !== undefined) {
+          throw Error('PopupButton does not handle more than one Label child.');
+        }
+        popupLabel = child.props.children;
+      } else if (child.type.displayName === 'Content') {
+        if (popupContent !== undefined) {
+          throw Error('PopupButton does not handle more than one Content child.');
+        }
+        popupContent = child.props.children;
+      } else {
+        otherChildren.push(child);
+      }
+    }
+
+    const iconName = icon ? icon : undefined;
+    const buttonProps = {
+      label,
+      style: {...defaultStyle, style},
+      color,
+      icon: iconComponent,
+      iconName,
+      iconInverse,
+      labelStyle,
+      variant,
+      raised: variant === 'raised' ? true : false,
+      fab: variant === 'fab' ? true : false,
+    };
+
+    if (otherChildren.length === 1 && popupLabel === undefined && popupContent === undefined) {
+      return (
+        <Button
+          {...buttonProps}
+          onClick={(e) => this.handleClick(e, otherChildren)}
+        />
+      );
+    } else if (otherChildren.length === 0 && popupLabel !== undefined && popupContent !== undefined) {
+      return (
+        <Button
+          {...buttonProps}
+          onClick={(e) => this.handleClick(e, popupContent)}
+        >
+          {popupLabel}
+        </Button>
+      );
+    } else {
+      console.error('otherChildren: ', otherChildren);
+      console.error('popupLabel: ', popupLabel);
+      console.error('popupContent: ', popupContent);
+      throw Error('PopupButton requires either one child (popup content) or one Label and one Content child.');
+    }
+
   },
 });
 
