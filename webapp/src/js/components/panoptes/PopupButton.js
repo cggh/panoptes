@@ -25,6 +25,8 @@ let PopupButton = createReactClass({
     color: PropTypes.string,
     labelStyle: PropTypes.object,
     iconInverse: PropTypes.bool,
+    table: PropTypes.string,
+    primKey: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -41,17 +43,19 @@ let PopupButton = createReactClass({
 
   handleClick(e, popupContent) {
     e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front
-    let {target} = this.props;
+    let {target, table, primKey} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (target === 'tab') {
       this.getFlux().actions.session.tabOpen(popupContent, !middleClick);
+    } else if (target === 'dataItemPopup') {
+      this.getFlux().actions.panoptes.dataItemPopup({table, primKey});
     } else {
       this.getFlux().actions.session.popupOpen(popupContent, !middleClick);
     }
   },
 
   render() {
-    let {children, label, icon, iconComponent, variant, style, color, labelStyle, iconInverse} = this.props;
+    let {children, label, icon, iconComponent, variant, style, color, labelStyle, iconInverse, target} = this.props;
     children = React.Children.toArray(filterChildren(this, children)); // Want array when 1 child.
 
     // Don't want to set in prop default, because want to merge style.
@@ -60,7 +64,7 @@ let PopupButton = createReactClass({
     };
 
     if (!children) {
-      throw Error('PopupButton has no children. Requires either one child (popup content) or one Label and one Content child.');
+      throw Error('PopupButton has no children. Requires either: one child (popup content); or one Label and one Content child; or one Label the target dataItemPopup.');
     }
 
     let popupLabel = undefined;
@@ -104,7 +108,7 @@ let PopupButton = createReactClass({
           onClick={(e) => this.handleClick(e, <span>{otherChildren}</span>)}
         />
       );
-    } else if (otherChildren.length === 0 && popupLabel !== undefined && popupContent !== undefined) {
+    } else if (otherChildren.length === 0 && popupLabel !== undefined && (popupContent !== undefined || target === 'dataItemPopup')) {
       return (
         <Button
           {...buttonProps}
@@ -117,7 +121,7 @@ let PopupButton = createReactClass({
       console.error('otherChildren: ', otherChildren);
       console.error('popupLabel: ', popupLabel);
       console.error('popupContent: ', popupContent);
-      throw Error('PopupButton requires either one child (popup content) or one Label and one Content child.');
+      throw Error('PopupButton requires either: one child (popup content); or one Label and one Content child; or one Label the target dataItemPopup.');
     }
 
   },
