@@ -176,14 +176,15 @@ let ProportionBarChartRow = createReactClass({
       //// Determine bar colours
       let leftBarColour = numeratorBarColour !== undefined ? numeratorBarColour : colours[1];
       let rightBarColour = remainderBarColour !== undefined ? remainderBarColour : 'transparent';
+      // Use proportionTable but don't override numeratorBarColour or remainderBarColour.
       if (proportionTable !== undefined && proportionTableColourColumn !== undefined && proportionTableColourColumnNumeratorValue !== undefined) {
         if (this.config.tablesById[proportionTable].propertiesById[proportionTableColourColumn] === undefined) {
           console.error('proportionTableColourColumn ' + proportionTableColourColumn + ' is not in the propertiesById config for proportionTable ' + proportionTable);
         }
         const colourFunction = propertyColour(this.config.tablesById[proportionTable].propertiesById[proportionTableColourColumn]);
-        leftBarColour = colourFunction(proportionTableColourColumnNumeratorValue);
+        leftBarColour = numeratorBarColour !== undefined ? numeratorBarColour : colourFunction(proportionTableColourColumnNumeratorValue);
         if (proportionTableColourColumnRemainderValue !== undefined) {
-          rightBarColour = colourFunction(proportionTableColourColumnRemainderValue);
+          rightBarColour = remainderBarColour !== undefined ? remainderBarColour : colourFunction(proportionTableColourColumnRemainderValue);
         }
       }
       const lightColour = '#F0F0F0';
