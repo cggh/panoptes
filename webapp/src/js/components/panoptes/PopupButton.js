@@ -101,14 +101,14 @@ let PopupButton = createReactClass({
       return (
         <Button
           {...buttonProps}
-          onClick={(e) => this.handleClick(e, otherChildren)}
+          onClick={(e) => this.handleClick(e, <span>{otherChildren}</span>)}
         />
       );
     } else if (otherChildren.length === 0 && popupLabel !== undefined && popupContent !== undefined) {
       return (
         <Button
           {...buttonProps}
-          onClick={(e) => this.handleClick(e, popupContent)}
+          onClick={(e) => this.handleClick(e, <span>{popupContent}</span>)}
         >
           {popupLabel}
         </Button>
