@@ -20,6 +20,7 @@ let ObsListItem = createReactClass({
     href: PropTypes.string,
     download: PropTypes.bool,
     target: PropTypes.string,
+    children: PropTypes.node,
   },
 
 
@@ -45,7 +46,7 @@ let ObsListItem = createReactClass({
         );
       } else {
         //External link
-        return (<a style={{textDecoration:'none'}} href={href}>
+        return (<a style={{textDecoration: 'none'}} href={href}>
           <ListItem button {...other}>
             {children}
           </ListItem>
@@ -54,7 +55,7 @@ let ObsListItem = createReactClass({
     } else {
       // This path prefix isn't determined by process.env.DATASET_URL_PATH_PREFIX
       return (
-        <a style={{textDecoration:'none'}} href={`/panoptes/Docs/${this.config.dataset}/${href}`} target={target}>
+        <a style={{textDecoration: 'none'}} href={`/panoptes/Docs/${this.config.dataset}/${href}`} target={target}>
           <ListItem button {...other}>
             {children}
           </ListItem>
