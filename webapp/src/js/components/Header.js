@@ -153,7 +153,7 @@ let Header = createReactClass({
                 </ListItem>
                 <ListItem button onClick={() => (this.handleCloseDrawer(), this.handleChangeTab(1))}>
                   <ListItemIcon>
-                    <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:guidebook.svg" />
+                    <Icon className="icon" name="docimage:icons/guidebook.svg" />
                   </ListItemIcon>
                   <ListItemText primary="Guidebooks" />
                   {guidebooksIsExpanded ? <ExpandLess onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('guidebooksIsExpanded'))}/> : <ExpandMore onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('guidebooksIsExpanded'))}/>}
@@ -162,7 +162,7 @@ let Header = createReactClass({
                   <List component="div" disablePadding>
                     <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="news.html"/>))}>
                       <ListItemIcon>
-                        <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:stories-news.svg" />
+                        <Icon className="icon"  name="docimage:icons/stories-news.svg" />
                       </ListItemIcon>
                       <ListItemText primary="Articles" />
                     </ListItem>
@@ -170,7 +170,7 @@ let Header = createReactClass({
                   <List component="div" disablePadding>
                     <ListItem button className={classes.nested} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="pf.html"/>))}>
                       <ListItemIcon>
-                        <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:plasmodium-falciparum.svg" />
+                        <Icon className="icon"  name="docimage:icons/plasmodium-falciparum.svg" />
                       </ListItemIcon>
                       <ListItemText primary="P. falciparum" />
                       {pfIsExpanded ? <ExpandLess onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('pfIsExpanded'))}/> : <ExpandMore onClick={(event) => (event.stopPropagation(), this.handleToggleExpand('pfIsExpanded'))}/>}
@@ -180,19 +180,19 @@ let Header = createReactClass({
                     <List component="div" disablePadding>
                       <ListItem button className={classes.nested2} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="regions.html"/>))}>
                         <ListItemIcon>
-                          <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:map.svg" />
+                          <Icon className="icon"  name="docimage:icons/map.svg" />
                         </ListItemIcon>
                         <ListItemText inset primary="Regions" />
                       </ListItem>
                       <ListItem button className={classes.nested2} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="drugs.html"/>))}>
                         <ListItemIcon>
-                          <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:drug01.svg" />
+                          <Icon className="icon"  name="docimage:icons/drug01.svg" />
                         </ListItemIcon>
                         <ListItemText inset primary="Drugs" />
                       </ListItem>
                       <ListItem button className={classes.nested2} onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="genes.html"/>))}>
                         <ListItemIcon>
-                          <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:gene01.svg" />
+                          <Icon className="icon"  name="docimage:icons/gene01.svg" />
                         </ListItemIcon>
                         <ListItemText inset primary="Genes" />
                       </ListItem>
@@ -201,7 +201,7 @@ let Header = createReactClass({
                 </Collapse>
                 <ListItem button onClick={() => (this.handleCloseDrawer(), actions.session.tabOpen(<DocPage path="about.html"/>))}>
                   <ListItemIcon>
-                    <Icon className="icon" baseURL="/panoptes/Docs/observatory/images/icons/" name="image:table01.svg" />
+                    <Icon className="icon" name="docimage:icons/table01.svg" />
                   </ListItemIcon>
                   <ListItemText inset primary="Data" />
                 </ListItem>
