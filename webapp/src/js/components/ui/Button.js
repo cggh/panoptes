@@ -49,7 +49,7 @@ let Button = createReactClass({
       }
     }
 
-    if (children) {
+    if (children !== undefined && !(children instanceof Array && children.length === 0)) {
       return (
         <MuiButton label={label} {...otherProps}>
           {children}
