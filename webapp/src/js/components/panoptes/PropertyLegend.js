@@ -60,14 +60,14 @@ let PropertyLegend = createReactClass({
       }
       background += ')';
       legendElements = [
-        <div key="min" className="legend-element">{min || propConfig.minVal}</div>,
-        <div key="bar" className="legend-element">
+        <span key="min" className="legend-element">{min === undefined ? propConfig.minVal : min}</span>,
+        <span key="bar" className="legend-element">
           <div
             style={{width: '100px', height: '10px', background}}
           >
           </div>
-        </div>,
-        <div key="max" className="legend-element">{max || propConfig.maxVal}</div>
+        </span>,
+        <span key="max" className="legend-element">{max === undefined ? propConfig.minVal : max}</span>
       ];
     }
 

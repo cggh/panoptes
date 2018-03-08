@@ -200,6 +200,7 @@ export function scaleColour(domain) {
   return scaleLinear()
     .domain(domain)  // min/max of data
     .range(scaleColours)
+    .clamp(true)
     .interpolate(interpolateHcl);
 }
 
@@ -234,7 +235,7 @@ export function propertyColour(propConfig, min = null, max = null) {
   }
   if (propConfig.isText)
     return categoryColours(`${propConfig.tableId}_${propConfig.id}`);
-  return scaleColour([min || propConfig.minVal, max || propConfig.maxVal]);
+  return scaleColour([min === null ? propConfig.minVal : min, max === null ? propConfig.maxVal : max]);
 }
 
 // Credit: https://gist.github.com/olmokramer/82ccce673f86db7cda5e
