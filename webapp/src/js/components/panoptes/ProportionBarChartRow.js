@@ -52,6 +52,9 @@ let ProportionBarChartRow = createReactClass({
     onClickBehaviour: PropTypes.string,
     docLinkHref: PropTypes.string,
     sampleSizeWarningMinimum: PropTypes.number,
+    zeroDenominatorContent: PropTypes.node,
+    replaceParent: PropTypes.function,
+    children: PropTypes.node,
     config: PropTypes.object, // This will be provided via withAPIData
     numeratorData: PropTypes.object, // This will be provided via withAPIData
     denominatorData: PropTypes.object, // This will be provided via withAPIData
@@ -69,7 +72,8 @@ let ProportionBarChartRow = createReactClass({
       proportionTableJoins: [],
       proportionTableGroupByColumns: [],
       sampleSizeWarningMinimum: 200,
-      rowLabelStyle: {margin: 0, padding: 0}
+      rowLabelStyle: {margin: 0, padding: 0},
+      zeroDenominatorContent: <span style={{paddingLeft: '3px'}}>No data</span>,
     };
   },
 
@@ -86,6 +90,8 @@ let ProportionBarChartRow = createReactClass({
 
   // NOTE: copied from DocLink and re-parameterized
   handleClickDocLink(e) {
+    // children isn't used here, but is being excluded from ...other
+    // https://eslint.org/docs/rules/no-unused-vars#ignorerestsiblings
     let {docLinkHref, replaceParent, children, config, rowTable, rowPrimKeyValue, ...other} = this.props;
     let primKeyPropertyName = config.tablesById[rowTable].primKey;
     other[primKeyPropertyName] = rowPrimKeyValue;
@@ -141,6 +147,7 @@ let ProportionBarChartRow = createReactClass({
       numberOfTickLines,
       onClickBehaviour,
       sampleSizeWarningMinimum,
+      zeroDenominatorContent,
     } = this.props;
 
     if (numeratorData === undefined || denominatorData === undefined) {
@@ -207,11 +214,15 @@ let ProportionBarChartRow = createReactClass({
         verticalAlign: 'middle',
       };
 
-      //////////////////////
-
       const numerator = numeratorData.numerator !== undefined ? numeratorData.numerator[0] : 0;
       const denominator = denominatorData.denominator[0];
       const formattingFunction = roundProportionsToIntegers ? (n) => Math.round(n) : (n) => n;
+      if (denominator !== 0 && isNaN(numerator / denominator)) {
+        console.error('numerator: ', numerator);
+        console.error('denominator: ', denominator);
+        console.error('numerator / denominator:', (numerator / denominator));
+        throw Error('denominator !== 0 && isNaN(numerator / denominator)');
+      }
       const numeratorAsPercentage = Number(formattingFunction((numerator / denominator) * 100));
       const proportionAsString = convertProportionsToPercentages ? numeratorAsPercentage + '%' : formattingFunction(numerator) + '/' + formattingFunction(denominator);
       const sampleSizeAsString = denominator !== undefined ? denominator : '';
@@ -281,18 +292,32 @@ let ProportionBarChartRow = createReactClass({
             >
               {tickElements}
             </div>
-            <div
-              style={{
-                position: 'relative',
-                display: 'table',
-                width: '100%',
-                height: barHeight !== undefined ? barHeight : 'auto',
-                opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
-              }}
-            >
-              <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
-              <div style={{display: 'table-cell', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
-            </div>
+            {denominator !== 0 ?
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'table',
+                  width: '100%',
+                  height: barHeight !== undefined ? barHeight : 'auto',
+                  opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
+                }}
+              >
+                <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
+                <div style={{display: 'table-cell', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
+              </div>
+              :
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'table',
+                  width: '100%',
+                  height: barHeight !== undefined ? barHeight : 'auto',
+                  opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
+                }}
+              >
+                <div style={{display: 'table-cell'}}>{zeroDenominatorContent}</div>
+              </div>
+            }
           </TableCell>
           <TableCell
             style={{
