@@ -44,6 +44,8 @@ let TableGeoJSONsLayer = createReactClass({
     maxLegendItems: PropTypes.number,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array, // This will be provided via withAPIData
+    min: PropTypes.number, //For legend on continuous properties
+    max: PropTypes.number,
     disableClick: PropTypes.bool
   },
 
@@ -75,7 +77,7 @@ let TableGeoJSONsLayer = createReactClass({
   render() {
 
     let {layerContainer, map} = this.context;
-    let {colourProperty, table, labelProperty, showLegend, maxLegendItems, disableClick, geoJSONs} = this.props;
+    let {colourProperty, table, labelProperty, showLegend, maxLegendItems, disableClick, max, min, geoJSONs} = this.props;
 
     if (_isEmpty(geoJSONs)) {
       return null;
@@ -92,6 +94,8 @@ let TableGeoJSONsLayer = createReactClass({
               table={table}
               labelProperty={labelProperty}
               maxLegendItems={maxLegendItems}
+              max={max}
+              min={min}
             />
           </MapControlComponent>
           : null
@@ -121,7 +125,7 @@ let TableGeoJSONsLayer = createReactClass({
 
 TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
-  let {table, query, colourProperty, geoJsonProperty, labelProperty} = props;
+  let {table, query, colourProperty, geoJsonProperty, labelProperty, min, max} = props;
 
   query = query ||
     (table  ? config.tablesById[table].defaultQuery : null) ||
@@ -189,7 +193,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
         let valueAsColour = DEFAULT_GEOJSON_FILL_COLOUR;
         let value = undefined;
         if (colourProperty !== undefined && colourProperty !== null) {
-          let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty]);
+          let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty], min, max);
           let nullifiedValue = (data[i][colourProperty] === '' ? null : data[i][colourProperty]);
           valueAsColour = colourFunction(nullifiedValue);
           value = nullifiedValue;
