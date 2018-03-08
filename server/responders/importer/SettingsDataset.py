@@ -15,6 +15,10 @@ class SettingsDataset(ImportSettings):
                                           'type': 'Text',
                                           'required': False,
                                           'description': 'Visible name of the dataset, as it appears on the top banner of the app.\n  Note: this text may contain html markup'}),
+                                    ('version', {
+                                          'type': 'Text',
+                                          'required': False,
+                                          'description': 'Visible version of the dataset, as it may appear in the app.\n  Note: this text may contain HTML markup.'}),
                                     ('dataTables', {
                                           'type': 'List',
                                           'required': False,
