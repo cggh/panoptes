@@ -1,6 +1,5 @@
 import React from 'react';
 import './page-template.scss'
-import KeyboardArrowRight from 'material-ui-icons/KeyboardArrowRight';
 import filterChildren from 'util/filterChildren';
 import DocLink from 'panoptes/DocLink';
 
@@ -29,7 +28,7 @@ class BreadCrumb extends React.Component {
       <div className="obs-breadcrumb">
         <div className="obs-breadcrumb-inner">
           {React.Children.map(children, (child, i) =>
-            [<div className="obs-breadcrumb-component">{child}</div>, i < children.length - 1 ? <KeyboardArrowRight style={{height: '16px', marginTop: '3px'}}/> : null]
+            [<div className="obs-breadcrumb-component">{child}</div>, i < children.length - 1 ? <span style={{color: '#FF5722'}}>&#160;&#160;&#62;&#160;&#160;</span> : null]
           )}
         </div>
       </div>
