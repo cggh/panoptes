@@ -66,6 +66,7 @@ let Header = createReactClass({
     classes: PropTypes.object.isRequired,
     tabs: PropTypes.object.isRequired,
     components: PropTypes.object.isRequired,
+    version: PropTypes.string,
   },
 
   getInitialState() {
@@ -119,7 +120,7 @@ let Header = createReactClass({
   },
 
   render() {
-    let {logo, classes} = this.props;
+    let {logo, classes, version} = this.props;
     let actions = this.getFlux().actions;
     const {drawerIsOpen, guidebooksIsExpanded, pfIsExpanded} = this.state;
     return (
@@ -248,10 +249,11 @@ let Header = createReactClass({
             variant="title"
             onClick={() => actions.session.tabSwitch('FirstTab')}
             align="center"
-            style={{width: '100%', marginRight: '48px'}}
+            style={{flex: 1}}
           >
             {<img className="top-bar-logo" src={logo} style={{margin: '0', padding: '0'}}/>}
           </Typography>
+          <div style={{width: '48px', fontSize: 'smaller', color: '#36454F', textAlign: 'center', marginRight: '12px'}}>version<br/>{version}</div>
         </Toolbar>
       </AppBar>
     );
