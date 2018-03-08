@@ -253,7 +253,7 @@ let Header = createReactClass({
           >
             {<img className="top-bar-logo" src={logo} style={{margin: '0', padding: '0'}}/>}
           </Typography>
-          <div style={{width: '48px', fontSize: 'smaller', color: '#36454F', textAlign: 'center', marginRight: '12px'}}>version<br/>{version}</div>
+          <div style={{fontSize: '11px', color: '#36454F', textAlign: 'center', marginRight: '12px'}}>data&#160;version<br/>{version}&#160;beta</div>
         </Toolbar>
       </AppBar>
     );
