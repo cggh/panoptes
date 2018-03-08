@@ -166,6 +166,7 @@ let Panoptes = createReactClass({
               <Header
                 dataset={config.dataset}
                 name={config.settings.nameBanner}
+                version={config.settings.version}
                 logo={initialConfig.logo}
                 tabs={tabs}
                 components={components}
