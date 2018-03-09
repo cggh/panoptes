@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
-import ConfigMixin from "mixins/ConfigMixin";
+import ConfigMixin from 'mixins/ConfigMixin';
 
 import _startsWith from 'lodash.startswith';
 
@@ -77,7 +77,7 @@ let Icon = createReactClass({
     }
     if (_startsWith(name, 'docimage:'))
       baseURL = `/panoptes/Docs/${this.config.dataset}/images/`;
-    if (_startsWith(name, 'bitmap:') || _startsWith(name, 'image:')|| _startsWith(name, 'docimage:')) {
+    if (_startsWith(name, 'bitmap:') || _startsWith(name, 'image:') || _startsWith(name, 'docimage:')) {
       const fileName = name.split(':')[1];
       return <span {...props} className={classNames}><img className="image" src={baseURL !== undefined ? baseURL + fileName : dynamicRequire(fileName)} /></span>;
     } else {
