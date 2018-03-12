@@ -247,11 +247,10 @@ let Header = createReactClass({
           </Drawer>
           <Typography
             variant="title"
-            onClick={() => actions.session.tabSwitch('FirstTab')}
             align="center"
             style={{flex: 1}}
           >
-            {<img className="top-bar-logo" src={logo} style={{margin: '0', padding: '0'}}/>}
+            {<img onClick={() => actions.session.tabSwitch('FirstTab')} className="top-bar-logo" src={logo} style={{margin: '0', padding: '0'}}/>}
           </Typography>
           <div style={{fontSize: '11px', color: '#36454F', textAlign: 'center', marginRight: '12px'}}>data&#160;version<br/>{version}&#160;beta</div>
         </Toolbar>
