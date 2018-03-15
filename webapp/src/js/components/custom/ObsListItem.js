@@ -21,16 +21,22 @@ let ObsListItem = createReactClass({
     download: PropTypes.bool,
     target: PropTypes.string,
     children: PropTypes.node,
+    disableGutters: PropTypes.bool,
   },
 
+  getDefaultProps() {
+    return {
+      disableGutters: false,
+    };
+  },
 
   render() {
-    let {children, table, primKey, href, download, target, ...other} = this.props;
+    let {children, table, primKey, href, download, target, disableGutters, ...other} = this.props;
     if (!download) {
       if (!href || (href && href.indexOf('://') === -1)) {
         //Internal link
         return (
-          <ListItem button onClick={(e) => {
+          <ListItem button disableGutters={disableGutters} onClick={(e) => {
             e.stopPropagation(); //To prevent a popup containing this button bringing itself to the front
             // if (link) {
             //   this.getFlux().actions.session.tabOpen(link);
@@ -47,7 +53,7 @@ let ObsListItem = createReactClass({
       } else {
         //External link
         return (<a style={{textDecoration: 'none'}} href={href}>
-          <ListItem button {...other}>
+          <ListItem button disableGutters={disableGutters} {...other}>
             {children}
           </ListItem>
         </a>);
@@ -56,7 +62,7 @@ let ObsListItem = createReactClass({
       // This path prefix isn't determined by process.env.DATASET_URL_PATH_PREFIX
       return (
         <a style={{textDecoration: 'none'}} href={`/panoptes/Docs/${this.config.dataset}/${href}`} target={target}>
-          <ListItem button {...other}>
+          <ListItem button disableGutters={disableGutters} {...other}>
             {children}
           </ListItem>
         </a>
