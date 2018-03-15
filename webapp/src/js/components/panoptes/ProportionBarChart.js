@@ -51,6 +51,8 @@ let ProportionBarChart = createReactClass({
     numberOfTickLabels: PropTypes.number, // Defaults to numberOfTickLines.
     showTickLabels: PropTypes.bool,
     onClickBehaviour: PropTypes.string,
+    onClickTable: PropTypes.string,
+    onClickPrimKey: PropTypes.string,
     docLinkHref: PropTypes.string,
     sampleSizeWarningMinimum: PropTypes.number,
     config: PropTypes.object, // This will be provided via withAPIData
@@ -86,6 +88,8 @@ let ProportionBarChart = createReactClass({
       numberOfTickLabels,
       showTickLabels,
       onClickBehaviour,
+      onClickTable,
+      onClickPrimKey,
       numeratorQuery,
       denominatorQuery,
       docLinkHref,
@@ -188,6 +192,8 @@ let ProportionBarChart = createReactClass({
                 numberOfTickLines={numberOfTickLines}
                 showTickLabels={showTickLabels}
                 onClickBehaviour={onClickBehaviour}
+                onClickTable={onClickTable}
+                onClickPrimKey={onClickPrimKey}
                 docLinkHref={docLinkHref}
                 sampleSizeWarningMinimum={sampleSizeWarningMinimum}
                 {...other}
