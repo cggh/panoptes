@@ -50,6 +50,8 @@ let ProportionBarChartRow = createReactClass({
     numberOfTickLines: PropTypes.number,
     showTickLabels: PropTypes.bool,
     onClickBehaviour: PropTypes.string,
+    onClickTable: PropTypes.string,
+    onClickPrimKey: PropTypes.string,
     docLinkHref: PropTypes.string,
     sampleSizeWarningMinimum: PropTypes.number,
     zeroDenominatorContent: PropTypes.node,
@@ -79,8 +81,11 @@ let ProportionBarChartRow = createReactClass({
 
   // NOTE: copied from ItemLink and re-parameterized
   handleClickItemLink(e, primKey) {
-    const {rowTable} = this.props;
-    const table = rowTable;
+    const {rowTable, onClickTable, onClickPrimKey} = this.props;
+    const table = onClickTable || rowTable;
+    if (onClickPrimKey) {
+      primKey = onClickPrimKey.replace('{}', primKey);
+    }
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (!middleClick) {
       e.stopPropagation();
