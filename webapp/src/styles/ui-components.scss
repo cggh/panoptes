@@ -86,16 +86,6 @@
   }
 }
 
-.icon {
-  position: relative;
-  vertical-align: middle;
-  font-size: 22px;
-  .image {
-    height: 22px;
-    filter: hue-rotate(0deg); // Potentially alter the hue of all image icons.
-  }
-}
-
 .pointer {
   cursor: pointer;
 }
@@ -113,7 +103,6 @@
 }
 
 .icon.inverted-image {
-  filter: invert(100%);
   img.image {
     vertical-align: middle;
   }
