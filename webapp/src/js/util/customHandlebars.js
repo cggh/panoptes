@@ -150,6 +150,7 @@ const customHandlebars = ({dataset, tablesById, handlebars}) => {
               data.index = index;
               data.first = index === 0;
               data.last = index === rows.length - 1;
+              data.penultimate = index === rows.length - 2;
             }
             return fn(row, {data});
           })).then((fragments) => {
