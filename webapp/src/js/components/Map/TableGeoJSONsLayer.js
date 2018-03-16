@@ -13,6 +13,7 @@ import withAPIData from 'hoc/withAPIData';
 import DataItem from 'DataItem';
 import DataItemViews from 'panoptes/DataItemViews';
 import CalcMapBounds from 'util/CalcMapBounds';
+import ComponentRegistry from 'util/ComponentRegistry';
 
 const DEFAULT_GEOJSON_FILL_COLOUR = '#3d8bd5';
 
@@ -46,7 +47,10 @@ let TableGeoJSONsLayer = createReactClass({
     data: PropTypes.array, // This will be provided via withAPIData
     min: PropTypes.number, //For legend on continuous properties
     max: PropTypes.number,
-    disableClick: PropTypes.bool
+    disableClick: PropTypes.bool,
+    onClickBehaviour: PropTypes.string,
+    onClickComponent: PropTypes.string,
+    onClickComponentProps: PropTypes.object,
   },
 
   childContextTypes: {
@@ -70,6 +74,7 @@ let TableGeoJSONsLayer = createReactClass({
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
+      onClickBehaviour: 'dataItemPopup',
       showLegend: true
     };
   },
@@ -111,6 +116,7 @@ let TableGeoJSONsLayer = createReactClass({
                   weight={geoJSON.weight}
                   opacity={geoJSON.opacity}
                   onClick={disableClick ? () => null : geoJSON.onClick}
+                  popup={disableClick ? undefined : geoJSON.popup}
                 />
             )
           }
@@ -125,7 +131,7 @@ let TableGeoJSONsLayer = createReactClass({
 
 TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
-  let {table, query, colourProperty, geoJsonProperty, labelProperty, min, max} = props;
+  let {table, query, colourProperty, geoJsonProperty, labelProperty, min, max, onClickBehaviour, onClickComponent, onClickComponentProps} = props;
 
   query = query ||
     (table  ? config.tablesById[table].defaultQuery : null) ||
@@ -200,7 +206,15 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
         }
 
         let views = DataItemViews.getViews(tableConfig.dataItemViews, tableConfig.hasGeoCoord);
-        let onClick = () => this.getFlux().actions.session.popupOpen(<DataItem primKey={primKey} table={table}>{views}</DataItem>);
+        onClickComponent = ComponentRegistry(onClickComponent) || onClickComponent;
+        let onClickComponentMergedProps = {table, primKey, flux: this.flux};
+        if (onClickComponentProps) {
+          onClickComponentMergedProps = {...onClickComponentProps, ...onClickComponentMergedProps}
+        }
+
+        let onClick = onClickBehaviour === 'dataItemPopup' ? () => this.getFlux().actions.session.popupOpen(<DataItem primKey={primKey} table={table}>{views}</DataItem>) : undefined;
+        onClick = onClick ||  (onClickBehaviour === 'popup' ? () => this.getFlux().actions.session.popupOpen(React.createElement(onClickComponent, onClickComponentMergedProps)) : undefined);
+        let popup = onClickBehaviour === 'tooltip' ?  React.createElement(onClickComponent, onClickComponentMergedProps) : undefined;
 
         if (data[i][geoJsonProperty]) {
           let json = JSON.parse(data[i][geoJsonProperty]);
@@ -211,7 +225,8 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
             valueAsColour,
             value,
             json,
-            onClick
+            onClick,
+            popup
           };
           geoJSONs.push(geoJSON);
           jsons.push(json);
