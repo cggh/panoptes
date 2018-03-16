@@ -38,7 +38,8 @@ let DocPage = createReactClass({
     path: PropTypes.string,
     replaceSelf: PropTypes.func,
     updateTitleIcon: PropTypes.func,
-    replaceable: PropTypes.bool
+    replaceable: PropTypes.bool,
+    dynamicSize: PropTypes.bool
   },
 
   componentWillMount() {
@@ -137,12 +138,12 @@ let DocPage = createReactClass({
   },
 
   render() {
-    const {path} = this.props;
+    const {path, dynamicSize} = this.props;
     const {content, loadStatus} = this.state;
     const replaceSelf = this.props.replaceable ? this.props.replaceSelf : undefined;
     const actions = this.getFlux().actions;
 
-    return <div className="load-container">
+    return <div className={dynamicSize ? "" : "load-container"}>
       <HTMLWithComponents className="doc-page" replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       {this.config.user.isManager ?
         <div className="docpage-edit"  style={{zIndex:'99999'}}>
