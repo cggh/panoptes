@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import {GeoJSON as LeafletGeoJSON} from 'react-leaflet';
+import {GeoJSON as LeafletGeoJSON, Popup} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -30,7 +30,7 @@ let GeoJSON = createReactClass({
   },
 
   render() {
-    let {json, colour, weight, opacity, onClick} = this.props;
+    let {json, colour, weight, opacity, onClick, popup} = this.props;
 
     let style = {
       color: colour,
@@ -38,7 +38,10 @@ let GeoJSON = createReactClass({
       opacity
     };
 
-    return (<LeafletGeoJSON data={json} style={style} onClick={onClick} />);
+    return (
+      <LeafletGeoJSON data={json} style={style} onClick={onClick}>
+        {popup ? <Popup minWidth={300}>{popup}</Popup> : null}
+      </LeafletGeoJSON>);
 
   },
 });
