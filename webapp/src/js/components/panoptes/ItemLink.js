@@ -8,7 +8,7 @@ import Icon from 'ui/Icon';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
-import ConfigMixin from "mixins/ConfigMixin";
+import ConfigMixin from 'mixins/ConfigMixin';
 
 let ItemLink = createReactClass({
   displayName: 'ItemLink',
@@ -22,7 +22,8 @@ let ItemLink = createReactClass({
   propTypes: {
     table: PropTypes.string,
     primKey: PropTypes.string,
-    button: PropTypes.bool
+    button: PropTypes.bool,
+    children: PropTypes.node,
   },
 
   handleClick(e) {
@@ -48,9 +49,17 @@ let ItemLink = createReactClass({
         </span>
       );
     } else if (button) {
-      return <Button onClick={(e) => this.handleClick(e)}
-                     icon={<Icon name={this.config.tablesById[table].icon} />}
-                     color="secondary" label={children} iconName="circle" raised="raised" target="popup"/>
+      return (
+        <Button
+          onClick={(e) => this.handleClick(e)}
+          icon={<Icon name={this.config.tablesById[table].icon} />}
+          color="secondary"
+          label={children}
+          iconName="circle"
+          raised="raised"
+          target="popup"
+        />
+      );
     } else {
       return <span style={{cursor: 'pointer'}} onClick={(e) => this.handleClick(e)}>{children}</span>;
     }
