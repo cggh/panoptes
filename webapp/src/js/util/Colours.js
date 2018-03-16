@@ -28,8 +28,8 @@ export const colours = [
 ];
 
 export const scaleColours = [
-  '#3d8bd5',
-  '#ff4081'
+  '#2ca02c',
+  '#d62728'
 ];
 
 // "a list of the X11 colors [X11COLORS] supported by popular browsers with the addition of gray/grey variants from SVG 1.0."
