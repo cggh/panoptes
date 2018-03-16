@@ -18,7 +18,8 @@ let GeoJSON = createReactClass({
     colour: PropTypes.string,
     weight: PropTypes.number,
     opacity: PropTypes.number,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
+    popup: PropTypes.node,
   },
 
   getDefaultProps() {
