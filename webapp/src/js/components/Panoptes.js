@@ -114,10 +114,10 @@ let Panoptes = createReactClass({
     components = components.toJS();
     //Filter all the DocPage components to a list
     let docPages = [];
-    let others = [];
+    let otherComponents = [];
     tabs.components.forEach((component) => {
       if (component !== 'FirstTab') {
-        (this.isDocPage(components[component]) ? docPages : others).push(component);
+        (this.isDocPage(components[component]) ? docPages : otherComponents).push(component);
       }
     });
     if (index === 0) {
@@ -127,7 +127,7 @@ let Panoptes = createReactClass({
       actions.tabSwitch(docPages[docPages.length - 1]);
     }
     if (index === 2) {
-      actions.tabSwitch(others[others.length - 1]);
+      actions.tabSwitch(otherComponents[otherComponents.length - 1]);
     }
   },
 
@@ -139,21 +139,30 @@ let Panoptes = createReactClass({
     components = components.toJS();
     //Filter all the DocPage components to a list
     let docPages = [];
-    let others = [];
+    let otherComponents = [];
     tabs.components.forEach((component) => {
-      (this.isDocPage(components[component]) ? docPages : others).push(component);
+      (this.isDocPage(components[component]) ? docPages : otherComponents).push(component);
     });
-    let tabIndex = 0;
-    let selectedDocPage = 'InitialDocPage';
-    let selectedOther = 'InitialOther';
-    if (tabs.selectedTab !== 'FirstTab' && docPages.indexOf(tabs.selectedTab) >= 0) {
+    let tabIndex = undefined;
+    let selectedDocPage = undefined;
+    let selectedOther = undefined;
+
+    if (tabs.selectedTab === 'FirstTab') {
+      tabIndex = 0;
+    } else if (tabs.selectedTab === 'InitialDocPage') {
+      tabIndex = 1;
+      selectedDocPage = 'InitialDocPage';
+    } else if (docPages.indexOf(tabs.selectedTab) !== -1) {
       tabIndex = 1;
       selectedDocPage = tabs.selectedTab;
-    }
-    if (others.indexOf(tabs.selectedTab) >= 0) {
+    } else if (tabs.selectedTab === 'InitialOther') {
+      tabIndex = 2;
+      selectedOther = 'InitialOther';
+    } else if (otherComponents.indexOf(tabs.selectedTab) !== -1) {
       tabIndex = 2;
       selectedOther = tabs.selectedTab;
     }
+
     // NB: initialConfig is actually defined (in index.html)
     return (
       <DetectResize onResize={this.handleResize}>
