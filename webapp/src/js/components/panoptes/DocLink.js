@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import DocPage from 'panoptes/DocPage';
+import Button from 'ui/Button';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -18,7 +19,8 @@ let DocLink = createReactClass({
   propTypes: {
     children: PropTypes.node,
     href: PropTypes.string,
-    replaceParent: PropTypes.func
+    replaceParent: PropTypes.func,
+    button: PropTypes.bool,
   },
 
   handleClick(e) {
@@ -37,13 +39,28 @@ let DocLink = createReactClass({
   },
 
   render() {
-    return (
-      <a
-        onClick={(e) => this.handleClick(e)}
-      >
-        {this.props.children}
-      </a>
-    );
+    const {children, button} = this.props;
+
+    if (button) {
+      return (
+        <Button
+          onClick={(e) => this.handleClick(e)}
+          color="primary"
+          raised="raised"
+          target="popup"
+        >
+          {children}
+        </Button>
+      );
+    } else {
+      return (
+        <a
+          onClick={(e) => this.handleClick(e)}
+        >
+          {children}
+        </a>
+      );
+    }
   },
 });
 
