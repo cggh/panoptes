@@ -231,13 +231,13 @@ if (dataset === undefined || dataset === null || dataset === '') {
             const selectedTabComponentKey = newState.get('session').get('tabs').get('selectedTab');
             const selectedTabComponent = newState.get('session').get('components').get(selectedTabComponentKey);
 
-            if (tableComponents.indexOf(selectedTabComponent.get('type')) !== -1) {
+            if (selectedTabComponent !== undefined && tableComponents.indexOf(selectedTabComponent.get('type')) !== -1) {
 
               const selectedTabTable = selectedTabComponent.get('props').get('table');
               const selectedTabTablePrimKey = selectedTabComponent.get('props').get('selectedPrimKey');
               history.push(baseURLPath + selectedTabTable + '/' + selectedTabTablePrimKey, newState.toJS());
 
-            } else if (selectedTabComponent.get('type') === 'DocPage') {
+            } else if (selectedTabComponent !== undefined && selectedTabComponent.get('type') === 'DocPage') {
 
               const selectedTabDocPagePath = selectedTabComponent.get('props').get('path');
               history.push(baseURLPath + selectedTabDocPagePath, newState.toJS());
