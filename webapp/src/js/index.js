@@ -118,7 +118,10 @@ if (dataset === undefined || dataset === null || dataset === '') {
               }
             },
             InitialOtherPage: {
-              type: 'Viewers',
+              type: 'DocPage',
+              props: {
+                path: 'viewers/viewers.html'
+              }
             }
           },
           tabs: {
