@@ -107,24 +107,36 @@ let Panoptes = createReactClass({
     return component.type === 'DocPage' ||  component.type ===  'DataItem';
   },
 
+  isViewerDocPage(component) {
+    return (this.isDocPage(component) && component.props !== undefined && component.props.path !== undefined && component.props.path.startsWith('viewers/'));
+  },
+
+  isNonViewerDocPage(component) {
+    return (this.isDocPage(component) && !this.isViewerDocPage(component));
+  },
+
+  separateNonViewerDocPagesFromOtherComponents(tabComponents, components) {
+    let nonViewerDocPageComponents = [];
+    let otherComponents = [];
+    tabComponents.forEach((component) => {
+      if (component !== 'FirstTab') {
+        (this.isNonViewerDocPage(components[component]) ? nonViewerDocPageComponents : otherComponents).push(component);
+      }
+    });
+    return {nonViewerDocPageComponents, otherComponents};
+  },
+
   handleChangeTab(event, index) {
     let actions = this.getFlux().actions.session;
     let {tabs,  components} = this.state;
     tabs = tabs.toJS();
     components = components.toJS();
-    //Filter all the DocPage components to a list
-    let docPages = [];
-    let otherComponents = [];
-    tabs.components.forEach((component) => {
-      if (component !== 'FirstTab') {
-        (this.isDocPage(components[component]) ? docPages : otherComponents).push(component);
-      }
-    });
+    const {nonViewerDocPageComponents, otherComponents} = this.separateNonViewerDocPagesFromOtherComponents(tabs.components, components);
     if (index === 0) {
       actions.tabSwitch('FirstTab');
     }
     if (index === 1) {
-      actions.tabSwitch(docPages[docPages.length - 1]);
+      actions.tabSwitch(nonViewerDocPageComponents[nonViewerDocPageComponents.length - 1]);
     }
     if (index === 2) {
       actions.tabSwitch(otherComponents[otherComponents.length - 1]);
@@ -137,12 +149,8 @@ let Panoptes = createReactClass({
     let config = this.config;
     tabs = tabs.toJS();
     components = components.toJS();
-    //Filter all the DocPage components to a list
-    let docPages = [];
-    let otherComponents = [];
-    tabs.components.forEach((component) => {
-      (this.isDocPage(components[component]) ? docPages : otherComponents).push(component);
-    });
+    const {nonViewerDocPageComponents, otherComponents} = this.separateNonViewerDocPagesFromOtherComponents(tabs.components, components);
+
     let tabIndex = undefined;
     let selectedDocPage = undefined;
     let selectedOther = undefined;
@@ -152,7 +160,7 @@ let Panoptes = createReactClass({
     } else if (tabs.selectedTab === 'InitialDocPage') {
       tabIndex = 1;
       selectedDocPage = 'InitialDocPage';
-    } else if (docPages.indexOf(tabs.selectedTab) !== -1) {
+    } else if (nonViewerDocPageComponents.indexOf(tabs.selectedTab) !== -1) {
       tabIndex = 1;
       selectedDocPage = tabs.selectedTab;
     } else if (tabs.selectedTab === 'InitialOther') {
