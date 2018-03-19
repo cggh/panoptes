@@ -81,6 +81,7 @@ SelectRow = withAPIData(SelectRow, ({config, props}) => {
   let columns = templateFieldsUsed(itemTitle, _keys(tableConfig.propertiesById));
   columns.push(tableConfig.primKey);
   columns = _uniq(columns);
+  columns = _map(columns, (column) => ({expr:`${table}.${column}`, as: column}));
   return {
     requests: {
       data: {
