@@ -121,7 +121,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
             InitialOtherPage: {
               type: 'DocPage',
               props: {
-                path: 'viewers/viewers.html'
+                path: 'viewers/index.html'
               }
             }
           },
