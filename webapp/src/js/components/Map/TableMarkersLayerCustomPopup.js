@@ -564,7 +564,7 @@ let TableMarkersLayerCustomPopup = createReactClass({
                             <ComponentMarker
                               key={`ComponentMarker_${i}`}
                               position={{lat: marker.lat, lng: marker.lng}}
-                              onClick={disableOnClickMarker ? null : (e) => this.handleClickClusterMarker(e, {
+                              onClick={disableOnClickMarker || clickPrimaryKeyProperty ? null : (e) => this.handleClickClusterMarker(e, {
                                 table: marker.table,
                                 originalLat: marker.originalLat,
                                 originalLng: marker.originalLng,
@@ -572,6 +572,13 @@ let TableMarkersLayerCustomPopup = createReactClass({
                                 lngProperty: marker.lngProperty
                               })}
                               zIndexOffset={0}
+                              popup={
+                                <span>
+                                  {_map(marker.clickPrimKeyBreakdown, (val, key) => {
+                                    return React.Children.map(children, (child) => child.type === CustomPopup ? React.cloneElement(child, {primKey: key}) : null);
+                                  })}
+                                </span>
+                              }
                             >
                               {clusterComponent}
                             </ComponentMarker>
