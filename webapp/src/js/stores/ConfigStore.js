@@ -117,10 +117,9 @@ const ConfigStore = createStore({
       table.quickFindFields = table.quickFindFields ? _map(table.quickFindFields.split(','), (s) => s.trim()) : [table.primKey];
       table.previewProperties = table.previewProperties ? _map(table.previewProperties.split(','), (s) => s.trim()) : null;
       //TODO Remove the fa here for now - should be in settings
-      if (table.icon)
+      if (table.icon && table.icon.indexOf(':') === -1)
         table.icon = table.icon.substring(3);
-      else
-        table.icon = 'table';
+      table.icon = table.icon || 'table';
       table.propertyGroupsById = {};
       table.propertyGroups.forEach((group) => {
         table.propertyGroupsById[group.id] = group;
