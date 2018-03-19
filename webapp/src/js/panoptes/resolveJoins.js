@@ -16,6 +16,9 @@ export default function resolveJoins(queryAPIargs, config) {
     let foreignTables = [];
     for (let i = 0; i < queryAPIargs.columns.length; i++) {
       let column = queryAPIargs.columns[i];
+      if (column.expr) {
+        column = column.expr;
+      }
       if (typeof column === 'string' && column.indexOf('.') !== -1) {
         // Get the tableId from the qualified column Id.
         let [tableId] = column.split('.');
