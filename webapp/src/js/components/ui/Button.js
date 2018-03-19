@@ -17,7 +17,8 @@ let Button = createReactClass({
     icon: PropTypes.element,
     iconName: PropTypes.string,
     iconInverse: PropTypes.bool,
-    labelStyle: PropTypes.object
+    labelStyle: PropTypes.object,
+    raised: PropTypes.bool
   },
 
   getDefaultProps() {
