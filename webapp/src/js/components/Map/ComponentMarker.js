@@ -63,7 +63,7 @@ let ComponentMarker = createReactClass({
 
     /* Credit: https://materialdesignicons.com */
 
-    if (!children) {
+    if (!children || children.length === 0) {
       children = (
         <svg style={{overflow: 'visible', width: '25px', height: '25px'}} viewBox="0 0 24 24">
           <g transform="translate(-12, -24)">
@@ -85,7 +85,6 @@ let ComponentMarker = createReactClass({
     }
 
     // NB: any className to override the default white squares set by Leaflet CSS.
-
     return (
       <DivIcon
         alt={alt}
