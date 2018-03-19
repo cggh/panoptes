@@ -29,12 +29,6 @@ let ResistanceMap = createReactClass({
   render() {
     let {drug} = this.state;
 
-    let popup = "{{name}} - {{#query 'country_id' table='pf_samples' distinct='true' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}'}}\n" +
-      "                        <QueryResult table=\"countries\" expression='\"name\"' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"country_id\",\"CompValue\":\"{{country_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' />\n" +
-      "                      {{/query}} <br/><strong><QueryResult table=\"pf_samples\" query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' /></strong> <em>P. Falciparum</em> samples from {{name}},\n" +
-      "                        contributed by <strong><QueryResult table=\"pf_samples\" expression='[\"count\", [[\"distinct\", [\"study_id\"]]]]' query='{\"whcClass\":\"comparefixed\",\"isCompound\":false,\"ColName\":\"site_id\",\"CompValue\":\"{{site_id}}\",\"isRoot\":true,\"Tpe\":\"=\"}' /></strong> studies." +
-      "<br/><ItemLink table='sites' primKey='{{site_id}}'><Button color=\"primary\" raised label='more'></PopupButton></ItemLink>";
-
     return (
       <div className="centering-container">
         <Card>
