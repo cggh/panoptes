@@ -1,5 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import Card, {CardContent, CardHeader} from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
 import Map from 'components/Map/Map';
@@ -16,9 +17,19 @@ let ResistanceMap = createReactClass({
     FluxMixin,
   ],
 
+  propTypes: {
+    initialDrug: PropTypes.string,
+  },
+
+  getDefaultProps() {
+    return {
+      initialDrug: 'sites',
+    };
+  },
+
   getInitialState() {
     return {
-      drug: 'sites'
+      drug: this.props.initialDrug,
     };
   },
 
@@ -28,7 +39,6 @@ let ResistanceMap = createReactClass({
 
   render() {
     let {drug} = this.state;
-
     return (
       <div className="centering-container">
         <Card>
