@@ -161,6 +161,7 @@ module.exports = function(env) {
       ]
     },
     resolve: {
+      symlinks: false,
       alias: {
         'handlebars': 'handlebars/dist/handlebars.js'
       },
