@@ -9,9 +9,7 @@ if (typeof String.prototype.endsWith !== 'function') {
 
 const typeByDisplayName = {};
 dynreq.keys().forEach((component) => {
-  if (!component.endsWith('.js') && !component.endsWith('.css') &&
-    component !== './Panoptes'
-  ) {
+  if (!component.endsWith('.js') && !component.endsWith('.css')) {
     let reactClass = dynreq(component);
     if (reactClass.__esModule) {
       reactClass = reactClass.default;

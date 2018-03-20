@@ -1,6 +1,7 @@
 import _debounce from 'lodash.debounce';
 import createHistory from 'history/createBrowserHistory';
 const history = createHistory();
+import ComponentRegistry from 'util/ComponentRegistry';
 
 //Needed for JSX
 import React from 'react'; //eslint-disable-line no-unused-vars
@@ -290,11 +291,10 @@ if (dataset === undefined || dataset === null || dataset === '') {
           dispatch(action)
         )
       );
-
       ReactDOM.render(
         <div>
           <Loading status="done"/>
-          <Panoptes flux={flux}/>
+          {React.createElement(ComponentRegistry(config.settings.topLevelComponent), {flux})}
         </div>
         , document.getElementById('main')
       );
