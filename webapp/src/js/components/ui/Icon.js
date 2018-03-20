@@ -82,7 +82,6 @@ let Icon = createReactClass({
       }
     } else {
       classNames += `fa fa-${name} `;
-      defaultStyle.margin = '0';
     }
     if (size) {
       // Increases icon sizes relative to their container, fa-lg = 33% increase.
