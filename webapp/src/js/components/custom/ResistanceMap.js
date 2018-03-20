@@ -28,8 +28,9 @@ let ResistanceMap = createReactClass({
   },
 
   getInitialState() {
+    const {initialDrug} = this.props;
     return {
-      drug: this.props.initialDrug,
+      drug: (initialDrug !== undefined && initialDrug !== null && this.props.initialDrug !== '') ? this.props.initialDrug : 'sites',
     };
   },
 
