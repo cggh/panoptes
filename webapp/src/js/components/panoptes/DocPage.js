@@ -48,7 +48,7 @@ let DocPage = createReactClass({
   },
 
   onConfigChange() {
-    const {path, repaceSelf, updateTitleIcon, replaceable, ...other} = this.props;
+    const {path, replaceSelf, updateTitleIcon, replaceable, ...other} = this.props;
     this.handlebars = customHandlebars(this.config, ...other);
     if (this.config.docs[path]) {
       this.handlebars.compile(this.config.docs[path])({config: this.config})
@@ -61,7 +61,7 @@ let DocPage = createReactClass({
   },
 
   fetchData(props, requestContext) {
-    const {path, repaceSelf, updateTitleIcon, replaceable, ...other} = props;
+    const {path, replaceSelf, updateTitleIcon, replaceable, ...other} = props;
     if (path !== this.props.path) {
       this.titleFromHTML = 'Loading...';
       this.setState(this.getInitialState());
@@ -139,7 +139,7 @@ let DocPage = createReactClass({
 
   render() {
     const {path, dynamicSize} = this.props;
-    const {content} = this.state;
+    const {content, loadStatus} = this.state;
     const replaceSelf = this.props.replaceable ? this.props.replaceSelf : undefined;
     const actions = this.getFlux().actions;
     // NOTE: z-index of the Edit modal is currently set to 9997.
