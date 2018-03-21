@@ -51,6 +51,8 @@ let TableGeoJSONsLayer = createReactClass({
     onClickBehaviour: PropTypes.string,
     onClickComponent: PropTypes.string,
     onClickComponentProps: PropTypes.object,
+    geoJSONs: PropTypes.array,
+    colour: PropTypes.string, // Overrides DEFAULT_GEOJSON_FILL_COLOUR but not colourProperty
   },
 
   childContextTypes: {
@@ -131,10 +133,22 @@ let TableGeoJSONsLayer = createReactClass({
 
 TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
-  let {table, query, colourProperty, geoJsonProperty, labelProperty, min, max, onClickBehaviour, onClickComponent, onClickComponentProps} = props;
+  let {
+    table,
+    query,
+    colourProperty,
+    geoJsonProperty,
+    labelProperty,
+    min,
+    max,
+    onClickBehaviour,
+    onClickComponent,
+    onClickComponentProps,
+    colour,
+  } = props;
 
   query = query ||
-    (table  ? config.tablesById[table].defaultQuery : null) ||
+    (table  ? this.config.tablesById[table].defaultQuery : null) ||
     SQL.nullQuery;
 
   let tableConfig = this.config.tablesById[table];
@@ -196,12 +210,12 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
         let primKey = data[i][primKeyProperty];
 
-        let valueAsColour = DEFAULT_GEOJSON_FILL_COLOUR;
+        let valueAsColour = colour || DEFAULT_GEOJSON_FILL_COLOUR;
         let value = undefined;
         if (colourProperty !== undefined && colourProperty !== null) {
           let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty], min, max);
           let nullifiedValue = (data[i][colourProperty] === '' ? null : data[i][colourProperty]);
-          valueAsColour = colourFunction(nullifiedValue);
+          valueAsColour = colourFunction(nullifiedValue) || colour || DEFAULT_GEOJSON_FILL_COLOUR;
           value = nullifiedValue;
         }
 
@@ -209,7 +223,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
         onClickComponent = ComponentRegistry(onClickComponent) || onClickComponent;
         let onClickComponentMergedProps = {table, primKey, flux: this.flux};
         if (onClickComponentProps) {
-          onClickComponentMergedProps = {...onClickComponentProps, ...onClickComponentMergedProps}
+          onClickComponentMergedProps = {...onClickComponentProps, ...onClickComponentMergedProps};
         }
 
         let onClick = onClickBehaviour === 'dataItemPopup' ? () => this.getFlux().actions.session.popupOpen(<DataItem primKey={primKey} table={table}>{views}</DataItem>) : undefined;
