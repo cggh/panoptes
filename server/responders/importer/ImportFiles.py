@@ -39,6 +39,20 @@ def ImportDocs(calculationObject, datasetFolder, datasetId):
         except:
             shutil.copytree(sourceDocFolder, destDocFolder)
 
+def ImportCustomComponents(calculationObject, datasetFolder, datasetId):
+    sourceFolder = join(datasetFolder, 'components')
+    if not(os.path.exists(sourceFolder)):
+        return
+    with calculationObject.LogHeader('Linking custom components'):
+        destFolder = os.path.join(os.path.dirname(os.path.abspath(config.__file__)),
+                                  'webapp/src/js/components/custom',
+                                  datasetId)
+        if not os.path.exists(destFolder):
+            try:
+                os.symlink(sourceFolder, destFolder)
+            except:
+                shutil.copytree(sourceFolder, destFolder)
+
 
 #TODO: Identical to ImportDocs
 def ImportMaps(calculationObject, datasetFolder, datasetId):
@@ -106,6 +120,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         ImportDocs(calculationObject, datasetFolder, datasetId)
         ImportMaps(calculationObject, datasetFolder, datasetId)
+        ImportCustomComponents(calculationObject, datasetFolder, datasetId)
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):

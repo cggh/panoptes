@@ -37,6 +37,12 @@ class SettingsDataset(ImportSettings):
                                         'required': False,
                                         'description': 'The default tabs, popups and recently used genes and queries for a new session. Most easily set by using the save button on the header (only shown to managers)',
                                     }),
+                                    ('topLevelComponent', {
+                                        'type': 'Text',
+                                        'required': False,
+                                        'default': 'Panoptes',
+                                        'description': 'The name of the React component to use at the top level, for deeply customising look-and-feel'
+                                    }),
                                     ('genomeBrowserChannelSets', {
                                         'type': 'List',
                                         'required': False,
