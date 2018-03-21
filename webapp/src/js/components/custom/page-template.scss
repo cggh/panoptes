@@ -16,6 +16,7 @@ $usual-text-size: 14px;
 }
 
 .obs-page-container {
+  background-color: #F7F7F7;
   position: relative;
   min-height: 100%;
   div.paragraph, p {
@@ -47,7 +48,6 @@ $usual-text-size: 14px;
   max-width: $card-max-width;
   font-size: 25px;
   text-align: center;
-  background: rgba(255,255,255,0.6);
   margin-bottom: 20px;
 }
 
