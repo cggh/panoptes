@@ -22,7 +22,6 @@ import createTypography from 'material-ui/styles/createTypography';
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {withTheme} from 'material-ui/styles';
 import {deepOrange, blueGrey} from 'material-ui/colors';
-import Tabs, {Tab} from 'material-ui/Tabs';
 
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
@@ -187,18 +186,9 @@ let Panoptes = createReactClass({
                 logo={initialConfig.logo}
                 tabs={tabs}
                 components={components}
+                tabIndex={tabIndex}
+                onTabChange={this.handleChangeTab}
               />
-              <Tabs
-                onChange={this.handleChangeTab}
-                value={tabIndex}
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-              >
-                <Tab label="Home" />
-                <Tab label="Guidebook" />
-                <Tab label="Viewer" />
-              </Tabs>
               {tabIndex === 0 ?
                 <div className="body scroll-within">
                   <SessionComponent key="FirstTab" compId={'FirstTab'} />
