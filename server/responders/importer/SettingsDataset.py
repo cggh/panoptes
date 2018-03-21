@@ -66,6 +66,23 @@ class SettingsDataset(ImportSettings):
                                             },
                                         }
                                     }),
+                                    ('colours', {
+                                        'type': 'List',
+                                        'required': False,
+                                        'description': '''A list of the colour identifiers and their values for the dataset.''',
+                                            'children': {
+                                                'id': {
+                                                    'type': 'Text',
+                                                    'required': True,
+                                                    'description': 'Colour identifier'
+                                                },
+                                                'value': {
+                                                    'type': 'Text',
+                                                    'required': True,
+                                                    'description': 'Colour values'
+                                                },
+                                            }
+                                    }),
 
             ))
             return datasetSettings
