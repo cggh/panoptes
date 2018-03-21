@@ -61,6 +61,9 @@ const ConfigStore = createStore({
     let chromosomes = {};
     _each(_sortBy(_keys(newConfig.chromosomes)), (name) => chromosomes[name] = newConfig.chromosomes[name]);
     newConfig.chromosomes = chromosomes;
+    let colours = {};
+    _each(newConfig.settings.colours, (colour) => colours[colour.id] = colour.value);
+    newConfig.colours = colours;
     return newConfig;
   },
 
