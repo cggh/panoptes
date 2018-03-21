@@ -31,6 +31,7 @@ import List, {ListItem} from 'material-ui/List';
 import Collapse from 'material-ui/transitions/Collapse';
 import ExpandLess from 'material-ui-icons/ExpandLess';
 import ExpandMore from 'material-ui-icons/ExpandMore';
+import Tabs, {Tab} from 'material-ui/Tabs';
 
 import 'font-awesome.css';
 import 'ui-components.scss';
@@ -67,6 +68,8 @@ let Header = createReactClass({
     tabs: PropTypes.object.isRequired,
     components: PropTypes.object.isRequired,
     version: PropTypes.string,
+    tabIndex: PropTypes.number,
+    onTabChange: PropTypes.func,
   },
 
   getInitialState() {
@@ -89,42 +92,12 @@ let Header = createReactClass({
     this.setState({[stateToToggle]: !this.state[stateToToggle]});
   },
 
-  // NOTE: Copied from Panoptes.js
-  isDocPage(component) {
-    return component.type === 'DocPage' ||  component.type ===  'DataItem';
-  },
-  // NOTE: Mutated from Panoptes.js
-  handleChangeTab(index) {
-    let actions = this.getFlux().actions.session;
-    // let {tabs,  components} = this.state;
-    // tabs = tabs.toJS();
-    // components = components.toJS();
-    let {tabs,  components} = this.props;
-    //Filter all the DocPage components to a list
-    let docPages = [];
-    let others = [];
-    tabs.components.forEach((component) => {
-      if (component !== 'FirstTab') {
-        (this.isDocPage(components[component]) ? docPages : others).push(component);
-      }
-    });
-    if (index === 0) {
-      actions.tabSwitch('FirstTab');
-    }
-    if (index === 1) {
-      actions.tabSwitch(docPages[docPages.length - 1]);
-    }
-    if (index === 2) {
-      actions.tabSwitch(others[others.length - 1]);
-    }
-  },
-
   render() {
-    let {logo, classes, version} = this.props;
+    let {logo, classes, version, tabIndex, onTabChange} = this.props;
     let actions = this.getFlux().actions;
     const {drawerIsOpen, guidebooksIsExpanded, pfIsExpanded} = this.state;
     return (
-      <AppBar position="static">
+      <AppBar position="static" style={{backgroundColor: this.config.colours.appBar}}>
         <Toolbar disableGutters={true} style={{marginLeft: '12px', marginRight: '12px'}}>
           <IconButton
             style={{color: '#36454F'}}
@@ -152,7 +125,7 @@ let Header = createReactClass({
                   </ListItemIcon>
                   <ListItemText primary="Home" />
                 </ListItem>
-                <ListItem button onClick={() => (this.handleCloseDrawer(), this.handleChangeTab(1))}>
+                <ListItem button onClick={() => (this.handleCloseDrawer(), onTabChange(1))}>
                   <ListItemIcon>
                     <Icon className="icon" name="docimage:icons/guidebook.svg" />
                   </ListItemIcon>
@@ -245,15 +218,25 @@ let Header = createReactClass({
               </List>
             </div>
           </Drawer>
-          <Typography
-            variant="title"
-            align="center"
-            style={{flex: 1}}
+          <div
+            style={{flex: '1', marginLeft: '21px', height: '64px', textAlign: 'center'}}
           >
-            {<img onClick={() => actions.session.tabSwitch('FirstTab')} className="top-bar-logo" src={logo} style={{margin: '0', padding: '0'}}/>}
-          </Typography>
-          <div style={{fontSize: '11px', color: '#36454F', textAlign: 'center', marginRight: '12px'}}>data&#160;version<br/>{version}&#160;beta</div>
+            <img onClick={() => actions.session.tabSwitch('FirstTab')} src={logo} style={{cursor: 'pointer', maxWidth: '100%', height: 'calc(100% - 12px)', marginTop: '12px', marginBottom: '12px'}}/>
+          </div>
+          <div style={{fontSize: '11px', color: '#36454F', textAlign: 'center', marginRight: '12px', marginLeft: '12px'}}>data&#160;version<br/>{version}&#160;beta</div>
         </Toolbar>
+        <Tabs
+          onChange={onTabChange}
+          value={tabIndex}
+          indicatorColor="primary"
+          textColor="primary"
+          centered
+          style={{marginRight: '21px'}}
+        >
+          <Tab label="Home" />
+          <Tab label="Guidebook" />
+          <Tab label="Viewer" />
+        </Tabs>
       </AppBar>
     );
   },
