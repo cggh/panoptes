@@ -32,11 +32,13 @@ let TextRange = createReactClass({
     if (!data) {
       return <span> ... </span>;
     } else {
-      const {max, min} = data;
+      let {max, min} = data;
+      max = max[0];
+      min = min[0];
       if (max === min) {
-        return <span>in {max}</span>
+        return <span>in <strong>{max}</strong></span>
       } else {
-        return <span>between {min} and {max}</span>
+        return <span>between <strong>{min}</strong> and <strong>{max}</strong></span>
       }
     }
   },
