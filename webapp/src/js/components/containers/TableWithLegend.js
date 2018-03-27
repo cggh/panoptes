@@ -11,7 +11,7 @@ import filterChildren from 'util/filterChildren';
 
 const styles = (theme) => ({
   card: {
-    maxWidth: 650,
+    maxWidth: 700,
   },
 });
 
@@ -84,23 +84,24 @@ let TableWithLegend = createReactClass({
           <CardContent>
             {filteredChildren}
           </CardContent>
+          <div className="grow" style={{padding:"15px"}}>
+            <MuiDataTableView
+              table={table}
+              query={query}
+              order={order}
+              columns={columns}
+              onOrderChange={this.handleOrderChange}
+              maxRowsPerPage={maxRowsPerPage}
+              nullReplacement="-"
+              nanReplacement="-"
+              onClickBehaviour={onClickBehaviour}
+              onClickComponent={onClickComponent}
+              onClickComponentProps={onClickComponentProps}
+              onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
+            />
+          </div>
+
         </Card>
-        <div className="grow" style={{width: '650px'}}>
-          <MuiDataTableView
-            table={table}
-            query={query}
-            order={order}
-            columns={columns}
-            onOrderChange={this.handleOrderChange}
-            maxRowsPerPage={maxRowsPerPage}
-            nullReplacement="-"
-            nanReplacement="-"
-            onClickBehaviour={onClickBehaviour}
-            onClickComponent={onClickComponent}
-            onClickComponentProps={onClickComponentProps}
-            onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
-          />
-        </div>
       </div>
     );
   },
