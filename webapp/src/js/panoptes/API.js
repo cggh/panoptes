@@ -471,6 +471,20 @@ function staticContent(options) {
   return request(options).then((resp) => resp.responseText);
 }
 
+function fetchFeedData(options) {
+  assertRequired(options, ['url']);
+  const {url, cancellation} = options;
+  const args = cancellation ? {cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'getfeed',
+      url,
+      cache: true,
+    }
+  })
+    .then((resp) => JSON.parse(Base64.decode(resp.content)));
+}
 
 //Null values from monet - https://www.monetdb.org/Documentation/Manuals/SQLreference/BuiltinTypes
 //Monet will not let these values be imported so it is safe to do.
@@ -487,6 +501,7 @@ export default {
   encodeQuery,
   errorMessage,
   fetchData,
+  fetchFeedData,
   fetchGene,
   fetchImportStatusData,
   fetchImportStatusLog,
