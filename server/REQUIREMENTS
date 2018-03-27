@@ -21,6 +21,6 @@ zarr==2.1.4
 toolz==0.8.2
 dask==0.13.0
 git+git://github.com/benjeffery/cas_wsgi_middleware.git
-
+xmltodict==0.11.0
 
 
