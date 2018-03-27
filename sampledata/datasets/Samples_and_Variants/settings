@@ -18,3 +18,27 @@ dataTables:
 - sequence
 
 googleAnalyticsId: UA-56388755-1
+
+colours:
+  - id: coffee
+    value: '#C0FFEE'
+  - id: tea
+    value: '#7EA'
+  - id: bob
+    value: '#B0B'
+  - id: office
+    value: '#0FF1CE'
+  - id: access
+    value: '#ACCE55'
+
+vars:
+  - id: foo
+    value: bar
+  - id: bar
+    value: baz
+
+feeds:
+  - id: WordPress
+    url: https://en.blog.wordpress.com/feed/
+  - id: malariageninformatics
+    url: https://malariageninformatics.wordpress.com/feed/
