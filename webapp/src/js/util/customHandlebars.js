@@ -9,8 +9,11 @@ import _forEach from 'lodash.foreach';
 import handlebarsHelpers from 'handlebars-helpers';
 import resolveJoins from 'panoptes/resolveJoins';
 
-const customHandlebars = ({dataset, tablesById, handlebars, colours}) => {
+const customHandlebars = ({dataset, tablesById, handlebars, colours, vars}) => {
   let hb = handlebars || promisedHandlebars(Handlebars);
+  hb.registerHelper('var', function() {
+    return vars !== undefined ? vars[arguments[0]] : undefined;
+  });
   hb.registerHelper('colour', function() {
     return colours !== undefined ? colours[arguments[0]] : undefined;
   });
