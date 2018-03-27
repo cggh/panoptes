@@ -83,7 +83,41 @@ class SettingsDataset(ImportSettings):
                                                 'value': {
                                                     'type': 'Text',
                                                     'required': True,
-                                                    'description': 'Colour values'
+                                                    'description': 'Colour value'
+                                                },
+                                            }
+                                    }),
+                                    ('vars', {
+                                        'type': 'List',
+                                        'required': False,
+                                        'description': '''A list of custom variables, their identifiers and their values, for the dataset.''',
+                                            'children': {
+                                                'id': {
+                                                    'type': 'Text',
+                                                    'required': True,
+                                                    'description': 'The identifier for (name of) the variable'
+                                                },
+                                                'value': {
+                                                    'type': 'Text',
+                                                    'required': True,
+                                                    'description': 'The value (setting) of the variable'
+                                                },
+                                            }
+                                    }),
+                                    ('feeds', {
+                                        'type': 'List',
+                                        'required': False,
+                                        'description': '''A list of feeds (RSS, Atom, etc.), their identifiers and their URLs, for the dataset.''',
+                                            'children': {
+                                                'id': {
+                                                    'type': 'Text',
+                                                    'required': True,
+                                                    'description': 'The identifier for (name of) the feed'
+                                                },
+                                                'url': {
+                                                    'type': 'Text',
+                                                    'required': True,
+                                                    'description': 'The URL of the feed'
                                                 },
                                             }
                                     }),
