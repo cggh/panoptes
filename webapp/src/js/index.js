@@ -1,3 +1,4 @@
+import 'string.prototype.startswith';
 import _debounce from 'lodash.debounce';
 import createHistory from 'history/createBrowserHistory';
 const history = createHistory();
