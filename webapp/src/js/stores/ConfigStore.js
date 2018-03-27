@@ -58,12 +58,23 @@ const ConfigStore = createStore({
     this.addTableConfig(newConfig);
     this.addRelationConfig(newConfig);
     this.add2DConfig(newConfig);
+
     let chromosomes = {};
     _each(_sortBy(_keys(newConfig.chromosomes)), (name) => chromosomes[name] = newConfig.chromosomes[name]);
     newConfig.chromosomes = chromosomes;
+
     let colours = {};
     _each(newConfig.settings.colours, (colour) => colours[colour.id] = colour.value);
     newConfig.colours = colours;
+
+    let vars = {};
+    _each(newConfig.settings.vars, (customVar) => vars[customVar.id] = customVar.value);
+    newConfig.vars = vars;
+
+    let feeds = {};
+    _each(newConfig.settings.feeds, (feed) => feeds[feed.id] = {url: feed.url});
+    newConfig.feeds = feeds;
+
     return newConfig;
   },
 
