@@ -87,20 +87,20 @@ class SettingsDataset(ImportSettings):
                                                 },
                                             }
                                     }),
-                                    ('vars', {
+                                    ('constants', {
                                         'type': 'List',
                                         'required': False,
-                                        'description': '''A list of custom variables, their identifiers and their values, for the dataset.''',
+                                        'description': '''A list of custom constants, their identifiers and their values, for the dataset.''',
                                             'children': {
                                                 'id': {
                                                     'type': 'Text',
                                                     'required': True,
-                                                    'description': 'The identifier for (name of) the variable'
+                                                    'description': 'The identifier for (i.e. the name of) the constant.'
                                                 },
                                                 'value': {
                                                     'type': 'Text',
                                                     'required': True,
-                                                    'description': 'The value (setting) of the variable'
+                                                    'description': 'The value (i.e. the setting) of the constant.'
                                                 },
                                             }
                                     }),
