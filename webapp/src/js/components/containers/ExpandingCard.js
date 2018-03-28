@@ -43,6 +43,15 @@ let ExpandingCard = createReactClass({
     classes: PropTypes.object,
     title: PropTypes.string,
     subheader: PropTypes.string,
+    actionsAreaIsClickable: PropTypes.bool,
+    actionsAreaDisappearsOnExpand: PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return {
+      actionsAreaIsClickable: false,
+      actionsAreaDisappearsOnExpand: false,
+    };
   },
 
   getInitialState() {
@@ -56,7 +65,7 @@ let ExpandingCard = createReactClass({
   },
 
   render() {
-    let {title, subheader, children, classes} = this.props;
+    let {title, subheader, children, classes, actionsAreaIsClickable, actionsAreaDisappearsOnExpand} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     // Style 1: title and subheader props with Typography children.
@@ -104,8 +113,13 @@ let ExpandingCard = createReactClass({
     return (
       <Card className={classes.card}>
         {staticContent}
-        <CardActions disableActionSpacing className={classes.cardActions}>
-          {cardActionsContent}
+        <CardActions
+          disableActionSpacing
+          className={classes.cardActions}
+          onClick={actionsAreaIsClickable ? this.handleExpandClick : undefined}
+          style={{cursor: actionsAreaIsClickable ? 'pointer' : 'auto'}}
+        >
+          {actionsAreaDisappearsOnExpand && this.state.expanded ? null : cardActionsContent}
           <div className={classes.flexGrow} />
           <IconButton
             className={classnames(classes.expand, {
