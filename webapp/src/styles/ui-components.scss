@@ -737,3 +737,12 @@ input.invalid {
     padding: 10px;
   }
 }
+
+.card-stack {
+  max-width: $card-max-width;
+  width: 100%
+}
+
+.card-stack > div {
+  margin-bottom: 15px;
+}
