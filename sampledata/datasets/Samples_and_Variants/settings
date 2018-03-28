@@ -31,7 +31,7 @@ colours:
   - id: access
     value: '#ACCE55'
 
-vars:
+constants:
   - id: foo
     value: bar
   - id: bar
@@ -42,3 +42,4 @@ feeds:
     url: https://en.blog.wordpress.com/feed/
   - id: malariageninformatics
     url: https://malariageninformatics.wordpress.com/feed/
+
