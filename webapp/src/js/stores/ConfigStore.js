@@ -67,9 +67,9 @@ const ConfigStore = createStore({
     _each(newConfig.settings.colours, (colour) => colours[colour.id] = colour.value);
     newConfig.colours = colours;
 
-    let vars = {};
-    _each(newConfig.settings.vars, (customVar) => vars[customVar.id] = customVar.value);
-    newConfig.vars = vars;
+    let constants = {};
+    _each(newConfig.settings.constants, (constant) => constants[constant.id] = constant.value);
+    newConfig.constants = constants;
 
     let feeds = {};
     _each(newConfig.settings.feeds, (feed) => feeds[feed.id] = {url: feed.url});
