@@ -9,15 +9,17 @@ import _forEach from 'lodash.foreach';
 import handlebarsHelpers from 'handlebars-helpers';
 import resolveJoins from 'panoptes/resolveJoins';
 
-const customHandlebars = ({dataset, tablesById, handlebars, colours, vars}) => {
+const customHandlebars = ({dataset, tablesById, handlebars, colours, constants}) => {
   let hb = handlebars || promisedHandlebars(Handlebars);
-  hb.registerHelper('var', function() {
-    return vars !== undefined ? vars[arguments[0]] : undefined;
+  hb.registerHelper('constant', function() {
+    return constants !== undefined ? constants[arguments[0]] : undefined;
   });
   hb.registerHelper('colour', function() {
+    // NOTE: Might be rendered obsolete by the "constant" helper.
     return colours !== undefined ? colours[arguments[0]] : undefined;
   });
   hb.registerHelper('concat', function() {
+    // NOTE: Might be rendered obsolete by https://github.com/helpers/handlebars-helpers#append
     // Credit: https://gist.github.com/adg29/f312d6fab93652944a8a1026142491b1
     let str = '';
     for (let arg in arguments) {
