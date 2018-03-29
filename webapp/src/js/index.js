@@ -10,7 +10,6 @@ import ReactDOM from 'react-dom';
 
 import {Flux} from 'fluxxor';
 import Immutable from 'immutable';
-import Panoptes from 'components/Panoptes.js';
 import Loading from 'components/ui/Loading.js';
 
 import SessionStore from 'stores/SessionStore';
