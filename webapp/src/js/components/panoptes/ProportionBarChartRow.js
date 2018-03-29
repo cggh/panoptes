@@ -7,12 +7,10 @@ import FluxMixin from 'mixins/FluxMixin'; // required by ConfigMixin
 
 import SQL from 'panoptes/SQL';
 import withAPIData from 'hoc/withAPIData';
-import Loading from 'ui/Loading';
 import {
   TableCell,
   TableRow,
 } from 'material-ui/Table';
-import classNames from 'classnames';
 import Color from 'color';
 import {colours, propertyColour} from 'util/Colours';
 import DocPage from 'panoptes/DocPage';
@@ -55,6 +53,7 @@ let ProportionBarChartRow = createReactClass({
     docLinkHref: PropTypes.string,
     sampleSizeWarningMinimum: PropTypes.number,
     zeroDenominatorContent: PropTypes.node,
+    loadingBarContent: PropTypes.node,
     replaceParent: PropTypes.function,
     children: PropTypes.node,
     config: PropTypes.object, // This will be provided via withAPIData
@@ -76,6 +75,7 @@ let ProportionBarChartRow = createReactClass({
       sampleSizeWarningMinimum: 200,
       rowLabelStyle: {margin: 0, padding: 0},
       zeroDenominatorContent: <span style={{paddingLeft: '3px'}}>No data</span>,
+      loadingBarContent: <span style={{paddingLeft: '3px'}}>Loading...</span>,
     };
   },
 
@@ -144,7 +144,6 @@ let ProportionBarChartRow = createReactClass({
       zeroLineColour,
       numeratorData,
       denominatorData,
-      className,
       numeratorBarColour,
       remainderBarColour,
       numeratorTextColour,
@@ -153,19 +152,68 @@ let ProportionBarChartRow = createReactClass({
       onClickBehaviour,
       sampleSizeWarningMinimum,
       zeroDenominatorContent,
+      loadingBarContent,
     } = this.props;
 
+    const cellStyle = {
+      border: 'none',
+    };
+
     if (numeratorData === undefined || denominatorData === undefined) {
+      // This is shown when the bar is still loading.
+      // TODO: merge this markup with the loaded markup (for maintenance)
       return (
-        <div className={classNames('load-container', className)}>
-          <Loading status="custom">Loading...</Loading>
-        </div>
+        <TableRow
+          key={'row_' + rowPrimKeyValue}
+          style={{
+            height: rowHeight,
+          }}
+        >
+          <TableCell
+            style={{
+              ...cellStyle,
+              textAlign: 'left',
+              borderRight: `solid ${zeroLineColour} 1px`,
+              width: '30%',
+              whiteSpace: 'normal',
+              wordWrap: 'break-word',
+              height: rowHeight,
+              ...rowLabelStyle
+            }}
+          >
+            {rowLabel}
+          </TableCell>
+          <TableCell
+            style={{
+              ...cellStyle,
+              width: '60%',
+              position: 'relative',
+              height: rowHeight,
+              overflow: 'hidden',
+            }}
+            padding="none"
+          >
+            <div
+              style={{
+                position: 'relative',
+                display: 'table',
+                width: '100%',
+                height: barHeight !== undefined ? barHeight : 'auto',
+              }}
+            >
+              {loadingBarContent}
+            </div>
+          </TableCell>
+          <TableCell
+            style={{
+              ...cellStyle,
+            }}
+            padding="none"
+          >
+          </TableCell>
+        </TableRow>
       );
     } else {
-
-      const cellStyle = {
-        border: 'none',
-      };
 
       const tickLineWidthPercentage = 100 / numberOfTickLines;
       let tickElements = [];
