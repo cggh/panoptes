@@ -144,7 +144,7 @@ let ComponentDocs = createReactClass({
     console.info('componentDisplayNamePaths: ', componentDisplayNamePaths);
 
     return (
-      <div style={{margin: '20px'}}>Components ({parsedComponentFiles.length}):
+      <div style={{margin: '20px'}}>Below is a list of all {parsedComponentFiles.length} local components, followed by the extracted documentation for each component:
         <Table>
           <TableHead>
             <TableRow>
