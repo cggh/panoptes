@@ -40,9 +40,31 @@ class ColourPropertyLegend extends React.Component {
     const colourPropConfig = config.tablesById[table].propertiesById[colourProperty];
     const colourFunc = propertyColour(colourPropConfig);
 
+    if (!colourPropConfig.isBoolean && !colourPropConfig.isCategorical && !colourPropConfig.isText) {
+      //// Default to a continous colour-gradient spectrum, corresponding to values.
+      const colour = scaleColour([0, 1]);
+      let background = `linear-gradient(to right, ${colour(0)} 0%`;
+      for (let i = 0.1; i < 1; i += 0.1) {
+        background += `,${colour(i)} ${i * 100}%`;
+      }
+      background += ')';
+      const minVal = min === undefined ? colourPropConfig.minVal : min;
+      const maxVal = max === undefined ? colourPropConfig.maxVal : max;
+      return (
+        <div className="legend">
+          <div className="legend-title">{labelPropConfig.name}</div>
+          <div key="minMax" style={{width: '100%', textAlign: 'center'}}>
+            <span style={{width: minVal.toString().length + 'em', paddingRight: '0.5em'}}>{minVal.toString()}</span>
+            <div style={{display: 'inline-block', width: 'calc(100% - ' + (minVal.toString().length + maxVal.toString().length + 1) + 'em)', background}}>&#8203;</div>
+            <span style={{width: maxVal.toString().length + 'em', paddingLeft: '0.5em'}}>{maxVal.toString()}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // When colourPropConfig.isBoolean OR .isCategorical OR .isText
     // Translate the apiData data into legendElements.
     let legendElements = [];
-
     if (colourPropConfig.isBoolean) {
       legendElements = [
         <LegendElement key="false" name="False" colour={colourFunc(false)} />,
@@ -55,25 +77,7 @@ class ColourPropertyLegend extends React.Component {
         let legendElement = <LegendElement key={`LegendElement_${i}`} name={label !== null ? label : 'NULL'} colour={colourFunc(colour)} />;
         legendElements.push(legendElement);
       }
-    } else {
-      const colour = scaleColour([0, 1]);
-      let background = `linear-gradient(to right, ${colour(0)} 0%`;
-      for (let i = 0.1; i < 1; i += 0.1) {
-        background += `,${colour(i)} ${i * 100}%`;
-      }
-      background += ')';
-      legendElements = [
-        <span key="min" className="legend-element">{min === undefined ? colourPropConfig.minVal : min}</span>,
-        <span key="bar" className="legend-element">
-          <div
-            style={{width: '100px', height: '10px', background}}
-          >
-          </div>
-        </span>,
-        <span key="max" className="legend-element">{max === undefined ? colourPropConfig.maxVal : max}</span>
-      ];
     }
-
 
     if (_isEmpty(legendElements)) {
       return null;
