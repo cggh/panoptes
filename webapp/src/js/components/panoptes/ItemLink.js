@@ -53,10 +53,10 @@ let ItemLink = createReactClass({
         <Button
           onClick={(e) => this.handleClick(e)}
           icon={<Icon name={this.config.tablesById[table].icon} />}
-          color="secondary"
+          color="default"
           label={children}
           iconName="circle"
-          raised="raised"
+          raised={true}
           target="popup"
         />
       );
