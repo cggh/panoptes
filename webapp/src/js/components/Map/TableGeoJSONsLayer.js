@@ -47,12 +47,19 @@ let TableGeoJSONsLayer = createReactClass({
     data: PropTypes.array, // This will be provided via withAPIData
     min: PropTypes.number, //For legend on continuous properties
     max: PropTypes.number,
+    numberOfBins: PropTypes.number,
     disableClick: PropTypes.bool,
     onClickBehaviour: PropTypes.string,
     onClickComponent: PropTypes.string,
     onClickComponentProps: PropTypes.object,
     geoJSONs: PropTypes.array,
     colour: PropTypes.string, // Overrides DEFAULT_GEOJSON_FILL_COLOUR but not colourProperty
+    colourRange: PropTypes.array, // Overrides default Colours scaleColours but not propConfig.valueColours
+    binTextColour: PropTypes.string,
+    noDataColour: PropTypes.string,
+    zeroColour: PropTypes.string,
+    legendLayout: PropTypes.string,
+    legendValueSuffix: PropTypes.string,
   },
 
   childContextTypes: {
@@ -84,7 +91,11 @@ let TableGeoJSONsLayer = createReactClass({
   render() {
 
     let {layerContainer, map} = this.context;
-    let {colourProperty, table, labelProperty, showLegend, maxLegendItems, disableClick, max, min, geoJSONs} = this.props;
+    let {
+      colourProperty, table, labelProperty, showLegend, maxLegendItems,
+      disableClick, max, min, numberOfBins, geoJSONs, colourRange, binTextColour,
+      noDataColour, zeroColour, legendLayout, legendValueSuffix,
+    } = this.props;
 
     if (_isEmpty(geoJSONs)) {
       return null;
@@ -103,6 +114,13 @@ let TableGeoJSONsLayer = createReactClass({
               maxLegendItems={maxLegendItems}
               max={max}
               min={min}
+              numberOfBins={numberOfBins}
+              colourRange={colourRange}
+              binTextColour={binTextColour}
+              noDataColour={noDataColour}
+              zeroColour={zeroColour}
+              layout={legendLayout}
+              valueSuffix={legendValueSuffix}
             />
           </MapControlComponent>
           : null
@@ -145,6 +163,8 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
     onClickComponent,
     onClickComponentProps,
     colour,
+    colourRange,
+    zeroColour,
   } = props;
 
   query = query ||
@@ -213,9 +233,10 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
         let valueAsColour = colour || DEFAULT_GEOJSON_FILL_COLOUR;
         let value = undefined;
         if (colourProperty !== undefined && colourProperty !== null) {
-          let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty], min, max);
+          let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty], min, max, colourRange);
           let nullifiedValue = (data[i][colourProperty] === '' ? null : data[i][colourProperty]);
           valueAsColour = colourFunction(nullifiedValue) || colour || DEFAULT_GEOJSON_FILL_COLOUR;
+          valueAsColour = zeroColour !== undefined && nullifiedValue === 0 ? zeroColour : valueAsColour;
           value = nullifiedValue;
         }
 
