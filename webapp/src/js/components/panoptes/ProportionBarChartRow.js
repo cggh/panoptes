@@ -11,8 +11,7 @@ import {
   TableCell,
   TableRow,
 } from 'material-ui/Table';
-import Color from 'color';
-import {colours, propertyColour} from 'util/Colours';
+import {colours, propertyColour, isColourDark} from 'util/Colours';
 import DocPage from 'panoptes/DocPage';
 
 let ProportionBarChartRow = createReactClass({
@@ -112,19 +111,6 @@ let ProportionBarChartRow = createReactClass({
         this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, true);
       }
     }
-  },
-
-  // Credit: https://24ways.org/2010/calculating-color-contrast
-  isColourDark(colour) {
-    if (colour === 'transparent' || colour === 'inherit' || colour === 'initial') {
-      return null;
-    }
-    colour = Color(colour);
-    const r = colour.red();
-    const g = colour.green();
-    const b = colour.blue();
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? false : true;
   },
 
   render() {
@@ -250,8 +236,8 @@ let ProportionBarChartRow = createReactClass({
       const lightColour = '#F0F0F0';
       const mediumColour = '#888888';
       const darkColour = '#101010';
-      const leftBarColourIsDark = this.isColourDark(leftBarColour);
-      const rightBarColourIsDark = this.isColourDark(rightBarColour);
+      const leftBarColourIsDark = isColourDark(leftBarColour);
+      const rightBarColourIsDark = isColourDark(rightBarColour);
       const leftBarTextColour = numeratorTextColour !== undefined ? numeratorTextColour : (leftBarColourIsDark === null ? mediumColour : (leftBarColourIsDark ? lightColour : darkColour));
       const rightBarTextColour = remainderTextColour !== undefined ? remainderTextColour : (rightBarColourIsDark === null ? mediumColour : (rightBarColourIsDark ? lightColour : darkColour));
       const leftBarStyle = {

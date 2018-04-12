@@ -1,6 +1,6 @@
-
 import {scaleOrdinal, scaleLinear} from 'd3-scale';
 import {interpolateHcl} from 'd3-interpolate';
+import Color from 'color';
 
 let exisitingScales = {};
 
@@ -196,10 +196,10 @@ export function categoryColours(identifier) {
   return exisitingScales[identifier];
 }
 
-export function scaleColour(domain) {
+export function scaleColour(domain, range = scaleColours) {
   return scaleLinear()
-    .domain(domain)  // min/max of data
-    .range(scaleColours)
+    .domain(domain)  // min/max of data, or extremes for range, e.g. .domain([-1, 0, 1]).range(["red", "white", "green"])
+    .range(range)
     .clamp(true)
     .interpolate(interpolateHcl);
 }
@@ -215,7 +215,7 @@ export function booleanColours() {
   };
 }
 
-export function propertyColour(propConfig, min = null, max = null) {
+export function propertyColour(propConfig, min = null, max = null, range = scaleColours) {
   if (!propConfig) {
     return () => 'inherit';
   }
@@ -235,7 +235,7 @@ export function propertyColour(propConfig, min = null, max = null) {
   }
   if (propConfig.isText)
     return categoryColours(`${propConfig.tableId}_${propConfig.id}`);
-  return scaleColour([min === null ? propConfig.minVal : min, max === null ? propConfig.maxVal : max]);
+  return scaleColour([min === null ? propConfig.minVal : min, max === null ? propConfig.maxVal : max], range);
 }
 
 // Credit: https://gist.github.com/olmokramer/82ccce673f86db7cda5e
@@ -250,4 +250,17 @@ export function isValidColour(colour) {
   } else {
     return /^(rgb|hsl)a?\((\d+%?(deg|rad|grad|turn)?[,\s]+){2,3}[\s\/]*[\d\.]+%?\)$/i.test(colour);
   }
+}
+
+// Credit: https://24ways.org/2010/calculating-color-contrast
+export function isColourDark(colour) {
+  if (colour === 'transparent' || colour === 'inherit' || colour === 'initial') {
+    return null;
+  }
+  colour = Color(colour);
+  const r = colour.red();
+  const g = colour.green();
+  const b = colour.blue();
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? false : true;
 }
