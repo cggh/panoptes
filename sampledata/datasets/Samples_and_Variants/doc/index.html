@@ -4,6 +4,53 @@
         This is the description of this sample dataset.
         <p>Example of a page using the <DocLink href="wp_feed.html">feed from the WordPress blog</DocLink> without a template (default).</p>
         <p>Example of a page using the <DocLink href="MalariaGEN_Informatics_feed.html">feed from the MalariaGEN Informatics blog</DocLink> with a template file.</p>
+        <p>Example of a ColourPropertyLegend for a range of binned values:</p>
+        <div style="padding: 10px; width: 500px;">
+          <ColourPropertyLegend
+            colourProperty="Uniqueness"
+            table="sequence"
+            max="100"
+            min="0"
+            numberOfBins="5"
+            colourRange='["yellow", "red"]'
+            hideLegendTitle
+            noDataColour="lightgrey"
+            zeroColour="green"
+            layout="values-outside-colours"
+            valueSuffix="%"
+          />
+        </div>
+        <p>Example of a ColourPropertyLegend for a range of binned values, with labels inside:</p>
+        <div style="padding: 10px; width: 500px;">
+          <ColourPropertyLegend
+            colourProperty="Uniqueness"
+            table="sequence"
+            max="100"
+            min="0"
+            numberOfBins="5"
+            colourRange='["yellow", "red"]'
+            hideLegendTitle
+            noDataColour="lightgrey"
+            zeroColour="green"
+            layout="values-inside-colours"
+            valueSuffix="%"
+          />
+        </div>
+        <p>Example of a ColourPropertyLegend with a continuous value range, with labels inside:</p>
+        <div style="padding: 10px; width: 500px;">
+          <ColourPropertyLegend
+            colourProperty="Uniqueness"
+            table="sequence"
+            max="100"
+            min="0"
+            colourRange='["yellow", "red"]'
+            hideLegendTitle
+            noDataColour="lightgrey"
+            zeroColour="green"
+            layout="values-inside-colours"
+            valueSuffix="%"
+          />
+        </div>
         <div style="color:rgb(0,128,0)">
             A second line, html formatted
         </div>
