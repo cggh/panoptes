@@ -5,6 +5,7 @@ import SQL from 'panoptes/SQL';
 import withAPIData from 'hoc/withAPIData';
 import LegendElement from 'panoptes/LegendElement';
 import {propertyColour, scaleColour, isColourDark} from 'util/Colours';
+import Color from 'color';
 
 class ColourPropertyLegend extends React.Component {
 
@@ -33,6 +34,9 @@ class ColourPropertyLegend extends React.Component {
     tickLineHeight: PropTypes.string,
     valueSuffix: PropTypes.string,
     binHeight: PropTypes.string,
+    colourFillOpacity: PropTypes.number,
+    colourBackgroundColour: PropTypes.string,
+    showColourBorder: PropTypes.bool,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
   };
@@ -46,6 +50,7 @@ class ColourPropertyLegend extends React.Component {
     tickLineHeight: '7px',
     valueSuffix: '',
     binHeight: '10px',
+    showColourBorder: true,
   }
 
   render() {
@@ -53,7 +58,8 @@ class ColourPropertyLegend extends React.Component {
       table, labelProperty, maxLegendItems, colourProperty, config, data,
       max, min, numberOfBins, colourRange, hideLegendTitle, binTextColour,
       noDataColour, zeroColour, noDataText, layout, tickLineColour, valueSuffix,
-      binHeight, tickLineHeight,
+      binHeight, tickLineHeight, colourFillOpacity, colourBackgroundColour,
+      showColourBorder,
     } = this.props;
 
     // NOTE: render() is still called when isRequired props are undefined.
@@ -177,9 +183,14 @@ class ColourPropertyLegend extends React.Component {
           // NOTE: reducing the zeroBin width means the other bin widths won't actually add up to 100%.
           // However, the whole table is set to stretch to 100% width, so the difference is spread out automatically.
 
-          const zeroBinBackgroundColourIsDark = isColourDark(zeroColour);
+          // NOTE: Setting CSS opacity would also change the text and border colours.
+          const zeroBinBackgroundColourObj = colourFillOpacity !== undefined ? Color(zeroColour).alpha(colourFillOpacity) : Color(zeroColour);
+
+          const zeroBinBackgroundColourIsDark = isColourDark(zeroBinBackgroundColourObj.rgb());
           const zeroBinTextColourAmended = binTextColour !== undefined ? binTextColour : (zeroBinBackgroundColourIsDark === null ? mediumColour : (zeroBinBackgroundColourIsDark ? lightColour : darkColour));
           const valueInsideColour = layout === 'values-inside-colours' ? <span>0</span> : null;
+
+
           binElements.push(
             <div
               key={'zeroBinElement'}
@@ -188,8 +199,9 @@ class ColourPropertyLegend extends React.Component {
                 display: 'table-cell',
                 width: '' + (binWidthPercentage / 2) + '%',
                 color: zeroBinTextColourAmended,
-                backgroundColor: zeroColour,
+                backgroundColor: zeroBinBackgroundColourObj.rgb(), // rgb() gives rgba()
                 padding: '0 3px 0 3px',
+                border: showColourBorder ? `solid ${zeroColour} 1px` : 'none',
               }}
             >
               {valueInsideColour}
@@ -231,13 +243,14 @@ class ColourPropertyLegend extends React.Component {
         for (let i = 1; i <= numberOfBins; i++) {
 
           const binMax = (maxVal / numberOfBins) * i;
-          const binBackgroundColour = colourFunc((binMax - (binWidthValue / 2)));
           const binMin = binMax - binWidthValue;
 
           //// Determine bar colours
-          const binBackgroundColourIsDark = isColourDark(binBackgroundColour);
+          const binBackgroundColour = colourFunc((binMax - (binWidthValue / 2)));
+          // NOTE: Setting CSS opacity would also change the text and border colours.
+          const binBackgroundColourObj = colourFillOpacity !== undefined ? Color(binBackgroundColour).alpha(colourFillOpacity) : Color(binBackgroundColour);
+          const binBackgroundColourIsDark = isColourDark(binBackgroundColourObj.rgb());
           const binTextColourAmended = binTextColour !== undefined ? binTextColour : (binBackgroundColourIsDark === null ? mediumColour : (binBackgroundColourIsDark ? lightColour : darkColour));
-
           const valueInsideColour = layout === 'values-inside-colours' ? <span>{Math.round(binMin)}&ndash;{Math.round(binMax)}{valueSuffix}</span> : null;
 
           binElements.push(
@@ -248,10 +261,12 @@ class ColourPropertyLegend extends React.Component {
                 display: 'table-cell',
                 width: binWidthPercentage + '%',
                 color: binTextColourAmended,
-                backgroundColor: binBackgroundColour,
+                backgroundColor: binBackgroundColourObj.rgb(), // rgb() gives rgba()
                 padding: '0 3px 0 3px',
-                borderLeft: layout === 'values-outside-colours' ? `solid ${tickLineColour} 1px` : 'none',
-                borderRight: (i === numberOfBins && layout === 'values-outside-colours') ? `solid ${tickLineColour} 1px` : 'none',
+                borderLeft: layout === 'values-outside-colours' ? `solid ${tickLineColour} 1px` : (showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
+                borderRight: (i === numberOfBins && layout === 'values-outside-colours') ? `solid ${tickLineColour} 1px` : (i === numberOfBins && showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
+                borderTop: showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none',
+                borderBottom: showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none',
               }}
             >
               {valueInsideColour}
@@ -340,6 +355,7 @@ class ColourPropertyLegend extends React.Component {
                   height: layout === 'values-outside-colours' ? binHeight : '100%',
                   borderRight: 'none',
                   textAlign: 'center',
+                  backgroundColor: colourBackgroundColour !== undefined ? colourBackgroundColour : 'inherit',
                 }}
               >
                 {binElements}
