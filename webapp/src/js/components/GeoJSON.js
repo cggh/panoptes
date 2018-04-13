@@ -17,7 +17,8 @@ let GeoJSON = createReactClass({
     json: PropTypes.object.isRequired,
     colour: PropTypes.string,
     weight: PropTypes.number,
-    opacity: PropTypes.number,
+    opacity: PropTypes.number, // stroke-opacity
+    fillOpacity: PropTypes.number,
     onClick: PropTypes.func,
     popup: PropTypes.node,
   },
@@ -26,17 +27,19 @@ let GeoJSON = createReactClass({
     return {
       colour: '#006400',
       weight: 1,
-      opacity: 0.65
+      opacity: 0.65,
+      fillOpacity: 0.2,
     };
   },
 
   render() {
-    let {json, colour, weight, opacity, onClick, popup} = this.props;
+    let {json, colour, weight, opacity, fillOpacity, onClick, popup} = this.props;
 
     let style = {
       color: colour,
       weight,
-      opacity
+      opacity,
+      fillOpacity,
     };
 
     return (
