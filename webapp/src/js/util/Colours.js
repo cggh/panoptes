@@ -255,12 +255,14 @@ export function isValidColour(colour) {
 // Credit: https://24ways.org/2010/calculating-color-contrast
 export function isColourDark(colour) {
   if (colour === 'transparent' || colour === 'inherit' || colour === 'initial') {
+    console.warn('Cannot determine isColourDark for ', colour);
     return null;
   }
   colour = Color(colour);
   const r = colour.red();
   const g = colour.green();
   const b = colour.blue();
+  const a = colour.alpha();
   const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-  return (yiq >= 128) ? false : true;
+  return (a < 0.5 || yiq >= 128) ? false : true;
 }
