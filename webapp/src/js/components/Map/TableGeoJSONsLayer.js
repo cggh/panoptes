@@ -3,6 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import FluxMixin from 'mixins/FluxMixin';
 import _isEmpty from 'lodash.isempty';
+import _inRange from 'lodash.inrange';
 import FeatureGroup from 'Map/FeatureGroup';
 import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';
@@ -47,19 +48,22 @@ let TableGeoJSONsLayer = createReactClass({
     data: PropTypes.array, // This will be provided via withAPIData
     min: PropTypes.number, //For legend on continuous properties
     max: PropTypes.number,
-    numberOfBins: PropTypes.number,
     disableClick: PropTypes.bool,
     onClickBehaviour: PropTypes.string,
     onClickComponent: PropTypes.string,
     onClickComponentProps: PropTypes.object,
     geoJSONs: PropTypes.array,
     colour: PropTypes.string, // Overrides DEFAULT_GEOJSON_FILL_COLOUR but not colourProperty
+    numberOfBins: PropTypes.number,
     colourRange: PropTypes.array, // Overrides default Colours scaleColours but not propConfig.valueColours
     binTextColour: PropTypes.string,
     noDataColour: PropTypes.string,
     zeroColour: PropTypes.string,
     legendLayout: PropTypes.string,
     legendValueSuffix: PropTypes.string,
+    showMaxValueAsMaxColour: PropTypes.bool,
+    geoJsonStrokeOpacity: PropTypes.number,
+    geoJsonFillOpacity: PropTypes.number,
   },
 
   childContextTypes: {
@@ -84,7 +88,8 @@ let TableGeoJSONsLayer = createReactClass({
     return {
       query: SQL.nullQuery,
       onClickBehaviour: 'dataItemPopup',
-      showLegend: true
+      showLegend: true,
+      showMaxValueAsMaxColour: false,
     };
   },
 
@@ -135,6 +140,7 @@ let TableGeoJSONsLayer = createReactClass({
                   colour={geoJSON.valueAsColour}
                   weight={geoJSON.weight}
                   opacity={geoJSON.opacity}
+                  fillOpacity={geoJSON.fillOpacity}
                   onClick={disableClick ? () => null : geoJSON.onClick}
                   popup={disableClick ? undefined : geoJSON.popup}
                 />
@@ -159,12 +165,16 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
     labelProperty,
     min,
     max,
+    numberOfBins,
     onClickBehaviour,
     onClickComponent,
     onClickComponentProps,
     colour,
     colourRange,
     zeroColour,
+    showMaxValueAsMaxColour,
+    geoJsonStrokeOpacity,
+    geoJsonFillOpacity,
   } = props;
 
   query = query ||
@@ -226,17 +236,54 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
       let tableConfig = this.config.tablesById[table];
       let primKeyProperty = tableConfig.primKey;
 
+      // Prep binValueRanges
+      let binValueRanges = undefined;
+      if (numberOfBins !== undefined && numberOfBins > 0) {
+        binValueRanges = [];
+        const binValueWidth = max / numberOfBins;
+        const colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty], min, max, colourRange);
+        for (let binMinValueBoundary = min; binMinValueBoundary < max; binMinValueBoundary += binValueWidth) {
+          const binMaxValueBoundary = binMinValueBoundary + binValueWidth;
+          const binMidValue = binMinValueBoundary + (binValueWidth / 2);
+          const midValueAsColour = colourFunction(binMidValue) || colour || DEFAULT_GEOJSON_FILL_COLOUR;
+          binValueRanges.push(
+            {
+              min: binMinValueBoundary,
+              max: binMaxValueBoundary,
+              midValueAsColour,
+            }
+          );
+        }
+      }
+
       for (let i = 0; i < data.length; i++) {
 
         let primKey = data[i][primKeyProperty];
 
+        const colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty], min, max, colourRange);
         let valueAsColour = colour || DEFAULT_GEOJSON_FILL_COLOUR;
         let value = undefined;
         if (colourProperty !== undefined && colourProperty !== null) {
-          let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[colourProperty], min, max, colourRange);
           let nullifiedValue = (data[i][colourProperty] === '' ? null : data[i][colourProperty]);
-          valueAsColour = colourFunction(nullifiedValue) || colour || DEFAULT_GEOJSON_FILL_COLOUR;
-          valueAsColour = zeroColour !== undefined && nullifiedValue === 0 ? zeroColour : valueAsColour;
+          if (binValueRanges !== undefined && binValueRanges.length > 0) {
+            if (nullifiedValue === max && showMaxValueAsMaxColour) {
+              valueAsColour = colourFunction(nullifiedValue) || colour || DEFAULT_GEOJSON_FILL_COLOUR;
+            } else if (nullifiedValue === max && !showMaxValueAsMaxColour) {
+              valueAsColour = binValueRanges[binValueRanges.length - 1].midValueAsColour;
+            } else if (nullifiedValue === 0 && zeroColour !== undefined) {
+              valueAsColour = zeroColour;
+            } else {
+              for (let i = 0, iLength = binValueRanges.length; i < iLength; i++) {
+                if (_inRange(nullifiedValue, binValueRanges[i].min, binValueRanges[i].max)) {
+                  valueAsColour = binValueRanges[i].midValueAsColour;
+                  break;
+                }
+              }
+            }
+          } else {
+            valueAsColour = colourFunction(nullifiedValue) || colour || DEFAULT_GEOJSON_FILL_COLOUR;
+            valueAsColour = nullifiedValue === 0 && zeroColour !== undefined ? zeroColour : valueAsColour;
+          }
           value = nullifiedValue;
         }
 
@@ -261,7 +308,9 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
             value,
             json,
             onClick,
-            popup
+            popup,
+            opacity: geoJsonStrokeOpacity,
+            fillOpacity: geoJsonFillOpacity,
           };
           geoJSONs.push(geoJSON);
           jsons.push(json);
