@@ -90,6 +90,7 @@
     "lodash.has": "^4.5.2",
     "lodash.head": "^4.0.1",
     "lodash.indexof": "^4.0.5",
+    "lodash.inrange": "^3.3.6",
     "lodash.intersection": "^4.4.0",
     "lodash.isfinite": "^3.3.2",
     "lodash.isfunction": "^3.0.8",
