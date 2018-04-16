@@ -5,12 +5,12 @@ import urllib2
 import xmltodict
 import DQXbase64
 import json
-from cache import getCache
+from cache import getExpiringCache
 
 def response(returndata):
     url = returndata['url']
     
-    cache = getCache()
+    cache = getExpiringCache()
     cacheKey = json.dumps([url])
     returndata['content'] = None
     if returndata['cache']:

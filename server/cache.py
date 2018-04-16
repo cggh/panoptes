@@ -11,3 +11,15 @@ with FanoutCache(join(config.BASEDIR, 'cache'),
                  ) as cache:
     def getCache():
         return cache
+
+
+with FanoutCache(join(config.BASEDIR, 'cache', 'expiring'),
+                 shards=4,
+                 size_limit=int(5e10),
+                 large_value_threshold=4096,
+                 eviction_policy='least-recently-used',
+                 timeout=10,
+                 expire=60*5
+                 ) as cache:
+    def getExpiringCache():
+        return cache
