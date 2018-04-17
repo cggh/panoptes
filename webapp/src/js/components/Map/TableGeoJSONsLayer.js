@@ -61,7 +61,7 @@ let TableGeoJSONsLayer = createReactClass({
     zeroColour: PropTypes.string,
     legendLayout: PropTypes.string,
     legendValueSuffix: PropTypes.string,
-    showMaxValueAsMaxColour: PropTypes.bool,
+    showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
     geoJsonStrokeOpacity: PropTypes.number,
     geoJsonFillOpacity: PropTypes.number,
   },
@@ -183,8 +183,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
   let tableConfig = this.config.tablesById[table];
   if (tableConfig === undefined) {
-    console.error('tableConfig === undefined');
-    return null;
+    throw Error('tableConfig === undefined');
   }
 
   // Collect the set of columns to fetch.
@@ -193,7 +192,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
   if (geoJsonProperty !== undefined && typeof geoJsonProperty === 'string' && geoJsonProperty !== '') {
     if (tableConfig.propertiesById[geoJsonProperty] === undefined) {
-      console.error(`The specified geoJsonProperty field ${geoJsonProperty} was not found in the table ${table}`);
+      throw Error(`The specified geoJsonProperty field ${geoJsonProperty} was not found in the table ${table}`);
     } else {
       columns.add(geoJsonProperty);
     }
@@ -201,7 +200,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
   if (colourProperty !== undefined && typeof colourProperty === 'string' && colourProperty !== '') {
     if (tableConfig.propertiesById[colourProperty] === undefined) {
-      console.error(`The specified colourProperty field ${colourProperty} was not found in the table ${table}`);
+      throw Error(`The specified colourProperty field ${colourProperty} was not found in the table ${table}`);
     } else {
       columns.add(colourProperty);
     }
@@ -209,7 +208,7 @@ TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
 
   if (labelProperty !== undefined && typeof labelProperty === 'string' && labelProperty !== '') {
     if (tableConfig.propertiesById[labelProperty] === undefined) {
-      console.error(`The specified labelProperty field ${labelProperty} was not found in the table ${table}`);
+      throw Error(`The specified labelProperty field ${labelProperty} was not found in the table ${table}`);
     } else {
       columns.add(labelProperty);
     }
