@@ -12,9 +12,10 @@ import {
   TableRow,
 } from 'material-ui/Table';
 
-import {colours, propertyColour, isColourDark} from 'util/Colours';
+import {colours, propertyColour, isColourDark, scaleColour} from 'util/Colours';
 
 import DocPage from 'panoptes/DocPage';
+import _inRange from 'lodash.inrange';
 
 let ProportionBarChartRow = createReactClass({
   displayName: 'ProportionBarChartRow',
@@ -30,9 +31,9 @@ let ProportionBarChartRow = createReactClass({
     rowLabel: PropTypes.string.isRequired,
     rowLabelStyle: PropTypes.object,
     proportionTable: PropTypes.string.isRequired,
-    proportionTableColourColumn: PropTypes.string,
-    proportionTableColourColumnNumeratorValue: PropTypes.string,
-    proportionTableColourColumnRemainderValue: PropTypes.string,
+    proportionTableColourColumn: PropTypes.string, // To get property value colours from config.
+    proportionTableColourColumnNumeratorValue: PropTypes.string, // To get property value colour from config.
+    proportionTableColourColumnRemainderValue: PropTypes.string, // To get property value colour from config.
     numeratorQuery: PropTypes.string,
     denominatorQuery: PropTypes.string,
     convertProportionsToPercentages: PropTypes.bool,
@@ -55,6 +56,9 @@ let ProportionBarChartRow = createReactClass({
     sampleSizeWarningMinimum: PropTypes.number,
     zeroDenominatorContent: PropTypes.node,
     loadingBarContent: PropTypes.node,
+    numberOfBins: PropTypes.number, // Overrides proportionTableColourColumn (any specified property config)
+    colourRange: PropTypes.array, // Overrides proportionTableColourColumn (any specified property config)
+    showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
     replaceParent: PropTypes.function,
     children: PropTypes.node,
     config: PropTypes.object, // This will be provided via withAPIData
@@ -77,6 +81,7 @@ let ProportionBarChartRow = createReactClass({
       rowLabelStyle: {margin: 0, padding: 0},
       zeroDenominatorContent: <span style={{paddingLeft: '3px'}}>No data</span>,
       loadingBarContent: <span style={{paddingLeft: '3px'}}>Loading...</span>,
+      showMaxValueAsMaxColour: false,
     };
   },
 
@@ -141,6 +146,9 @@ let ProportionBarChartRow = createReactClass({
       sampleSizeWarningMinimum,
       zeroDenominatorContent,
       loadingBarContent,
+      numberOfBins,
+      colourRange,
+      showMaxValueAsMaxColour,
     } = this.props;
 
     const cellStyle = {
@@ -221,13 +229,40 @@ let ProportionBarChartRow = createReactClass({
         );
       }
 
+      const numerator = numeratorData.numerator !== undefined ? numeratorData.numerator[0] : 0;
+      const denominator = denominatorData.denominator[0];
+
       //// Determine bar colours
       let leftBarColour = numeratorBarColour !== undefined ? numeratorBarColour : colours[1];
       let rightBarColour = remainderBarColour !== undefined ? remainderBarColour : 'transparent';
-      // Use proportionTable but don't override numeratorBarColour or remainderBarColour.
-      if (proportionTable !== undefined && proportionTableColourColumn !== undefined && proportionTableColourColumnNumeratorValue !== undefined) {
+
+      if (numberOfBins === undefined && colourRange !== undefined) {
+        const colourFunction = scaleColour([0, denominator], colourRange);
+        leftBarColour = colourFunction(numerator);
+      } else if (numberOfBins !== undefined && numberOfBins > 0 && colourRange !== undefined) {
+        if (numerator === denominator && showMaxValueAsMaxColour) {
+          const colourFunction = scaleColour([0, denominator], colourRange);
+          leftBarColour = colourFunction(numerator);
+        } else {
+          const colourFunction = scaleColour([0, denominator], colourRange);
+          const binValueWidth = denominator / numberOfBins;
+          for (let binMinValueBoundary = 0; binMinValueBoundary < denominator; binMinValueBoundary += binValueWidth) {
+            const binMaxValueBoundary = binMinValueBoundary + binValueWidth;
+            const binMidValue = binMinValueBoundary + (binValueWidth / 2);
+            const midValueAsColour = colourFunction(binMidValue);
+            if (
+              _inRange(numerator, binMinValueBoundary, binMaxValueBoundary)
+              || (numerator === denominator && !showMaxValueAsMaxColour && binMinValueBoundary >= (denominator - binValueWidth))
+            ) {
+              leftBarColour = midValueAsColour;
+              break;
+            }
+          }
+        }
+      } else if (proportionTable !== undefined && proportionTableColourColumn !== undefined && proportionTableColourColumnNumeratorValue !== undefined) {
+        // Use proportionTable but don't override numeratorBarColour or remainderBarColour.
         if (this.config.tablesById[proportionTable].propertiesById[proportionTableColourColumn] === undefined) {
-          console.error('proportionTableColourColumn ' + proportionTableColourColumn + ' is not in the propertiesById config for proportionTable ' + proportionTable);
+          throw Error('proportionTableColourColumn ' + proportionTableColourColumn + ' is not in the propertiesById config for proportionTable ' + proportionTable);
         }
         const colourFunction = propertyColour(this.config.tablesById[proportionTable].propertiesById[proportionTableColourColumn]);
         leftBarColour = numeratorBarColour !== undefined ? numeratorBarColour : colourFunction(proportionTableColourColumnNumeratorValue);
@@ -235,6 +270,12 @@ let ProportionBarChartRow = createReactClass({
           rightBarColour = remainderBarColour !== undefined ? remainderBarColour : colourFunction(proportionTableColourColumnRemainderValue);
         }
       }
+
+      // TODO:
+      // then support numberOfBins (e.g. bin the scaled the proportionTableColour),
+      // then support colourRange (i.e. used the specified colours instead of proportionTableColour).
+
+
       const lightColour = '#F0F0F0';
       const mediumColour = '#888888';
       const darkColour = '#101010';
@@ -255,8 +296,6 @@ let ProportionBarChartRow = createReactClass({
         verticalAlign: 'middle',
       };
 
-      const numerator = numeratorData.numerator !== undefined ? numeratorData.numerator[0] : 0;
-      const denominator = denominatorData.denominator[0];
       const formattingFunction = roundProportionsToIntegers ? (n) => Math.round(n) : (n) => n;
       if (denominator !== 0 && isNaN(numerator / denominator)) {
         console.error('numerator: ', numerator);
@@ -381,8 +420,8 @@ let ProportionBarChartRow = createReactClass({
 ProportionBarChartRow = withAPIData(ProportionBarChartRow, ({config, props}) => {
 
   const {proportionTable, numeratorQuery, denominatorQuery} = props;
-  const amendednumeratorQuery = numeratorQuery || (proportionTable ? config.tablesById[proportionTable].defaultQuery : null) || SQL.nullQuery;
-  const amendeddenominatorQuery = denominatorQuery || (proportionTable ? config.tablesById[proportionTable].defaultQuery : null) || SQL.nullQuery;
+  const amendedNumeratorQuery = numeratorQuery || (proportionTable ? config.tablesById[proportionTable].defaultQuery : null) || SQL.nullQuery;
+  const amendedDenominatorQuery = denominatorQuery || (proportionTable ? config.tablesById[proportionTable].defaultQuery : null) || SQL.nullQuery;
 
   return {
     requests: {
@@ -392,7 +431,7 @@ ProportionBarChartRow = withAPIData(ProportionBarChartRow, ({config, props}) => 
           database: config.dataset,
           table: proportionTable,
           columns: [{expr: ['count', ['*']], as: 'numerator'}],
-          query: amendednumeratorQuery,
+          query: amendedNumeratorQuery,
         }
       },
       denominatorData: {
@@ -401,7 +440,7 @@ ProportionBarChartRow = withAPIData(ProportionBarChartRow, ({config, props}) => 
           database: config.dataset,
           table: proportionTable,
           columns: [{expr: ['count', ['*']], as: 'denominator'}],
-          query: amendeddenominatorQuery,
+          query: amendedDenominatorQuery,
         }
       }
     }
