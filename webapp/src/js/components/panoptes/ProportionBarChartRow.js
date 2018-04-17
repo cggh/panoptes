@@ -271,11 +271,6 @@ let ProportionBarChartRow = createReactClass({
         }
       }
 
-      // TODO:
-      // then support numberOfBins (e.g. bin the scaled the proportionTableColour),
-      // then support colourRange (i.e. used the specified colours instead of proportionTableColour).
-
-
       const lightColour = '#F0F0F0';
       const mediumColour = '#888888';
       const darkColour = '#101010';
