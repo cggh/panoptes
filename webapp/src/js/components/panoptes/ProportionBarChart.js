@@ -30,10 +30,10 @@ let ProportionBarChart = createReactClass({
     rowTableJoins: PropTypes.array,
     rowTableOrder: PropTypes.array,
     proportionTable: PropTypes.string.isRequired,
+    proportionTableColourColumn: PropTypes.string, // To get property value colours from config.
+    proportionTableColourColumnNumeratorValue: PropTypes.string, // To get property value colour from config.
+    proportionTableColourColumnRemainderValue: PropTypes.string, // To get property value colour from config.
     proportionTableJoinKeyColumn: PropTypes.string, // Defaults to same name as rowTableJoinKeyColumn.
-    proportionTableColourColumn: PropTypes.string,
-    proportionTableColourColumnNumeratorValue: PropTypes.string,
-    proportionTableColourColumnRemainderValue: PropTypes.string,
     numeratorQuery: PropTypes.string,
     denominatorQuery: PropTypes.string,
     convertProportionsToPercentages: PropTypes.bool,
@@ -55,6 +55,9 @@ let ProportionBarChart = createReactClass({
     onClickPrimKey: PropTypes.string,
     docLinkHref: PropTypes.string,
     sampleSizeWarningMinimum: PropTypes.number,
+    numberOfBins: PropTypes.number,
+    colourRange: PropTypes.array, // Overrides default Colours scaleColours but not propConfig.valueColours
+    showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
     config: PropTypes.object, // This will be provided via withAPIData
     rowTableData: PropTypes.array, // This will be provided via withAPIData
   },
@@ -62,6 +65,7 @@ let ProportionBarChart = createReactClass({
   getDefaultProps() {
     return {
       rowLabelColumn: 'name',
+      showMaxValueAsMaxColour: false,
     };
   },
 
@@ -98,6 +102,9 @@ let ProportionBarChart = createReactClass({
       rowTableJoinKeyColumn,
       proportionTableJoinKeyColumn,
       sampleSizeWarningMinimum,
+      numberOfBins,
+      colourRange,
+      showMaxValueAsMaxColour,
       ...other
     } = this.props;
 
@@ -196,6 +203,9 @@ let ProportionBarChart = createReactClass({
                 onClickPrimKey={onClickPrimKey}
                 docLinkHref={docLinkHref}
                 sampleSizeWarningMinimum={sampleSizeWarningMinimum}
+                numberOfBins={numberOfBins}
+                colourRange={colourRange}
+                showMaxValueAsMaxColour={showMaxValueAsMaxColour}
                 {...other}
               />
             );
