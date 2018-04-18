@@ -64,6 +64,9 @@ let MuiDataTableView = createReactClass({
     onClickComponent: PropTypes.string,
     onClickComponentProps: PropTypes.object,
     onClickComponentTemplateDocPath: PropTypes.string,
+    loadStatus: PropTypes.string,
+    colourValueTextBackground: PropTypes.bool,
+    colourValueCellBackground: PropTypes.bool,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array, // This will be provided via withAPIData
     onClickComponentTemplate: PropTypes.string, // This will be provided via withAPIData
@@ -82,6 +85,8 @@ let MuiDataTableView = createReactClass({
       columnWidths: {},
       joins: [],
       onClickBehaviour: 'dataItemPopup',
+      colourValueTextBackground: false,
+      colourValueCellBackground: true,
     };
   },
 
@@ -156,7 +161,8 @@ let MuiDataTableView = createReactClass({
     let {
       className, columns, order, data, loadStatus, maxRowsPerPage, startRowIndex,
       nullReplacement, nanReplacement, table,
-      onClickBehaviour, onClickComponent, onClickComponentProps, onClickComponentTemplate
+      onClickBehaviour, onClickComponent, onClickComponentProps, onClickComponentTemplate,
+      colourValueTextBackground, colourValueCellBackground,
     } = this.props;
 
     if (!this.tableConfig()) {
@@ -372,7 +378,8 @@ let MuiDataTableView = createReactClass({
                           numeric={columnData.isNumerical}
                           padding={'none'}
                           style={{
-                            textAlign: alignment
+                            textAlign: alignment,
+                            background: colourValueCellBackground ? background : 'inherit',
                           }}
                         >
                           <PropertyCell
@@ -380,7 +387,7 @@ let MuiDataTableView = createReactClass({
                             prop={columnData}
                             value={cellData}
                             style={{
-                              background,
+                              background: colourValueTextBackground ? background : 'inherit',
                               paddingLeft: '2px',
                               paddingRight: '2px'
                             }}
