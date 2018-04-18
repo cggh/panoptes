@@ -23,7 +23,7 @@ let TableWithLegend = createReactClass({
     table: PropTypes.string,
     query: PropTypes.string,
     order: PropTypes.array,
-    columns: PropTypes.oneOfType(PropTypes.array, PropTypes.string),
+    columns: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     columnWidths: PropTypes.object,
     classes: PropTypes.object,
     disableMultipleColumnOrder: PropTypes.bool,
