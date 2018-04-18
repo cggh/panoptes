@@ -42,4 +42,6 @@ feeds:
     url: https://en.blog.wordpress.com/feed/
   - id: malariageninformatics
     url: https://malariageninformatics.wordpress.com/feed/
+  - id: SinglePostBlog
+    url: https://singlepostblog.wordpress.com/feed/
 
