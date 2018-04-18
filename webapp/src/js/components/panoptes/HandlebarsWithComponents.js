@@ -19,7 +19,7 @@ let HandlebarsWithComponents = createReactClass({
   ],
 
   propTypes: {
-    children: PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired,
+    children: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   },
 
   getInitialState() {
@@ -30,6 +30,9 @@ let HandlebarsWithComponents = createReactClass({
 
   componentDidMount() {
     let {children, ...other} = this.props;
+    if (children === undefined || children === null) {
+      return;
+    }
     this.handlebars = customHandlebars(this.config, ...other);
     children = children instanceof Array ? children.join('') : children;
     const result = this.handlebars.compile(children)({config: this.config, ...other});
