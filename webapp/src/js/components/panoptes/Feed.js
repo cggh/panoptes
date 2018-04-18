@@ -43,9 +43,19 @@ let Feed = createReactClass({
     }
 
     let cards = [];
-    feedObj.rss.channel.item.forEach((item) => {
 
-      const {pubDate, title, description} = item;
+    let items = [];
+    if (Array.isArray(feedObj.rss.channel.item)) {
+      items = feedObj.rss.channel.item;
+    } else if (feedObj.rss.channel.item !== undefined) {
+      items.push(feedObj.rss.channel.item);
+    } else {
+      console.warn('There is no item array or item property in this feedObj.rss.channel: ', feedObj.rss.channel);
+    }
+
+    items.forEach((item) => {
+      const {pubDate, title, description, guid} = item;
+      const guidText = guid['#text'];
       const content = item['content:encoded'];
       const creator = item['dc:creator'];
       const date = new Date(pubDate);
@@ -58,6 +68,7 @@ let Feed = createReactClass({
       if (templateDocPath !== undefined) {
         cards.push(
           <DocTemplate
+            key={guidText}
             path={templateDocPath}
             className={className}
             actionsAreaIsClickable={actionsAreaIsClickable}
@@ -75,6 +86,7 @@ let Feed = createReactClass({
       } else {
         cards.push(
           <ExpandingCard
+            key={guidText}
             actionsAreaIsClickable={actionsAreaIsClickable}
             actionsAreaDisappearsOnExpand={actionsAreaDisappearsOnExpand}
           >
@@ -93,6 +105,7 @@ let Feed = createReactClass({
         );
       }
     });
+
     return <div className={className}>{cards}</div>;
   },
 });
