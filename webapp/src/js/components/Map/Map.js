@@ -219,7 +219,7 @@ let Map = createReactClass({
         // Also, this.props.setProps is not available when the component is mounted through DataItemActions
 
         if (this.props.setProps !== undefined) {
-          this.props.setProps({center: newCenter, zoom: newZoom});
+          this.props.setProps({center: newCenter, zoom: newZoom}, true);
         } else {
           this.forceUpdate();
         }

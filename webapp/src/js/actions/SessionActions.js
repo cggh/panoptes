@@ -7,10 +7,11 @@ import EmptyTab from 'containers/EmptyTab';
 
 
 let SessionActions = {
-  componentSetProps(componentPath, updater) {
+  componentSetProps(componentPath, updater, throttleStoreState) {
     this.dispatch(SESSION.COMPONENT_SET_PROPS, {
       componentPath,
       updater,
+      throttleStoreState
     });
   },
   componentReplace(componentPath, newComponent) {

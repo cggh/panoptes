@@ -3,6 +3,7 @@ import {createStore} from 'fluxxor';
 import Immutable from 'immutable';
 import uid from 'uid';
 import Constants from '../constants/Constants';
+import _throttle from 'lodash.throttle';
 const SESSION = Constants.SESSION;
 import _isFunction from 'lodash.isfunction';
 import _isEqual from 'lodash.isequal';
@@ -21,14 +22,15 @@ let SessionStore = createStore({
   initialize(state) {
     this.state = Immutable.fromJS(state);
     this.modal = null;
+    this.throttledStoreState = _throttle(() => this.emit('storeState'), 1000);
 
     this.bindActions(
-      SESSION.COMPONENT_SET_PROPS, this.emitIfNeeded(this.componentSetProps),
+      SESSION.COMPONENT_SET_PROPS, this.componentSetProps,
       SESSION.COMPONENT_REPLACE, this.emitIfNeeded(this.componentReplace),
       SESSION.MODAL_CLOSE, this.modalClose,
       SESSION.MODAL_OPEN, this.modalOpen,
       SESSION.MODAL_SET_PROPS, this.emitIfNeeded(this.modalSetProps),
-      SESSION.NOTIFY, this.emitIfNeeded(this.notify, 'notify'),
+      SESSION.NOTIFY, this.emitIfNeeded(this.notify, ['notify']),
       SESSION.POPUP_CLOSE, this.emitIfNeeded(this.popupClose),
       SESSION.POPUP_FOCUS, this.emitIfNeeded(this.popupFocus),
       SESSION.POPUP_MOVE, this.emitIfNeeded(this.popupMove),
@@ -46,20 +48,30 @@ let SessionStore = createStore({
     );
   },
 
-  emitIfNeeded(action, event = 'change') {
+  emitIfNeeded(action, events=['change', 'storeState']) {
     return (payload) => {
       let oldState = this.state;
       action(payload);
-      if (!oldState.equals(this.state) || event === 'notify')
-        this.emit(event);
+      if (!oldState.equals(this.state) || event === 'notify') {
+        events.forEach((event) => this.emit(event));
+      }
     };
   },
 
-  componentSetProps({componentPath, updater}) {
+  componentSetProps({componentPath, updater, throttleStoreState}) {
+    let oldState = this.state;
     if (_isFunction(updater)) {
       this.state = this.state.updateIn(['components', ...componentPath, 'props'], updater);
     } else {
       this.state = this.state.mergeDeepIn(['components', ...componentPath, 'props'], updater);
+    }
+    if (!oldState.equals(this.state)) {
+      this.emit('change');
+      if(throttleStoreState) {
+        this.throttledStoreState();
+      } else {
+        this.emit('storeState');
+      }
     }
   },
 

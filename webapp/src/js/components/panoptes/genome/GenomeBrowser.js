@@ -185,7 +185,7 @@ let GenomeBrowser = createReactClass({
     start = pos - (newWidth * fracX);
     end = pos + (newWidth * (1 - fracX));
     [start, end] = this.scaleClamp(start, end, fracX);
-    this.props.setProps({start, end});
+    this.props.setProps({start, end}, true);
   },
 
   handleMouseWheel(e) {
@@ -233,7 +233,7 @@ let GenomeBrowser = createReactClass({
       // });
       this.nextSpringConfig = NO_SPRING;
     }
-    this.props.setProps({start, end});
+    this.props.setProps({start, end}, true);
   },
 
   handleChangeLoadStatus(status) {

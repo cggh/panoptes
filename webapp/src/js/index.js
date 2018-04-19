@@ -1,5 +1,4 @@
 import 'string.prototype.startswith';
-import _debounce from 'lodash.debounce';
 import createHistory from 'history/createBrowserHistory';
 const history = createHistory();
 import ComponentRegistry from 'util/ComponentRegistry';
@@ -101,6 +100,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
     ;
   };
 
+  let historyChangeCount = 0;
   Promise.all(promises)
     .then(([config, appState]) => {
 
@@ -136,7 +136,6 @@ if (dataset === undefined || dataset === null || dataset === '') {
       // appState would have been returned by the fetchData promise,
 
       if (appState === undefined) {
-
         if (remainingPath !== undefined && remainingPath !== '' && remainingPath !== 'index.html') {
           appState = _clone(defaultState);
           if (config.tablesById[datasetURLPathParts[1]] !== undefined) {
@@ -191,16 +190,8 @@ if (dataset === undefined || dataset === null || dataset === '') {
 
       let lastState = getState();
 
-      //Store if state change was due to backbutton - if it was then don't store it again.
-      let backbutton = null;
-
-      const storeState = _debounce(() => {
-        if (backbutton) {
-          backbutton = false;
-          return;
-        }
-
-        backbutton = false;
+      const storeState = () => {
+        historyChangeCount += 1;
 
         const newState = getState();
 
@@ -232,11 +223,17 @@ if (dataset === undefined || dataset === null || dataset === '') {
 
 
           if (hasState) {
+            //Push with current URL until we get the hash from the server
+            history.push(history.location.pathname, newState.toJS());
+            const ourPushCount = historyChangeCount;
 
             API.storeData(newState.toJS()).then((hash) => {
-              history.push(baseURLPath + hash, newState.toJS());
-            });
-
+                if (ourPushCount === historyChangeCount) {
+                  //If we are still relevant then update the URL
+                  history.replace(baseURLPath + hash, newState.toJS());
+                }
+              }
+            );
           } else {
 
             const selectedTabComponentKey = newState.get('session').get('tabs').get('selectedTab');
@@ -261,19 +258,19 @@ if (dataset === undefined || dataset === null || dataset === '') {
           }
         }
 
-      }, 250);
+      };
 
-      stores.SessionStore.on('change', storeState);
+      stores.SessionStore.on('storeState', storeState);
 
       //Replace our current navigation point with one with a state.
       history.replace(history.location.pathname, appState);
 
       history.listen((location, action) => {
         if (action === 'POP') {
+          historyChangeCount += 1;
           const newState = Immutable.fromJS((location.state ? location.state.session : {}));
           if (!newState.equals(stores.SessionStore.state)) {
             stores.SessionStore.state = newState;
-            backbutton = true;
             stores.SessionStore.emit('change');
           }
         }
