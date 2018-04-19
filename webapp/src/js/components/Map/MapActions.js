@@ -131,7 +131,7 @@ let MapActions = createReactClass({
 
   handleChangeMap(payload) {
     let {center, zoom} = payload;
-    this.props.setProps({center, zoom});
+    this.props.setProps({center, zoom}, true);
   },
 
   handleChangeOverlayLayer(selectedTileLayer) {
