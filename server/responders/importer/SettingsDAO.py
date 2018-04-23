@@ -15,7 +15,7 @@ import time
 import math
 import sqlparse
 from Numpy_to_SQL import Numpy_to_SQL
-import monetdb.control
+import pymonetdb.control
 
 class SettingsDAO(object):
     
@@ -70,14 +70,14 @@ class SettingsDAO(object):
         self._datasetId = None
         
         DQXUtils.CheckValidDatabaseIdentifier(db)
-        control = monetdb.control.Control(passphrase='monetdb')
+        control = pymonetdb.control.Control(passphrase='monetdb')
         try:
             control.stop(db)
-        except monetdb.exceptions.OperationalError:
+        except pymonetdb.exceptions.OperationalError:
             pass
         try:
             control.destroy(db)
-        except monetdb.exceptions.OperationalError:
+        except pymonetdb.exceptions.OperationalError:
             pass
         control.create(db)
         control.release(db)

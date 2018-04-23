@@ -5,7 +5,7 @@
 import threading
 import uuid
 import DQXDbTools
-import monetdb.sql
+# import pymonetdb.sql
 import DQXUtils
 import datetime
 import config
@@ -60,7 +60,7 @@ class CalculationThreadList:
                 self.threads[id]['progress'] = progress
         with DQXDbTools.DBCursor() as cur:
             status = cap(status,250)
-            # status = monetdb.sql.escape_string(status)
+            # status = pymonetdb.sql.escape_string(status)
             # status = status.encode('ascii','ignore')
             sqlstring = "UPDATE calculations SET status=%s, progress=%s WHERE id=%s" #.format(id, status, progress)
             cur.execute(sqlstring, (status, progress, id))

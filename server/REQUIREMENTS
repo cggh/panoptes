@@ -3,7 +3,7 @@ Werkzeug==0.11.11
 argparse==1.2.1
 simplejson==3.10.0
 requests==2.11.1
-python-monetdb==11.19.3.2
+pymonetdb==1.1.1
 Cython==0.25.1
 xlrd==1.0.0
 stuf==0.9.16
