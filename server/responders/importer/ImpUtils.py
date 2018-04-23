@@ -12,7 +12,7 @@ import uuid
 import DQXDbTools
 import DQXUtils
 import errno
-import monetdb.control
+import pymonetdb.control
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -64,7 +64,7 @@ def mkdir(name):
             raise
 
 def IsDatasetPresentInServer(credInfo, datasetId):
-    control = monetdb.control.Control(passphrase='monetdb')
+    control = pymonetdb.control.Control(passphrase='monetdb')
     datasets = [db['name'] for db in control.status()]
     return datasetId in datasets
 

@@ -8,7 +8,7 @@ import uuid
 import DQXDbTools
 import authorization
 import schemaversion
-from monetdb.exceptions import DatabaseError
+from pymonetdb.exceptions import DatabaseError
 
 
 def response(returndata):

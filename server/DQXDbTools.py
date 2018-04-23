@@ -5,7 +5,7 @@
 
 import simplejson
 import DQXbase64
-import monetdb.sql
+import pymonetdb.sql
 import config
 #As we created the DB and it is only listening on localhost set these here
 config.DBUSER = 'monetdb'
@@ -199,7 +199,8 @@ class DBCursor(object):
 
     def __enter__(self):
         self.credentials.VerifyCanDo(DbOperationRead(self.db_args['database']))
-        self.db = monetdb.sql.connect(**self.db_args)
+        self.db = pymonetdb.connect(**self.db_args)
+        self.db.arraysize = 1000
         self.db.autocommit = self.db_args.get('autocommit', False)
         self.cursor = self.db.cursor()
         #Needed for timeout which is currently disabled
@@ -220,7 +221,7 @@ class DBCursor(object):
                     # print repr(query), repr(params)
                     result = self.cursor.execute(query, params)
                     retry = False
-                except monetdb.sql.ProgrammingError as e:
+                except pymonetdb.sql.ProgrammingError as e:
                     if '40000' in str(e):
                         retry = True
                     else:
