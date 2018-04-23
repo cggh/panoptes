@@ -70,7 +70,7 @@ class SettingsDAO(object):
         self._datasetId = None
         
         DQXUtils.CheckValidDatabaseIdentifier(db)
-        control = pymonetdb.control.Control(passphrase='monetdb')
+        control = pymonetdb.control.Control(passphrase='monetdb', hostname='localhost')
         try:
             control.stop(db)
         except pymonetdb.exceptions.OperationalError:

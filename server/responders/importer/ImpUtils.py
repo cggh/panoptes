@@ -64,7 +64,7 @@ def mkdir(name):
             raise
 
 def IsDatasetPresentInServer(credInfo, datasetId):
-    control = pymonetdb.control.Control(passphrase='monetdb')
+    control = pymonetdb.control.Control(passphrase='monetdb', hostname='localhost')
     datasets = [db['name'] for db in control.status()]
     return datasetId in datasets
 
