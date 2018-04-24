@@ -52,7 +52,7 @@ let SessionStore = createStore({
     return (payload) => {
       let oldState = this.state;
       action(payload);
-      if (!oldState.equals(this.state) || event === 'notify') {
+      if (!oldState.equals(this.state) || events.includes('notify')) {
         events.forEach((event) => this.emit(event));
       }
     };
