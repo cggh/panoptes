@@ -70,39 +70,11 @@ class SettingsDataset(ImportSettings):
                                             },
                                         }
                                     }),
-                                    ('colours', {
-                                        'type': 'List',
-                                        'required': False,
-                                        'description': '''A list of the colour identifiers and their values for the dataset.''',
-                                            'children': {
-                                                'id': {
-                                                    'type': 'Text',
-                                                    'required': True,
-                                                    'description': 'Colour identifier'
-                                                },
-                                                'value': {
-                                                    'type': 'Text',
-                                                    'required': True,
-                                                    'description': 'Colour value'
-                                                },
-                                            }
-                                    }),
                                     ('constants', {
-                                        'type': 'List',
+                                        'type': 'Block',
                                         'required': False,
-                                        'description': '''A list of custom constants, their identifiers and their values, for the dataset.''',
-                                            'children': {
-                                                'id': {
-                                                    'type': 'Text',
-                                                    'required': True,
-                                                    'description': 'The identifier for (i.e. the name of) the constant.'
-                                                },
-                                                'value': {
-                                                    'type': 'Text',
-                                                    'required': True,
-                                                    'description': 'The value (i.e. the setting) of the constant.'
-                                                },
-                                            }
+                                        'description': '''A dict of custom constants''',
+                                        'default': {}
                                     }),
                                     ('feeds', {
                                         'type': 'List',

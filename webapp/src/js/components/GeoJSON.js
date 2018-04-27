@@ -34,7 +34,6 @@ let GeoJSON = createReactClass({
 
   render() {
     let {json, colour, weight, opacity, fillOpacity, onClick, popup} = this.props;
-
     let style = {
       color: colour,
       weight,
@@ -43,7 +42,7 @@ let GeoJSON = createReactClass({
     };
 
     return (
-      <LeafletGeoJSON data={json} style={style} onClick={onClick}>
+      <LeafletGeoJSON data={json} {...style} onClick={onClick}>
         {popup ? <Popup minWidth={300}>{popup}</Popup> : null}
       </LeafletGeoJSON>);
 
