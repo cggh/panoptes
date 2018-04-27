@@ -40,7 +40,8 @@ const ALLOWED_CHILDREN = [
   'Marker',
   'Overlay',
   'ColumnPieChartMarkersLayer',
-  'TableGeoJSONsLayer'
+  'TableGeoJSONsLayer',
+  'HideLayerAtZoom'
 ];
 
 /* To use maps in templates

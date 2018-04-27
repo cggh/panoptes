@@ -23,7 +23,9 @@ const ALLOWED_CHILDREN = [
   'PieChartMarkersLayer',
   'Polyline',
   'GeoLayouter',
-  'GeoJSON'
+  'GeoJSON',
+  'TableGeoJSONsLayer',
+  'HideLayerAtZoom'
 ];
 
 let FeatureGroup = createReactClass({

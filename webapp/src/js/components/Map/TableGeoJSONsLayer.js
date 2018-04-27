@@ -94,7 +94,6 @@ let TableGeoJSONsLayer = createReactClass({
   },
 
   render() {
-
     let {layerContainer, map} = this.context;
     let {
       colourProperty, table, labelProperty, showLegend, maxLegendItems,
@@ -156,7 +155,6 @@ let TableGeoJSONsLayer = createReactClass({
 
 
 TableGeoJSONsLayer = withAPIData(TableGeoJSONsLayer, function({props}) {
-
   let {
     table,
     query,
