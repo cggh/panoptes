@@ -62,15 +62,7 @@ const ConfigStore = createStore({
     let chromosomes = {};
     _each(_sortBy(_keys(newConfig.chromosomes)), (name) => chromosomes[name] = newConfig.chromosomes[name]);
     newConfig.chromosomes = chromosomes;
-
-    let colours = {};
-    _each(newConfig.settings.colours, (colour) => colours[colour.id] = colour.value);
-    newConfig.colours = colours;
-
-    let constants = {};
-    _each(newConfig.settings.constants, (constant) => constants[constant.id] = constant.value);
-    newConfig.constants = constants;
-
+    newConfig.constants = newConfig.settings.constants;
     let feeds = {};
     _each(newConfig.settings.feeds, (feed) => feeds[feed.id] = {url: feed.url});
     newConfig.feeds = feeds;
