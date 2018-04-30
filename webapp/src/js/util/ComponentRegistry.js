@@ -30,10 +30,15 @@ dynreq.keys().forEach((component) => {
 
 //We now add in specific material-ui classes
 import Card, { CardHeader, CardMedia, CardContent, CardActions } from 'material-ui/Card';
+Card.displayName = "Card";
 typeByDisplayName['Card'] = Card;
+CardActions.displayName = "CardActions";
 typeByDisplayName['CardActions'] = CardActions;
+CardHeader.displayName = "CardHeader";
 typeByDisplayName['CardHeader'] = CardHeader;
+CardMedia.displayName = "CardMedia";
 typeByDisplayName['CardMedia'] = CardMedia;
+CardMedia.displayName = "CardMedia";
 typeByDisplayName['CardContent'] = CardContent;
 
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
