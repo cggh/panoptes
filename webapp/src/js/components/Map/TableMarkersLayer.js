@@ -557,18 +557,13 @@ let TableMarkersLayer = createReactClass({
 
       // NB: Copied from PieChartMarkersLayer
       let size = map.getSize();
-      let bounds = map.getBounds();
       let pixelArea = size.x * size.y;
-      let pieAreaSum = _sum(_map(
-        _filter(markers, (marker) => {
-          let {lat, lng} = marker;
-          return bounds.contains([lat, lng]);
-        }),
+      let pieAreaSum = _sum(_map(markers,
         (marker) => marker.originalRadius * marker.originalRadius * 2 * Math.PI)
       );
       let lengthRatio = this.lastLengthRatio || 1;
       if (pieAreaSum > 0) {
-        lengthRatio = Math.sqrt(0.05 / (pieAreaSum / pixelArea));
+        lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(markers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
@@ -597,7 +592,6 @@ let TableMarkersLayer = createReactClass({
                     {
                       renderNodes.map(
                         (marker, i) => {
-
                           let clusterComponent = undefined;
 
                           if (marker.clusterType === 'pieChart') {
