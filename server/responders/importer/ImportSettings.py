@@ -98,8 +98,40 @@ class ImportSettings:
                                    'required': False,
                                    'description': 'Specifies display colours for specific values of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
                                    }),
+                            ('scaleColours', {
+                                'type': 'Block',
+                                'required': False,
+                                'default' : {'thresholds':None, 'colours': ['#2ca02c', '#d62728'], 'interpolate': True, 'nullColour': 'rgba(0,0,0,0)'},
+                                'description': 'For value types specifies colours to represent the value in graphical elements',
+                                'children': OrderedDict((
+                                    ('thresholds', {
+                                        'type': 'List',
+                                        'required': True,
+                                        'default': None,
+                                        'description': 'A list of values that split the range into colours, if unspecifed defaults to [minVal, maxVal]'
+                                    }),
+                                    ('colours', {
+                                        'type': 'List',
+                                        'required': True,
+                                        'default': ['#2ca02c', '#d62728'],
+                                        'description': "A list of colours (HTML compatible) this list should be same length as the thresholds if interpolation is true and one shorter if it is not, a value of '...' will make a colour between it's neighbours."
+                                    }),
+                                    ('nullColour', {
+                                        'type': 'Text',
+                                        'required': False,
+                                        'default': 'rgba(0,0,0,0)',
+                                        'description': 'Colour for NULL values'
+                                    }),
+                                    ('interpolate', {
+                                        'type': 'Boolean',
+                                        'required': False,
+                                        'default': True,
+                                        'description': 'If true the colours are smoothed between values'
+                                    })
+                                ))
+                            }),
                             ('valueDescriptions', {
-                                    'type': 'Block',
+                                'type': 'Block',
                                     'required': False,
                                     'description': 'Specifies descriptions for specific values of this property which will displayed next to it under an info icon.'
                             }),

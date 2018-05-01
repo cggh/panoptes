@@ -1,6 +1,8 @@
 import {scaleOrdinal, scaleLinear} from 'd3-scale';
 import {interpolateHcl} from 'd3-interpolate';
 import Color from 'color';
+import _sortedIndex from 'lodash.sortedindex';
+import _sortedLastIndex from 'lodash.sortedlastindex';
 
 let exisitingScales = {};
 
@@ -226,8 +228,7 @@ export function propertyColour(propConfig, min = null, max = null, range = scale
   if (propConfig.isCategorical) {
     // NOTE: isCategorical is set to true by ImportDataTable.py whenever all the values in the column are unique.
     const colourFunc = categoryColours(`${propConfig.tableId}_${propConfig.id}`);
-    // FIXME: What is going on below? categoryColours(identifier) is being called for every distinctValue, which returns exisitingScales[identifier] forEach.
-    //Run thorugh the possibilites so they are enumerated in sort order, not appearance order.
+    //Run thorugh the possibilities so they are enumerated in sort order, not appearance order. If we don't do this colours will be different depending on what plots etc are looked at first. As the colours are allocated as they are requested.
     if (propConfig.distinctValues) {
       propConfig.distinctValues.forEach(colourFunc);
     }
@@ -235,7 +236,34 @@ export function propertyColour(propConfig, min = null, max = null, range = scale
   }
   if (propConfig.isText)
     return categoryColours(`${propConfig.tableId}_${propConfig.id}`);
-  return scaleColour([min === null ? propConfig.minVal : min, max === null ? propConfig.maxVal : max], range);
+  let {colours, thresholds, nullColour, interpolate} = propConfig.scaleColours;
+
+  //Special case the simplest to avoid invoking all the sortedIndex machinery without need
+  if (thresholds.length === 2) {
+    if (interpolate) {
+      let scale = scaleColour(thresholds, colours);
+      return (value) => value === null ? nullColour : scale(value);
+    } else {
+      return (value) => value === null ? nullColour : colours[0];
+    }
+  } else {
+    if (interpolate) {
+      let scales = [];
+      for(let i = 0, l = colours.length-1; i < l; ++i) {
+        scales.push(scaleColour([thresholds[i], thresholds[i+1]], [colours[i], colours[i+1]]));
+      }
+      return (value) => {
+        let index = Math.max(0,Math.min(scales.length - 1, _sortedIndex(thresholds, value) - 1));
+        return value === null ? nullColour : scales[index](value);
+      }
+    } else {
+      return (value) => {
+        let index = Math.max(0,Math.min(colours.length - 1, _sortedLastIndex(thresholds, value) - 1));
+        if (value === thresholds[index]) index -= 1;
+        return value === null ? nullColour : colours[index];
+      }
+    }
+  }
 }
 
 // Credit: https://gist.github.com/olmokramer/82ccce673f86db7cda5e

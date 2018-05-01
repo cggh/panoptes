@@ -1,4 +1,5 @@
 import {createStore} from 'fluxxor';
+import {scaleColour} from 'util/Colours';
 
 import Constants from '../constants/Constants';
 const APIConst = Constants.API;
@@ -321,6 +322,41 @@ const ConfigStore = createStore({
         'Date': 0,
         'GeoJSON': ''
       }[prop.dataType];
+      if (prop.scaleColours) {
+        if (!prop.scaleColours.thresholds) {
+          prop.scaleColours.thresholds = [prop.minVal, prop.maxVal];
+        }
+
+        //Interpolate thresholds where .. has been used.
+        let {thresholds, colours, interpolate} = prop.scaleColours;
+        if ((colours.length !== thresholds.length && interpolate) || (colours.length !== thresholds.length-1 && !interpolate)) {
+          console.error(`thresholds and colours are incompatible lengths for ${prop.id}`);
+        }
+        let gaps = [];
+        let inGap = false;
+        for(let i = 0, l = colours.length; i < l; ++i) {
+          if (colours[i] === '...') {
+            if (i === 0 || i === l-1){
+              console.error(`... cannot be used at start or end of colours ${prop.id}`)
+            }
+            if (!inGap) {
+              inGap = true;
+              gaps.push({start: i-1, end:i+1});
+            } else {
+              gaps[gaps.length -1].end = i+1;
+            }
+          } else {
+            inGap = false;
+          }
+        }
+        for(let i = 0, l = gaps.length; i < l; ++i) {
+          let {start, end} = gaps[i];
+          let colourFunc = scaleColour([start, end], [colours[start], colours[end]]);
+          for(let j = start + 1; j < end; ++j) {
+            colours[j] = colourFunc(j);
+          }
+        }
+      }
     });
     table.visibleProperties = _filter(table.properties, (property) => property.showInTable);
     table.hasGeoCoord = !!(table.longitude && table.latitude);
