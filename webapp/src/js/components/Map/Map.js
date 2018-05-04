@@ -24,6 +24,7 @@ import _min from 'lodash.min';
 // CSS
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-loading/src/Control.Loading.css';
+import 'map.scss';
 
 // Workaround for default marker icons.
 import L from 'leaflet';
@@ -128,9 +129,21 @@ let Map = createReactClass({
     };
   },
 
+  onTouch(e) {
+    if (e.type === 'touchmove' && e.touches.length === 1) {
+      e.currentTarget.classList.add('leaflet-swiping');
+    } else {
+      e.currentTarget.classList.remove('leaflet-swiping');
+    }
+  },
+
+  componentWillMount() {
+    this.mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  },
+
   componentDidMount() {
+    let map = this.map.leafletElement;
     if (this.props.disableInteraction) {
-      let map = this.map.leafletElement;
       map.dragging.disable();
       map.touchZoom.disable();
       map.doubleClickZoom.disable();
@@ -138,6 +151,10 @@ let Map = createReactClass({
       map.boxZoom.disable();
       map.keyboard.disable();
       if (map.tap) map.tap.disable();
+    } else if (this.mobile) {
+        map.dragging.disable();
+        map._container.addEventListener("touchmove", this.onTouch);
+        map._container.addEventListener("touchend", this.onTouch);
     }
   },
 
@@ -262,7 +279,7 @@ let Map = createReactClass({
       ref: (ref) => this.map = ref,
       zoom,
       zoomAnimation: false,
-      zoomControl: !disableInteraction,
+      zoomControl: !(this.mobile || disableInteraction),
       zoomSnap: 0.5,
       zoomDelta: 0.5,
       wheelPxPerZoomLevel: 120
