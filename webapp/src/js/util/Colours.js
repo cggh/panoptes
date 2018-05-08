@@ -217,7 +217,7 @@ export function booleanColours() {
   };
 }
 
-export function propertyColour(propConfig, min = null, max = null, range = scaleColours) {
+export function propertyColour(propConfig) {
   if (!propConfig) {
     return () => 'inherit';
   }
@@ -259,7 +259,7 @@ export function propertyColour(propConfig, min = null, max = null, range = scale
     } else {
       return (value) => {
         let index = Math.max(0,Math.min(colours.length - 1, _sortedLastIndex(thresholds, value) - 1));
-        if (value === thresholds[index]) index -= 1;
+        if (value === thresholds[index] && index > 0) index -= 1;
         return value === null ? nullColour : colours[index];
       }
     }
