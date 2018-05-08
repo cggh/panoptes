@@ -58,6 +58,7 @@ let ProportionBarChartRow = createReactClass({
     loadingBarContent: PropTypes.node,
     numberOfBins: PropTypes.number, // Overrides proportionTableColourColumn (any specified property config)
     colourRange: PropTypes.array, // Overrides proportionTableColourColumn (any specified property config)
+    colourProperty: PropTypes.string,
     showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
     replaceParent: PropTypes.function,
     children: PropTypes.node,
@@ -148,6 +149,8 @@ let ProportionBarChartRow = createReactClass({
       loadingBarContent,
       numberOfBins,
       colourRange,
+      colourProperty,
+
       showMaxValueAsMaxColour,
     } = this.props;
 
@@ -269,6 +272,10 @@ let ProportionBarChartRow = createReactClass({
         if (proportionTableColourColumnRemainderValue !== undefined) {
           rightBarColour = remainderBarColour !== undefined ? remainderBarColour : colourFunction(proportionTableColourColumnRemainderValue);
         }
+      } else if (colourProperty !== undefined) {
+        const [cTable, cProp] = colourProperty.split('.');
+        const colourFunction = propertyColour(this.config.tablesById[cTable].propertiesById[cProp]);
+        leftBarColour = colourFunction(convertProportionsToPercentages ? 100 * (numerator/denominator) : numerator/denominator);
       }
 
       const lightColour = '#F0F0F0';

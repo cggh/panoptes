@@ -172,7 +172,6 @@ class ColourPropertyLegend extends React.Component {
         const binBackgroundColourIsDark = isColourDark(binBackgroundColourObj.rgb());
         const binTextColourAmended = binTextColour !== undefined ? binTextColour : (binBackgroundColourIsDark === null ? mediumColour : (binBackgroundColourIsDark ? lightColour : darkColour));
         const valueInsideColour = layout === 'values-inside-colours' ? <span>{Math.round(binMin)}&ndash;{Math.round(binMax)}{valueSuffix}</span> : null;
-        console.log(binBackgroundColour);
         const style={
           border: 0,
             position: 'relative',

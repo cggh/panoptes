@@ -57,6 +57,7 @@ let ProportionBarChart = createReactClass({
     sampleSizeWarningMinimum: PropTypes.number,
     numberOfBins: PropTypes.number,
     colourRange: PropTypes.array, // Overrides default Colours scaleColours but not propConfig.valueColours
+    colourProperty: PropTypes.string, // Overrides default Colours scaleColours but not propConfig.valueColours
     showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
     config: PropTypes.object, // This will be provided via withAPIData
     rowTableData: PropTypes.array, // This will be provided via withAPIData
@@ -104,6 +105,7 @@ let ProportionBarChart = createReactClass({
       sampleSizeWarningMinimum,
       numberOfBins,
       colourRange,
+      colourProperty,
       showMaxValueAsMaxColour,
       ...other
     } = this.props;
@@ -205,6 +207,7 @@ let ProportionBarChart = createReactClass({
                 sampleSizeWarningMinimum={sampleSizeWarningMinimum}
                 numberOfBins={numberOfBins}
                 colourRange={colourRange}
+                colourProperty={colourProperty}
                 showMaxValueAsMaxColour={showMaxValueAsMaxColour}
                 {...other}
               />
