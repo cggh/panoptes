@@ -19,6 +19,7 @@ import Loading from 'ui/Loading';
 
 import DatasetImportStatusListView from 'DatasetImportStatus/ListView';
 import API from 'panoptes/API';
+import ComponentDocs from 'ComponentDocs';
 
 let DatasetManagerActions = createReactClass({
   displayName: 'DatasetManagerActions',
@@ -72,6 +73,13 @@ let DatasetManagerActions = createReactClass({
           iconName="refresh"
           message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
           onConfirm={() => this.handleReimport()}
+          style={buttonStyle}
+        />
+        <Button
+          color="primary"
+          onClick={() => this.getFlux().actions.session.tabOpen(<ComponentDocs/>, true)}
+          iconName="file-code-o"
+          label="Component Docs"
           style={buttonStyle}
         />
         <Button
