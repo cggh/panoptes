@@ -219,7 +219,6 @@ let Map = createReactClass({
       let maxZoom = this.map.leafletElement.getMaxZoom();
       let newCenter = {lat: leafletCenter.lat, lng: leafletCenter.lng};
       let newZoom = this.map.leafletElement.getZoom();
-
       if (newZoom > maxZoom) {
         console.warn(`Zooming beyond maxZoom:${newZoom}>${maxZoom}`);
       }
@@ -282,7 +281,9 @@ let Map = createReactClass({
       zoomControl: !(this.mobile || disableInteraction),
       zoomSnap: 0.5,
       zoomDelta: 0.5,
-      wheelPxPerZoomLevel: 120
+      wheelPxPerZoomLevel: 120,
+      maxBounds: new L.LatLngBounds(new L.LatLng(80, 230), new L.LatLng(-62, -204)),
+      maxBoundsViscosity: 0.75
     };
 
     let mapComponent = null;
