@@ -81,6 +81,6 @@ export default class DivIcon extends MapLayer {
 
   render() {
     let {popup} = this.props;
-    return popup ? <Popup minWidth={300}>{popup}</Popup> : null;
+    return popup ? <Popup minWidth={200}>{popup}</Popup> : null;
   }
 }
