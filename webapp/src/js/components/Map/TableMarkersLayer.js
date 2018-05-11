@@ -43,10 +43,6 @@ import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
 const HISTOGRAM_WIDTH_PIXELS = 100;
 
-const ALLOWED_CHILDREN = [
-  'svg'
-];
-
 let TableMarkersLayer = createReactClass({
   displayName: 'TableMarkersLayer',
 
@@ -91,6 +87,7 @@ let TableMarkersLayer = createReactClass({
     onClickClusterComponentTemplateDocPath: PropTypes.string,
     knownLegendValues: PropTypes.array,
     legendPropertyName: PropTypes.string,
+    childDataColumns: PropTypes.array
   },
 
   childContextTypes: {
@@ -183,7 +180,7 @@ let TableMarkersLayer = createReactClass({
     let {
       highlight, primKey, table, query, markerColourProperty,
       clickPrimaryKeyProperty, onClickSingleComponentTemplateDocPath,
-      onClickClusterComponentTemplateDocPath
+      onClickClusterComponentTemplateDocPath, childDataColumns
     } = props;
     let {changeLayerStatus} = this.context;
 
@@ -219,6 +216,10 @@ let TableMarkersLayer = createReactClass({
     locationColumns.add(locationPrimKeyProperty);
     locationColumns.add(locationLongitudeProperty);
     locationColumns.add(locationLatitudeProperty);
+    if (childDataColumns) {
+      childDataColumns.forEach((column) => locationColumns.add(column));
+    }
+
     if (clickPrimaryKeyProperty) {
       locationColumns.add(clickPrimaryKeyProperty);
     }
@@ -376,6 +377,13 @@ let TableMarkersLayer = createReactClass({
             originalLng: lng,
             clickPrimKey: data[i][clickPrimaryKeyProperty]
           };
+          marker.childData = {};
+          if (childDataColumns) {
+            childDataColumns.forEach((column) => {
+              marker.childData[column.as || column] = data[i][column.as || column];
+            });
+          }
+
 
           markers.push({lat, lng}); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
 
@@ -413,11 +421,12 @@ let TableMarkersLayer = createReactClass({
       onClickClusterComponent,
       onClickClusterComponentProps,
       knownLegendValues,
-      legendPropertyName
+      legendPropertyName,
+      childDataColumns
     } = this.props;
 
     let {markersGroupedByLocation, minValue, maxValue, onClickClusterComponentTemplate, onClickSingleComponentTemplate} = this.state;
-    children = filterChildren(this, children, ALLOWED_CHILDREN);
+    children = filterChildren(this, children);
 
     if (_isEmpty(markersGroupedByLocation)) {
       return null;
@@ -498,6 +507,7 @@ let TableMarkersLayer = createReactClass({
           lngProperty: markersGroupedByLocation[location][0].lngProperty,
           originalLat: markersGroupedByLocation[location][0].originalLat,
           originalLng: markersGroupedByLocation[location][0].originalLng,
+          childData: markersGroupedByLocation[location][0].childData,
           markersAtLocationCount
         });
 
@@ -547,11 +557,10 @@ let TableMarkersLayer = createReactClass({
           originalLat: markersGroupedByLocation[location][0].originalLat,
           originalLng: markersGroupedByLocation[location][0].originalLng,
           markersAtLocationCount,
-          clickPrimKeyBreakdown: _countBy(markersGroupedByLocation[location], 'clickPrimKey')
+          clickPrimKeyBreakdown: _countBy(markersGroupedByLocation[location], 'clickPrimKey'),
+          childData: markersGroupedByLocation[location][0].childData
         });
-
       }
-
     }
     if (markers.length > 0) {
 
@@ -758,6 +767,7 @@ let TableMarkersLayer = createReactClass({
                       latProperty: marker.latProperty,
                       lngProperty: marker.lngProperty,
                       flux: this.getFlux(),
+                      ...marker.childData
                     };
 
                     const onClickSingleComponentMergedProps = {...onClickSingleComponentDefaultProps, ...onClickSingleComponentPropsJSON};
@@ -780,7 +790,6 @@ let TableMarkersLayer = createReactClass({
                       // TODO: clickTable and clickPrimaryKeyProperty should probably be deprecated in favour of templated tooltips.
                       console.error('onClickSingleBehaviour tooltip currently only supports onClickSingleComponent ItemTemplate or undefined with clickPrimaryKeyProperty. (onClickSingleComponent, clickPrimaryKeyProperty): ', onClickSingleComponent, clickPrimaryKeyProperty);
                     }
-
                     return (
                       <ComponentMarker
                         key={`ComponentMarker_${i}`}
@@ -792,7 +801,7 @@ let TableMarkersLayer = createReactClass({
                         zIndexOffset={0}
                         popup={onClickSingleBehaviour === 'tooltip' ? onClickSingleTooltipReactElement : null}
                       >
-                        {children}
+                        {children ? React.cloneElement(children, marker.childData) : null}
                       </ComponentMarker>
                     );
                   })

@@ -8,9 +8,18 @@ import _map from 'lodash.map';
 import _forEach from 'lodash.foreach';
 import handlebarsHelpers from 'handlebars-helpers';
 import resolveJoins from 'panoptes/resolveJoins';
+import {propertyColour,isColourDark} from 'util/Colours';
 
 const customHandlebars = ({dataset, tablesById, handlebars, constants}) => {
   let hb = handlebars || promisedHandlebars(Handlebars);
+  hb.registerHelper('colour', function() {
+    const [table, property, value] = arguments;
+    return propertyColour(tablesById[table].propertiesById[property])(value);
+  });
+  hb.registerHelper('visibleColour', function() {
+    const [table, property, value] = arguments;
+    return isColourDark(propertyColour(tablesById[table].propertiesById[property])(value)) ? '#F0F0F0' : '#101010';
+  });
   hb.registerHelper('constant', function() {
     return constants[arguments[0]];
   });
