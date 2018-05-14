@@ -38,6 +38,7 @@ let ProportionBarChartRow = createReactClass({
     denominatorQuery: PropTypes.string,
     convertProportionsToPercentages: PropTypes.bool,
     roundProportionsToIntegers: PropTypes.bool,
+    rawNumerator: PropTypes.bool,
     rowHeight: PropTypes.string,
     barHeight: PropTypes.string,
     gridLineColour: PropTypes.string,
@@ -78,11 +79,12 @@ let ProportionBarChartRow = createReactClass({
       onClickBehaviour: 'ItemLink',
       proportionTableJoins: [],
       proportionTableGroupByColumns: [],
-      sampleSizeWarningMinimum: 200,
+      sampleSizeWarningMinimum: 0,
       rowLabelStyle: {margin: 0, padding: 0},
       zeroDenominatorContent: <span style={{paddingLeft: '3px'}}>No data</span>,
       loadingBarContent: <span style={{paddingLeft: '3px'}}>Loading...</span>,
       showMaxValueAsMaxColour: false,
+      rawNumerator: false
     };
   },
 
@@ -132,6 +134,7 @@ let ProportionBarChartRow = createReactClass({
       proportionTableColourColumnRemainderValue,
       convertProportionsToPercentages,
       roundProportionsToIntegers,
+      rawNumerator,
       rowHeight,
       barHeight,
       gridLineColour,
@@ -306,8 +309,11 @@ let ProportionBarChartRow = createReactClass({
         throw Error('denominator !== 0 && isNaN(numerator / denominator)');
       }
       const numeratorAsPercentage = Number(formattingFunction((numerator / denominator) * 100));
-      const proportionAsString = convertProportionsToPercentages ? numeratorAsPercentage + '%' : formattingFunction(numerator) + '/' + formattingFunction(denominator);
-      const sampleSizeAsString = denominator !== undefined ? denominator : '';
+      let proportionAsString = convertProportionsToPercentages ? numeratorAsPercentage + '%' : formattingFunction(numerator) + '/' + formattingFunction(denominator);
+      if (rawNumerator) {
+        proportionAsString = numerator.toString();
+      }
+      const sampleSizeAsString = denominator !== undefined ? `/ ${denominator}` : '';
       const leftBarTextPercentageMinimum = 25;
       const leftBarText = numeratorAsPercentage < leftBarTextPercentageMinimum ? String.fromCharCode(8203) : proportionAsString;
       const rightBarText = numeratorAsPercentage < leftBarTextPercentageMinimum ? proportionAsString : String.fromCharCode(8203);
