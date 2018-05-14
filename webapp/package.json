@@ -94,6 +94,7 @@
     "lodash.intersection": "^4.4.0",
     "lodash.isfinite": "^3.3.2",
     "lodash.isfunction": "^3.0.8",
+    "lodash.isnan": "^3.0.2",
     "lodash.isnumber": "^3.0.3",
     "lodash.isobject": "^3.0.2",
     "lodash.isstring": "^4.0.1",
