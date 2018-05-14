@@ -313,7 +313,7 @@ let ProportionBarChartRow = createReactClass({
       if (rawNumerator) {
         proportionAsString = numerator.toString();
       }
-      const sampleSizeAsString = denominator !== undefined ? `/ ${denominator}` : '';
+      const sampleSizeAsString = denominator !== undefined ? `of ${denominator}` : '';
       const leftBarTextPercentageMinimum = 25;
       const leftBarText = numeratorAsPercentage < leftBarTextPercentageMinimum ? String.fromCharCode(8203) : proportionAsString;
       const rightBarText = numeratorAsPercentage < leftBarTextPercentageMinimum ? proportionAsString : String.fromCharCode(8203);
