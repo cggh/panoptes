@@ -391,7 +391,7 @@ let ProportionBarChartRow = createReactClass({
                 }}
               >
                 <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
-                <div style={{display: 'table-cell', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
+                <div style={{display: 'table-cell', width: (100-numeratorAsPercentage) + '%', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
               </div>
               :
               <div
