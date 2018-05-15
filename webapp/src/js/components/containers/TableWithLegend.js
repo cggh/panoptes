@@ -85,30 +85,38 @@ let TableWithLegend = createReactClass({
     }
 
     return (
-      <div className="horiz-centering-container vertical stack obs-page-content">
-        <Card className={classes.card} style={{marginBottom: '15px'}}>
-          <CardContent>
-            {filteredChildren}
-          </CardContent>
-          <div className="grow" style={{padding:"15px"}}>
-            <MuiDataTableView
-              table={table}
-              query={query}
-              order={order}
-              columns={columns}
-              onOrderChange={this.handleOrderChange}
-              maxRowsPerPage={maxRowsPerPage}
-              nullReplacement="-"
-              nanReplacement="-"
-              onClickBehaviour={onClickBehaviour}
-              onClickComponent={onClickComponent}
-              onClickComponentProps={onClickComponentProps}
-              onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
-            />
-          </div>
+      <div style={{position: 'relative',minHeight: '100%'}}>
+        <div className="horiz-centering-container vertical stack"
+             style={{height: '100%', position: 'relative', zIndex: 100}}>
+          <div style={{maxWidth: '650px', width: '100%'}}>
+            <Card className={classes.card} style={{marginBottom: '15px'}}>
+              <CardContent>
+                {filteredChildren}
+              </CardContent>
+              <div className="grow" style={{padding:"15px"}}>
+                <div className="scroll-within">
+                  <MuiDataTableView
+                    table={table}
+                    query={query}
+                    order={order}
+                    columns={columns}
+                    onOrderChange={this.handleOrderChange}
+                    maxRowsPerPage={maxRowsPerPage}
+                    nullReplacement="-"
+                    nanReplacement="-"
+                    onClickBehaviour={onClickBehaviour}
+                    onClickComponent={onClickComponent}
+                    onClickComponentProps={onClickComponentProps}
+                    onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
+                  />
+                </div>
+              </div>
 
-        </Card>
+            </Card>
+          </div>
+        </div>
       </div>
+
     );
   },
 });
