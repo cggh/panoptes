@@ -54,7 +54,11 @@ let Feed = createReactClass({
     }
 
     items.forEach((item) => {
-      const {pubDate, title, description, guid} = item;
+      let {pubDate, title, description, guid} = item;
+      //Remove text after"..."
+      description = description.split('&#8230;');
+      description.pop();
+      description = description.join()+'...';
       const guidText = guid['#text'];
       const content = item['content:encoded'];
       const creator = item['dc:creator'];
