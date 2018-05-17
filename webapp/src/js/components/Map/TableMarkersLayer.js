@@ -801,7 +801,7 @@ let TableMarkersLayer = createReactClass({
                         zIndexOffset={0}
                         popup={onClickSingleBehaviour === 'tooltip' ? onClickSingleTooltipReactElement : null}
                       >
-                        {children ? React.cloneElement(children, marker.childData) : null}
+                        {children ? React.cloneElement(children, {flux: this.flux, ...marker.childData}) : null}
                       </ComponentMarker>
                     );
                   })
