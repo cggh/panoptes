@@ -54,11 +54,11 @@ let TileLayer = createReactClass({
 
   getDefaultProps() {
     return {
-      attribution: '&copy <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution: "&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> &copy; <a href=\"http://cartodb.com/attributions\">CartoDB</a>",
       ext: 'png',
       maxZoom: 17,
       minZoom: 0,
-      url: `${location.protocol}//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`
+      url: `${location.protocol}//{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png`
     };
   },
 
