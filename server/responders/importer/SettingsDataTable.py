@@ -334,6 +334,13 @@ containing the relative size of that specific pie'''
                                                         })
                                                 ))
                                 }),
+                         ('cacheTableInConfig', {
+                             'type': 'Boolean',
+                             'required': False,
+                             'default': False,
+                             'description': "If true the table data will be placed into dataset config in it's entirety, to be used in custom components and templates"
+                         }),
+
                          ('listView', {
                                    'type': 'Boolean',
                                    'required': False,

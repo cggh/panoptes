@@ -1,4 +1,7 @@
+import csv
 import os
+import sys
+
 import uuid
 from os import path, listdir
 from os.path import join
@@ -52,6 +55,7 @@ def readJSONConfig(datasetId):
             print('refsequence.fa not found - skipping')
 
     tables = readSetOfSettings(join(dataset_folder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
+    cachedTables = []
     try:
         for tableId, table_config in tables.items():
             config_file = join(base_folder, tableId, 'dataConfig.json')
@@ -90,6 +94,13 @@ def readJSONConfig(datasetId):
     except IOError:
         introPage = None
 
+    cachedTables = {}
+    csv.field_size_limit(sys.maxsize)
+    for tableId, table_config in tables.items():
+        if table_config['cacheTableInConfig']:
+            with open(join(dataset_folder, 'datatables', tableId, 'data')) as csvfile:
+                cachedTables[tableId] = list(csv.DictReader(csvfile, delimiter='\t'))
+
     return {
         'cas': {'service': pnConfig.getCasService(), 'logout': pnConfig.getCasLogout()},
         'settings': settings,
@@ -98,7 +109,8 @@ def readJSONConfig(datasetId):
         'twoDTablesById': twoDTables,
         'genome': genome,
         'mapLayers': mapLayers,
-        'docs': {'index.html': introPage}
+        'docs': {'index.html': introPage},
+        'cachedTables': cachedTables
     }
 
 class ReadOnlyErrorWriter:
