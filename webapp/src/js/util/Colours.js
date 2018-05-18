@@ -243,9 +243,9 @@ export function propertyColour(propConfig) {
   if (thresholds.length === 2) {
     if (interpolate) {
       let scale = scaleColour(thresholds, colours);
-      return (value) => value === null || _isNan(value) ? nullColour : scale(value);
+      return (value) => value === undefined || value === null || _isNan(value) ? nullColour : scale(value);
     } else {
-      return (value) => value === null || _isNan(value) ? nullColour : colours[0];
+      return (value) => value === undefined || value === null || _isNan(value) ? nullColour : colours[0];
     }
   } else {
     if (interpolate) {
@@ -255,13 +255,13 @@ export function propertyColour(propConfig) {
       }
       return (value) => {
         let index = Math.max(0,Math.min(scales.length - 1, _sortedIndex(thresholds, value) - 1));
-        return value === null || _isNan(value) ? nullColour : scales[index](value);
+        return value === undefined || value === null || _isNan(value) ? nullColour : scales[index](value);
       }
     } else {
       return (value) => {
         let index = Math.max(0,Math.min(colours.length - 1, _sortedLastIndex(thresholds, value) - 1));
         if (value === thresholds[index] && index > 0) index -= 1;
-        return value === null || _isNan(value) ? nullColour : colours[index];
+        return value === undefined || value === null || _isNan(value) ? nullColour : colours[index];
       }
     }
   }
