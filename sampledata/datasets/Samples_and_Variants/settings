@@ -19,23 +19,14 @@ dataTables:
 
 googleAnalyticsId: UA-56388755-1
 
-colours:
-  - id: coffee
-    value: '#C0FFEE'
-  - id: tea
-    value: '#7EA'
-  - id: bob
-    value: '#B0B'
-  - id: office
-    value: '#0FF1CE'
-  - id: access
-    value: '#ACCE55'
-
 constants:
-  - id: foo
-    value: bar
-  - id: bar
-    value: baz
+  foo: bar
+  bar: baz
+  coffee: '#C0FFEE'
+  tea: '#7EA'
+  bob: '#B0B'
+  office: '#0FF1CE'
+  access: '#ACCE55'
 
 feeds:
   - id: WordPress
