@@ -55,10 +55,18 @@ let Feed = createReactClass({
 
     items.forEach((item) => {
       let {pubDate, title, description, guid} = item;
-      //Remove text after"..."
-      description = typeof description === 'string' ? description.split('&#8230;') : [];
-      description.pop();
-      description = description.join() + '...';
+
+      // Remove text after any of these text barriers. Order matters.
+      const textBarriers = ['[&#8230;]', '&#8230;'];
+      if (typeof description === 'string') {
+        for (const textBarrier of textBarriers) {
+          const indexOfTextBarrier = description.indexOf(textBarrier);
+          if (indexOfTextBarrier !== -1) {
+            description = description.substring(0, indexOfTextBarrier);
+          }
+        }
+      }
+      description += '&#8230;'; // NOTE: .concat() is slower
       const guidText = guid['#text'];
       const content = item['content:encoded'];
       const creator = item['dc:creator'];
