@@ -98,7 +98,7 @@ let MapActions = createReactClass({
 
   handleChangeTable(table) {
 
-    if (table === "") {
+    if (table === '') {
       this.props.setProps({table: undefined});
     } else {
       this.props.setProps({table, markerColourProperty: undefined});
@@ -109,7 +109,7 @@ let MapActions = createReactClass({
   handleChangeBaseTileLayer(selectedTileLayer) {
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
 
-    if (selectedTileLayer === "") {
+    if (selectedTileLayer === '') {
       this.props.setProps({baseTileLayer: undefined, baseTileLayerProps: undefined, zoom: undefined});
     } else {
 
@@ -136,7 +136,7 @@ let MapActions = createReactClass({
 
   handleChangeOverlayLayer(selectedTileLayer) {
 
-    if (selectedTileLayer === "") {
+    if (selectedTileLayer === '') {
       this.props.setProps({overlayLayer: undefined});
     } else {
       this.props.setProps({overlayLayer: selectedTileLayer});
