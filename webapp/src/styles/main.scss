@@ -37,7 +37,7 @@ a {
 .main {
   position: relative;
   .page {
-    height: 100%;
+    height: 100vh;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -94,4 +94,3 @@ a {
 a:visited {
   color: $light-primary-color;
 }
-
