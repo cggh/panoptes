@@ -304,7 +304,7 @@ let MuiDataTableView = createReactClass({
                               </div>
                             </div>}
                           >
-                            <Icon style={{paddingLeft: '5px'}} className="info" name="info-circle"/>
+                            <Icon style={{paddingRight: '3px'}} className="info" name="info-circle"/>
                           </Tooltip> : null
                         }
                         {columnData.name}
