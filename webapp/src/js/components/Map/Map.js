@@ -283,7 +283,8 @@ let Map = createReactClass({
       zoomDelta: 0.5,
       wheelPxPerZoomLevel: 120,
       maxBounds: new L.LatLngBounds(new L.LatLng(80, 230), new L.LatLng(-62, -204)),
-      maxBoundsViscosity: 0.75
+      maxBoundsViscosity: 0.75,
+      minZoom: 1,
     };
 
     let mapComponent = null;
