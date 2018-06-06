@@ -221,7 +221,7 @@ class DBCursor(object):
                     # print repr(query), repr(params)
                     result = self.cursor.execute(query, params)
                     retry = False
-                except pymonetdb.sql.ProgrammingError as e:
+                except pymonetdb.exceptions.ProgrammingError as e:
                     if '40000' in str(e):
                         retry = True
                     else:
