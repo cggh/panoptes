@@ -436,6 +436,7 @@ let MuiDataTableView = createReactClass({
 MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
 
   let {table, columns, order, startRowIndex, query, maxRowsPerPage, joins, onClickComponentTemplateDocPath} = props;
+
   query = query || (table ? config.tablesById[table].defaultQuery : null) || SQL.nullQuery;
 
   let stopRowIndex = undefined;
