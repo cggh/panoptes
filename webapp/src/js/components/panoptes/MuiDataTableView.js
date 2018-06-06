@@ -436,7 +436,6 @@ let MuiDataTableView = createReactClass({
 MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
 
   let {table, columns, order, startRowIndex, query, maxRowsPerPage, joins, onClickComponentTemplateDocPath} = props;
-
   query = query || (table ? config.tablesById[table].defaultQuery : null) || SQL.nullQuery;
 
   let stopRowIndex = undefined;
@@ -450,13 +449,16 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
   let fetchStartRowIndex = startRowIndex !== undefined ? Math.floor(startRowIndex / 100) * 100 : undefined;
   let fetchStopRowIndex = stopRowIndex !== undefined ? (Math.floor(stopRowIndex / 100) + 1) * 100 : undefined;
 
+  let columnsSet = new Set(columns);
+  columnsSet.add(config.tablesById[table].primKey);
+
   let requests = {
     data: {
       method: 'query',
       args: resolveJoins({
         database: config.dataset,
         table,
-        columns: columns.concat([config.tablesById[table].primKey]),
+        columns: Array.from(columnsSet),
         query,
         transpose: true,
         start: fetchStartRowIndex,
