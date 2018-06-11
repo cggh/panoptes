@@ -30,7 +30,7 @@ export default function deserialiseComponent(component, path = null, mappedFunct
     if (type.propTypes && type.propTypes.childrenHash && serialisedChildren && serialisedChildren.hashCode) {
       otherProps.childrenHash = serialisedChildren.hashCode();
     }
-    return React.createElement(type, {children, ...otherProps});
+    return React.createElement(type, otherProps, children);
   }
   return _deserialiseComponent(component, path);
 }
