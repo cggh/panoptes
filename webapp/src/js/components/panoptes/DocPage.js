@@ -39,7 +39,14 @@ let DocPage = createReactClass({
     replaceSelf: PropTypes.func,
     updateTitleIcon: PropTypes.func,
     replaceable: PropTypes.bool,
-    dynamicSize: PropTypes.bool
+    dynamicSize: PropTypes.bool,
+    setProps: PropTypes.func,
+  },
+
+  getDefaultProps() {
+    return {
+      setProps: null,
+    };
   },
 
   componentWillMount() {
@@ -138,14 +145,14 @@ let DocPage = createReactClass({
   },
 
   render() {
-    const {path, dynamicSize} = this.props;
-    const {content, loadStatus} = this.state;
+    const {path, dynamicSize, ...otherProps} = this.props;
+    const {content} = this.state;
     const replaceSelf = this.props.replaceable ? this.props.replaceSelf : undefined;
     const actions = this.getFlux().actions;
     // NOTE: z-index of the Edit modal is currently set to 9997.
     const editButtonZIndex = 9996;
     return <div className={dynamicSize ? '' : 'load-container'}>
-      <HTMLWithComponents className="doc-page" replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
+      <HTMLWithComponents className="doc-page" replaceSelf={replaceSelf} {...otherProps}>{content}</HTMLWithComponents>
       {this.config.user.isManager ?
         <div className="docpage-edit"  style={{zIndex: editButtonZIndex}}>
           <IconButton
