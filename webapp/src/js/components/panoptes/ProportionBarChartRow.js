@@ -61,7 +61,7 @@ let ProportionBarChartRow = createReactClass({
     colourRange: PropTypes.array, // Overrides proportionTableColourColumn (any specified property config)
     colourProperty: PropTypes.string,
     showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
-    replaceParent: PropTypes.function,
+    replaceParent: PropTypes.func,
     children: PropTypes.node,
     config: PropTypes.object, // This will be provided via withAPIData
     numeratorData: PropTypes.object, // This will be provided via withAPIData
