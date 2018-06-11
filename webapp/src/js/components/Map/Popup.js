@@ -19,7 +19,7 @@ let MapPopup = createReactClass({
 
   contextTypes: {
     layerContainer: PropTypes.object,
-    map: PropTypes.object
+    map: PropTypes.object,
   },
 
   propTypes: {

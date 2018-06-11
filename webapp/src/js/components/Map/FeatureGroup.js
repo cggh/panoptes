@@ -24,6 +24,7 @@ const ALLOWED_CHILDREN = [
   'Polyline',
   'GeoLayouter',
   'GeoJSON',
+  'TableData',
   'TableGeoJSONsLayer',
   'HideLayerAtZoom'
 ];
@@ -66,9 +67,7 @@ let FeatureGroup = createReactClass({
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
-      <LeafletFeatureGroup
-        children={children}
-      />
+      <LeafletFeatureGroup>{children}</LeafletFeatureGroup>
     );
   },
 });

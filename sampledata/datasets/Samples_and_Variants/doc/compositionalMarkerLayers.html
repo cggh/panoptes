@@ -1,0 +1,146 @@
+<title>Compositional Marker Layers</title>
+<p>This page shows some examples of using the compositional TableData and MarkerLayers components.</p>
+<p>Clustered markers</p>
+<div style="height: 400px;">
+  <Map>
+    <TableData
+            table="samplingsites"
+            area='["*", [80, "NumSamples"]]'
+            lat="Latitude"
+            lng="Longitude"
+            colour="Contributor_ID"
+            primKey="SiteID"
+    >
+      <AttributeToColour table="samplingsites" property="Contributor_ID">
+        <MarkerLayer cluster="true">
+          <MarkerLayerMarker>
+            <DocTemplate table="samplingsites" hideEditButton path="mapClusterMarker.html"/>
+          </MarkerLayerMarker>
+          <MarkerLayerPopup>
+            <DocTemplate hideEditButton path="mapClusterPopup.html"/>
+          </MarkerLayerPopup>
+        </MarkerLayer>
+      </AttributeToColour>
+    </TableData>
+    <TileLayer/>
+  </Map>
+</div>
+
+<p>Open item on click</p>
+<div style="height: 400px;">
+  <Map>
+    <TableData
+      table="samplingsites"
+      radius='["*", [5, "NumSamples"]]'
+      lat="Latitude"
+      lng="Longitude"
+      colour="Contributor_ID"
+      primKey="SiteID"
+    >
+      <AttributeToColour table="samplingsites" property="Contributor_ID">
+        <MarkerLayer>
+          <MarkerLayerMarker>
+            <DocTemplate link="true" table="samplingsites" hideEditButton path="mapMarker.html"/>
+          </MarkerLayerMarker>
+        </MarkerLayer>
+      </AttributeToColour>
+    </TableData>
+    <TileLayer/>
+  </Map>
+</div>
+<p>Open popup on click</p>
+<div style="height: 400px;">
+  <Map>
+    <TableData
+            table="samplingsites"
+            radius='["*", [5, "NumSamples"]]'
+            lat="Latitude"
+            lng="Longitude"
+            colour="Contributor_ID"
+            primKey="SiteID"
+    >
+      <AttributeToColour table="samplingsites" property="Contributor_ID">
+        <MarkerLayer>
+          <MarkerLayerMarker>
+            <DocTemplate table="samplingsites" hideEditButton path="mapMarker.html"/>
+          </MarkerLayerMarker>
+          <MarkerLayerPopup>
+            <DocTemplate hideEditButton path="mapPopup.html"/>
+          </MarkerLayerPopup>
+        </MarkerLayer>
+      </AttributeToColour>
+    </TableData>
+    <TileLayer/>
+  </Map>
+</div>
+<!--<p>Using the Map > TableData > MarkersLayer > PieChart composition:</p>-->
+<!--<div style="height: 400px;">-->
+  <!--<Map>-->
+    <!--&lt;!&ndash; TableData provides all of its direct children with a prop (`data` by default, otherwise dataAsChildProp). &ndash;&gt;-->
+    <!--&lt;!&ndash; layerContainer & map are forwarded by context. &ndash;&gt;-->
+    <!--<TableData-->
+      <!--table="samplingsites"-->
+      <!--columns='["SiteID", "Longitude", "Latitude", "samples.Value1", "samples.SampleTypeID"]'-->
+      <!--includeCountAs="SamplesCount"-->
+      <!--groupBy='["samplingsites.SiteID", "samplingsites.Longitude", "samplingsites.Latitude", "samples.Value1", "samples.SampleTypeID"]'-->
+      <!--joins='[{"type": "LEFT", "foreignTable": "samples", "foreignColumn": "samples.Site_ID", "column": "samplingsites.SiteID"}]'-->
+      <!--generateColourColumnsFromValueColumns='{"samples.SampleTypeID": ["SampleTypeIDAsColour"]}'-->
+      <!--dataAsChildProp="markersData"-->
+    <!--&gt;-->
+      <!--&lt;!&ndash; MarkersLayer takes a `data` prop (array) and produces a series of FeatureGroup-wrapped ComponentMarker markers. -&ndash;&gt;-->
+      <!--&lt;!&ndash; MarkersLayer forwards specified named values from `data` to each child of each ComponentMarker.  &ndash;&gt;-->
+      <!--&lt;!&ndash; The child component of MarkersLayer specifies the child component of each ComponentMarker. -&ndash;&gt;-->
+      <!--&lt;!&ndash; Array elements in `data` that share the same location (latitude and longitude) can be grouped together and passed to the child component via a named prop. -&ndash;&gt;-->
+      <!--&lt;!&ndash; As an alternative approach to grouping, you can use another <TableData> component and a <TableDataIterator> as a wrapper, e.g. around a <PieChartSector>, to perfom a sub-query. &ndash;&gt;-->
+      <!--<MarkersLayer-->
+        <!--longitudeDataKey="Longitude"-->
+        <!--latitudeDataKey="Latitude"-->
+        <!--onClickBehaviour="tooltip"-->
+        <!--onClickComponentTemplateDocPath="templates/onClickPieChartTooltip.html"-->
+        <!--dataKeyToChildPropMappings='{"SamplesCount": ["radius", "faceText"], "Latitude": "lat", "Longitude": "lng"}'-->
+        <!--verbatimDataKeysAsChildProps="false"-->
+        <!--groupByLocationAsChildProp="chartData"-->
+        <!--dataKeyToGroupItemPropertyMappings='{"SiteID": "name", "samples.Value1": "value", "SampleTypeIDAsColour": "color"}'-->
+      <!--&gt;-->
+        <!--<PieChart/>-->
+        <!--&lt;!&ndash;-->
+          <!--These are the props that need to be reproducible.-->
+          <!--<PieChart-->
+            <!--chartData (via groupByLocationAsChildProp)-->
+            <!--crs (via context, not being used)-->
+            <!--hideValues (can be set directly or via dataKeyToChildPropMappings)-->
+            <!--lat (via dataKeyToChildPropMappings)-->
+            <!--lng (via dataKeyToChildPropMappings)-->
+            <!--radius (can be set directly or via dataKeyToChildPropMappings)-->
+            <!--faceText  (can be set directly or via dataKeyToChildPropMappings)-->
+            <!--isHighlighted (can be set directly or via dataKeyToChildPropMappings)-->
+          <!--/>-->
+        <!--&ndash;&gt;-->
+      <!--</MarkersLayer>-->
+    <!--</TableData>-->
+    <!--<TileLayer/>-->
+  <!--</Map>-->
+<!--</div>-->
+
+
+<!--<p>Using the Map > FeatureGroup > TableData (iterate) > ComponentMarker composition:</p>-->
+<!--<div style="height: 400px;">-->
+  <!--<Map>-->
+    <!--<FeatureGroup>-->
+      <!--<TableData-->
+        <!--table="samplingsites"-->
+        <!--columns='["SiteID", "Longitude", "Latitude", "samples.Value1", "samples.SampleTypeID"]'-->
+        <!--includeCountAs="SamplesCount"-->
+        <!--groupBy='["samplingsites.SiteID", "samplingsites.Longitude", "samplingsites.Latitude", "samples.Value1", "samples.SampleTypeID"]'-->
+        <!--joins='[{"type": "LEFT", "foreignTable": "samples", "foreignColumn": "samples.Site_ID", "column": "samplingsites.SiteID"}]'-->
+        <!--iterate="true"-->
+        <!--iterationColumnToChildPropMappings='{"Longitude": "lng", "Latitude": "lat"}'-->
+      <!--&gt;-->
+        <!--<ComponentMarker/>-->
+      <!--</TableData>-->
+    <!--</FeatureGroup>-->
+    <!--<TileLayer/>-->
+  <!--</Map>-->
+<!--</div>-->
+
+

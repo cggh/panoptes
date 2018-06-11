@@ -84,6 +84,10 @@ properties:
     tableId: sampletypes
     forwardName: is
     reverseName: contains
+  valueColours:
+     St1: rgb(255,128,60)
+     St2: rgb(0,180,0)
+     _other_: rgb(128, 128, 128)
 
 - id: Comment
   name: Comment

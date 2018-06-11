@@ -13,24 +13,29 @@ let ComponentMarker = createReactClass({
     FluxMixin
   ],
 
+  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
+  // in which case, we copy those props into context. Props override context.
+
   contextTypes: {
     layerContainer: PropTypes.object,
     map: PropTypes.object
   },
 
   propTypes: {
-    children: PropTypes.node,
-    onClick: PropTypes.func,
-    position: PropTypes.object,
-    title: PropTypes.string,
-    alt: PropTypes.string,
     layerContainer: PropTypes.object,
     map: PropTypes.object,
+    children: PropTypes.node,
+    onClick: PropTypes.func,
+    position: PropTypes.object, // Alternatively provide lat & lng
+    title: PropTypes.string,
+    alt: PropTypes.string,
     opacity: PropTypes.number,
     zIndexOffset: PropTypes.number,
     fillColour: PropTypes.string,
     iconColour: PropTypes.string,
-    popup: PropTypes.node
+    popup: PropTypes.node,
+    lat: PropTypes.number,
+    lng: PropTypes.number,
   },
 
   childContextTypes: {
@@ -41,7 +46,7 @@ let ComponentMarker = createReactClass({
   getChildContext() {
     return {
       layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
-      map: this.props.map !== undefined ? this.props.map : this.context.map
+      map: this.props.map !== undefined ? this.props.map : this.context.map,
     };
   },
 
@@ -53,18 +58,26 @@ let ComponentMarker = createReactClass({
   },
 
   render() {
-    let {alt, children, fillColour, iconColour, onClick, opacity, position, title, zIndexOffset, popup} = this.props;
+    const {
+      fillColour, iconColour, onClick, opacity, title,
+      zIndexOffset, popup, lat, lng, ...otherProps
+    } = this.props;
+    let {position, alt, children} = this.props;
+
+    if (position === undefined && (lat !== undefined && lng !== undefined)) {
+      // If no position has been specified, then use lat & lng (if available)
+      position = {lat, lng};
+    }
 
     if (alt === undefined && title !== undefined) {
-      // If not alt has been specified, then use the title.
+      // If no alt has been specified, then use title.
       alt = title;
     }
 
-
-    /* Credit: https://materialdesignicons.com */
-
+    let child = undefined;
     if (!children || children.length === 0) {
-      children = (
+      /* Credit: https://materialdesignicons.com */
+      child = (
         <svg style={{overflow: 'visible', width: '25px', height: '25px'}} viewBox="0 0 27 27">
           <g transform="translate(-12, -24)">
             <g transform="scale(0.4) translate(18, 10)">
@@ -82,9 +95,11 @@ let ComponentMarker = createReactClass({
           </g>
         </svg>
       );
+    } else {
+      child = React.cloneElement(React.Children.only(children), otherProps);
     }
 
-    // NB: any className to override the default white squares set by Leaflet CSS.
+    // NOTE: Using any className (null) to override the default, set by Leaflet CSS, which otherwise causes white squares.
     return (
       <DivIcon
         alt={alt}
@@ -96,9 +111,8 @@ let ComponentMarker = createReactClass({
         zIndexOffset={zIndexOffset}
         popup={popup}
         onClick={onClick}
-
       >
-        {React.Children.only(children)}
+        {child}
       </DivIcon>
     );
 

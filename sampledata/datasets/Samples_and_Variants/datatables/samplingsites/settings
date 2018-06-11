@@ -59,6 +59,8 @@ properties:
      C0002: rgb(0,180,0)
      _other_: rgb(128, 128, 128)
 
+- id: NumSamples
+  dataType: Int8
 
 
 externalLinks:
@@ -68,12 +70,6 @@ externalLinks:
 
 
 dataItemViews:
--              # Lists all the custom views that should appear in the popup for an individual data table item
-
-  type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
-  name: Location                                       # Name of the view
-  mapZoom: 7                                           # Start zoom factor of the map
-
 - type: Overview                                       # Specifies the default view of all fields
   name: Overview
 
@@ -82,4 +78,3 @@ dataItemViews:
   fields:
   - SiteID                                             # List of the fields to be included
   - Country
-  - Name@contributors

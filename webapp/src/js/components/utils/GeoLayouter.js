@@ -28,7 +28,7 @@ let forceCrossLink = function(links) {
         s = (-s1_y * (sourceA.x - sourceB.x) + s1_x * (sourceA.y - sourceB.y)) / (-s2_x * s1_y + s1_x * s2_y);
         t = ( s2_x * (sourceA.y - sourceB.y) - s2_y * (sourceA.x - sourceB.x)) / (-s2_x * s1_y + s1_x * s2_y);
 
-        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1 && !(sourceA.x === sourceB.x && sourceA.y === sourceB.y)) {
           // Collision detected - swap the positions of the targets
           [targetA.x, targetB.x] = [targetB.x, targetA.x];
           [targetA.y, targetB.y] = [targetB.y, targetA.y];
@@ -44,7 +44,7 @@ let forceCrossLink = function(links) {
 };
 
 class GeoLayouter extends React.Component {
-  static displayName = 'GeoLayouter'
+  static displayName = 'GeoLayouter';
 
   static contextTypes = {
     map: PropTypes.object,
