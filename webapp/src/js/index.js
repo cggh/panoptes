@@ -199,15 +199,18 @@ if (dataset === undefined || dataset === null || dataset === '') {
           lastState = newState;
 
           // Set hasState to true if there are any statefull components.
-          const statelessComponents = ['DocPage', 'EmptyTab'];
+          const statelessComponents = ['EmptyTab'];
           const tableComponents = ['ListWithActions', 'DataTableWithActions'];
+          const pathComponents = ['DocPage'];
+
           let hasState = false;
           newState.get('session').get('components').keySeq().forEach((key) => {
             if (
               statelessComponents.indexOf(newState.get('session').get('components').get(key).get('type')) == -1
               && tableComponents.indexOf(newState.get('session').get('components').get(key).get('type')) == -1
+              && pathComponents.indexOf(newState.get('session').get('components').get(key).get('type')) == -1
             ) {
-              // There is a component that isn't stateless nor a table component.
+              // There is a component that isn't stateless nor a table component, nor a path component.
               hasState = true;
               return;
             } else if (
@@ -215,6 +218,14 @@ if (dataset === undefined || dataset === null || dataset === '') {
               && !_isEqual(newState.get('session').get('components').get(key).get('props').keySeq().toArray(), ['table', 'selectedPrimKey'])
             ) {
               // There is a tableComponents that has more than the URL-derivable table prop.
+              hasState = true;
+              return;
+            } else if (
+              pathComponents.indexOf(newState.get('session').get('components').get(key).get('type')) !== -1
+              && !_isEqual(newState.get('session').get('components').get(key).get('props').keySeq().toArray(), ['path'])
+              && !_isEqual(newState.get('session').get('components').get(key).get('props').keySeq().toArray(), ['path', 'setProps'])
+            ) {
+              // There is a pathComponent that has more than the URL-derivable path props.
               hasState = true;
               return;
             }
