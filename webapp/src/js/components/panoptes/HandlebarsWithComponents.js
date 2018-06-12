@@ -30,10 +30,15 @@ let HandlebarsWithComponents = createReactClass({
 
   componentDidMount() {
     let {children, ...otherProps} = this.props;
+    this.handlebars = customHandlebars(this.config, ...otherProps);
+    this.update();
+  },
+
+  update() {
+    let {children, ...otherProps} = this.props;
     if (children === undefined || children === null) {
       return;
     }
-    this.handlebars = customHandlebars(this.config, ...otherProps);
     children = children instanceof Array ? children.join('') : children;
     const result = this.handlebars.compile(children)({config: this.config, ...otherProps});
     if (result.then) {
@@ -46,6 +51,10 @@ let HandlebarsWithComponents = createReactClass({
         rendered: result
       });
     }
+  },
+
+  componentDidUpdate() {
+    this.update();
   },
 
   render() {

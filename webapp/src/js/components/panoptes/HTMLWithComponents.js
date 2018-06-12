@@ -116,7 +116,6 @@ class HTMLWithComponents extends React.Component {
   render() {
 
     const {children, className, ...otherProps} = this.props;
-
     // NOTE: wrapping avoids "Error: html-to-react currently only supports HTML with one single root element. The HTML provided contains 0 root elements. You can fix that by simply wrapping your HTML in a <div> element."
     // The original children will be inside this temporary wrapper, but now React.
     const wrappedChildrenAsReact = this.htmlToReact(`<div>${children}</div>`);

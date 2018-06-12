@@ -81,11 +81,6 @@ let MarkerLayer = createReactClass({
         }
       }
       rows = _values(clusters);
-      rows.forEach((row) => {
-        if (row.area !== undefined && row.radius === undefined) {
-          row.radius = Math.sqrt(row.area);
-        }
-      })
     } else {
       for (let i = 0; i < data[columns[0]].length; i++) {
         let row = {};
@@ -94,6 +89,11 @@ let MarkerLayer = createReactClass({
         rows.push(row);
       }
     }
+    rows.forEach((row) => {
+      if (row.area !== undefined && row.radius === undefined) {
+        row.radius = Math.sqrt(row.area/Math.PI);
+      }
+    });
     let marker = (row) => null;
     if (childrenByType['MarkerLayerMarker'] && childrenByType['MarkerLayerMarker'].props.children) {
       marker = (row) => React.cloneElement(filterChildren(this, childrenByType['MarkerLayerMarker'].props.children), {radius: fixedRadius, ...row})

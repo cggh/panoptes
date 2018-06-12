@@ -10,7 +10,7 @@ for _op in ['count', 'max', 'min', 'avg', 'distinct']:
 for _op in ['median', 'stddev_samp', 'stddev_pop', 'var_samp', 'var_pop']:
     #For some reason these need a prefix
     decoders[_op] = (lambda op: lambda a: 'sys.' + op + '(' + _decode(a) + ')')(_op)
-for _op in ['qualtile', 'corr']:
+for _op in ['qualtile', 'corr', 'sql_min', 'sql_max']:
     decoders[_op] = (lambda op: lambda a,b: 'sys.' + op + '(' + _decode(a) + ',' + _decode(b) + ')')(_op)
 
 def _decode(column):
