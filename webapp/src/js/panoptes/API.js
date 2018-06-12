@@ -425,7 +425,7 @@ function query(options) {
     limit: (_isNumber(start) && _isNumber(stop)) ? `${start}~${stop}` : undefined,
     distinct: distinct ? 'true' : 'false',
     orderBy: JSON.stringify(orderBy),
-    groupBy: groupBy.join('~'),
+    groupBy: Array.isArray(groupBy) ? groupBy.join('~') : undefined,
     randomSample,
     cache,
     joins: JSON.stringify(joins)

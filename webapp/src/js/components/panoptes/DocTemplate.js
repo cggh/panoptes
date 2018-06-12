@@ -19,15 +19,22 @@ let DocTemplate = createReactClass({
   propTypes: {
     path: PropTypes.string,
     template: PropTypes.string, // This will be provided via withAPIData
+    hideEditButton: PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return {
+      hideEditButton: false,
+    };
   },
 
   render() {
-    const {path, template, ...otherProps} = this.props;
+    const {path, template, hideEditButton, ...otherProps} = this.props;
     // NOTE: z-index of the Edit modal is currently set to 9997.
     const editButtonZIndex = 9996;
     return (
       [
-        this.config.user.isManager ?
+        this.config.user.isManager && hideEditButton == false ?
           <IconButton
             aria-label="Edit"
             className="fa fa-edit"

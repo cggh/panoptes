@@ -19,7 +19,7 @@ let Histogram = createReactClass({
   ],
 
   propTypes: {
-    chartData: PropTypes.array,
+    chartData: PropTypes.array.isRequred,
     top: PropTypes.number,
     right: PropTypes.number,
     bottom: PropTypes.number,

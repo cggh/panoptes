@@ -1,0 +1,17 @@
+<title>TableHotSpotsLayer</title>
+<p>HotSpots the old-fashioned way (without TableData composition)</p>
+
+<p>Using the Map > TableHotSpotsLayer:</p>
+<div style="height: 400px;">
+  <Map>
+    <TableHotSpotsLayer
+      table="samplingsites"
+      columns='["SiteID", "Longitude", "Latitude", "samples.Value1", "samples.SampleTypeID"]'
+      groupBy='["samplingsites.SiteID", "samplingsites.Longitude", "samplingsites.Latitude", "samples.Value1", "samples.SampleTypeID"]'
+      joins='[{"type": "LEFT", "foreignTable": "samples", "foreignColumn": "samples.Site_ID", "column": "samplingsites.SiteID"}]'
+    />
+    <TileLayer/>
+  </Map>
+</div>
+
+

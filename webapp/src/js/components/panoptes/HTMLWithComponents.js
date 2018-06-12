@@ -29,7 +29,7 @@ class HTMLWithComponents extends React.Component {
 
   static propTypes = {
     className: PropTypes.string,
-    children: PropTypes.string,
+    children: PropTypes.string, // NOTE: children is not usually a STRING
     replaceSelf: PropTypes.func
   };
 
@@ -80,6 +80,13 @@ class HTMLWithComponents extends React.Component {
                     throw Error(`Can't parse ${key} attribute for ${node.name}:${value}`);
                   }
                   break;
+                  case PropTypes.string:
+                    break;
+                default:
+                  try {
+                    value = JSON.parse(value);
+                  } catch (e) {
+                  }
                 }
               }
               elementProps[key] = value;
@@ -89,7 +96,7 @@ class HTMLWithComponents extends React.Component {
           if (type === DocLink) {
             elementProps.replaceParent = this.props.replaceSelf;
           }
-          return React.createElement(type, {children, ...elementProps});
+          return React.createElement(type, elementProps, children);
         }
       },
       {
@@ -107,7 +114,23 @@ class HTMLWithComponents extends React.Component {
   }
 
   render() {
-    return this.htmlToReact(`<div class="${this.props.className ? this.props.className : ''}">${this.props.children}</div>`);
+
+    const {children, className, ...otherProps} = this.props;
+
+    // NOTE: wrapping avoids "Error: html-to-react currently only supports HTML with one single root element. The HTML provided contains 0 root elements. You can fix that by simply wrapping your HTML in a <div> element."
+    // The original children will be inside this temporary wrapper, but now React.
+    const wrappedChildrenAsReact = this.htmlToReact(`<div>${children}</div>`);
+
+    //// Pass all otherProps to all immediate React Component children.
+    // child is a string when it is just a text node.
+    // child has a function type (as opposed to string) when it is a React Component.
+    // Passing otherProps to a DOM element might generate warnings.
+    // TODO: iterator should have a unique "key" prop
+    const childrenAsReactWithProps = wrappedChildrenAsReact.props.children.map((child, index) =>
+      typeof child === 'string' ? child : (typeof child.type === 'function' ? React.cloneElement(child, otherProps) : child)
+    );
+
+    return <div className={className}>{childrenAsReactWithProps}</div>;
   }
 }
 

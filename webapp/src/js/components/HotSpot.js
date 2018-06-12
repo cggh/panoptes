@@ -11,8 +11,8 @@ import FluxMixin from 'mixins/FluxMixin';
 // Panoptes components
 import PieChartSector from 'PieChartSector';
 
-let PieChart = createReactClass({
-  displayName: 'PieChart',
+let HotSpot = createReactClass({
+  displayName: 'HotSpot',
 
   mixins: [
     PureRenderMixin,
@@ -25,8 +25,6 @@ let PieChart = createReactClass({
     lat: PropTypes.number,
     lng: PropTypes.number,
     name: PropTypes.string,
-    // originalLat: PropTypes.number,
-    // originalLng: PropTypes.number,
     radius: PropTypes.number,
     hideValues: PropTypes.bool,
     faceText: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -83,21 +81,6 @@ let PieChart = createReactClass({
       />
     );
 
-    // let location = crs.project({lat, lng});
-    //
-    // let line = null;
-    // if (pieData.length && originalLat && originalLng) {
-    //   let originalLocation = crs.project({lat: originalLat, lng: originalLng});
-    //   line = (
-    //     <line
-    //       className="pie-chart-line"
-    //       style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
-    //       x1="0" y1="0"
-    //       x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}
-    //     />
-    //   );
-    // }
-
     const faceTextStyle = {
       fontSize: '10px',
       paintOrder: 'stroke',
@@ -121,4 +104,4 @@ let PieChart = createReactClass({
   },
 });
 
-export default PieChart;
+export default HotSpot;

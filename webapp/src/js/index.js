@@ -9,7 +9,6 @@ import ReactDOM from 'react-dom';
 
 import {Flux} from 'fluxxor';
 import Immutable from 'immutable';
-import Panoptes from 'components/Panoptes.js';
 import Loading from 'components/ui/Loading.js';
 
 import SessionStore from 'stores/SessionStore';
@@ -228,11 +227,11 @@ if (dataset === undefined || dataset === null || dataset === '') {
             const ourPushCount = historyChangeCount;
 
             API.storeData(newState.toJS()).then((hash) => {
-                if (ourPushCount === historyChangeCount) {
-                  //If we are still relevant then update the URL
-                  history.replace(baseURLPath + hash, newState.toJS());
-                }
+              if (ourPushCount === historyChangeCount) {
+                //If we are still relevant then update the URL
+                history.replace(baseURLPath + hash, newState.toJS());
               }
+            }
             );
           } else {
 
@@ -251,7 +250,8 @@ if (dataset === undefined || dataset === null || dataset === '') {
               history.push(baseURLPath + selectedTabDocPagePath, newState.toJS());
 
             } else {
-              console.warn('selectedTab has no state or path');
+              // This may be a new, blank tab.
+              //console.warn('selectedTab has no state or path');
               history.push(baseURLPath, newState.toJS());
             }
 

@@ -1,0 +1,162 @@
+<title>Examples</title>
+<div class="horizontal stack start-align">
+    <div class="grow description">
+        <div style="color:rgb(0,128,0)">
+            A second line, html formatted
+        </div>
+        <div>
+            This is a dataset specific component:
+            <CustomExample />
+        </div>
+        An <a href="http://panoptes.readthedocs.org/en/latest//"
+              target="_blank">external hyperlink</a> and a
+        <DocLink href="intro.html">link</DocLink>
+        to documentation part of this deployment.
+        <p>More <DocLink href="intro.html">examples of features</DocLink>.</p>
+        <p>This dataset contains <QueryResult table="samples"/> samples</p>
+        <p>The first variant position is <QueryResult table="variants" expression='"position"'/></p>
+        <p>The average variant position is <QueryResult table="variants" expression='["avg",["position"]]' formatNumber=".5n"/>.</p>
+        <p><QueryResult table="variants" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Extra_1","CompValue":"A","isRoot":true,"Tpe":"="}'/> variants have Extra 1 = 'A'</p>
+        <p>Here is an example of a template being filled for each row of a query, and a subquery for each row:<br/>
+            {{#query 'SiteID' 'Country' table='samplingsites'}}
+              {{ordinalize (add @index 1)}} site: {{SiteID}} in {{Country}} Samples at this site:
+              {{#query 'key' table='samples' query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Site_ID","CompValue":"{{SiteID}}","isRoot":true,"Tpe":"="}'}}
+                {{key}}
+              {{/query}}<br/>
+            {{/query}}
+        </p>
+        <p>Here is an example of a template being filled for each row of a query, with an implicit join:<br/>
+            {{#query 'key' 'samplingsites.Country' table='samples'}}
+              {{key}}:{{samplingsites.Country}},
+            {{/query}}
+        </p>
+        <p>Some buttons that open popups or tabs:</p>
+        <PopupButton target="tab" label="Table of Samples" icon="table">
+            <DataTableWithActions table="samples"/>
+        </PopupButton>
+        <PopupButton target="tab" label="List of Contributors" icon="table">
+            <DataTableWithActions table="contributors"/>
+        </PopupButton>
+        <PopupButton label="Plot of Variants" icon="area-chart">
+            <TablePlot plotType="scatter" table="variants" horizontal="Value1" vertical="Value2"/>
+        </PopupButton>
+        <PopupButton label="Map of sites" icon="globe">
+            <TableMap table="samplingsites"/>
+        </PopupButton>
+        <PopupButton label="Tree of samples" icon="tree">
+            <TreeContainer table="samples" tree="tree2"/>
+        </PopupButton>
+        <PopupButton>
+            <div>Some <b>config specified</b> content</div>
+        </PopupButton>
+        <p>A popup button targeting a tab:</p>
+        <PopupButton label="Tree of samples" target="tab">
+            <TreeContainer table="samples" tree="tree2"/>
+        </PopupButton>
+        <p>A drop down that chooses a component</p>
+        <div style="width:200px;position:relative">
+            <SelectComponent label="Choose a thing:">
+                <option label="Text1" index="1">
+                    <p>Text 1</p>
+                </option>
+                <option label="Text2" index="2">
+                    <p>Text 1</p>
+                </option>
+            </SelectComponent>
+        </div>
+        <p>A drop down that chooses a component, that already has a selection</p>
+        <div style="width:200px;position:relative">
+            <SelectComponent label="Choose a thing:" selectedIndex="1">
+            <option label="Text1" index="1">
+                <p>Text 1</p>
+            </option>
+            <option label="Text2" index="2">
+                <p>Text 1</p>
+            </option>
+            </SelectComponent>
+        </div>
+        <p>A custom button targeting a tab:</p>
+	    <CustomButton target="tab">
+            <Anchor>
+                <span style="background-color: lightblue"><i class="fa fa-globe" /> Click here for the same thing</span>
+            </Anchor>
+            <Content>
+                <span><i class="fa fa-globe" /> The same thing</span>
+            </Content>
+	    </CustomButton>
+        <ToggleBox>
+            <Caption>
+                <span>Title of hidden stuff</span>
+            </Caption>
+            <Content>
+                <span>I was hidden!</span>
+            </Content>
+        </ToggleBox>
+        <div> A drop down allowing one to select a row:<br/>
+            <div style="width:200px;position:relative">
+                <SelectRow table="contributors" />
+            </div>
+        </div>
+        <div> A drop down allowing one to select a row, restricted to a query on a related table:<br/>
+            <div style="width:200px;position:relative">
+                <SelectRow table="contributors" queryTable="samples" query='{"whcClass":"comparefixed","isCompound":false,"ColName":"Site_ID","CompValue":"St01","isRoot":true,"ColName2":"key","Tpe":"="}' />
+            </div>
+        </div>
+        <PopupButton label="Table with legend" target="tab">
+            <TableWithLegend table="samples" columns='["key", "Site_ID"]'>
+              <CardHeader title="A table" />
+              <CardContent>
+                <Typography>
+                    This is a table which has interesting data in
+                </Typography>
+              </CardContent>
+            </TableWithLegend>
+        </PopupButton>
+        <p>A table, with styled headers</p>
+            <PivotTableView table="variants" columnProperty="Extra_1" rowProperty="HighQuality"/>
+        <p>A tree of samples</p>
+        <div style="position:relative;width:300px;height:300px">
+            <TreeContainer table="samples" tree="tree2"/>
+        </div>
+        <p>A plot of variants:</p>
+        <div style="position:relative;width:300px;height:300px">
+            <TablePlot plotType="scatter" table="variants" horizontal="Value1" vertical="Value2"/>
+        </div>
+        <p>A complex map:</p>
+        <div style="width:300px;height:300px">
+            <Map center='{"lat": 1, "lng": -1.1}' zoom="2">
+                <LayersControl position="topright">
+                    <BaseLayer checked name="OpenStreetMap.Mapnik">
+                        <TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"/>
+                    </BaseLayer>
+                    <BaseLayer name="OpenStreetMap.BlackAndWhite">
+                        <FeatureGroup>
+                            <TileLayer attribution="FIXME"
+                                       url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"/>
+                        </FeatureGroup>
+                    </BaseLayer>
+                    <Overlay name="Sampling Sites">
+                        <TableMarkersLayer table="samplingsites"/>
+                    </Overlay>
+                    <Overlay checked name="Layer group with circles">
+                        <FeatureGroup>
+                            <Circle center='{"lat":0, "lng":0}' fillColor="blue" radius="200"/>
+                            <Circle center='{"lat":0, "lng":0}' fillColor="red" radius="100" stroke="false"/>
+                            <FeatureGroup>
+                                <Circle center='{"lat":51.51, "lng":-0.08}' color="green" fillColor="green"
+                                        radius="100"/>
+                            </FeatureGroup>
+                        </FeatureGroup>
+                    </Overlay>
+                    <Overlay name="Feature group">
+                        <FeatureGroup color="purple">
+                            <MapPopup><span>MapPopup in FeatureGroup</span></MapPopup>
+                            <Circle center='{"lat":51.51, "lng":-0.06}' radius="200"/>
+                            <Rectangle bounds='[{"lat":51.49, "lng":-0.08},{"lat":51.5, "lng":-0.06}]'/>
+                        </FeatureGroup>
+                    </Overlay>
+                </LayersControl>
+            </Map>
+        </div>
+    </div>
+</div>

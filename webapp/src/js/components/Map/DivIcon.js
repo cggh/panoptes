@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React, {Children} from 'react';
 import {render, unmountComponentAtNode} from 'react-dom';
 import {DivIcon as LeafletDivIcon, marker} from 'leaflet';
-import {MapLayer, Popup} from 'react-leaflet';
+import {MapLayer, Popup, PropTypes as mapPropTypes} from 'react-leaflet';
 
 export default class DivIcon extends MapLayer {
   static displayName = 'DivIcon';
@@ -19,18 +19,22 @@ export default class DivIcon extends MapLayer {
 
   static childContextTypes = {
     popupContainer: PropTypes.object,
+    flux: PropTypes.object
+  };
+
+  static contextTypes = {
+    flux: PropTypes.object,
+    map: mapPropTypes.map,
+    layerContainer: mapPropTypes.layerContainer,
+    pane: PropTypes.string
   };
 
   getChildContext() {
     return {
       popupContainer: this.leafletElement,
+      flux: this.props.flux || (this.context && this.context.flux)
     };
   }
-
-  static defaultProps = {
-    onClick: () => null
-  };
-
 
   createLeafletElement(props) {
     const {position, ...otherProps} = props;
@@ -62,11 +66,14 @@ export default class DivIcon extends MapLayer {
   }
 
   renderContent() {
+    const {children, ...otherProps} = this.props;
     const container = this.leafletElement._icon;
-
     if (container) {
+      const child = Children.only(children);
       render(
-        Children.only(this.props.children),
+        // FIXME: popups (map tooltip bubbles) aren't triggered when child is Circle.
+        // Maybe related to panes? https://gis.stackexchange.com/questions/207706/how-to-position-leaflet-circlemarkers-on-top-of-markers
+        typeof child.type === 'function' ? React.cloneElement(child, {...otherProps, flux:this.props.flux || (this.context && this.context.flux)}) : child,
         container
       );
     }
@@ -80,7 +87,9 @@ export default class DivIcon extends MapLayer {
   }
 
   render() {
-    let {popup} = this.props;
-    return popup ? <Popup minWidth={200}>{popup}</Popup> : null;
+    let {popup, ...otherProps} = this.props;
+    if (!popup) return null;
+    popup = React.cloneElement(popup, {flux:this.props.flux || (this.context && this.context.flux)});
+    return <Popup minWidth={200} {...otherProps}>{popup}</Popup>;
   }
 }

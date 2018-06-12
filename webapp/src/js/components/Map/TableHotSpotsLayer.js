@@ -28,11 +28,9 @@ import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';
 import GeoLayouter from 'utils/GeoLayouter';
 import Polyline from 'Map/Polyline';
-import PieChart from 'PieChart';
+import HotSpot from 'HotSpot';
 import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';
-import Histogram from 'Histogram';
-import {scaleColour} from 'util/Colours';
 import PropertyLegend from 'panoptes/PropertyLegend';
 import MapControlComponent from 'Map/MapControlComponent';
 import filterChildren from 'util/filterChildren';
@@ -41,10 +39,13 @@ import ItemTemplate from 'panoptes/ItemTemplate';
 import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
 
 const DEFAULT_MARKER_FILL_COLOUR = '#3d8bd5';
-const HISTOGRAM_WIDTH_PIXELS = 100;
 
-let TableMarkersLayer = createReactClass({
-  displayName: 'TableMarkersLayer',
+const ALLOWED_CHILDREN = [
+  'svg'
+];
+
+let TableHotSpotsLayer = createReactClass({
+  displayName: 'TableHotSpotsLayer',
 
   mixins: [
     FluxMixin,
@@ -87,7 +88,6 @@ let TableMarkersLayer = createReactClass({
     onClickClusterComponentTemplateDocPath: PropTypes.string,
     knownLegendValues: PropTypes.array,
     legendPropertyName: PropTypes.string,
-    childDataColumns: PropTypes.array
   },
 
   childContextTypes: {
@@ -180,7 +180,7 @@ let TableMarkersLayer = createReactClass({
     let {
       highlight, primKey, table, query, markerColourProperty,
       clickPrimaryKeyProperty, onClickSingleComponentTemplateDocPath,
-      onClickClusterComponentTemplateDocPath, childDataColumns
+      onClickClusterComponentTemplateDocPath
     } = props;
     let {changeLayerStatus} = this.context;
 
@@ -216,10 +216,6 @@ let TableMarkersLayer = createReactClass({
     locationColumns.add(locationPrimKeyProperty);
     locationColumns.add(locationLongitudeProperty);
     locationColumns.add(locationLatitudeProperty);
-    if (childDataColumns) {
-      childDataColumns.forEach((column) => locationColumns.add(column));
-    }
-
     if (clickPrimaryKeyProperty) {
       locationColumns.add(clickPrimaryKeyProperty);
     }
@@ -377,13 +373,6 @@ let TableMarkersLayer = createReactClass({
             originalLng: lng,
             clickPrimKey: data[i][clickPrimaryKeyProperty]
           };
-          marker.childData = {};
-          if (childDataColumns) {
-            childDataColumns.forEach((column) => {
-              marker.childData[column.as || column] = data[i][column.as || column];
-            });
-          }
-
 
           markers.push({lat, lng}); // markers[] is only used for CalcMapBounds.calcMapBounds(markers)
 
@@ -421,12 +410,11 @@ let TableMarkersLayer = createReactClass({
       onClickClusterComponent,
       onClickClusterComponentProps,
       knownLegendValues,
-      legendPropertyName,
-      childDataColumns
+      legendPropertyName
     } = this.props;
 
-    let {markersGroupedByLocation, minValue, maxValue, onClickClusterComponentTemplate, onClickSingleComponentTemplate} = this.state;
-    children = filterChildren(this, children);
+    let {markersGroupedByLocation, onClickClusterComponentTemplate, onClickSingleComponentTemplate} = this.state;
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     if (_isEmpty(markersGroupedByLocation)) {
       return null;
@@ -443,11 +431,9 @@ let TableMarkersLayer = createReactClass({
     }
 
     let markerColourPropertyIsNumerical = false;
-    let markerColourPropertyIsCategorical = false;
 
     if (markerColourProperty !== undefined && markerColourProperty !== null) {
       markerColourPropertyIsNumerical = this.config.tablesById[table].propertiesById[markerColourProperty].isNumerical;
-      markerColourPropertyIsCategorical = this.config.tablesById[table].propertiesById[markerColourProperty].isCategorical;
     }
 
     let markers = [];
@@ -470,109 +456,72 @@ let TableMarkersLayer = createReactClass({
       }
 
 
-      if (markerColourPropertyIsNumerical || (markerColourPropertyIsNumerical && markerColourPropertyIsCategorical)) {
 
-        //// Prepare a histogram
+      // Includes markerColourPropertyIsCategorical
+      // as well as neither isCategorical nor isNumerical
 
-        // Create a chart item (histogram bin) for each unique marker value.
-        // NB: all markers that have the same value also have the same valueAsColour.
-        let markerChartData = [];
-        for (let value in markersGroupedByValue) {
-          markerChartData.push({
-            value: markersGroupedByValue[value][0].value,
-            color: markersGroupedByValue[value][0].valueAsColour
-          });
+      // NB: This includes that case when a primary key is selected as markerColourProperty.
+      // The primary key property (isPrimKey) should not be categorical, if it is to be unique,
+      // but showing a pieChart is more visually useful than showing a histogram.
+
+      //// Prepare a pie chart
+
+      // Create a chart item (pie chart sector) for each unique marker value.
+      // NB: all markers that have the same value also have the same colour.
+      // NB: the key for undefined values is the string "undefined"
+      let markerChartData = [];
+      for (let value in markersGroupedByValue) {
+        uniqueValues[value] = true;
+
+        let name = `${(value !== 'undefined' ? `${value}: ` : '') + markersGroupedByValue[value].length} ${markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural}`;
+        if (markerColourPropertyIsNumerical) {
+          name = `${markersGroupedByValue[value].length} ${markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural}${value !== 'undefined' ? ` with ${value}` : ''}`;
         }
 
-        // NB: The originalRadius is for the GeoLayouter collision detection.
-        const histogramRadius = Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2));
-
-        // NB: The colours associated with the individual values
-        // can not be applied to the histogram,
-        // at least not to the fillColour of the bins,
-        // because each bin represents a range of values.
-
-        markers.push({
-          clusterType: 'histogram',
-          chartDataTable: table,
-          key: location,
-          lat: markersGroupedByLocation[location][0].lat,
-          lng: markersGroupedByLocation[location][0].lng,
-          originalRadius: histogramRadius,
-          chartData: markerChartData,
-          table,
-          primKey: markersGroupedByLocation[location][0].primKey,
-          colourScaleFunction: scaleColour([minValue, maxValue]),
-          latProperty: markersGroupedByLocation[location][0].latProperty,
-          lngProperty: markersGroupedByLocation[location][0].lngProperty,
-          originalLat: markersGroupedByLocation[location][0].originalLat,
-          originalLng: markersGroupedByLocation[location][0].originalLng,
-          childData: markersGroupedByLocation[location][0].childData,
-          markersAtLocationCount
-        });
-
-      } else {
-
-        // Includes markerColourPropertyIsCategorical
-        // as well as neither isCategorical nor isNumerical
-
-        // NB: This includes that case when a primary key is selected as markerColourProperty.
-        // The primary key property (isPrimKey) should not be categorical, if it is to be unique,
-        // but showing a pieChart is more visually useful than showing a histogram.
-
-        //// Prepare a pie chart
-
-        // Create a chart item (pie chart sector) for each unique marker value.
-        // NB: all markers that have the same value also have the same colour.
-        // NB: the key for undefined values is the string "undefined"
-        let markerChartData = [];
-        for (let value in markersGroupedByValue) {
-          uniqueValues[value] = true;
-
-          let name = `${(value !== 'undefined' ? `${value}: ` : '') + markersGroupedByValue[value].length} ${markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural}`;
-          if (markerColourPropertyIsNumerical) {
-            name = `${markersGroupedByValue[value].length} ${markersGroupedByValue[value].length === 1 ? this.config.tablesById[table].nameSingle : this.config.tablesById[table].namePlural}${value !== 'undefined' ? ` with ${value}` : ''}`;
-          }
-
-          markerChartData.push({
-            name,
-            value: markersGroupedByValue[value].length,
-            color: markersGroupedByValue[value][0].valueAsColour
-          });
-        }
-
-        markers.push({
-          clusterType: 'pieChart',
-          chartDataTable: table,
-          key: location,
-          lat: markersGroupedByLocation[location][0].lat,
-          lng: markersGroupedByLocation[location][0].lng,
-          originalRadius: Math.sqrt(markersGroupedByLocation[location].length),
-          chartData: markerChartData,
-          table,
-          primKey: markersGroupedByLocation[location][0].primKey,
-          count: markersGroupedByLocation[location].length,
-          latProperty: markersGroupedByLocation[location][0].latProperty,
-          lngProperty: markersGroupedByLocation[location][0].lngProperty,
-          originalLat: markersGroupedByLocation[location][0].originalLat,
-          originalLng: markersGroupedByLocation[location][0].originalLng,
-          markersAtLocationCount,
-          clickPrimKeyBreakdown: _countBy(markersGroupedByLocation[location], 'clickPrimKey'),
-          childData: markersGroupedByLocation[location][0].childData
+        markerChartData.push({
+          name,
+          value: markersGroupedByValue[value].length,
+          color: markersGroupedByValue[value][0].valueAsColour
         });
       }
+
+      markers.push({
+        clusterType: 'hotSpot',
+        chartDataTable: table,
+        key: location,
+        lat: markersGroupedByLocation[location][0].lat,
+        lng: markersGroupedByLocation[location][0].lng,
+        originalRadius: Math.sqrt(markersGroupedByLocation[location].length),
+        chartData: markerChartData,
+        table,
+        primKey: markersGroupedByLocation[location][0].primKey,
+        count: markersGroupedByLocation[location].length,
+        latProperty: markersGroupedByLocation[location][0].latProperty,
+        lngProperty: markersGroupedByLocation[location][0].lngProperty,
+        originalLat: markersGroupedByLocation[location][0].originalLat,
+        originalLng: markersGroupedByLocation[location][0].originalLng,
+        markersAtLocationCount,
+        clickPrimKeyBreakdown: _countBy(markersGroupedByLocation[location], 'clickPrimKey')
+      });
+
     }
+
     if (markers.length > 0) {
 
       // NB: Copied from PieChartMarkersLayer
       let size = map.getSize();
+      let bounds = map.getBounds();
       let pixelArea = size.x * size.y;
-      let pieAreaSum = _sum(_map(markers,
+      let pieAreaSum = _sum(_map(
+        _filter(markers, (marker) => {
+          let {lat, lng} = marker;
+          return bounds.contains([lat, lng]);
+        }),
         (marker) => marker.originalRadius * marker.originalRadius * 2 * Math.PI)
       );
       let lengthRatio = this.lastLengthRatio || 1;
       if (pieAreaSum > 0) {
-        lengthRatio = Math.sqrt(0.15 / (pieAreaSum / pixelArea));
+        lengthRatio = Math.sqrt(0.05 / (pieAreaSum / pixelArea));
       }
       this.lastLengthRatio = lengthRatio;
       _forEach(markers, (marker) => marker.radius = Math.max(10, marker.originalRadius * lengthRatio));
@@ -601,11 +550,12 @@ let TableMarkersLayer = createReactClass({
                     {
                       renderNodes.map(
                         (marker, i) => {
+
                           let clusterComponent = undefined;
 
-                          if (marker.clusterType === 'pieChart') {
+                          if (marker.clusterType === 'hotSpot') {
                             clusterComponent = (
-                              <PieChart
+                              <HotSpot
                                 chartData={marker.chartData}
                                 crs={crs}
                                 hideValues={true}
@@ -615,30 +565,6 @@ let TableMarkersLayer = createReactClass({
                                 originalLng={marker.originalLng}
                                 radius={marker.radius}
                                 faceText={marker.count !== undefined ? marker.count : 1}
-                                isHighlighted={marker.isHighlighted}
-                              />
-                            );
-
-                          } else if (marker.clusterType === 'histogram') {
-
-                            const histogramWidth = Math.sqrt(Math.pow(marker.radius, 2) / 2) * 2;
-
-                            clusterComponent = (
-                              <Histogram
-                                chartData={marker.chartData}
-                                width={histogramWidth}
-                                height={histogramWidth}
-                                radius={marker.radius}
-                                lat={marker.lat}
-                                lng={marker.lng}
-                                originalLat={marker.originalLat}
-                                originalLng={marker.originalLng}
-                                unitNameSingle={this.config.tablesById[table].nameSingle}
-                                unitNamePlural={this.config.tablesById[table].namePlural}
-                                valueName={this.config.tablesById[table].propertiesById[markerColourProperty].name}
-                                colourScaleFunction={marker.colourScaleFunction}
-                                minValue={minValue}
-                                maxValue={maxValue}
                                 isHighlighted={marker.isHighlighted}
                               />
                             );
@@ -767,7 +693,6 @@ let TableMarkersLayer = createReactClass({
                       latProperty: marker.latProperty,
                       lngProperty: marker.lngProperty,
                       flux: this.getFlux(),
-                      ...marker.childData
                     };
 
                     const onClickSingleComponentMergedProps = {...onClickSingleComponentDefaultProps, ...onClickSingleComponentPropsJSON};
@@ -790,6 +715,7 @@ let TableMarkersLayer = createReactClass({
                       // TODO: clickTable and clickPrimaryKeyProperty should probably be deprecated in favour of templated tooltips.
                       console.error('onClickSingleBehaviour tooltip currently only supports onClickSingleComponent ItemTemplate or undefined with clickPrimaryKeyProperty. (onClickSingleComponent, clickPrimaryKeyProperty): ', onClickSingleComponent, clickPrimaryKeyProperty);
                     }
+
                     return (
                       <ComponentMarker
                         key={`ComponentMarker_${i}`}
@@ -801,7 +727,7 @@ let TableMarkersLayer = createReactClass({
                         zIndexOffset={0}
                         popup={onClickSingleBehaviour === 'tooltip' ? onClickSingleTooltipReactElement : null}
                       >
-                        {children ? React.cloneElement(children, {flux: this.flux, ...marker.childData}) : null}
+                        {children}
                       </ComponentMarker>
                     );
                   })
@@ -817,4 +743,4 @@ let TableMarkersLayer = createReactClass({
   },
 });
 
-export default TableMarkersLayer;
+export default TableHotSpotsLayer;

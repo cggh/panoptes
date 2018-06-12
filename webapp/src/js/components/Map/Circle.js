@@ -13,18 +13,43 @@ let Circle = createReactClass({
     FluxMixin
   ],
 
+  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
+  // in which case, we copy those props into context. Props override context.
+
+  contextTypes: {
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
+  },
+
   propTypes: {
-    center: PropTypes.object,
+    layerContainer: PropTypes.object,
+    map: PropTypes.object,
+    center: PropTypes.object.isRequired, // shape {lat: num, lng: num}
     radius: PropTypes.number,
   },
 
+  // Without this: TypeError: Cannot read property 'addLayer' of undefined
+  childContextTypes: {
+    layerContainer: PropTypes.object,
+    map: PropTypes.object
+  },
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map
+    };
+  },
+
   render() {
-    let {center, radius} = this.props;
+    let {center, ...otherProps} = this.props;
+console.log('Circle props', this.props);
+    // Convert lat, lng strings to numbers
+    center.lat = Number(center.lat);
+    center.lng = Number(center.lng);
     return (
       <LeafletCircle
-        children={null}
         center={center}
-        radius={radius}
+        {...otherProps}
       />
     );
   },
