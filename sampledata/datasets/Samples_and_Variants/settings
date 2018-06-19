@@ -36,3 +36,26 @@ feeds:
   - id: SinglePostBlog
     url: https://singlepostblog.wordpress.com/feed/
 
+initialSessionState:
+  session:
+    components:
+      FirstTab:
+        type: DocPage
+        props:
+          path: index.html
+    tabs:
+      components:
+        - FirstTab
+      selectedTab: FirstTab
+      unclosableTabs:
+        - FirstTab
+      unreplaceableTabs:
+        - FirstTab
+    popups:
+      components: []
+      state: {}
+    foundGenes: []
+    usedTableQueries: []
+    popupSlots: []
+
+                                        

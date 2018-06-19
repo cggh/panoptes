@@ -40,6 +40,28 @@ class SettingsDataset(ImportSettings):
                                         'type': 'Block',
                                         'required': False,
                                         'description': 'The default tabs, popups and recently used genes and queries for a new session. Most easily set by using the save button on the header (only shown to managers)',
+                                        'default': {
+                                            'session': {
+                                                'components': {
+                                                    'FirstTab': {
+                                                        'type': 'EmptyTab',
+                                                    }
+                                                },
+                                                'tabs': {
+                                                    'components': ['FirstTab'],
+                                                    'selectedTab': 'FirstTab',
+                                                    'unclosableTabs': ['FirstTab'],
+                                                    'unreplaceableTabs': ['FirstTab']
+                                                },
+                                                'popups': {
+                                                    'components': [],
+                                                    'state': {}
+                                                },
+                                                'foundGenes': [],
+                                                'usedTableQueries': [],
+                                                'popupSlots': []
+                                            }
+                                        }
                                     }),
                                     ('topLevelComponent', {
                                         'type': 'Text',
