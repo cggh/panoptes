@@ -224,11 +224,17 @@ let MuiDataTableView = createReactClass({
     if (columns.length > 0) {
       return (
         <div style={{position: 'relative'}} className={classNames(className)}>
-          <Table>
+          <Table
+            style={{
+              overflow: 'visible', // Otherwise Edge hides column group top border.
+            }}
+          >
             <TableHead>
               {Object.keys(columnGroups).length ?
                 <TableRow
-                  style={{height: 'auto'}}
+                  style={{
+                    height: 'auto',
+                  }}
                 >
                   {columns.map((column, columnIndex) => {
                     let columnData = this.propertiesByColumn(column);
@@ -242,11 +248,9 @@ let MuiDataTableView = createReactClass({
                           padding={'none'}
                           style={{
                             textAlign: 'center',
+                            border: 'solid 1px rgba(0, 0, 0, 0.075)',
                             borderBottom: 'none',
-                            borderLeft: 'solid 1px rgba(0, 0, 0, 0.075)',
-                            borderRight: 'solid 1px rgba(0, 0, 0, 0.075)',
-                            borderTop: 'solid 1px rgba(0, 0, 0, 0.075)',
-                            paddingTop: '5px'
+                            paddingTop: '5px',
                           }}
                           colSpan={columnGroups[columnData.groupId].columns.length}
                         >
