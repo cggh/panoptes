@@ -103,40 +103,12 @@ if (dataset === undefined || dataset === null || dataset === '') {
   Promise.all(promises)
     .then(([config, appState]) => {
 
-      const defaultState = {
-        session: {
-          components: {
-            FirstTab: config.docs['index.html'] ? {
-              type: 'DocPage',
-              props: {
-                path: 'index.html'
-              }
-            } : {
-              type: 'EmptyTab'
-            }
-          },
-          tabs: {
-            components: ['FirstTab'],
-            selectedTab: 'FirstTab',
-            unclosableTabs: ['FirstTab'],
-            unreplaceableTabs: ['FirstTab']
-          },
-          popups: {
-            components: [],
-            state: {}
-          },
-          foundGenes: [],
-          usedTableQueries: [],
-          popupSlots: []
-        }
-      };
-
       // NOTE: if remainingPath was a UID ("hash"),
       // appState would have been returned by the fetchData promise,
 
       if (appState === undefined) {
         if (remainingPath !== undefined && remainingPath !== '' && remainingPath !== 'index.html') {
-          appState = _clone(defaultState);
+          appState = _clone(config.settings.initialSessionState);
           if (config.tablesById[datasetURLPathParts[1]] !== undefined) {
             const table = datasetURLPathParts[1];
             const selectedPrimKey = datasetURLPathParts[2];
@@ -165,10 +137,8 @@ if (dataset === undefined || dataset === null || dataset === '') {
           }
           appState.session.tabs.components.push('URLTab');
           appState.session.tabs.selectedTab = 'URLTab';
-        } else if (config.settings.initialSessionState !== undefined) {
-          appState = {session: config.settings.initialSessionState};
         } else {
-          appState = defaultState;
+          appState = config.settings.initialSessionState;
         }
       }
 

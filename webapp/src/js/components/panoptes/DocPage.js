@@ -146,7 +146,7 @@ let DocPage = createReactClass({
 
   render() {
     const {path, dynamicSize, ...otherProps} = this.props;
-    const {content} = this.state;
+    const {content, loadStatus} = this.state;
     const replaceSelf = this.props.replaceable ? this.props.replaceSelf : undefined;
     const actions = this.getFlux().actions;
     // NOTE: z-index of the Edit modal is currently set to 9997.
