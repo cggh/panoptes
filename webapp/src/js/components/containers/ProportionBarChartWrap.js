@@ -49,7 +49,6 @@ let ProportionBarChartWrap = createReactClass({
             display: 'table-cell',
             width: tickLabelWidthPercentage + '%',
             textAlign: 'center',
-            left: '' + (tickLabelWidthPercentage / 2) + '%',
           }}
         >
           {i * tickLabelWidthPercentage}%
@@ -101,7 +100,7 @@ let ProportionBarChartWrap = createReactClass({
                   style={{
                     position: 'absolute',
                     top: '0',
-                    left: '0',
+                    left: '' + (tickLabelWidthPercentage / 2) + '%', // Edge text-align overrides left, so keep separate.
                     display: 'table',
                     width: '100%',
                     height: '100%',
