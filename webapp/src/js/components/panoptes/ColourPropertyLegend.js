@@ -4,7 +4,7 @@ import _isEmpty from 'lodash.isempty';
 import SQL from 'panoptes/SQL';
 import withAPIData from 'hoc/withAPIData';
 import LegendElement from 'panoptes/LegendElement';
-import {propertyColour, scaleColour, isColourDark} from 'util/Colours';
+import {propertyColour, isColourDark} from 'util/Colours';
 import Color from 'color';
 
 class ColourPropertyLegend extends React.Component {
@@ -164,7 +164,7 @@ class ColourPropertyLegend extends React.Component {
 
       for (let i = 0, numberOfBins = thresholds.length - 1; i < numberOfBins; i++) {
         const binMin = thresholds[i];
-        const binMax = thresholds[i+1];
+        const binMax = thresholds[i + 1];
         //// Determine bar colours
         let binBackgroundColour = colours[i];
         // NOTE: Setting CSS opacity would also change the text and border colours.
@@ -172,21 +172,21 @@ class ColourPropertyLegend extends React.Component {
         const binBackgroundColourIsDark = isColourDark(binBackgroundColourObj.rgb());
         const binTextColourAmended = binTextColour !== undefined ? binTextColour : (binBackgroundColourIsDark === null ? mediumColour : (binBackgroundColourIsDark ? lightColour : darkColour));
         const valueInsideColour = layout === 'values-inside-colours' ? <span>{Math.round(binMin)}&ndash;{Math.round(binMax)}{valueSuffix}</span> : null;
-        const style={
+        const style = {
           border: 0,
-            position: 'relative',
-            display: 'table-cell',
-            width: binWidthPercentage + '%',
-            color: binTextColourAmended,
-            backgroundColor: binBackgroundColourObj.rgb(), // rgb() gives rgba()
-            padding: '0 3px 0 3px',
-            borderLeft: layout === 'values-outside-colours' ? `solid ${tickLineColour} 1px` : (showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
-            borderRight: (i === numberOfBins && layout === 'values-outside-colours') ? `solid ${tickLineColour} 1px` : (i === numberOfBins && showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
+          position: 'relative',
+          display: 'table-cell',
+          width: binWidthPercentage + '%',
+          color: binTextColourAmended,
+          backgroundColor: binBackgroundColourObj.rgb(), // rgb() gives rgba()
+          padding: '0 3px 0 3px',
+          borderLeft: layout === 'values-outside-colours' ? `solid ${tickLineColour} 1px` : (showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
+          borderRight: (i === numberOfBins && layout === 'values-outside-colours') ? `solid ${tickLineColour} 1px` : (i === numberOfBins && showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
         };
         if (interpolate) {
           let gradientColour = `linear-gradient(to right, ${colourFunc(binMin)} 0%`;
           for (let i = 0.1; i < 1; i += 0.2) {
-            gradientColour += `,${colourFunc(binMin + i*(binMax-binMin))} ${i * 100}%`;
+            gradientColour += `,${colourFunc(binMin + i * (binMax - binMin))} ${i * 100}%`;
           }
           gradientColour += ')';
           style.background = gradientColour;
@@ -210,11 +210,17 @@ class ColourPropertyLegend extends React.Component {
                 width: binWidthPercentage + '%',
                 color: binTextColour,
                 padding: '0 3px 0 3px',
-                textAlign: 'right',
-                right: '-1.5em',
+                textAlign: 'right', // Edge text-align overrides left, so keep separate.
               }}
             >
-              {Math.round(binMax)}{valueSuffix}
+              <div
+                style={{
+                  position: 'relative',
+                  left: '1.5em', // Edge text-align overrides left, so keep separate.
+                }}
+              >
+                {Math.round(binMax)}{valueSuffix}
+              </div>
             </div>
           );
           tickElements.push(
@@ -225,7 +231,7 @@ class ColourPropertyLegend extends React.Component {
                 display: 'table-cell',
                 width: binWidthPercentage + '%',
                 borderLeft: `solid ${tickLineColour} 1px`,
-                borderRight: i === numberOfBins-1 ? `solid ${tickLineColour} 1px` : 'none',
+                borderRight: i === numberOfBins - 1 ? `solid ${tickLineColour} 1px` : 'none',
               }}
             >
             </div>
@@ -248,7 +254,13 @@ class ColourPropertyLegend extends React.Component {
               {tickElements}
             </div>
           </div>,
-          <div key="labelElements" style={{width: 'calc(100% - 3em)', marginLeft: '1.5em'}}>
+          <div
+            key="labelElements"
+            style={{
+              width: 'calc(100% - 3em)',
+              marginLeft: '1.5em',
+            }}
+          >
             <div
               style={{
                 display: 'table',
