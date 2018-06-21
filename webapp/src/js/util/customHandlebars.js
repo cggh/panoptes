@@ -8,17 +8,24 @@ import _map from 'lodash.map';
 import _forEach from 'lodash.foreach';
 import handlebarsHelpers from 'handlebars-helpers';
 import resolveJoins from 'panoptes/resolveJoins';
-import {propertyColour,isColourDark} from 'util/Colours';
+import {propertyColour, isColourDark} from 'util/Colours';
+
+const lightTextColour = '#F0F0F0';
+const darkTextColour = '#101010';
 
 const customHandlebars = ({dataset, tablesById, handlebars, constants}) => {
   let hb = handlebars || promisedHandlebars(Handlebars);
+  hb.registerHelper('constrastTextColour', function() {
+    const [backgroundColour] = arguments;
+    return isColourDark(backgroundColour) ? lightTextColour : darkTextColour;
+  });
   hb.registerHelper('colour', function() {
     const [table, property, value] = arguments;
     return propertyColour(tablesById[table].propertiesById[property])(value);
   });
   hb.registerHelper('visibleColour', function() {
     const [table, property, value] = arguments;
-    return isColourDark(propertyColour(tablesById[table].propertiesById[property])(value)) ? '#F0F0F0' : '#101010';
+    return isColourDark(propertyColour(tablesById[table].propertiesById[property])(value)) ? lightTextColour : darkTextColour;
   });
   hb.registerHelper('constant', function() {
     return constants[arguments[0]];
