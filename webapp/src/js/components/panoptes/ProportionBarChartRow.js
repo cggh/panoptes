@@ -278,7 +278,7 @@ let ProportionBarChartRow = createReactClass({
       } else if (colourProperty !== undefined) {
         const [cTable, cProp] = colourProperty.split('.');
         const colourFunction = propertyColour(this.config.tablesById[cTable].propertiesById[cProp]);
-        leftBarColour = colourFunction(convertProportionsToPercentages ? 100 * (numerator/denominator) : numerator/denominator);
+        leftBarColour = colourFunction(convertProportionsToPercentages ? 100 * (numerator / denominator) : numerator / denominator);
       }
 
       const lightColour = '#F0F0F0';
@@ -392,7 +392,7 @@ let ProportionBarChartRow = createReactClass({
                 }}
               >
                 <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
-                <div style={{display: 'table-cell', width: (100-numeratorAsPercentage) + '%', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
+                <div style={{display: 'table-cell', width: (100 - numeratorAsPercentage) + '%', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
               </div>
               :
               <div
