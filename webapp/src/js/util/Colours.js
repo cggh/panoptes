@@ -284,7 +284,7 @@ export function isValidColour(colour) {
 // Credit: https://24ways.org/2010/calculating-color-contrast
 export function isColourDark(colour) {
   if (colour === 'transparent' || colour === 'inherit' || colour === 'initial') {
-    console.warn('Cannot determine isColourDark for ', colour);
+    console.warn('Cannot determine isColourDark for', colour);
     return null;
   }
   colour = Color(colour);
