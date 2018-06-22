@@ -22,12 +22,34 @@
         }
       }
 
+      @keyframes grow-right {
+        from {
+          transform: scaleX(0.05);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      @keyframes grow-left {
+        from {
+          transform: scaleX(0.05);
+          transform-origin: 35.918px;
+        }
+        to {
+          transform: scaleX(1);
+          transform-origin: 35.918px;
+        }
+      }
+
       .right-bar {
         -webkit-animation: grow-right 2s infinite ease-out;
+        animation: grow-right 2s infinite ease-out;
       }
 
       .left-bar {
         -webkit-animation: grow-left 2s infinite ease-out;
+        animation: grow-left 2s infinite ease-out;
       }
 
     /* ]]> */
