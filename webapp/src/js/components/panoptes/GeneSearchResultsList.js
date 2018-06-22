@@ -11,8 +11,8 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
-import ListSubheader from 'material-ui/List/ListSubheader';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 

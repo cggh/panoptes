@@ -68,7 +68,7 @@ let Confirm = createReactClass({
             onClick={this.handleCancel}
           />
           <Button
-            raised
+            raised="true"
             autoFocus={true}
             style={{marginRight: '10px'}}
             label={confirmButtonLabel}

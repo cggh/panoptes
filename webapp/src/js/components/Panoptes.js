@@ -25,20 +25,20 @@ import SessionComponent from 'panoptes/SessionComponent';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 // Material UI
-import IconButton from 'material-ui/IconButton';
-// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-// import createMuiTheme from 'material-ui/styles/createMuiTheme';
-import createPalette from 'material-ui/styles/createPalette';
-import createTypography from 'material-ui/styles/createTypography';
-import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {withTheme} from 'material-ui/styles';
+import IconButton from '@material-ui/core/IconButton';
+// import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+// import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import createPalette from '@material-ui/core/styles/createPalette';
+import createTypography from '@material-ui/core/styles/createTypography';
+import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
+import {withTheme} from '@material-ui/core/styles';
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
 
 //https://github.com/facebook/flow/issues/380
-import {blue, pink} from 'material-ui/colors';
-import {A200 as pinkA200} from 'material-ui/colors/pink';
-//import red from 'material-ui/colors/red';
+import {blue, pink} from '@material-ui/core/colors';
+import {A200 as pinkA200} from '@material-ui/core/colors/pink';
+//import red from '@material-ui/core/colors/red';
 
 // Panoptes utils
 import DetectResize from 'utils/DetectResize';
@@ -53,10 +53,6 @@ const palette = createPalette({
   primary1Color: blue[500],
   primary2Color: blue[700],
   accent1Color: pinkA200,
-  genotypeRefColor: 'rgb(0, 128, 192)',
-  genotypeAltColor: 'rgb(255, 50, 50)',
-  genotypeHetColor: 'rgb(0, 192, 120)',
-  genotypeNoCallColor: 'rgb(230, 230, 230)'
 });
 
 const fontStyle = {

@@ -37,7 +37,7 @@ let RandomSubsetSizeSelector = createReactClass({
   },
 
   render() {
-    let {label, value} = this.props;
+    let {label, value, style} = this.props;
 
     let options = [
       { key: NULL_VALUE , label: "No subsampling" , value: NULL_VALUE },
@@ -59,6 +59,7 @@ let RandomSubsetSizeSelector = createReactClass({
 
     return (
       <SelectWithNativeFallback
+        style={style}
         value={value}
         fullWidth={true}
         helperText={label}

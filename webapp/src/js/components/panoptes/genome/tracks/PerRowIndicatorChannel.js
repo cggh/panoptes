@@ -431,19 +431,18 @@ let PerRowIndicatorChannel = createReactClass({
     let hoverId = this.primKeys ? this.primKeys[hoverIndex] : null;
     const scaleFactor = ((width - sideWidth) / (end - start));
     let hoverPx = hoverId ? scaleFactor * (this.positions[hoverIndex] - start) : null;
+    const Side = (props) => <div className="side-name">
+            <span>
+              {this.getDefinedQuery() !== SQL.nullQuery ? <span>Filtered<br/></span> : null}
+              {this.config.tablesById[table].capNamePlural}
+            </span>
+          </div>;
     return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
         height={HEIGHT}
-        sideComponent={
-          <div className="side-name">
-            <span>
-              {this.getDefinedQuery() !== SQL.nullQuery ? <span>Filtered<br/></span> : null}
-              {this.config.tablesById[table].capNamePlural}
-            </span>
-          </div>
-        }
+        sideComponent={<Side/>}
         //Override component update to get latest in case of skipped render
         configComponent={<PerRowIndicatorControls {...this.props} query={this.getDefinedQuery()}
           setProps={this.redirectedProps.setProps}/>}

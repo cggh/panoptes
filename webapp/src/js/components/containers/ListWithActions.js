@@ -10,7 +10,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
-import TextField from 'material-ui/TextField';
+import TextField from '@material-ui/core/TextField';
 import Button from 'ui/Button';
 
 // Panoptes UI

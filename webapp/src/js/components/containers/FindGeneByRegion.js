@@ -176,7 +176,7 @@ let FindGeneByRegion = createReactClass({
               <th className="table-col-header"></th>
               <td className="table-col-cell">
                 <Button
-                  raised
+                  raised="true"
                   label="Find"
                   disabled={startPosition < 0 || endPosition > chromosomeLength}
                   color="primary"

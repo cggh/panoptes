@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import TextField from 'material-ui/TextField';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
 
 
 let NumericInput = createReactClass({
@@ -42,7 +45,7 @@ let NumericInput = createReactClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    let focused = this.textField.state.isFocused;
+    let focused = this.textField === document.activeElement;
     if (!focused) {
       this.setState({value: nextProps.value.toString()});
     }
@@ -72,17 +75,17 @@ let NumericInput = createReactClass({
     let {label, width, disabled} = this.props;
     let {error, value} = this.state;
     return (
-      <TextField
-        disabled={disabled}
-        type="number"
-        style={{width: `${width * 30}px`}}
-        ref={(node) => this.textField = node}
-        label={label}
-        errorText={error}
-        value={value}
-        onBlur={this.handleBlur}
-        onChange={this.handleChange}
-      />
+      <FormControl error={!!error} aria-describedby="name-error-text">
+        <InputLabel htmlFor="name-error">{label}</InputLabel>
+        <Input  disabled={disabled}
+                type="number"
+                style={{width: `${width * 30}px`}}
+                inputRef={(node) => this.textField = node}
+                value={value}
+                onBlur={this.handleBlur}
+                onChange={this.handleChange} />
+        {error ? <FormHelperText id="name-error-text">{error}</FormHelperText> : null}
+      </FormControl>
     );
   },
 });

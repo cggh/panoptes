@@ -5,15 +5,15 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import classNames from 'classnames';
 import Highlight from 'react-highlighter';
 
-import TextField from 'material-ui/TextField';
+import TextField from '@material-ui/core/TextField';
 import Button from 'ui/Button';
-import List, {ListItem, ListItemText, ListItemIcon, ListItemSecondaryAction} from 'material-ui/List';
-import Collapse from 'material-ui/transitions/Collapse';
-import ExpandLess from 'material-ui-icons/ExpandLess';
-import ExpandMore from 'material-ui-icons/ExpandMore';
-import DeleteIcon from 'material-ui-icons/Delete';
-import PlaylistAddIcon from 'material-ui-icons/PlaylistAdd';
-import {withStyles} from 'material-ui/styles';
+import {List, ListItem, ListItemText, ListItemIcon, ListItemSecondaryAction} from '@material-ui/core';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import DeleteIcon from '@material-ui/icons/Delete';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import {withStyles} from '@material-ui/core/styles';
 import _map from 'lodash.map';
 import _includes from 'lodash.includes';
 import _intersection from 'lodash.intersection';
@@ -25,7 +25,7 @@ import _filter from 'lodash.filter';
 import _difference from 'lodash.difference';
 import _clone from 'lodash.clone';
 import Icon from 'ui/Icon';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '@material-ui/core/IconButton';
 
 const styles = (theme) => ({
   nested: {
@@ -205,7 +205,7 @@ let GroupedItemPicker = createReactClass({
                               </ListItemSecondaryAction>
                             </span>
                           </ListItem>
-                          <Collapse in={this.isAvailableExpanded(id)} transitionDuration="auto" unmountOnExit>
+                          <Collapse in={this.isAvailableExpanded(id)} >
                             {subItems}
                           </Collapse>
                         </div>
@@ -250,7 +250,7 @@ let GroupedItemPicker = createReactClass({
                             </ListItemSecondaryAction>
                           </span>
                         </ListItem>
-                        <Collapse in={this.isPickedExpanded(id)} transitionDuration="auto" unmountOnExit>
+                        <Collapse in={this.isPickedExpanded(id)} >
                           {
                             _map(properties, (prop) => {
                               let {name, description, id, icon} = prop;
@@ -282,7 +282,7 @@ let GroupedItemPicker = createReactClass({
               </List>
             </div>
             <div className="centering-container">
-              <Button raised label="Use" color="primary" onClick={this.handlePick}/>
+              <Button raised="true" label="Use" color="primary" onClick={this.handlePick}/>
             </div>
           </div>
         </div>

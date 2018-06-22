@@ -351,16 +351,17 @@ let AnnotationChannel = createReactClass({
     //   }
     // }
 
+    const Side = (props) =>
+      <div className="side-name">
+        <span>{name || 'Genes'}</span>
+      </div>;
+
     return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
         height={height}
-        sideComponent={
-          <div className="side-name">
-            <span>{name || 'Genes'}</span>
-          </div>
-        }
+        sideComponent={ <Side/> }
         configComponent={null}
         legendComponent={<Legend/>}
         onClose={null}

@@ -8,8 +8,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
-import ListSubheader from 'material-ui/List/ListSubheader';
+import { List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import Icon from 'ui/Icon';
 import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
 

@@ -3,9 +3,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'ui/Sidebar';
-import Select from 'material-ui/Select';
-import Input from 'material-ui/Input';
-import {MenuItem} from 'material-ui/Menu';
+import Select from '@material-ui/core/Select';
+import Input from '@material-ui/core/Input';
+import MenuItem from '@material-ui/core/MenuItem';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';

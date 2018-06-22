@@ -28,7 +28,7 @@ import QueryString from 'panoptes/QueryString';
 import FilterButton from 'panoptes/FilterButton';
 import TooltipEllipsis from 'ui/TooltipEllipsis';
 
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '@material-ui/core/Checkbox';
 
 
 let CategoricalChannel = createReactClass({
@@ -408,19 +408,21 @@ let CategoricalTrackControls = createReactClass({
         <div className="control">
           <div className="label">Fractional:</div>
           <Checkbox
+            color="primary"
             name="fractional"
-            defaultChecked={fractional}
+            checked={fractional}
             style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.setProps({fractional: checked})}/>
+            onChange={(e, checked) => this.redirectedProps.setProps({fractional: checked})}/>
         </div>
         <div className="control-group">
           <div className="control">
             <div className="label">Auto Y Scale:</div>
             <Checkbox
+              color="primary"
               name="autoYScale"
-              defaultChecked={autoYScale}
+              checked={autoYScale}
               style={{width: 'inherit'}}
-              onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
+              onChange={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
           </div>
           {!autoYScale ? <div className="control">
             <div className="label">Y Min:</div>

@@ -18,12 +18,12 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-import Table, {
+import {Table,
   TableBody,
   TableHead,
   TableRow,
   TableCell
-} from 'material-ui/Table';
+} from '@material-ui/core';
 // Panoptes components
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';

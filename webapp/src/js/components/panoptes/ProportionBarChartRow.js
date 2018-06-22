@@ -10,7 +10,7 @@ import withAPIData from 'hoc/withAPIData';
 import {
   TableCell,
   TableRow,
-} from 'material-ui/Table';
+} from '@material-ui/core';
 
 import {colours, propertyColour, isColourDark, scaleColour} from 'util/Colours';
 

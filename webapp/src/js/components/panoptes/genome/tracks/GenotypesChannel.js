@@ -20,10 +20,10 @@ import _some from 'lodash.some';
 import _takeRight from 'lodash.takeright';
 import _unique from 'lodash.uniq';
 import _isFinite from 'lodash.isfinite';
-import Select from 'material-ui/Select';
-import Input from 'material-ui/Input';
-import {MenuItem} from 'material-ui/Menu';
-import Checkbox from 'material-ui/Checkbox';
+import Select from '@material-ui/core/Select';
+import Input from '@material-ui/core/Input';
+import MenuItem from '@material-ui/core/MenuItem';
+import Checkbox from '@material-ui/core/Checkbox';
 import Button from 'ui/Button';
 
 import SQL from 'panoptes/SQL';
@@ -485,6 +485,7 @@ let GenotypesChannel = createReactClass({
   handleMouseMove(e) {
     e.persist();
     e.hoverHandled = true;
+    if (!this.state.layoutBlocks) return;
     let [x, y] = this.convertXY(e);
     let {nearestPos, nearestClickIndex} = this.xyToIndex(x, y);
     this.setHover({nearestPos, nearestClickIndex});
@@ -764,6 +765,7 @@ const GenotypesControls = createReactClass({
           </div>
           <div className="control">
             <RandomSubsetSizeSelector
+              style={{width: "175px"}}
               value={rowRandomSubsetSize}
               onChange={(v) => this.handleChangeRandomSubsetSize(v)}
               label="Row random subset size"
@@ -783,7 +785,7 @@ const GenotypesControls = createReactClass({
         </div>
         <div className="control-group">
           <div className="control">
-            <Select value={cellColour}
+            <Select value={cellColour === undefined ? '' : cellColour}
               fullWidth={true}
               label="Cell colour"
               onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}
@@ -794,7 +796,7 @@ const GenotypesControls = createReactClass({
             </Select>
           </div>
           <div className="control">
-            <Select value={cellAlpha}
+            <Select value={cellAlpha === undefined ? 'none' : cellAlpha}
               fullWidth={true}
               label="Cell opacity"
               onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}
@@ -807,7 +809,7 @@ const GenotypesControls = createReactClass({
             </Select>
           </div>
           <div className="control">
-            <Select value={cellHeight}
+            <Select value={cellHeight === undefined ? 'none' : cellHeight}
               fullWidth={true}
               label="Cell height"
               onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}
@@ -825,9 +827,10 @@ const GenotypesControls = createReactClass({
             <div className="label">Space columns:</div>
             <Checkbox
               name="layoutGaps"
-              defaultChecked={layoutGaps}
+              color="primary"
+              checked={layoutGaps}
               style={{width: 'inherit'}}
-              onCheck={(e, checked) => this.redirectedProps.setProps({layoutGaps: checked})}/>
+              onChange={(e, checked) => this.redirectedProps.setProps({layoutGaps: checked})}/>
           </div>
         </div>
 

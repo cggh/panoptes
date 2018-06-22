@@ -46,7 +46,7 @@ let DocLink = createReactClass({
         <Button
           onClick={(e) => this.handleClick(e)}
           color="primary"
-          raised={true}
+          raised="true"
           target="popup"
         >
           {children}

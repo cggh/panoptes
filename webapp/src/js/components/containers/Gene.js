@@ -188,7 +188,7 @@ let Gene = createReactClass({
             </div>
             <div className="horizontal stack wrap">
               <Button
-                raised
+                raised="true"
                 style={{margin: '7px', color: 'white'}}
                 label="Show in Genome Browser"
                 color="primary"

@@ -111,22 +111,22 @@ let GenotypesTable = createReactClass({
           let height = heightArray ?
             Math.max(0, Math.min(1, (heightArray[index] - heightOffset) / heightScale)) : 1;
           //Decide a colour for this genotype
-          let {genotypeRefColor, genotypeAltColor, genotypeHetColor, genotypeNoCallColor} = this.context.muiTheme.palette;
+          let {genotypeRefColour, genotypeAltColour, genotypeHetColour, genotypeNoCallColour} = this.config.twoDTablesById[table];
           if (cellColour === 'call') {
             switch (colArray[index]) {
             case 0:  //REF
-              ctx.fillStyle = colourToRGBA(genotypeRefColor, alpha);
+              ctx.fillStyle = colourToRGBA(genotypeRefColour, alpha);
               break;
             case 1:  //ALT
-              ctx.fillStyle = colourToRGBA(genotypeAltColor, alpha);
+              ctx.fillStyle = colourToRGBA(genotypeAltColour, alpha);
               break;
             case 2:  //HET
-              ctx.fillStyle = colourToRGBA(genotypeHetColor, alpha);
+              ctx.fillStyle = colourToRGBA(genotypeHetColour, alpha);
               break;
             default: //NO CALL
               height = 0.2;
               alpha = 0.2;
-              ctx.fillStyle = genotypeNoCallColor;
+              ctx.fillStyle = genotypeNoCallColour;
               break;
             }
           } else if (cellColour === 'fraction') {

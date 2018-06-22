@@ -4,8 +4,8 @@ import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import MuiIcon from 'material-ui/Icon';
-import {withStyles} from 'material-ui/styles';
+import MuiIcon from '@material-ui/core/Icon';
+import {withStyles} from '@material-ui/core/styles';
 
 import _startsWith from 'lodash.startswith';
 

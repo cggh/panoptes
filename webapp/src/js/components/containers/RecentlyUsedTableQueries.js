@@ -9,8 +9,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Material UI
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
-import ListSubheader from 'material-ui/List/ListSubheader';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
+import ListSubheader from '@material-ui/core/ListSubheader';
 
 // UI
 import Icon from 'ui/Icon';

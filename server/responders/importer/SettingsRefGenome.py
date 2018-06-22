@@ -46,6 +46,7 @@ class SettingsRefGenome(ImportSettings):
                           ('externalGeneLinks' , {
                                    'type': 'List',
                                    'required': False,
+                                   'default': [],
                                    'description': '''Each item in the list specifies a link for a gene to an external url.
   These links will show up as buttons in the gene popup window''',
                                    'children': OrderedDict((

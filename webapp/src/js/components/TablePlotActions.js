@@ -15,11 +15,6 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-// Material UI
-import Select from 'material-ui/Select';
-import Input from 'material-ui/Input';
-import {MenuItem} from 'material-ui/Menu';
-
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';

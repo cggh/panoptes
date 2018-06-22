@@ -17,7 +17,7 @@ let LegendElement = createReactClass({
   ],
 
   propTypes: {
-    name: PropTypes.string,
+    name: PropTypes.node,
     colour: PropTypes.string,
     onPickColour: PropTypes.func
   },

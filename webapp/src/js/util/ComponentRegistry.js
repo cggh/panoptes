@@ -12,13 +12,13 @@ if (typeof String.prototype.endsWith !== 'function') {
 
 const typeByDisplayName = {};
 dynreq.keys().forEach((component) => {
-  if (!component.endsWith('.js') && !component.endsWith('.css')) {
+  if (!component.endsWith('.js') && !component.endsWith('.css') && !component.endsWith('.scss')) {
     let reactClass = dynreq(component);
     if (reactClass.__esModule) {
       reactClass = reactClass.default;
     }
     const displayName = getDisplayName(reactClass);
-    if (displayName == 'Component') {
+    if (displayName == 'Component' || displayName === 'Unknown') {
       console.error(`No displayName for:${component}`);
     } else if (typeByDisplayName[displayName]) {
       console.error(`Duplicate component displayName:${displayName} in ${component}`);
@@ -29,7 +29,7 @@ dynreq.keys().forEach((component) => {
 });
 
 //We now add in specific material-ui classes
-import Card, { CardHeader, CardMedia, CardContent, CardActions } from 'material-ui/Card';
+import { Card, CardHeader, CardMedia, CardContent, CardActions } from '@material-ui/core';
 Card.displayName = "Card";
 typeByDisplayName['Card'] = Card;
 CardActions.displayName = "CardActions";
@@ -41,7 +41,7 @@ typeByDisplayName['CardMedia'] = CardMedia;
 CardMedia.displayName = "CardMedia";
 typeByDisplayName['CardContent'] = CardContent;
 
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 typeByDisplayName['List'] = List;
 typeByDisplayName['ListItem'] = ListItem;
 let wrappedListItemIcon = ({children}) => {
@@ -61,12 +61,12 @@ let wrappedListItemText = ({children}) => {
 wrappedListItemText.displayName = "ListItemText";
 typeByDisplayName['ListItemText'] = wrappedListItemText;
 
-import Typography from 'material-ui/Typography';
+import Typography from '@material-ui/core/Typography';
 Typography.displayName = 'Typography';
 
 typeByDisplayName['Typography'] = Typography;
 
-import {Tabs, Tab} from 'material-ui/Tabs';
+import {Tabs, Tab} from '@material-ui/core';
 typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
 

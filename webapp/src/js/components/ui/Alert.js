@@ -55,7 +55,7 @@ let Alert = createReactClass({
         <div style={{padding: '10px'}}>{message}</div>
         <div style={{padding: '5px 0 0 0', textAlign: 'center'}}>
           <Button
-            raised
+            raised="true"
             style={{marginRight: '10px'}}
             label={OKButtonLabel}
             color="primary"

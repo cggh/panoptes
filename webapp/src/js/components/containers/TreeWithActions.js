@@ -142,7 +142,7 @@ let TreeWithActions = createReactClass({
             : null }
           {treeInfo && treeInfo.crossLink && _has(this.config.tablesById, treeInfo.crossLink.split('::')[0]) ?
             <Button
-              raised
+              raised="true"
               onClick={this.handleCrossLink}
               label={`Show ${this.config.tablesById[treeInfo.crossLink.split('::')[0]].capNameSingle}`}
               iconName={this.config.tablesById[treeInfo.crossLink.split('::')[0]].icon}

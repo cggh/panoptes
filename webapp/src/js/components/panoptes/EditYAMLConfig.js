@@ -87,7 +87,7 @@ let EditYAMLConfig = createReactClass({
               onClick={() => actions.session.modalClose()}
             />
             <Button
-              raised
+              raised="true"
               label="Save"
               color="primary"
               disabled={loading}

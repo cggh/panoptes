@@ -56,7 +56,7 @@ let ItemLink = createReactClass({
           color="default"
           label={children}
           iconName="circle"
-          raised={true}
+          raised="true"
           target="popup"
         />
       );

@@ -162,7 +162,7 @@ let EditDocPage = createReactClass({
               onClick={() => actions.session.modalClose()}
             />
             <Button
-              raised
+              raised="true"
               label="Save"
               color="primary"
               iconName="save"

@@ -2,11 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import Table, {
+import {Table,
   TableBody,
   TableCell,
   TableRow,
-} from 'material-ui/Table';
+} from '@material-ui/core';
 
 let ProportionBarChartWrap = createReactClass({
   displayName: 'ProportionBarChartWrap',

@@ -9,9 +9,9 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
-import List, {ListItem, ListItemText, ListItemIcon, ListItemSecondaryAction} from 'material-ui/List';
-import ListSubheader from 'material-ui/List/ListSubheader';
-import IconButton from 'material-ui/IconButton';
+import {List, ListItem, ListItemText, ListItemIcon, ListItemSecondaryAction} from '@material-ui/core';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import IconButton from '@material-ui/core/IconButton';
 
 // UI
 import Icon from 'ui/Icon';
