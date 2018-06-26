@@ -33,6 +33,7 @@ let TableWithLegend = createReactClass({
     onClickComponent: PropTypes.string,
     onClickComponentProps: PropTypes.string,
     onClickComponentTemplateDocPath: PropTypes.string,
+    verticalLabelsForColumns: PropTypes.array,
   },
 
   getDefaultProps() {
@@ -73,6 +74,7 @@ let TableWithLegend = createReactClass({
       onClickComponent,
       onClickComponentProps,
       onClickComponentTemplateDocPath,
+      verticalLabelsForColumns,
     } = this.props;
     order = this.state.order || order;
     query = this.getDefinedQuery(query, table);
@@ -85,15 +87,17 @@ let TableWithLegend = createReactClass({
     }
 
     return (
-      <div style={{position: 'relative',minHeight: '100%'}}>
-        <div className="horiz-centering-container vertical stack"
-             style={{height: '100%', position: 'relative', zIndex: 100}}>
+      <div style={{position: 'relative', minHeight: '100%'}}>
+        <div
+          className="horiz-centering-container vertical stack"
+          style={{height: '100%', position: 'relative', zIndex: 100}}
+        >
           <div style={{maxWidth: '650px', width: '100%'}}>
             <Card className={classes.card} style={{marginBottom: '15px'}}>
               <CardContent>
                 {filteredChildren}
               </CardContent>
-              <div className="grow" style={{padding:"15px"}}>
+              <div className="grow" style={{padding: '15px'}}>
                 <div className="scroll-within">
                   <MuiDataTableView
                     table={table}
@@ -108,6 +112,7 @@ let TableWithLegend = createReactClass({
                     onClickComponent={onClickComponent}
                     onClickComponentProps={onClickComponentProps}
                     onClickComponentTemplateDocPath={onClickComponentTemplateDocPath}
+                    verticalLabelsForColumns={verticalLabelsForColumns}
                   />
                 </div>
               </div>
