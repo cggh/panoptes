@@ -55,6 +55,7 @@
   "dependencies": {
     "babel-polyfill": "^6.23.0",
     "bloody-offset": "0.0.0",
+    "calculate-size": "^1.1.1",
     "classnames": "^2.2.5",
     "color": "^2.0.0",
     "console-polyfill": "^0.3.0",
@@ -157,8 +158,8 @@
     "react-plotlyjs": "^0.4.4",
     "react-resizable": "^1.6.0",
     "react-sidebar": "^2.3.0",
-    "react-transition-group": "^2.2.1",
     "react-swipeable-views": "^0.12.5",
+    "react-transition-group": "^2.2.1",
     "readline": "^1.3.0",
     "repeat-string": "^1.6.1",
     "scrollbar-size": "^2.1.0",
