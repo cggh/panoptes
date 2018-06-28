@@ -27,6 +27,7 @@ import resolveJoins from 'panoptes/resolveJoins';
 import withAPIData from 'hoc/withAPIData';
 import Loading from 'ui/Loading';
 import PropertyCell from 'panoptes/PropertyCell';
+import calculateSize from 'calculate-size';
 
 //FIXME: Allow any component for onClickComponent in onClickBehaviour tooltip.
 import ItemTemplate from 'panoptes/ItemTemplate';
@@ -67,6 +68,7 @@ let MuiDataTableView = createReactClass({
     loadStatus: PropTypes.string,
     colourValueTextBackground: PropTypes.bool,
     colourValueCellBackground: PropTypes.bool,
+    verticalLabelsForColumns: PropTypes.array,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array, // This will be provided via withAPIData
     onClickComponentTemplate: PropTypes.string, // This will be provided via withAPIData
@@ -87,6 +89,7 @@ let MuiDataTableView = createReactClass({
       onClickBehaviour: 'dataItemPopup',
       colourValueTextBackground: false,
       colourValueCellBackground: true,
+      verticalLabelsForColumns: [],
     };
   },
 
@@ -158,6 +161,7 @@ let MuiDataTableView = createReactClass({
   },
 
   render() {
+    const {verticalLabelsForColumns} = this.props;
     let {
       className, columns, order, data, loadStatus, maxRowsPerPage, startRowIndex,
       nullReplacement, nanReplacement, table,
@@ -283,11 +287,36 @@ let MuiDataTableView = createReactClass({
               <TableRow>
                 {groupOrderedColumns.map((column, columnIndex) => {
                   let columnData = this.propertiesByColumn(column);
+                  const hasVerticalLabel = (verticalLabelsForColumns.indexOf(column) !== -1);
+                  const size = calculateSize(columnData.name, {font: 'Roboto, sans-serif', fontSize: '12px'});
+                  const height = hasVerticalLabel ? (size.width + 25) + 'px' : size.height + 'px';
+                  const verticalWithNoDescriptionStyle = columnData.description ? {marginLeft: '10px'} : {marginLeft: '-6px'};
+                  const infoIcon = columnData.description ?
+                    <Tooltip
+                      placement="bottom"
+                      trigger="click"
+                      overlay={<div className="vertical stack">
+                        <div className="tooltip-description">
+                          <HTMLWithComponents>{columnData.description}</HTMLWithComponents>
+                        </div>
+                      </div>}
+                    >
+                      <Icon name="info-circle" className="info"/>
+                    </Tooltip>
+                    :
+                    null
+                  ;
                   return (
                     <TableCell
                       key={'column_' + columnIndex}
                       numeric={columnData.isNumerical}
                       padding={'none'}
+                      style={{
+                        border: 'solid 0', // Firefox leaks column group borders without this.
+                        verticalAlign: 'bottom',
+                        height,
+                        textAlign: 'left',
+                      }}
                     >
                       <TableSortLabel
                         active={sortOrderDirectionByColumnId[columnData.id] !== undefined ? true : false}
@@ -298,21 +327,25 @@ let MuiDataTableView = createReactClass({
                           }
                         }}
                       >
-                        {columnData.description ?
-                          <Tooltip
-                            placement="bottom"
-                            trigger="click"
-                            overlay={<div className="vertical stack">
-                              <div className="tooltip-description">
-                                <HTMLWithComponents>{columnData.description}</HTMLWithComponents>
-                              </div>
-                            </div>}
-                          >
-                            <Icon style={{paddingRight: '3px'}} className="info" name="info-circle"/>
-                          </Tooltip> : null
+                        {hasVerticalLabel ?
+                          <div style={{transformOrigin: 'left', transform: 'rotate(-90deg)', width: '0', marginLeft: '5px'}}>
+                            <span style={{fontSize: '12px', ...verticalWithNoDescriptionStyle}}>
+                              {columnData.name}
+                            </span>
+                          </div>
+                          :
+                          <div>
+                            <span style={{paddingRight: '3px'}}>{infoIcon}</span>
+                            {columnData.name}
+                          </div>
                         }
-                        {columnData.name}
+
                       </TableSortLabel>
+                      {hasVerticalLabel ?
+                        <span style={{position: 'absolute', left: '50%'}}>{infoIcon}</span>
+                        :
+                        null
+                      }
                     </TableCell>
                   );
                 }, this)}
