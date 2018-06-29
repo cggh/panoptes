@@ -89,7 +89,8 @@ export default class DivIcon extends MapLayer {
   render() {
     let {popup, ...otherProps} = this.props;
     if (!popup) return null;
-    popup = React.cloneElement(popup, {flux:this.props.flux || (this.context && this.context.flux)});
+    //We pass onChange so that when the popup resizes it moves the map so that it is in view
+    popup = React.cloneElement(popup, {onChange: () => this.forceUpdate(), flux:this.props.flux || (this.context && this.context.flux)});
     return <Popup minWidth={200} {...otherProps}>{popup}</Popup>;
   }
 }

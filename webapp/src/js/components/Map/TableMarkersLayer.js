@@ -719,7 +719,6 @@ let TableMarkersLayer = createReactClass({
                             // FIXME: Allow any other components.
                             console.error('onClickClusterBehaviour tooltip currently only supports onClickClusterComponent DataTableWithActions, ListWithActions and HandlebarsWithComponents, not: ', onClickClusterComponent);
                           }
-
                           return (
                             <ComponentMarker
                               key={`ComponentMarker_${i}`}
