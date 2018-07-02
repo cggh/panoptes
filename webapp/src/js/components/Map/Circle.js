@@ -42,7 +42,6 @@ let Circle = createReactClass({
 
   render() {
     let {center, ...otherProps} = this.props;
-console.log('Circle props', this.props);
     // Convert lat, lng strings to numbers
     center.lat = Number(center.lat);
     center.lng = Number(center.lng);

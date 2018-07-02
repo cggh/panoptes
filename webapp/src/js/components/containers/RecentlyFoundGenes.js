@@ -8,8 +8,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
-import ListSubheader from 'material-ui/List/ListSubheader';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import Icon from 'ui/Icon';
 
 let RecentlyFoundGenes = createReactClass({

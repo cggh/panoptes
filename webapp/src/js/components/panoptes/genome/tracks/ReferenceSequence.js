@@ -18,7 +18,7 @@ import Button from 'ui/Button';
 import PropTypes from 'prop-types';
 import Tooltip from 'rc-tooltip';
 
-const HEIGHT = 26;
+const HEIGHT = 27;
 const SEQ_LOOKUP = {
   97: 'A',
   116: 'T',

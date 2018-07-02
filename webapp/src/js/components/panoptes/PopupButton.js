@@ -97,22 +97,22 @@ let PopupButton = createReactClass({
       iconInverse,
       labelStyle,
       variant,
-      raised: variant === 'raised' ? true : false,
-      fab: variant === 'fab' ? true : false,
+      raised: variant === 'raised' ? "true" : "false",
+      fab: variant === 'fab' ? "true" : "false",
     };
 
     if (otherChildren.length === 1 && popupLabel === undefined && popupContent === undefined) {
       return (
         <Button
           {...buttonProps}
-          onClick={(e) => this.handleClick(e, <span>{otherChildren}</span>)}
+          onClick={(e) => this.handleClick(e, otherChildren[0])}
         />
       );
     } else if (otherChildren.length === 0 && popupLabel !== undefined && (popupContent !== undefined || target === 'dataItemPopup')) {
       return (
         <Button
           {...buttonProps}
-          onClick={(e) => this.handleClick(e, <span>{popupContent}</span>)}
+          onClick={(e) => this.handleClick(e, popupContent)}
         >
           {popupLabel}
         </Button>

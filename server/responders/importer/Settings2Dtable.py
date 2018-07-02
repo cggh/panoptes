@@ -53,6 +53,31 @@ class Settings2Dtable(ImportSettings):
                          'required': False,
                          'description': '1D Array in the zarr source dir that gives the value of ``rowIndexField`` for each row.\n  If this is omitted then it is assumed that the zarr columns are in the same\n  order as the ``rowDataTable`` data table, sorted by the ``rowIndexField property``'
                          }),
+                    ('genotypeRefColour', {
+                         'type': 'Text',
+                         'required': False,
+                         'default': 'rgb(0, 128, 192)',
+                         'description': 'Colour for the reference base'
+                         }),
+                    ('genotypeAltColour', {
+                         'type': 'Text',
+                         'required': False,
+                         'default': 'rgb(255, 50, 50)',
+                         'description': 'Colour for the alternative base'
+                         }),
+                    ('genotypeHetColour', {
+                         'type': 'Text',
+                         'required': False,
+                         'default': 'rgb(0, 192, 120)',
+                         'description': 'Colour for the heterogeneous call'
+                         }),
+                    ('genotypeNoCallColour', {
+                         'type': 'Text',
+                         'required': False,
+                         'default': 'rgb(230, 230, 230)',
+                         'description': 'Colour for the no-data call'
+                         }),
+
                     ('showInGenomeBrowser', {
                          'type': 'Block',
                          'required': False,

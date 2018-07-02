@@ -9,7 +9,7 @@ import Loading from 'ui/Loading';
 import ExpandingCard from 'containers/ExpandingCard';
 import ExpandingCardActions from 'containers/ExpandingCardActions';
 import ExpandingCardCollapse from 'containers/ExpandingCardCollapse';
-import {CardContent, CardHeader} from 'material-ui/Card';
+import {CardContent, CardHeader} from '@material-ui/core/Card';
 
 
 let Feed = createReactClass({

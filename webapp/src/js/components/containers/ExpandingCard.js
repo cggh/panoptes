@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Card, {CardContent, CardHeader, CardActions} from 'material-ui/Card';
+import {Card, CardContent, CardHeader, CardActions} from '@material-ui/core/Card';
 import filterChildren from 'util/filterChildren';
-import {withStyles} from 'material-ui/styles';
-import Collapse from 'material-ui/transitions/Collapse';
-import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
-import IconButton from 'material-ui/IconButton';
+import {withStyles} from '@material-ui/core/styles';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import IconButton from '@material-ui/core/IconButton';
 import classnames from 'classnames';
 
 const ALLOWED_CHILDREN = [
@@ -132,7 +132,7 @@ let ExpandingCard = createReactClass({
             <ExpandMoreIcon />
           </IconButton>
         </CardActions>
-        <Collapse in={this.state.expanded} transitionDuration="auto" unmountOnExit>
+        <Collapse in={this.state.expanded} >
           {collapsableContent}
         </Collapse>
       </Card>

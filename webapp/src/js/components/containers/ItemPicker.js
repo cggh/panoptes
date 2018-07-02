@@ -9,13 +9,13 @@ import _clone from 'lodash.clone';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
-import TextField from 'material-ui/TextField';
+import TextField from '@material-ui/core/TextField';
 import Button from 'ui/Button';
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
-import Collapse from 'material-ui/transitions/Collapse';
-import ExpandLess from 'material-ui-icons/ExpandLess';
-import ExpandMore from 'material-ui-icons/ExpandMore';
-import {withStyles} from 'material-ui/styles';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import {withStyles} from '@material-ui/core/styles';
 import Icon from 'ui/Icon';
 import Pluralise from 'ui/Pluralise';
 
@@ -50,7 +50,7 @@ let ItemPicker = createReactClass({
       PropTypes.shape({
         name: PropTypes.string.isRequired,
         icon: PropTypes.string,
-        items: PropTypes.objectOf(
+        items: PropTypes.arrayOf(
           PropTypes.shape({
             name: PropTypes.string.isRequired,
             icon: PropTypes.string,
@@ -62,7 +62,7 @@ let ItemPicker = createReactClass({
           PropTypes.shape({
             name: PropTypes.string.isRequired,
             icon: PropTypes.string,
-            items: PropTypes.objectOf(
+            items: PropTypes.arrayOf(
               PropTypes.shape({
                 name: PropTypes.string.isRequired,
                 icon: PropTypes.string,
@@ -228,7 +228,7 @@ let ItemPicker = createReactClass({
               />
               {this.isGroupExpanded(groupId) ? <ExpandMore /> : <ExpandLess />}
             </ListItem>
-            <Collapse in={this.isGroupExpanded(groupId)} transitionDuration="auto" unmountOnExit>
+            <Collapse in={this.isGroupExpanded(groupId)} >
               {nestedItems}
             </Collapse>
           </div>
@@ -266,7 +266,7 @@ let ItemPicker = createReactClass({
                 />
                 {this.isItemGroupExpanded(groupId, itemGroupId) ? <ExpandMore /> : <ExpandLess />}
               </ListItem>
-              <Collapse in={this.isItemGroupExpanded(groupId, itemGroupId)} transitionDuration="auto" unmountOnExit>
+              <Collapse in={this.isItemGroupExpanded(groupId, itemGroupId)} >
                 {itemGroupNestedItems}
               </Collapse>
             </div>
@@ -294,7 +294,7 @@ let ItemPicker = createReactClass({
                 />
                 {this.isGroupExpanded(groupId) ? <ExpandMore /> : <ExpandLess />}
               </ListItem>
-              <Collapse in={this.isGroupExpanded(groupId)} transitionDuration="auto" unmountOnExit>
+              <Collapse in={this.isGroupExpanded(groupId)} >
                 {nestedItemGroups}
               </Collapse>
             </div>
@@ -356,7 +356,7 @@ let ItemPicker = createReactClass({
             <div className="centering-container">
               <div style={{paddingRight: '10px'}}><Button label="Clear" onClick={this.handleRemoveAll}/></div>
               <Button
-                raised
+                raised="true"
                 label={<span>{`${pickVerb} ${picked.length}`} <Pluralise text={itemName} ord={picked.length}/></span>}
                 color="primary"
                 onClick={this.handlePick}

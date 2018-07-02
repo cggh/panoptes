@@ -9,7 +9,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import GeneSearchResultsList from 'panoptes/GeneSearchResultsList';
 
 // Material UI
-import TextField from 'material-ui/TextField';
+import TextField from '@material-ui/core/TextField';
 
 
 let FindGeneByNameDesc = createReactClass({

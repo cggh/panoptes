@@ -18,7 +18,7 @@ import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
 // Material UI
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
 
 // Utils
 import RequestContext from 'util/RequestContext';

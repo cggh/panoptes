@@ -10,7 +10,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 import Sidebar from 'ui/Sidebar';
-import Divider from 'material-ui/Divider';
+import Divider from '@material-ui/core/Divider';
 import Button from 'ui/Button';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';

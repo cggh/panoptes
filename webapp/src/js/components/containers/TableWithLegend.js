@@ -5,8 +5,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import SQL from 'panoptes/SQL';
 import MuiDataTableView from 'panoptes/MuiDataTableView';
-import Card, {CardContent} from 'material-ui/Card';
-import {withStyles} from 'material-ui/styles';
+import {Card, CardContent} from '@material-ui/core';
+import {withStyles} from '@material-ui/core/styles';
 import filterChildren from 'util/filterChildren';
 
 const styles = (theme) => ({

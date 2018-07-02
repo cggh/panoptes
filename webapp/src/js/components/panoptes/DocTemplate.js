@@ -5,7 +5,7 @@ import withAPIData from 'hoc/withAPIData';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin'; // Need this?
 import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '@material-ui/core/IconButton';
 import EditDocPage from 'panoptes/EditDocPage';
 
 let DocTemplate = createReactClass({
@@ -36,13 +36,14 @@ let DocTemplate = createReactClass({
       [
         this.config.user.isManager && hideEditButton == false ?
           <IconButton
+            key='icon'
             aria-label="Edit"
             className="fa fa-edit"
             onClick={() => this.getFlux().actions.session.modalOpen(<EditDocPage path={path}/>)}
             style={{position: 'absolute', left: '0', right: '0', margin: 'auto', zIndex: editButtonZIndex}}
           />
           : null,
-        template === undefined ? null : React.createElement(HandlebarsWithComponents, otherProps, template)
+        template === undefined ? null : React.createElement(HandlebarsWithComponents, {key: 'template', ...otherProps}, template)
       ]
     );
   }

@@ -15,7 +15,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
 import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
-import Checkbox from 'material-ui/Checkbox';
+import Checkbox from '@material-ui/core/Checkbox';
 import Button from 'ui/Button';
 import serialiseComponent from 'util/serialiseComponent';
 import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
@@ -400,7 +400,7 @@ let NumericalTrackGroupControls = createReactClass({
               value="toggleValue1"
               checked={autoYScale}
               style={{width: 'inherit'}}
-              onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
+              onChange={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
           </div>
           {!autoYScale ? <div className="control">
             <div className="label">Y Min:</div>

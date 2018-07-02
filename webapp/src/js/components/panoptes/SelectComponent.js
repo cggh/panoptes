@@ -4,10 +4,10 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import _map from 'lodash.map';
-import Select from 'material-ui/Select';
-import Input, {InputLabel} from 'material-ui/Input';
-import {FormControl, FormHelperText} from 'material-ui/Form';
-import {MenuItem} from 'material-ui/Menu';
+import Select from '@material-ui/core/Select';
+import {Input, InputLabel} from '@material-ui/core';
+import {FormControl, FormHelperText} from '@material-ui/core';
+import {MenuItem} from '@material-ui/core';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 import uid from 'uid';

@@ -22,7 +22,7 @@ import LRUCache from 'util/LRUCache';
 import templateFieldsUsed from 'util/templateFieldsUsed';
 
 // Material UI components
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
 
 // UI components
 import Loading from 'ui/Loading';

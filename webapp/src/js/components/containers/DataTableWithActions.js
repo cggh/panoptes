@@ -18,8 +18,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 
 // Material UI
 import Button from 'ui/Button';
-import TextField from 'material-ui/TextField';
-import Divider from 'material-ui/Divider';
+import TextField from '@material-ui/core/TextField';
+import Divider from '@material-ui/core/Divider';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -311,7 +311,7 @@ let DataTableWithActions = createReactClass({
       searchGUI = (
         <div>
           <Button
-            raised
+            raised="true"
             label="Find text"
             disabled={columns === undefined || columns.length === 0}
             color="primary"

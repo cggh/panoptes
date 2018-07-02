@@ -26,7 +26,7 @@ let ExternalLinkButton = createReactClass({
     const {label} = this.props;
 
     return <Button
-      raised
+      raised="true"
       style={{margin: '7px', color: 'white'}}
       label={label}
       color="primary"

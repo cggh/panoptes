@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import TextField from 'material-ui/TextField';
+import TextField from '@material-ui/core/TextField';
 import _map from 'lodash.map';
 import Button from 'ui/Button';
 import Icon from 'ui/Icon';
@@ -38,7 +38,7 @@ let ModalInput = createReactClass({
             onClick={onCancel}
           />
           <Button
-            raised
+            raised="true"
             autoFocus={true}
             style={{marginRight: '10px'}}
             label={action}

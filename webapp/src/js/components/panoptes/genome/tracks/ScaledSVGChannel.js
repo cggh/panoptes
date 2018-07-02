@@ -100,12 +100,15 @@ let ScaledSVGChannel = createReactClass({
     }
 
     let blockPixelWidth = (((width - sideWidth) / 2) / (end - start)) * (this.blockEnd - this.blockStart);
+
+    const Side = (props) => <div className="side-name">{side}</div>;
+
     return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
         height={height}
-        sideComponent={<div className="side-name">{side}</div>}
+        sideComponent={<Side/>}
         //Override component update to get latest in case of skipped render
         configComponent={controls}
         legendComponent={legend}

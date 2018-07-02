@@ -8,10 +8,12 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Material UI
-import Select from 'material-ui/Select';
-import {MenuItem} from 'material-ui/Menu';
-import {FormControl, FormHelperText} from 'material-ui/Form';
-import Input, {InputLabel} from 'material-ui/Input';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
 import uid from 'uid';
 
 import "select.scss";
@@ -52,7 +54,7 @@ let SelectWithNativeFallback = createReactClass({
 
 
   render() {
-    let {value, fullWidth, helperText, label, onChange, allowNone, options} = this.props;
+    let {value, fullWidth, helperText, label, onChange, allowNone, options, style} = this.props;
 
     if (options.length > MAX_SELECTFIELD_OPTIONS) {
       return (
@@ -99,7 +101,7 @@ let SelectWithNativeFallback = createReactClass({
       );
     } else {
       return (
-        <FormControl fullWidth={fullWidth}>
+        <FormControl style={style} fullWidth={fullWidth}>
           <InputLabel htmlFor={this.state.uid}>{helperText}</InputLabel>
           <Select
             value={value}
@@ -121,7 +123,7 @@ let SelectWithNativeFallback = createReactClass({
               </MenuItem>
             )}
           </Select>
-          <FormHelperText>{label}</FormHelperText>
+          { label ? <FormHelperText>{label}</FormHelperText> : null}
         </FormControl>
       );
     }

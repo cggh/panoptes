@@ -4,12 +4,12 @@ import createReactClass from 'create-react-class';
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
-import Divider from 'material-ui/Divider';
-import Select from 'material-ui/Select';
-import {MenuItem} from 'material-ui/Menu';
+import Divider from '@material-ui/core/Divider';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import uid from 'uid';
-import {FormControl, FormHelperText} from 'material-ui/Form';
-import Input, {InputLabel} from 'material-ui/Input';
+import {FormControl, FormHelperText} from '@material-ui/core';
+import {Input, InputLabel} from '@material-ui/core';
 
 
 const PropertySelector = createReactClass({
@@ -82,9 +82,10 @@ const PropertySelector = createReactClass({
     }
 
     return (
-      <FormControl fullWidth={true}>
+      <FormControl style={{minWidth:'100px'}} fullWidth={true}>
         <InputLabel htmlFor={this.state.uid}>{label}</InputLabel>
         <Select
+          autoWidth={true}
           value={value ? value : ''}
           onChange={(e) => this.redirectedProps.onSelect(e.target.value === '' ? null : e.target.value)}
           input={<Input id={this.state.uid} />}

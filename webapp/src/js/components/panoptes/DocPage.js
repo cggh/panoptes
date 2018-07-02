@@ -8,7 +8,7 @@ import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import EditDocPage from 'panoptes/EditDocPage';
 import htmlparser from 'htmlparser2';
 import Loading from 'ui/Loading';
-import IconButton from 'material-ui/IconButton';
+import IconButton from '@material-ui/core/IconButton';
 import customHandlebars from 'util/customHandlebars';
 
 // Mixins

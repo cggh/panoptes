@@ -17,7 +17,7 @@ import _keys from 'lodash.keys';
 import _values from 'lodash.values';
 
 import Sidebar from 'ui/Sidebar';
-import Divider from 'material-ui/Divider';
+import Divider from '@material-ui/core/Divider';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import GenomeBrowser from 'panoptes/genome/GenomeBrowser';
@@ -29,9 +29,9 @@ import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChanne
 import ItemPicker from 'containers/ItemPicker';
 import ModalInput from 'ui/ModalInput';
 import Button from 'ui/Button';
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
-import ListSubheader from 'material-ui/List/ListSubheader';
-import IconButton from 'material-ui/IconButton';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import IconButton from '@material-ui/core/IconButton';
 import scrollbarSize from 'scrollbar-size';
 import ListWithActions from 'containers/ListWithActions';
 import DataTableWithActions from 'containers/DataTableWithActions';

@@ -24,10 +24,10 @@ import PropertyLegend from 'panoptes/PropertyLegend';
 import PropertySelector from 'panoptes/PropertySelector';
 import {propertyColour, categoryColours} from 'util/Colours';
 
-import Checkbox from 'material-ui/Checkbox';
-import Select from 'material-ui/Select';
-import Input from 'material-ui/Input';
-import {MenuItem} from 'material-ui/Menu';
+import Checkbox from '@material-ui/core/Checkbox';
+import Select from '@material-ui/core/Select';
+import Input from '@material-ui/core/Input';
+import MenuItem from '@material-ui/core/MenuItem';
 import Slider from 'rc-slider';
 import FilterButton from 'panoptes/FilterButton';
 import _assign from 'lodash.assign';
@@ -433,10 +433,11 @@ let PerRowNumericalTrackControls = createReactClass({
         <div className="control">
           <div className="label">Auto Y Scale:</div>
           <Checkbox
+            color="primary"
             name="autoYScale"
-            defaultChecked={autoYScale}
+            checked={autoYScale}
             style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
+            onChange={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
         </div>
         {!autoYScale ? <div className="control">
           <div className="label">Y Min:</div>

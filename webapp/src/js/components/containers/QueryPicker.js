@@ -12,8 +12,8 @@ import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
 import Button from 'ui/Button';
-import Divider from 'material-ui/Divider';
-import TextField from 'material-ui/TextField';
+import Divider from '@material-ui/core/Divider';
+import TextField from '@material-ui/core/TextField';
 
 // UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -188,7 +188,7 @@ let QueryPicker = createReactClass({
                 this.config.user.isManager && query ?
                   <div className="centering-container">
                     <Button
-                      raised
+                      raised="true"
                       label="Get JSON"
                       color="primary"
                       onClick={() => prompt('Query as JSON:', query)}
@@ -210,7 +210,7 @@ let QueryPicker = createReactClass({
                         style={{width: '10em', marginRight: '10px'}}
                       />
                       <Button
-                        raised
+                        raised="true"
                         style={{marginRight: '10px'}}
                         label="Store"
                         color="primary"
@@ -225,7 +225,7 @@ let QueryPicker = createReactClass({
                 this.config.user.isManager && !storedFilterNameOpen ?
                   <div>
                     <Button
-                      raised
+                      raised="true"
                       style={{marginRight: '10px'}}
                       label="Store as..."
                       color="primary"
@@ -236,7 +236,7 @@ let QueryPicker = createReactClass({
                   : null
               }
               <Button
-                raised
+                raised="true"
                 label="Use"
                 color="primary"
                 onClick={this.handlePick}

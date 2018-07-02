@@ -7,7 +7,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
 import Icon from 'ui/Icon';
 import DataTableWithActions from 'containers/DataTableWithActions';
 import ListWithActions from 'containers/ListWithActions';

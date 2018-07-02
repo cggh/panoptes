@@ -69,7 +69,6 @@ let SessionComponent = createReactClass({
     const {compId, replaceable} = this.props;
     const {component} = this.state;
     let actions = this.getFlux().actions.session;
-
     return <ErrorBoundary>
       {component ? React.cloneElement(deserialiseComponent(component, [compId], {
           setProps: actions.componentSetProps,

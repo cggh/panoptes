@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Card, {CardContent} from 'material-ui/Card';
+import {Card, CardContent} from '@material-ui/core';
 import filterChildren from 'util/filterChildren';
-import {withStyles} from 'material-ui/styles';
+import {withStyles} from '@material-ui/core/styles';
 
 const styles = (theme) => ({
   card: {

@@ -17,8 +17,8 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
 
 // Material UI components
-import List, {ListItem, ListItemText, ListItemIcon} from 'material-ui/List';
-import ListSubheader from 'material-ui/List/ListSubheader';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
+import ListSubheader from '@material-ui/core/ListSubheader';
 
 // UI components
 import Loading from 'ui/Loading';

@@ -4,7 +4,7 @@ import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
 import Tooltip from 'rc-tooltip';
-//import Tooltip from 'material-ui/Tooltip';
+//import Tooltip from '@material-ui/core/Tooltip';
 // NOTE: material-ui/Tooltip doesn't have a native trigger="click" equivalent
 // and its sides are sometimes obscured. It also appears smaller, by default.
 // For other differences between the two Tooltips compare:
@@ -13,13 +13,13 @@ import Tooltip from 'rc-tooltip';
 import _forEach from 'lodash.foreach';
 import _filter from 'lodash.filter';
 import _clone from 'lodash.clone';
-import Table, {
+import {Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
   TableSortLabel,
-} from 'material-ui/Table';
+} from '@material-ui/core';
 import Icon from 'ui/Icon';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import SQL from 'panoptes/SQL';
