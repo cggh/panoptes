@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import {Card, CardContent, CardHeader, CardActions} from '@material-ui/core/Card';
+import {Card, CardContent, CardHeader, CardActions} from '@material-ui/core';
 import filterChildren from 'util/filterChildren';
 import {withStyles} from '@material-ui/core/styles';
 import Collapse from '@material-ui/core/Collapse';
