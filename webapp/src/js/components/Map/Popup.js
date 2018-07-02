@@ -41,10 +41,15 @@ let MapPopup = createReactClass({
   },
 
   render() {
-    let children = filterChildren(this, this.props.children);
+    let child = React.Children.only(filterChildren(this, this.props.children));
+    //The if here is to avoid passing an unknown prop to a DOM type element
+    if (React.isValidElement(child) && typeof element.type === 'string') {
+      //We pass onChange so that when the popup resizes it moves the map so that it is in view
+      child = React.cloneElement(child, {onChange: () => this.forceUpdate()});
+    }
     return (
       <LeafletPopup>
-        {React.Children.only(children)}
+        {children}
       </LeafletPopup>
     );
 

@@ -46,7 +46,8 @@ let ItemTemplate = createReactClass({
     table: PropTypes.string.isRequired,
     primKey: PropTypes.string.isRequired,
     immediate: PropTypes.bool,
-    data: PropTypes.any
+    data: PropTypes.any,
+    onChange: PropTypes.func
   },
 
   componentWillMount() {
@@ -185,11 +186,17 @@ let ItemTemplate = createReactClass({
       })
       .then((data) => {
         this.handlebars.compile(children)({...data, config: this.config})
-          .then((rendered) =>
-            this.setState({
-              loadStatus: 'loaded',
-              rendered
-            }));
+          .then((rendered) => {
+              this.setState({
+                loadStatus: 'loaded',
+                rendered
+              });
+              if (this.props.onChange) {
+                this.props.onChange();
+              }
+            }
+          );
+
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)

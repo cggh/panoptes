@@ -16,7 +16,7 @@ export default function deserialiseComponent(component, path = null, mappedFunct
     let children = null;
     if (List.isList(serialisedChildren)) {  //We don't check for element type as on serialisation lone children are placed in an array.
       children = serialisedChildren.map((child, i) => {
-        if (!child.getIn(['props', 'key'])) {
+        if (child.getIn && !child.getIn(['props', 'key'])) {
           child = child.setIn(['props', 'key'], i)
         }
         return _deserialiseComponent(child, path ? path.concat('props', 'children', i) : null);
