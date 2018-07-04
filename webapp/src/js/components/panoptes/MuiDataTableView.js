@@ -287,7 +287,6 @@ let MuiDataTableView = createReactClass({
               <TableRow>
                 {groupOrderedColumns.map((column, columnIndex) => {
                   let columnData = this.propertiesByColumn(column);
-                  columnData.description = 'sdssd'; //FIXME
                   const hasVerticalLabel = (verticalLabelsForColumns.indexOf(column) !== -1);
                   const size = calculateSize(columnData.name, {font: 'Roboto, sans-serif', fontSize: '12px'});
                   const height = hasVerticalLabel ? (size.width + 25) + 'px' : size.height + 'px';
