@@ -344,7 +344,7 @@ let MuiDataTableView = createReactClass({
                                   fontSize: '12px',
                                   whiteSpace: 'nowrap',
                                   position: 'absolute',
-                                  top: (columnIndex < groupOrderedColumns.length - 1 ? '27px' : '16px'), // Workaround MUI's paddingNone last-child style
+                                  top: '22px',
                                   left: (columnData.description ? '8px' : '-5px'),
                                 }}
                               >
