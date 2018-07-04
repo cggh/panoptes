@@ -287,10 +287,10 @@ let MuiDataTableView = createReactClass({
               <TableRow>
                 {groupOrderedColumns.map((column, columnIndex) => {
                   let columnData = this.propertiesByColumn(column);
+                  columnData.description = 'sdssd'; //FIXME
                   const hasVerticalLabel = (verticalLabelsForColumns.indexOf(column) !== -1);
                   const size = calculateSize(columnData.name, {font: 'Roboto, sans-serif', fontSize: '12px'});
                   const height = hasVerticalLabel ? (size.width + 25) + 'px' : size.height + 'px';
-                  const verticalWithNoDescriptionStyle = columnData.description ? {marginLeft: '10px'} : {marginLeft: '-6px'};
                   const infoIcon = columnData.description ?
                     <Tooltip
                       placement="bottom"
@@ -301,7 +301,7 @@ let MuiDataTableView = createReactClass({
                         </div>
                       </div>}
                     >
-                      <Icon name="info-circle" className="info"/>
+                      <Icon name="info-circle"/>
                     </Tooltip>
                     :
                     null
@@ -315,37 +315,57 @@ let MuiDataTableView = createReactClass({
                         border: 'solid 0', // Firefox leaks column group borders without this.
                         verticalAlign: 'bottom',
                         height,
-                        textAlign: 'left',
                       }}
                     >
-                      <TableSortLabel
-                        active={sortOrderDirectionByColumnId[columnData.id] !== undefined ? true : false}
-                        direction={sortOrderDirectionByColumnId[columnData.id]}
-                        onClick={(event) => {
-                          if (typeof event.target.className !== 'string' || (typeof event.target.className === 'string' && event.target.className.indexOf('info') == -1)) {
-                            this.handleOrderChange(columnData.id);
-                          }
+                      <div
+                        style={{
+                          position: 'relative', // Because some children may have position absolute.
+                          textAlign: (hasVerticalLabel ? 'left' : 'initial'),
                         }}
                       >
-                        {hasVerticalLabel ?
-                          <div style={{transformOrigin: 'left', transform: 'rotate(-90deg)', width: '0', marginLeft: '5px'}}>
-                            <span style={{fontSize: '12px', ...verticalWithNoDescriptionStyle}}>
-                              {columnData.name}
-                            </span>
-                          </div>
-                          :
-                          <div>
-                            <span style={{paddingRight: '3px'}}>{infoIcon}</span>
-                            {columnData.name}
-                          </div>
-                        }
+                        <TableSortLabel
+                          active={sortOrderDirectionByColumnId[columnData.id] !== undefined ? true : false}
+                          direction={sortOrderDirectionByColumnId[columnData.id]}
+                          onClick={(event) => {
+                            if (typeof event.target.className !== 'string' || (typeof event.target.className === 'string' && event.target.className.indexOf('info') == -1)) {
+                              this.handleOrderChange(columnData.id);
+                            }
+                          }}
+                        >
+                          {hasVerticalLabel ?
+                            <div
+                              style={{
+                                transformOrigin: 'left top 0px',
+                                transform: 'rotate(-90deg)',
+                                width: '1px',
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: '12px',
+                                  whiteSpace: 'nowrap',
+                                  position: 'absolute',
+                                  top: (columnIndex < groupOrderedColumns.length - 1 ? '27px' : '16px'), // Workaround MUI's paddingNone last-child style
+                                  left: (columnData.description ? '8px' : '-5px'),
+                                }}
+                              >
+                                {columnData.name}
+                              </span>
+                            </div>
+                            :
+                            <div>
+                              <span style={{paddingRight: '3px'}}>{infoIcon}</span>
+                              <span>{columnData.name}</span>
+                            </div>
+                          }
 
-                      </TableSortLabel>
-                      {hasVerticalLabel ?
-                        <span style={{position: 'absolute', left: '50%'}}>{infoIcon}</span>
-                        :
-                        null
-                      }
+                        </TableSortLabel>
+                        {hasVerticalLabel ?
+                          <div style={{display: 'inline-block', position: 'absolute', left: '50%', top: '1px'}}>{infoIcon}</div>
+                          :
+                          null
+                        }
+                      </div>
                     </TableCell>
                   );
                 }, this)}
