@@ -29,7 +29,7 @@ class HTMLWithComponents extends React.Component {
 
   static propTypes = {
     className: PropTypes.string,
-    children: PropTypes.string, // NOTE: children is not usually a STRING
+    children: PropTypes.string,
     replaceSelf: PropTypes.func
   };
 
@@ -94,13 +94,11 @@ class HTMLWithComponents extends React.Component {
             }
           });
 
-          const {replaceSelf, config, className, ...otherProps} = this.props;
+          const {replaceSelf} = this.props;
           if (type === DocLink) {
             elementProps.replaceParent = replaceSelf;
           }
-
-          const mergedProps = {...elementProps, ...otherProps};
-          return React.createElement(type, mergedProps, children);
+          return React.createElement(type, elementProps, children);
         }
       },
       {
@@ -118,22 +116,10 @@ class HTMLWithComponents extends React.Component {
   }
 
   render() {
-
     const {children, className, ...otherProps} = this.props;
     // NOTE: wrapping avoids "Error: html-to-react currently only supports HTML with one single root element. The HTML provided contains 0 root elements. You can fix that by simply wrapping your HTML in a <div> element."
     // The original children will be inside this temporary wrapper, but now React.
-    const wrappedChildrenAsReact = this.htmlToReact(`<div>${children}</div>`);
-
-    //// Pass all otherProps to all immediate React Component children.
-    // child is a string when it is just a text node.
-    // child has a function type (as opposed to string) when it is a React Component.
-    // Passing otherProps to a DOM element might generate warnings.
-    // TODO: iterator should have a unique "key" prop
-    const childrenAsReactWithProps = wrappedChildrenAsReact.props.children.map((child, index) =>
-      typeof child === 'string' ? child : (typeof child.type === 'function' ? React.cloneElement(child, otherProps) : child)
-    );
-
-    return <div className={className}>{childrenAsReactWithProps}</div>;
+    return this.htmlToReact(`<div class="${className}">${children}</div>`);
   }
 }
 
