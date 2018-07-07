@@ -10,6 +10,7 @@ import htmlparser from 'htmlparser2';
 import Loading from 'ui/Loading';
 import IconButton from '@material-ui/core/IconButton';
 import customHandlebars from 'util/customHandlebars';
+import _isFunction from 'lodash.isfunction';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -145,14 +146,14 @@ let DocPage = createReactClass({
   },
 
   render() {
-    const {path, dynamicSize, ...otherProps} = this.props;
+    const {path, dynamicSize} = this.props;
     const {content, loadStatus} = this.state;
     const replaceSelf = this.props.replaceable ? this.props.replaceSelf : undefined;
     const actions = this.getFlux().actions;
     // NOTE: z-index of the Edit modal is currently set to 9997.
     const editButtonZIndex = 9996;
     return <div className={dynamicSize ? '' : 'load-container'}>
-      <HTMLWithComponents className="doc-page" replaceSelf={replaceSelf} {...otherProps}>{content}</HTMLWithComponents>
+      <HTMLWithComponents className="doc-page" replaceSelf={replaceSelf}>{content}</HTMLWithComponents>
       {this.config.user.isManager ?
         <div className="docpage-edit"  style={{zIndex: editButtonZIndex}}>
           <IconButton
