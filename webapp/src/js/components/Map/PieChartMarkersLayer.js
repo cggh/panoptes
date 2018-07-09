@@ -15,7 +15,7 @@ import ComponentMarker from 'Map/ComponentMarker';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroup from 'Map/FeatureGroup';
 import Polyline from 'Map/Polyline';
-import GeoLayouter from 'utils/GeoLayouter';
+import ForceLayouter from 'utils/ForceLayouter';
 import LRUCache from 'util/LRUCache';
 import PieChart from 'PieChart';
 import MapControlComponent from 'Map/MapControlComponent';
@@ -307,7 +307,7 @@ let PieChartMarkersLayer = createReactClass({
           </MapControlComponent>
           : null
         }
-        <GeoLayouter nodes={markers}>
+        <ForceLayouter nodes={markers}>
           {
             (renderNodes) =>
               <FeatureGroup
@@ -345,7 +345,7 @@ let PieChartMarkersLayer = createReactClass({
                 }
               </FeatureGroup>
           }
-        </GeoLayouter>
+        </ForceLayouter>
       </FeatureGroup>
     );
 

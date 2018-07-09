@@ -7,7 +7,8 @@ import filterChildren from 'util/filterChildren';
 import MarkerLayerMarker from 'Map/MarkerLayerMarker';
 import MarkerLayerPopup from 'Map/MarkerLayerPopup';
 import _keys from 'lodash.keys';
-import GeoLayouter from 'utils/GeoLayouter';
+import ForceLayouter from 'utils/ForceLayouter';
+import OrderLayouter from 'utils/OrderLayouter';
 import Polyline from 'Map/Polyline';
 import _isArray from 'lodash.isarray';
 import _values from 'lodash.values';
@@ -16,6 +17,7 @@ let MarkerLayer = createReactClass({
   displayName: 'MarkerLayer',
 
     propTypes: {
+    layout: PropTypes.string,
     cluster: PropTypes.bool,
     children(props, propName, componentName) {
       // Only accept a two child, of the appropriate type
@@ -42,7 +44,7 @@ let MarkerLayer = createReactClass({
   },
 
   render() {
-    let {children, cluster, fixedRadius, ...data} = this.props;
+    let {layout, children, cluster, fixedRadius, ...data} = this.props;
     children = filterChildren(this, React.Children.toArray(children));
     if(!_isArray(children)) {
       children = [children]
@@ -102,9 +104,8 @@ let MarkerLayer = createReactClass({
     if (childrenByType['MarkerLayerPopup'] && childrenByType['MarkerLayerPopup'].props.children) {
       popup = (row) => React.cloneElement(filterChildren(this, childrenByType['MarkerLayerPopup'].props.children), {radius: fixedRadius, ...row})
     }
-    return <FeatureGroup>
-      <GeoLayouter nodes={rows}>
-        {
+    return <FeatureGroup>{
+      React.createElement(layout === 'force' ? ForceLayouter : OrderLayouter, {nodes: rows},
           (renderNodes) => {
             return <FeatureGroup>
               {
@@ -126,10 +127,8 @@ let MarkerLayer = createReactClass({
                       positions={[[markerData.lat, markerData.lng], [markerData.fixedNode.lat, markerData.fixedNode.lng]]}
                     />
                 ))}
-            </FeatureGroup>
-          }
-        }
-      </GeoLayouter>
+            </FeatureGroup>;
+          })}
     </FeatureGroup>
   }
 });

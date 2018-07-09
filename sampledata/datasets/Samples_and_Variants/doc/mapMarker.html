@@ -1,11 +1,11 @@
 {{#if link}}
     <ItemLink table="{{table}}" primKey="{{primKey}}">
         <svg style="overflow: visible; position: absolute" width={{radius}} height={{radius}}>
-            <circle r={{radius}} fill="{{./colour}}"/>
+            <circle r={{radius}} fill="{{./colour}}" stroke="black"/>
         </svg>
     </ItemLink>
 {{else}}
     <svg style="overflow: visible; position: absolute" width={{radius}} height={{radius}}>
-        <circle r={{radius}} fill="{{./colour}}"/>
+        <circle r={{radius}} fill="{{./colour}}" stroke="black"/>
     </svg>
 {{/if}}
