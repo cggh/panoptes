@@ -43,8 +43,8 @@ let forceCrossLink = function(links) {
   return force;
 };
 
-class GeoLayouter extends React.Component {
-  static displayName = 'GeoLayouter';
+class ForceLayouter extends React.Component {
+  static displayName = 'ForceLayouter';
 
   static contextTypes = {
     map: PropTypes.object,
@@ -170,4 +170,4 @@ class GeoLayouter extends React.Component {
   }
 }
 
-export default GeoLayouter;
+export default ForceLayouter;

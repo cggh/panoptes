@@ -26,7 +26,7 @@ import FeatureGroup from 'Map/FeatureGroup';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';
-import GeoLayouter from 'utils/GeoLayouter';
+import ForceLayouter from 'utils/ForceLayouter';
 import Polyline from 'Map/Polyline';
 import PieChart from 'PieChart';
 import DataTableWithActions from 'containers/DataTableWithActions';
@@ -484,7 +484,7 @@ let TableMarkersLayer = createReactClass({
           });
         }
 
-        // NB: The originalRadius is for the GeoLayouter collision detection.
+        // NB: The originalRadius is for the ForceLayouter collision detection.
         const histogramRadius = Math.sqrt(2 * Math.pow((HISTOGRAM_WIDTH_PIXELS / 2), 2));
 
         // NB: The colours associated with the individual values
@@ -594,7 +594,7 @@ let TableMarkersLayer = createReactClass({
             : null
           }
           {clusterMarkers ?
-            <GeoLayouter nodes={markers}>
+            <ForceLayouter nodes={markers}>
               {
                 (renderNodes) =>
                   <FeatureGroup>
@@ -745,7 +745,7 @@ let TableMarkersLayer = createReactClass({
                     }
                   </FeatureGroup>
               }
-            </GeoLayouter>
+            </ForceLayouter>
             :
             <FeatureGroup>
               {

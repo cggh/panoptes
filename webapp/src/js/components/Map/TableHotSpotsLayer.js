@@ -26,7 +26,7 @@ import FeatureGroup from 'Map/FeatureGroup';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import {propertyColour} from 'util/Colours';
-import GeoLayouter from 'utils/GeoLayouter';
+import ForceLayouter from 'utils/ForceLayouter';
 import Polyline from 'Map/Polyline';
 import HotSpot from 'HotSpot';
 import DataTableWithActions from 'containers/DataTableWithActions';
@@ -543,7 +543,7 @@ let TableHotSpotsLayer = createReactClass({
             : null
           }
           {clusterMarkers ?
-            <GeoLayouter nodes={markers}>
+            <ForceLayouter nodes={markers}>
               {
                 (renderNodes) =>
                   <FeatureGroup>
@@ -672,7 +672,7 @@ let TableHotSpotsLayer = createReactClass({
                     }
                   </FeatureGroup>
               }
-            </GeoLayouter>
+            </ForceLayouter>
             :
             <FeatureGroup>
               {

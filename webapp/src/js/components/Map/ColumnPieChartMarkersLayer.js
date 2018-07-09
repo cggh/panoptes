@@ -24,7 +24,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroup from 'Map/FeatureGroup';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
-import GeoLayouter from 'utils/GeoLayouter';
+import ForceLayouter from 'utils/ForceLayouter';
 import Polyline from 'Map/Polyline';
 import PieChart from 'PieChart';
 import {categoryColours} from 'util/Colours';
@@ -291,7 +291,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
             </MapControlComponent>
             : null
           }
-          <GeoLayouter nodes={clusterMarkers}>
+          <ForceLayouter nodes={clusterMarkers}>
             {
               (renderNodes) =>
                 <FeatureGroup>
@@ -339,7 +339,7 @@ let ColumnPieChartMarkersLayer = createReactClass({
                   }
                 </FeatureGroup>
             }
-          </GeoLayouter>
+          </ForceLayouter>
         </FeatureGroup>
       );
     }
