@@ -26,7 +26,7 @@ class OrderLayouter extends React.Component {
 
   render() {
     let {nodes} = this.props;
-    nodes.sort((a, b) => a.radius < b.radius);
+    nodes = nodes.sort((a, b) => b.radius - a.radius);
     _forEach(nodes, (node) => {
       node.fixedNode = node;
     });

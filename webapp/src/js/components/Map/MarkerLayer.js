@@ -114,7 +114,7 @@ let MarkerLayer = createReactClass({
                     <ComponentMarker
                       key={`ComponentMarker_${i}`}
                       position={{lat: markerData.lat, lng: markerData.lng}}
-                      zIndexOffset={0}
+                      zIndexOffset={i*1000} //https://github.com/Leaflet/Leaflet/issues/5560
                       popup={popup(markerData)}
                     >
                       {marker(markerData)}
