@@ -147,7 +147,7 @@ let GroupedItemPicker = createReactClass({
         <div className="horizontal stack">
           <div className="grow stack vertical scroll-within">
             <div>
-              <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
+              <div className="header">{count} Column{count != 1 ? 's' : null} Available (click to add/remove)</div>
               <div className="search">
                 <TextField autoFocus label="Search" value={search} onChange={this.handleSearchChange}/>
               </div>
@@ -217,7 +217,7 @@ let GroupedItemPicker = createReactClass({
           </div>
           <div className="grow stack vertical">
             <div>
-              <div className="header">{picked.length ? picked.length : 'No'} Column{picked.length != 1 ? 's' : null} Selected</div>
+              <div className="header">{picked.length ? picked.length : 'No'} Column{picked.length != 1 ? 's' : null} Selected (click to remove)</div>
             </div>
             <div className="grow scroll-within">
               <List>
