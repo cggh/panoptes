@@ -293,7 +293,7 @@ let DataTableWithActions = createReactClass({
     let quickFindFieldsList = '';
     for (let i = 0, len = this.tableConfig().quickFindFields.length; i < len; i++) {
       let quickFindField = this.tableConfig().quickFindFields[i];
-      if (i == 0) quickFindFieldsList += 'Columns: ';
+      if (i == 0) quickFindFieldsList += 'Searching: ';
       if (i != 0) quickFindFieldsList += ', ';
       quickFindFieldsList += this.tableConfig().propertiesById[quickFindField].name;
 

@@ -14,7 +14,7 @@ from abc import ABCMeta
 import ruamel.yaml
 import portalocker
 
-valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']
+valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date', 'GeoLatitude', 'GeoLongitude']
 
 class ImportSettings:
 
