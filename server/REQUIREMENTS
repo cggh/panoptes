@@ -16,7 +16,7 @@ sqlparse==0.2.2
 biopython==1.68
 ruamel.yaml==0.12.15
 portalocker==1.0.0
-diskcache==2.0.2
+diskcache==3.0.6
 zarr==2.1.4
 toolz==0.8.2
 dask==0.13.0

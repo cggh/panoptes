@@ -5,15 +5,17 @@ import urllib2
 import xmltodict
 import DQXbase64
 import json
-from cache import getExpiringCache
+from cache import getCache
+import os
 
 def response(returndata):
     url = returndata['url']
     
-    cache = getExpiringCache()
+    cache = getCache()
     cacheKey = json.dumps([url])
     returndata['content'] = None
-    if returndata['cache']:
+    use_cache = returndata['cache'] and not os.getenv('STAGING', '')
+    if use_cache:
         try:
             returndata['content'] = cache[cacheKey]
         except KeyError:
@@ -25,7 +27,7 @@ def response(returndata):
         file.close()
         data = xmltodict.parse(data)
         returndata['content'] = DQXbase64.b64encode_var2(json.dumps(data))
-        if returndata['cache']:
+        if use_cache:
             cache[cacheKey] = returndata['content']
     
     return returndata
