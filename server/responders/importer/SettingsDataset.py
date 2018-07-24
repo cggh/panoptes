@@ -99,21 +99,9 @@ class SettingsDataset(ImportSettings):
                                         'default': {}
                                     }),
                                     ('feeds', {
-                                        'type': 'List',
+                                        'type': 'Block',
                                         'required': False,
                                         'description': '''A list of feeds (RSS, Atom, etc.), their identifiers and their URLs, for the dataset.''',
-                                            'children': {
-                                                'id': {
-                                                    'type': 'Text',
-                                                    'required': True,
-                                                    'description': 'The identifier for (name of) the feed'
-                                                },
-                                                'url': {
-                                                    'type': 'Text',
-                                                    'required': True,
-                                                    'description': 'The URL of the feed'
-                                                },
-                                            }
                                     }),
 
             ))

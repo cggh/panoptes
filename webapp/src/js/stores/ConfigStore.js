@@ -18,6 +18,7 @@ const ConfigStore = createStore({
 
   initialize(initConfig) {
     this.state = this.addDerivedConfig(initConfig);
+    console.log("Config:", this.state);
     this.state.loadStatus = 'LOADED';
     this.bindActions(
       APIConst.MODIFY_CONFIG, this.modifyConfig,
@@ -64,10 +65,6 @@ const ConfigStore = createStore({
     _each(_sortBy(_keys(newConfig.chromosomes)), (name) => chromosomes[name] = newConfig.chromosomes[name]);
     newConfig.chromosomes = chromosomes;
     newConfig.constants = newConfig.settings.constants;
-    let feeds = {};
-    _each(newConfig.settings.feeds, (feed) => feeds[feed.id] = {url: feed.url});
-    newConfig.feeds = feeds;
-
     return newConfig;
   },
 

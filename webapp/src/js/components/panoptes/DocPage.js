@@ -47,6 +47,7 @@ let DocPage = createReactClass({
   getDefaultProps() {
     return {
       setProps: null,
+      replaceable: true
     };
   },
 

@@ -1,12 +1,15 @@
 import csv
 import os
 import sys
+import urllib2
 
 import uuid
 from os import path, listdir
 from os.path import join
 
 from os.path import exists
+
+import xmltodict
 from responders.importer import ImpUtils
 from simplejson import load, loads, dumps
 from PanoptesConfig import PanoptesConfig
@@ -101,6 +104,14 @@ def readJSONConfig(datasetId):
             with open(join(dataset_folder, 'datatables', tableId, 'data')) as csvfile:
                 cachedTables[tableId] = list(csv.DictReader(csvfile, delimiter='\t'))
 
+    feeds = {}
+    for id, url in settings.get('feeds').items():
+        file = urllib2.urlopen(url)
+        data = file.read()
+        file.close()
+        data = xmltodict.parse(data)
+        feeds[id] = data
+
     return {
         'cas': {'service': pnConfig.getCasService(), 'logout': pnConfig.getCasLogout()},
         'settings': settings,
@@ -110,7 +121,8 @@ def readJSONConfig(datasetId):
         'genome': genome,
         'mapLayers': mapLayers,
         'docs': {'index.html': introPage},
-        'cachedTables': cachedTables
+        'cachedTables': cachedTables,
+        'feeds': feeds
     }
 
 class ReadOnlyErrorWriter:
