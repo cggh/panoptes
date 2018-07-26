@@ -95,7 +95,7 @@ class HTMLWithComponents extends React.Component {
           });
 
           const {replaceSelf} = this.props;
-          if (type === DocLink) {
+          if (type && type.propTypes && type.propTypes.replaceParent) {
             elementProps.replaceParent = replaceSelf;
           }
           return React.createElement(type, elementProps, children);

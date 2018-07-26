@@ -29,12 +29,9 @@ constants:
   access: '#ACCE55'
 
 feeds:
-  - id: WordPress
-    url: https://en.blog.wordpress.com/feed/
-  - id: malariageninformatics
-    url: https://malariageninformatics.wordpress.com/feed/
-  - id: SinglePostBlog
-    url: https://singlepostblog.wordpress.com/feed/
+  WordPress: https://en.blog.wordpress.com/feed/
+  malariageninformatics: https://malariageninformatics.wordpress.com/feed/
+  SinglePostBlog: https://singlepostblog.wordpress.com/feed/
 
 initialSessionState:
   session:

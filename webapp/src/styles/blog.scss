@@ -1,0 +1,45 @@
+.blog-list-entry {
+  display: flex;
+  .blog-list-entry-details {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    .blog-list-entry-content {
+      flex: 1 0 auto;
+    }
+    .blog-list-entry-headline {
+      font-size: 1rem;
+
+    }
+  }
+  .blog-list-entry-media {
+    min-height: 111px;
+    min-width: 111px;
+    width: 131px;
+    margin: 16px;
+  }
+}
+
+
+.page-container {
+  background-color: #F7F7F7;
+  position: relative;
+  min-height: 100%;
+}
+
+.page-content {
+  font-family: Roboto, Cochin, Georgia, serif;
+  height: 100%;
+  position: relative;
+  z-index: 100;
+}
+
+.leader {
+  font-size: 25px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+div.paragraph {
+  text-align: justify;
+}

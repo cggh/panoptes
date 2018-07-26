@@ -2,24 +2,25 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import PropTypes from 'prop-types';
-import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
 import DocTemplate from 'panoptes/DocTemplate';
-import withAPIData from 'hoc/withAPIData';
-import Loading from 'ui/Loading';
-import ExpandingCard from 'containers/ExpandingCard';
-import ExpandingCardActions from 'containers/ExpandingCardActions';
-import ExpandingCardCollapse from 'containers/ExpandingCardCollapse';
-import {CardContent, CardHeader} from '@material-ui/core/Card';
-
+import FeedItem from 'panoptes/FeedItem';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import {Card, CardContent, CardHeader, CardMedia, Typography} from '@material-ui/core';
+import 'blog.scss';
 
 let Feed = createReactClass({
   displayName: 'Feed',
 
   mixins: [
     PureRenderMixin,
+    FluxMixin,
+    ConfigMixin,
   ],
 
   propTypes: {
+    replaceSelf: PropTypes.func,
+    replaceParent: PropTypes.func,
     id: PropTypes.string,
     feedObj: PropTypes.object, // This will be provided via withAPIData
     templateDocPath: PropTypes.string,
@@ -35,14 +36,21 @@ let Feed = createReactClass({
     };
   },
 
+  handleClick(feedId, itemId) {
+    let f = this.props.replaceSelf || this.props.replaceParent;
+    if (f) {
+      f(<FeedItem feedId={feedId} itemId={itemId}/>);
+    }
+  },
+
   render() {
-    const {feedObj, templateDocPath, className, actionsAreaIsClickable, actionsAreaDisappearsOnExpand, ...otherProps} = this.props;
+    const {id, templateDocPath, className, actionsAreaIsClickable, actionsAreaDisappearsOnExpand, ...otherProps} = this.props;
+
+    let feedObj = this.config.feeds[id];
 
     if (feedObj === undefined) {
-      return <Loading status="loading"/>;
+      return <div>No feed {{id}} defined</div>;
     }
-
-    let cards = [];
 
     let items = [];
     if (Array.isArray(feedObj.rss.channel.item)) {
@@ -53,8 +61,12 @@ let Feed = createReactClass({
       console.warn('There is no item array or item property in this feedObj.rss.channel: ', feedObj.rss.channel);
     }
 
+    let cards = [];
     items.forEach((item) => {
-      let {pubDate, title, description, guid} = item;
+      let {thumbnail, pubDate, title, description, category, link} = item;
+
+      let elements = link.split('/');
+      let itemId = elements[elements.length-2];
 
       // Remove text after any of these text barriers. Order matters.
       const textBarriers = ['[&#8230;]', '&#8230;'];
@@ -66,8 +78,7 @@ let Feed = createReactClass({
           }
         }
       }
-      description += '&#8230;'; // NOTE: .concat() is slower
-      const guidText = guid['#text'];
+      description += '&#8230;';
       const content = item['content:encoded'];
       const creator = item['dc:creator'];
       const date = new Date(pubDate);
@@ -80,7 +91,7 @@ let Feed = createReactClass({
       if (templateDocPath !== undefined) {
         cards.push(
           <DocTemplate
-            key={guidText}
+            key={itemId}
             path={templateDocPath}
             className={className}
             actionsAreaIsClickable={actionsAreaIsClickable}
@@ -97,49 +108,30 @@ let Feed = createReactClass({
         );
       } else {
         cards.push(
-          <ExpandingCard
-            key={guidText}
-            actionsAreaIsClickable={actionsAreaIsClickable}
-            actionsAreaDisappearsOnExpand={actionsAreaDisappearsOnExpand}
-          >
-            <CardHeader title={title} subheader={subheader} />
-            <ExpandingCardActions>
-              <div style={{paddingLeft: '12px'}}>
-                <HandlebarsWithComponents>{description}</HandlebarsWithComponents>
-              </div>
-            </ExpandingCardActions>
-            <ExpandingCardCollapse>
-              <CardContent>
-                <HandlebarsWithComponents>{content}</HandlebarsWithComponents>
+          <Card key={itemId} className="blog-list-entry" onClick={() => this.handleClick(id, itemId)}>
+            <div className="blog-list-entry-details">
+              <CardContent className="blog-list-entry-content">
+                <Typography className="blog-list-entry-headline" variant="headline">
+                  {title}
+                  </Typography>
+                <Typography variant="subheading" color="textSecondary">
+                  {subheader}
+                </Typography>
               </CardContent>
-            </ExpandingCardCollapse>
-          </ExpandingCard>
+            </div>
+            {thumbnail ?
+            <CardMedia
+              className="blog-list-entry-media"
+              image={thumbnail.img['@src']}
+            /> : null}
+          </Card>
         );
       }
     });
 
-    return <div className={className}>{cards}</div>;
+    return cards;
   },
 });
 
-Feed = withAPIData(Feed, ({config, props}) => {
-
-  const {id} = props;
-
-  if (config.feeds[id] === undefined) {
-    throw Error('Feed id ' + id + ' not found in dataset feeds: ', config.feeds);
-  }
-
-  let requests = {
-    feedObj: {
-      method: 'fetchFeedData',
-      args: {
-        url: config.feeds[id].url,
-      }
-    }
-  };
-
-  return {requests};
-});
 
 export default Feed;
