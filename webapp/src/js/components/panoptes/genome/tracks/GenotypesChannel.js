@@ -764,7 +764,7 @@ const GenotypesControls = createReactClass({
           </div>
           <div className="control">
             <RandomSubsetSizeSelector
-              style={{width: "175px"}}
+              style={{width: '175px'}}
               value={rowRandomSubsetSize}
               onChange={(v) => this.handleChangeRandomSubsetSize(v)}
               label="Row random subset size"
