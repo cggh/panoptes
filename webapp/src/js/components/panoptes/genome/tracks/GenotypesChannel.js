@@ -787,7 +787,7 @@ const GenotypesControls = createReactClass({
             <Select value={cellColour === undefined ? '' : cellColour}
               fullWidth={true}
               label="Cell colour"
-              onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}
+              onChange={(event, child) => this.redirectedProps.setProps({cellColour: event.target.value})}
               input={<Input id="cellColour" />}
             >
               <MenuItem value="call">Call</MenuItem>
@@ -798,7 +798,7 @@ const GenotypesControls = createReactClass({
             <Select value={cellAlpha === undefined ? 'none' : cellAlpha}
               fullWidth={true}
               label="Cell opacity"
-              onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}
+              onChange={(event, child) => this.redirectedProps.setProps({cellAlpha: event.target.value === 'none' ? undefined : event.target.value})}
               input={<Input id="cellAlpha" />}
             >
               <MenuItem value="none">None</MenuItem>
@@ -811,7 +811,7 @@ const GenotypesControls = createReactClass({
             <Select value={cellHeight === undefined ? 'none' : cellHeight}
               fullWidth={true}
               label="Cell height"
-              onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}
+              onChange={(event, child) => this.redirectedProps.setProps({cellHeight: event.target.value === 'none' ? undefined : event.target.value})}
               input={<Input id="cellHeight" />}
             >
               <MenuItem value="none">None</MenuItem>
