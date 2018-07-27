@@ -102,6 +102,7 @@ class SettingsDataset(ImportSettings):
                                         'type': 'Block',
                                         'required': False,
                                         'description': '''A list of feeds (RSS, Atom, etc.), their identifiers and their URLs, for the dataset.''',
+                                        'default': {}
                                     }),
 
             ))
