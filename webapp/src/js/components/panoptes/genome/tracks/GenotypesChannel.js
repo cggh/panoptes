@@ -38,7 +38,6 @@ import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
 import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericInput from 'ui/NumericInput';
-import Icon from 'ui/Icon';
 import queryToString from 'util/queryToString';
 import RandomSubsetSizeSelector from 'panoptes/RandomSubsetSizeSelector';
 import 'genotypes.scss';
