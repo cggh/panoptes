@@ -25,11 +25,11 @@ let GenotypesRowHeader = createReactClass({
   },
 
   componentDidMount() {
-    this.paint(this.refs.canvas);
+    this.paint(this.canvas);
   },
 
   componentDidUpdate() {
-    this.paint(this.refs.canvas);
+    this.paint(this.canvas);
   },
 
   paint(canvas) {
@@ -125,7 +125,7 @@ let GenotypesRowHeader = createReactClass({
     return <div className="genotypes-side">
       <div className="side-name">{config.namePlural}</div>
       <div className="row-label">{rowConfig.propertiesById[rowLabel].name}</div>
-      <canvas ref="canvas"
+      <canvas ref={(el) => this.canvas = el}
         width={width}
         height={height}/>
     </div>;
