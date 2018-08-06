@@ -8,9 +8,12 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import {Card, CardContent, CardHeader, CardMedia, Typography} from '@material-ui/core';
 import _filter from 'lodash.filter';
+import _isArray from 'lodash.isarray';
 import _intersection from 'lodash.intersection';
+import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
 
 import 'blog.scss';
+import HTMLWithComponents from "./HTMLWithComponents";
 
 let Feed = createReactClass({
   displayName: 'Feed',
@@ -68,7 +71,7 @@ let Feed = createReactClass({
 
     if (tags) {
       let tagArray = tags.split(',').map((tag) => tag.trim());
-      items = _filter(items, (item) => _intersection(tagArray, item.category).length > 0)
+      items = _filter(items, (item) => _intersection(tagArray, _isArray(item.category) ? item.category : [item.category]).length > 0)
     }
 
     if (count !== undefined) {
@@ -129,8 +132,11 @@ let Feed = createReactClass({
                 <Typography className="blog-list-entry-headline" variant="headline">
                   {title}
                   </Typography>
-                <Typography variant="subheading" color="textSecondary">
+                <Typography variant="subheading" color="textSecondary" paragraph={true}>
                   {subheader}
+                </Typography>
+                <Typography >
+                  <HTMLWithComponents>{description}</HTMLWithComponents> <a> Read more.. </a>
                 </Typography>
               </CardContent>
             </div>
