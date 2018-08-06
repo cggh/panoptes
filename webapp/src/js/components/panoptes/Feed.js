@@ -7,6 +7,9 @@ import FeedItem from 'panoptes/FeedItem';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import {Card, CardContent, CardHeader, CardMedia, Typography} from '@material-ui/core';
+import _filter from 'lodash.filter';
+import _intersection from 'lodash.intersection';
+
 import 'blog.scss';
 
 let Feed = createReactClass({
@@ -27,6 +30,8 @@ let Feed = createReactClass({
     className: PropTypes.string,
     actionsAreaIsClickable: PropTypes.bool,
     actionsAreaDisappearsOnExpand: PropTypes.bool,
+    tags: PropTypes.string,
+    count: PropTypes.number
   },
 
   getDefaultProps() {
@@ -44,7 +49,7 @@ let Feed = createReactClass({
   },
 
   render() {
-    const {id, templateDocPath, className, actionsAreaIsClickable, actionsAreaDisappearsOnExpand, ...otherProps} = this.props;
+    const {id, templateDocPath, className, actionsAreaIsClickable, actionsAreaDisappearsOnExpand, tags, count, ...otherProps} = this.props;
 
     let feedObj = this.config.feeds[id];
 
@@ -60,6 +65,16 @@ let Feed = createReactClass({
     } else {
       console.warn('There is no item array or item property in this feedObj.rss.channel: ', feedObj.rss.channel);
     }
+
+    if (tags) {
+      let tagArray = tags.split(',').map((tag) => tag.trim());
+      items = _filter(items, (item) => _intersection(tagArray, item.category).length > 0)
+    }
+
+    if (count !== undefined) {
+      items = items.slice(0, count)
+    }
+
 
     let cards = [];
     items.forEach((item) => {
