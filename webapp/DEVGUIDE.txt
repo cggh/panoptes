@@ -16,7 +16,7 @@ nano config.py #Edit config for DB, paths
 ./scripts/build.sh
 
 #Then you can run panoptes:
-./scripts/run.sh
+DEVELOPMENT=TRUE ./scripts/run.sh
 
 #Datasets are hosted at http://localhost:8000/{DATASET_ID}
 #If you're using the sampledata (by default you are) then several are available for example
