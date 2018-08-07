@@ -260,7 +260,7 @@ let Legend = createReactClass({
   render() {
     return <div className="legend">
       <div className="legend-element">Tracks:</div>
-      {React.Children.map(this.props.children,
+      {React.Children.map(filterChildren(this, this.props.children),
         (child, i) => <LegendElement
           key={child.props.track}
           name={child.props.track}
@@ -361,7 +361,7 @@ let NumericalTrackGroupControls = createReactClass({
   render() {
     let {autoYScale, yMin, yMax, children, table, query} = this.props;
     let actions = this.getFlux().actions;
-
+    children = filterChildren(this, children);
     return (
       <div className="channel-controls">
         <div className="control-group">
