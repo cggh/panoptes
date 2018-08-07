@@ -148,7 +148,7 @@
     "react-dom": "^16.0.0",
     "react-draggable": "^3.0.1",
     "react-hammerjs": "git+https://github.com/marvelapp/react-hammerjs.git",
-    "react-highlighter": "^0.4.0",
+    "react-highlighter": "^0.4.2",
     "react-hotkeys": "^0.10.0",
     "react-immutable-proptypes": "^2.1.0",
     "react-immutable-render-mixin": "^0.9.7",
