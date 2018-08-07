@@ -7,7 +7,13 @@ import FeedItem from 'panoptes/FeedItem';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import {Card, CardContent, CardHeader, CardMedia, Typography} from '@material-ui/core';
+import _filter from 'lodash.filter';
+import _isArray from 'lodash.isarray';
+import _intersection from 'lodash.intersection';
+import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
+
 import 'blog.scss';
+import HTMLWithComponents from "./HTMLWithComponents";
 
 let Feed = createReactClass({
   displayName: 'Feed',
@@ -27,6 +33,8 @@ let Feed = createReactClass({
     className: PropTypes.string,
     actionsAreaIsClickable: PropTypes.bool,
     actionsAreaDisappearsOnExpand: PropTypes.bool,
+    tags: PropTypes.string,
+    count: PropTypes.number
   },
 
   getDefaultProps() {
@@ -44,7 +52,7 @@ let Feed = createReactClass({
   },
 
   render() {
-    const {id, templateDocPath, className, actionsAreaIsClickable, actionsAreaDisappearsOnExpand, ...otherProps} = this.props;
+    const {id, templateDocPath, className, actionsAreaIsClickable, actionsAreaDisappearsOnExpand, tags, count, ...otherProps} = this.props;
 
     let feedObj = this.config.feeds[id];
 
@@ -60,6 +68,16 @@ let Feed = createReactClass({
     } else {
       console.warn('There is no item array or item property in this feedObj.rss.channel: ', feedObj.rss.channel);
     }
+
+    if (tags) {
+      let tagArray = tags.split(',').map((tag) => tag.trim());
+      items = _filter(items, (item) => _intersection(tagArray, _isArray(item.category) ? item.category : [item.category]).length > 0)
+    }
+
+    if (count !== undefined) {
+      items = items.slice(0, count)
+    }
+
 
     let cards = [];
     items.forEach((item) => {
@@ -114,8 +132,11 @@ let Feed = createReactClass({
                 <Typography className="blog-list-entry-headline" variant="headline">
                   {title}
                   </Typography>
-                <Typography variant="subheading" color="textSecondary">
+                <Typography variant="subheading" color="textSecondary" paragraph={true}>
                   {subheader}
+                </Typography>
+                <Typography >
+                  <HTMLWithComponents>{description}</HTMLWithComponents> <a> Read more.. </a>
                 </Typography>
               </CardContent>
             </div>

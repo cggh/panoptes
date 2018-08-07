@@ -129,6 +129,18 @@ if (dataset === undefined || dataset === null || dataset === '') {
                 props: {table}
               };
             }
+          } else if (config.feeds[datasetURLPathParts[1]] !== undefined) {
+            if (datasetURLPathParts[2]) {
+              appState.session.components.URLTab = {
+                type: 'FeedItem',
+                props: {feedId: datasetURLPathParts[1], itemId: datasetURLPathParts[2]}
+              };
+            } else {
+              appState.session.components.URLTab = {
+                type: 'FeedIndex',
+                props: {id: datasetURLPathParts[1]}
+              };
+            }
           } else {
             appState.session.components.URLTab = {
               type: 'DocPage',

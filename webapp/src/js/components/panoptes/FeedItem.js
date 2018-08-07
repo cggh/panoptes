@@ -32,7 +32,7 @@ let FeedItem = createReactClass({
 
     let feed = this.config.feeds[feedId];
     if (feed === undefined) {
-      return <div>No feed {{id}} defined</div>;
+      return <div>No feed {{feedId}} defined</div>;
     }
 
     let items = [];
@@ -52,6 +52,10 @@ let FeedItem = createReactClass({
     });
 
     let item = itemsById[itemId];
+    if (!item) {
+      return `No post with id ${itemId} found`;
+    }
+
     let {title, description, pubDate} = item;
 
     const textBarriers = ['[&#8230;]', '&#8230;'];
@@ -72,8 +76,6 @@ let FeedItem = createReactClass({
     const zeroPaddedDayOfMonth = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
     const dateMMDDDDYYYY = zeroPaddedDayOfMonth + ' ' + monthName + ' ' + fullYear;
     const subheader = 'by ' + creator + ', ' + dateMMDDDDYYYY;
-
-    console.log(item);
 
     return <div className="page-container">
       <div className="horiz-centering-container vertical stack page-content">

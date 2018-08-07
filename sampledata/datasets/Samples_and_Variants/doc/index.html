@@ -5,9 +5,9 @@
         <p><DocLink href="examples.html">Page of Examples</DocLink></p>
         <p>Other examples:</p>
         <ul>
-          <li><DocLink href="single_post_blog.html">feed from a single-post blog</DocLink>.</li>
-          <li><DocLink href="wp_feed.html">feed from the WordPress blog</DocLink> without a template (default).</li>
-          <li><DocLink href="MalariaGEN_Informatics_feed.html">feed from the MalariaGEN Informatics blog</DocLink> with a template file.</li>
+          <li><TextButton label="single post blog"><FeedIndex id="SinglePostBlog"/></TextButton></li>
+          <li><TextButton label="feed from the WordPress blog"><FeedIndex id="WordPress" selectedTags="WordPress.com" count="5"/></TextButton> without a template (default).</li>
+          <li><TextButton label="feed from the MalariaGEN Informatics blog"><FeedIndex id="malariageninformatics" templateDocPath="templates/blogPost.html" className="card-stack"/></TextButton> with a template file.</li>
           <li><DocLink href="MuiTable.html">MUI table</DocLink> component(s).</li>
           <li><DocLink href="compositionalMarkerLayers.html">compositional Map MarkerLayers</DocLink> component(s).</li>
           <li><DocLink href="TableHotSpotsLayer.html">old-fashioned TableHotSpotsLayer</DocLink> component(s).</li>
@@ -18,3 +18,5 @@
         <TableList style="width: 410px" />
     </div>
 </div>
+
+
