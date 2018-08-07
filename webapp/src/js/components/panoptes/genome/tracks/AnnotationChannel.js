@@ -104,10 +104,25 @@ let AnnotationChannel = createReactClass({
           {expr: 'ftype', as: 'types'},
           {expr: 'fparentid', as: 'parents'}
         ],
-        query: SQL.WhereClause.encode(SQL.WhereClause.AND([
-          SQL.WhereClause.CompareFixed('chromid', '=', chromosome),
-          SQL.WhereClause.CompareFixed('fstart', '>=', this.blockStart),
-          SQL.WhereClause.CompareFixed('fstop', '<', this.blockEnd)]))
+        query: SQL.WhereClause.encode(
+          SQL.WhereClause.AND([
+            SQL.WhereClause.CompareFixed('chromid', '=', chromosome),
+            SQL.WhereClause.OR([
+              SQL.WhereClause.AND([
+                SQL.WhereClause.CompareFixed('fstart', '>=', this.blockStart),
+                SQL.WhereClause.CompareFixed('fstart', '<', this.blockEnd)
+              ]),
+              SQL.WhereClause.AND([
+                SQL.WhereClause.CompareFixed('fstop', '>=', this.blockStart),
+                SQL.WhereClause.CompareFixed('fstop', '<', this.blockEnd)
+              ]),
+              SQL.WhereClause.AND([
+                SQL.WhereClause.CompareFixed('fstart', '<=', this.blockStart),
+                SQL.WhereClause.CompareFixed('fstop', '>', this.blockEnd)
+              ]),
+            ])
+          ])
+        )
       };
 
       requestContext.request((componentCancellation) =>
