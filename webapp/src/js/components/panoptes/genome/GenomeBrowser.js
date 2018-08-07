@@ -284,7 +284,6 @@ let GenomeBrowser = createReactClass({
 
   render() {
     let {start, end, sideWidth, chromosome, children} = this.props;
-    children = filterChildren(this, children); //Remove whitespace children from template padding
 
     chromosome = chromosome || this.defaultChrom;
     let {loading, hoverPos} = this.state;
@@ -363,17 +362,19 @@ let GenomeBrowser = createReactClass({
                           onChangeHoverPos={this.handleHover}
                           hoverPos={hoverPos}
                         />
-                        {ValidComponentChildren.map(children,
-                          (child, i) => child.props.fixed ?
+                        {children.map(
+                          (child, i) => filterChildren(this, child) && child.props.fixed ?
                             React.cloneElement(child, {
+                              key: i,
                               onClose: () => this.redirectedProps.setProps((props) => props.deleteIn(['children', i])),
                               ...trackProps
                             }) : null)}
                       </div>
                       <div ref={(node) => this.scrollTracks = node} className="scrolling grow scroll-within">
-                        {ValidComponentChildren.map(children,
-                          (child, i) => !child.props.fixed ?
+                        {children.map(
+                          (child, i) => filterChildren(this, child) && !child.props.fixed ?
                             React.cloneElement(child, {
+                              key: i,
                               onClose: () => this.redirectedProps.setProps((props) => props.deleteIn(['children', i])),
                               ref: (component) => this.scrollListeners[i] = component,
                               ...trackProps

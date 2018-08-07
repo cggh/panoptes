@@ -87,7 +87,7 @@ let CanvasGroupChannel = createReactClass({
         allDataYMax = dataYMax;
       }
     });
-    if (_isFinite(allDataYMin) && _isFinite(allDataYMax)) {
+    if (_isFinite(allDataYMin) && _isFinite(allDataYMax) && this.refs.spring) {
       this.setState({
         dataYMin: allDataYMin,
         dataYMax: allDataYMax
