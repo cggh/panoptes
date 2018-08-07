@@ -11,7 +11,6 @@ import _head from 'lodash.head';
 import _keys from 'lodash.keys';
 import {scaleLinear} from 'd3-scale';
 import scrollbarSize from 'scrollbar-size';
-import ValidComponentChildren from 'util/ValidComponentChildren';
 import normalizeWheel from 'normalize-wheel';
 
 import Hammer from 'react-hammerjs';
