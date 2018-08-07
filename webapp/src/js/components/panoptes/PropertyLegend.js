@@ -67,7 +67,7 @@ let PropertyLegend = createReactClass({
           >
           </div>
         </span>,
-        <span key="max" className="legend-element">{max === undefined ? propConfig.minVal : max}</span>
+        <span key="max" className="legend-element">{max === undefined ? propConfig.maxVal : max}</span>
       ];
     }
 
