@@ -81,7 +81,7 @@ a {
     }
 
     .body {
-      height: calc(100vh - 48px - 64px); // - tabs and header
+      height: calc(100vh - 64px); // - tabs and header
       position: relative;
     }
   }
