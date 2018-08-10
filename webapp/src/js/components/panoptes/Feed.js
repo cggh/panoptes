@@ -96,7 +96,6 @@ let Feed = createReactClass({
           }
         }
       }
-      description += '&#8230;';
       const content = item['content:encoded'];
       const creator = item['dc:creator'];
       const date = new Date(pubDate);
@@ -127,6 +126,11 @@ let Feed = createReactClass({
       } else {
         cards.push(
           <Card key={itemId} className="blog-list-entry" onClick={() => this.handleClick(id, itemId)}>
+                        {thumbnail ?
+            <CardMedia
+              className="blog-list-entry-media"
+              image={thumbnail.img['@src']}
+            /> : null}
             <div className="blog-list-entry-details">
               <CardContent className="blog-list-entry-content">
                 <Typography className="blog-list-entry-headline" variant="headline">
@@ -136,15 +140,10 @@ let Feed = createReactClass({
                   {subheader}
                 </Typography>
                 <Typography >
-                  <HTMLWithComponents>{description}</HTMLWithComponents> <a> Read more.. </a>
+                  <HTMLWithComponents>{description}</HTMLWithComponents> <a> Read more... </a>
                 </Typography>
               </CardContent>
             </div>
-            {thumbnail ?
-            <CardMedia
-              className="blog-list-entry-media"
-              image={thumbnail.img['@src']}
-            /> : null}
           </Card>
         );
       }
