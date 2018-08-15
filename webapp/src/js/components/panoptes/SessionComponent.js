@@ -5,14 +5,12 @@ import deserialiseComponent from 'util/deserialiseComponent';
 import ErrorBoundary from 'components/ErrorBoundary';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
-import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 let SessionComponent = createReactClass({
   displayName: 'SessionComponent',
 
   mixins: [
     FluxMixin,
-    StoreWatchMixin('SessionStore')
   ],
 
   propTypes: {
@@ -21,9 +19,9 @@ let SessionComponent = createReactClass({
     replaceable: PropTypes.bool
   },
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.compId !== this.props.compId) ||
-      (nextState.component !== this.state.component);
+  shouldComponentUpdate(nextProps) {
+    let component = this.getFlux().store('SessionStore').getState().getIn(['components', nextProps.compId]);
+    return component !== this.lastRendered;
   },
 
   getDefaultProps() {
@@ -34,6 +32,7 @@ let SessionComponent = createReactClass({
 
   componentWillMount() {
     //Store this so that we can access changes without render.
+    this.lastRendered = null;
     this.updateTitleIcon =
       (function () {
         return this.props.updateTitleIcon.apply(this, arguments);
@@ -48,26 +47,25 @@ let SessionComponent = createReactClass({
   },
 
   title() {
-    return this.state.component.getIn(['props', 'title']) || this.refs.child.title ? this.refs.child.title() : null || '';
+    let component = this.getFlux().store('SessionStore').getState().getIn(['components', props.compId]);
+    return component.getIn(['props', 'title']) || this.refs.child.title ? this.refs.child.title() : null || '';
   },
 
   icon() {
-    return this.state.component.getIn(['props', 'icon']) || this.refs.child.icon ? this.refs.child.icon() : null || '';
-  },
-
-  componentWillReceiveProps(nextProps) {
-    this.setState(this.getStateFromFlux(nextProps));
+    let component = this.getFlux().store('SessionStore').getState().getIn(['components', props.compId]);
+    return component.getIn(['props', 'icon']) || this.refs.child.icon ? this.refs.child.icon() : null || '';
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.updateTitleIcon && (!prevState.component || !this.state.component || (prevState.component.get('type') !== this.state.component.get('type')))) {
+    if (this.props.updateTitleIcon) {
       this.props.updateTitleIcon();
     }
   },
 
   render() {
     const {compId, replaceable} = this.props;
-    const {component} = this.state;
+    let component = this.getFlux().store('SessionStore').getState().getIn(['components', compId]);
+    this.lastRendered = component;
     let actions = this.getFlux().actions.session;
     return <ErrorBoundary>
       {component ? React.cloneElement(deserialiseComponent(component, [compId], {
