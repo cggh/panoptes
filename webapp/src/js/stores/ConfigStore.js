@@ -2,6 +2,7 @@ import {createStore} from 'fluxxor';
 import {scaleColour} from 'util/Colours';
 
 import Constants from '../constants/Constants';
+
 const APIConst = Constants.API;
 
 import _forEach from 'lodash.foreach';
@@ -65,6 +66,26 @@ const ConfigStore = createStore({
     _each(_sortBy(_keys(newConfig.chromosomes)), (name) => chromosomes[name] = newConfig.chromosomes[name]);
     newConfig.chromosomes = chromosomes;
     newConfig.constants = newConfig.settings.constants;
+
+    _each(newConfig.feeds, (feed, feedId) => {
+      let items = [];
+      if (Array.isArray(feed.rss.channel.item)) {
+        items = feed.rss.channel.item;
+      } else if (feed.rss.channel.item !== undefined) {
+        items.push(feed.rss.channel.item);
+      } else {
+        console.warn('There is no item array or item property in this feed.rss.channel: ', feed.rss.channel);
+      }
+
+      let itemsById = {};
+      items.forEach((item) => {
+        let elements = item.link.split('/');
+        let id = elements[elements.length - 2];
+        itemsById[id] = item;
+      });
+      feed.itemsById = itemsById;
+    });
+
     return newConfig;
   },
 
@@ -217,7 +238,12 @@ const ConfigStore = createStore({
         }
       } else {
         if (!table.propertyGroupsById['_UNGROUPED_']) {
-          table.propertyGroupsById['_UNGROUPED_'] = {id: '_UNGROUPED_', name: 'Properties', properties: [], visibleProperties: []};
+          table.propertyGroupsById['_UNGROUPED_'] = {
+            id: '_UNGROUPED_',
+            name: 'Properties',
+            properties: [],
+            visibleProperties: []
+          };
           table.propertyGroups.push(table.propertyGroupsById['_UNGROUPED_']);
         }
         table.propertyGroupsById['_UNGROUPED_'].properties.push(prop);
@@ -303,9 +329,9 @@ const ConfigStore = createStore({
       prop.showBar = prop.showBar || (prop.barWidth > 0);
       prop.showByDefault = 'tableDefaultVisible' in prop ? prop.tableDefaultVisible :
         prop.isPrimKey ||
-      prop.id == table.chromosome ||
-      prop.id == table.position ||
-      false;
+        prop.id == table.chromosome ||
+        prop.id == table.position ||
+        false;
       prop.defaultValue = (prop.distinctValues || {})[0] || {
         'Text': '',
         'Float': 0,
@@ -326,30 +352,30 @@ const ConfigStore = createStore({
 
         //Interpolate thresholds where .. has been used.
         let {thresholds, colours, interpolate} = prop.scaleColours;
-        if ((colours.length !== thresholds.length && interpolate) || (colours.length !== thresholds.length-1 && !interpolate)) {
+        if ((colours.length !== thresholds.length && interpolate) || (colours.length !== thresholds.length - 1 && !interpolate)) {
           console.error(`thresholds and colours are incompatible lengths for ${prop.id}`);
         }
         let gaps = [];
         let inGap = false;
-        for(let i = 0, l = colours.length; i < l; ++i) {
+        for (let i = 0, l = colours.length; i < l; ++i) {
           if (colours[i] === '...') {
-            if (i === 0 || i === l-1){
+            if (i === 0 || i === l - 1) {
               console.error(`... cannot be used at start or end of colours ${prop.id}`)
             }
             if (!inGap) {
               inGap = true;
-              gaps.push({start: i-1, end:i+1});
+              gaps.push({start: i - 1, end: i + 1});
             } else {
-              gaps[gaps.length -1].end = i+1;
+              gaps[gaps.length - 1].end = i + 1;
             }
           } else {
             inGap = false;
           }
         }
-        for(let i = 0, l = gaps.length; i < l; ++i) {
+        for (let i = 0, l = gaps.length; i < l; ++i) {
           let {start, end} = gaps[i];
           let colourFunc = scaleColour([start, end], [colours[start], colours[end]]);
-          for(let j = start + 1; j < end; ++j) {
+          for (let j = start + 1; j < end; ++j) {
             colours[j] = colourFunc(j);
           }
         }

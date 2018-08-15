@@ -35,23 +35,7 @@ let FeedItem = createReactClass({
       return <div>No feed {{feedId}} defined</div>;
     }
 
-    let items = [];
-    if (Array.isArray(feed.rss.channel.item)) {
-      items = feed.rss.channel.item;
-    } else if (feed.rss.channel.item !== undefined) {
-      items.push(feed.rss.channel.item);
-    } else {
-      console.warn('There is no item array or item property in this feed.rss.channel: ', feed.rss.channel);
-    }
-
-    let itemsById = {};
-    items.forEach((item) => {
-      let elements = item.link.split('/');
-      let id = elements[elements.length-2];
-      itemsById[id] = item;
-    });
-
-    let item = itemsById[itemId];
+    let item = feed.itemsById[itemId];
     if (!item) {
       return `No post with id ${itemId} found`;
     }
