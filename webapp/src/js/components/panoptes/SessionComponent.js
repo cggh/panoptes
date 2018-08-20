@@ -47,13 +47,13 @@ let SessionComponent = createReactClass({
   },
 
   title() {
-    let component = this.getFlux().store('SessionStore').getState().getIn(['components', props.compId]);
-    return component.getIn(['props', 'title']) || this.refs.child.title ? this.refs.child.title() : null || '';
+    let component = this.getFlux().store('SessionStore').getState().getIn(['components', this.props.compId]);
+    return component.getIn(['props', 'title']) || (this.refs.child && this.refs.child.title) ? this.refs.child.title() : null || '';
   },
 
   icon() {
-    let component = this.getFlux().store('SessionStore').getState().getIn(['components', props.compId]);
-    return component.getIn(['props', 'icon']) || this.refs.child.icon ? this.refs.child.icon() : null || '';
+    let component = this.getFlux().store('SessionStore').getState().getIn(['components', this.props.compId]);
+    return component.getIn(['props', 'icon']) || (this.refs.child && this.refs.child.icon) ? this.refs.child.icon() : null || '';
   },
 
   componentDidUpdate(prevProps, prevState) {
