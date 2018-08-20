@@ -129,7 +129,7 @@ const ConfigStore = createStore({
       });
       config.visibleTables = _filter(config.tables, (table) => !table.isHidden);
     }
-
+    config.cachedTablesByPrimKey = {};
     let processTable = (table) => {
       if (table.primKey === 'AutoKey') {
         table.properties.unshift({id: 'AutoKey', name: 'AutoKey', dataType: 'Int32'});
@@ -154,6 +154,13 @@ const ConfigStore = createStore({
       if (table.defaultQuery === '')
         table.defaultQuery = SQL.nullQuery;
       this.addPropertyConfig(table);
+      if (config.cachedTables[table.id]) {
+        config.cachedTablesByPrimKey[table.id] = {};
+        let pk = config.tablesById[table.id].primKey;
+        config.cachedTables[table.id].forEach((row) => {
+          config.cachedTablesByPrimKey[table.id][row[pk]] = row;
+        })
+      }
     };
     config.tables.forEach(processTable);
     return config;
