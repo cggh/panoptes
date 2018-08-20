@@ -41,7 +41,7 @@ let TextButton = createReactClass({
     }
 
     return <CustomButton target={target}>
-      <Anchor><span style={{textDecoration: 'underline', cursor: 'pointer'}}>{label}</span></Anchor>
+      <Anchor><a style={{textDecoration: 'underline', cursor: 'pointer'}}>{label}</a></Anchor>
       <Content>{children}</Content>
     </CustomButton>;
 
