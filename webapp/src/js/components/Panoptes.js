@@ -104,10 +104,11 @@ let Panoptes = createReactClass({
   },
 
   getStateFromFlux() {
-    let {tabs, popups} = this.getFlux().store('SessionStore').getState().toObject();
+    let {tabs, popups, components} = this.getFlux().store('SessionStore').getState().toObject();
     return {
       tabs,
       popups,
+      components,
       modal: this.getFlux().store('SessionStore').getModal(),
       panoptes: this.getFlux().store('PanoptesStore').getState()
     };
