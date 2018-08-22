@@ -49,7 +49,7 @@ let MapPopup = createReactClass({
     }
     return (
       <LeafletPopup>
-        {children}
+        {child}
       </LeafletPopup>
     );
 
