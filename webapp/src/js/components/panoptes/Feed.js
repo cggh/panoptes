@@ -6,14 +6,13 @@ import DocTemplate from 'panoptes/DocTemplate';
 import FeedItem from 'panoptes/FeedItem';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import {Card, CardContent, CardHeader, CardMedia, Typography} from '@material-ui/core';
+import {Card, CardContent, CardMedia, Typography} from '@material-ui/core';
 import _filter from 'lodash.filter';
 import _isArray from 'lodash.isarray';
 import _intersection from 'lodash.intersection';
-import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
 
 import 'blog.scss';
-import HTMLWithComponents from "./HTMLWithComponents";
+import HTMLWithComponents from './HTMLWithComponents';
 
 let Feed = createReactClass({
   displayName: 'Feed',
@@ -71,20 +70,21 @@ let Feed = createReactClass({
 
     if (tags) {
       let tagArray = tags.split(',').map((tag) => tag.trim());
-      items = _filter(items, (item) => _intersection(tagArray, _isArray(item.category) ? item.category : [item.category]).length > 0)
+      items = _filter(items, (item) => _intersection(tagArray, _isArray(item.category) ? item.category : [item.category]).length > 0);
     }
 
     if (count !== undefined) {
-      items = items.slice(0, count)
+      items = items.slice(0, count);
     }
 
 
     let cards = [];
     items.forEach((item) => {
-      let {thumbnail, pubDate, title, description, category, link} = item;
+      let {thumbnail, pubDate, title, description, link} = item;
 
+      description = description === null ? '' : description;
       let elements = link.split('/');
-      let itemId = elements[elements.length-2];
+      let itemId = elements[elements.length - 2];
 
       // Remove text after any of these text barriers. Order matters.
       const textBarriers = ['[&#8230;]', '&#8230;'];
@@ -126,16 +126,16 @@ let Feed = createReactClass({
       } else {
         cards.push(
           <Card key={itemId} className="blog-list-entry" onClick={() => this.handleClick(id, itemId)}>
-                        {thumbnail ?
-            <CardMedia
-              className="blog-list-entry-media"
-              image={thumbnail.img['@src']}
-            /> : null}
+            {thumbnail ?
+              <CardMedia
+                className="blog-list-entry-media"
+                image={thumbnail.img['@src']}
+              /> : null}
             <div className="blog-list-entry-details">
               <CardContent className="blog-list-entry-content">
                 <Typography className="blog-list-entry-headline" variant="headline">
                   {title}
-                  </Typography>
+                </Typography>
                 <Typography variant="subheading" color="textSecondary" paragraph={true}>
                   {subheader}
                 </Typography>
