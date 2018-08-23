@@ -2,15 +2,10 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import PropTypes from 'prop-types';
-import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
-import DocTemplate from 'panoptes/DocTemplate';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import ExpandingCard from 'containers/ExpandingCard';
-import ExpandingCardActions from 'containers/ExpandingCardActions';
-import ExpandingCardCollapse from 'containers/ExpandingCardCollapse';
-import {Card, CardStack, CardContent, CardHeader, CardMedia, Typography} from '@material-ui/core';
-import HTMLWithComponents from "./HTMLWithComponents";
+import {Card, CardContent, Typography} from '@material-ui/core';
+import HTMLWithComponents from './HTMLWithComponents';
 // import 'blog.scss';
 
 let FeedItem = createReactClass({
@@ -40,18 +35,8 @@ let FeedItem = createReactClass({
       return `No post with id ${itemId} found`;
     }
 
-    let {title, description, pubDate} = item;
+    let {title, pubDate} = item;
 
-    const textBarriers = ['[&#8230;]', '&#8230;'];
-    if (typeof description === 'string') {
-      for (const textBarrier of textBarriers) {
-        const indexOfTextBarrier = description.indexOf(textBarrier);
-        if (indexOfTextBarrier !== -1) {
-          description = description.substring(0, indexOfTextBarrier);
-        }
-      }
-    }
-    description += '&#8230;';
     const content = item['content:encoded'];
     const creator = item['dc:creator'];
     const date = new Date(pubDate);
@@ -77,7 +62,7 @@ let FeedItem = createReactClass({
           </CardContent>
         </Card>
       </div>
-    </div>
+    </div>;
   },
 });
 

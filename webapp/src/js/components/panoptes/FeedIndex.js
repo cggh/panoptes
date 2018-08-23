@@ -6,7 +6,6 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import Feed from 'panoptes/Feed';
 import CardStack from 'panoptes/CardStack';
-import {Card, CardContent, CardHeader, CardMedia, Typography} from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import _union from 'lodash.union';
@@ -71,21 +70,21 @@ let FeedIndex = createReactClass({
         <h2>{description}</h2>
         <CardStack>
           <div>
-              {tags.map((tag) => <div style={{display: "inline-block"}}>
-                <FormControlLabel
-                  key={tag}
-                  control={
-                    <Checkbox
-                      checked={_includes(selectedTags, tag)}
-                      // onChange={this.handleChange('checkedA')}
-                      value={tag}
-                      onChange={(event, checked) => {
-                        if (checked) {
-                          setProps({selectedTags: _union(selectedTags, [tag]).join(',')})
-                        } else {
-                          setProps({selectedTags: _pull(selectedTags, tag).join(',')})
-                        }
-                      }}
+            {tags.map((tag) => <div key={tag} style={{display: 'inline-block'}}>
+              <FormControlLabel
+                key={tag}
+                control={
+                  <Checkbox
+                    checked={_includes(selectedTags, tag)}
+                    // onChange={this.handleChange('checkedA')}
+                    value={tag}
+                    onChange={(event, checked) => {
+                      if (checked) {
+                        setProps({selectedTags: _union(selectedTags, [tag]).join(',')});
+                      } else {
+                        setProps({selectedTags: _pull(selectedTags, tag).join(',')});
+                      }
+                    }}
                   />
                 }
                 label={tag}
@@ -94,9 +93,9 @@ let FeedIndex = createReactClass({
             )}
           </div>
           <Feed id={id} replaceSelf={replaceSelf} replaceParent={replaceParent} tags={selectedTags.join(',')}/>
-          </CardStack>
+        </CardStack>
       </div>
-    </div>
+    </div>;
   },
 });
 
