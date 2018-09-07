@@ -260,11 +260,16 @@ if (dataset === undefined || dataset === null || dataset === '') {
 
       history.listen((location, action) => {
         if (action === 'POP') {
-          historyChangeCount += 1;
-          const newState = Immutable.fromJS((location.state ? location.state.session : {}));
-          if (!newState.equals(stores.SessionStore.state)) {
-            stores.SessionStore.state = newState;
-            stores.SessionStore.emit('change');
+          if (stores.SessionStore.modal) {
+            stores.SessionStore.modalClose();
+            history.push(location, action);
+          } else {
+            historyChangeCount += 1;
+            const newState = Immutable.fromJS((location.state ? location.state.session : {}));
+            if (!newState.equals(stores.SessionStore.state)) {
+              stores.SessionStore.state = newState;
+              stores.SessionStore.emit('change');
+            }
           }
         }
       });
