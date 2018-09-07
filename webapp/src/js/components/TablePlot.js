@@ -7,7 +7,7 @@ import _filter from 'lodash.filter';
 import _map from 'lodash.map';
 import _reduce from 'lodash.reduce';
 import _pickBy from 'lodash.pickby';
-
+import he from 'he';
 import Plot from 'Plot';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -122,9 +122,13 @@ let TablePlot = createReactClass({
             if (dimensionProperties[dimensionProperty] !== null) {
               // Decide which properties of the dimensionProperty to pass forward as metadata.
               // TODO: just pass all properties, i.e. the object?
-              let {id, colour, description, name, isCategorical, isNumerical} = this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]];
-              let colourFunction = propertyColour(this.config.tablesById[table].propertiesById[dimensionProperties[dimensionProperty]]);
-              let formatterFunction = (value) => Formatter(this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]], value);
+              const propConfig = this.tableConfig().propertiesById[dimensionProperties[dimensionProperty]];
+              let {id, colour, description, name, isCategorical, isNumerical} = propConfig;
+              let colourFunction = propertyColour(propConfig);
+              let formatterFunction = (value) => Formatter(propConfig, value);
+              if (propConfig.isText) {
+                data[dimensionProperties[dimensionProperty]] = data[dimensionProperties[dimensionProperty]].map(he.decode);
+              }
               dimensionData[dimensionProperty] = data[dimensionProperties[dimensionProperty]];
               dimensionMetadata[dimensionProperty] = {id, colour, description, name, isCategorical, isNumerical, colourFunction, formatterFunction};
             }
