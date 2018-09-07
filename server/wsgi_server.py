@@ -16,7 +16,7 @@ from werkzeug.wrappers import Response
 
 general_with_static = SharedDataMiddleware(wsgi_general.application, {
     '/': os.path.join(os.path.dirname(config.__file__), 'webapp/dist')
-}, cache_timeout=1)
+})
 api_application = DispatcherMiddleware(general_with_static, {
     '/panoptes/api':        wsgi_api.application,
 })
