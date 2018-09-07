@@ -13,7 +13,6 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import DeleteIcon from '@material-ui/icons/Delete';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
-import {withStyles} from '@material-ui/core/styles';
 import _map from 'lodash.map';
 import _includes from 'lodash.includes';
 import _intersection from 'lodash.intersection';
@@ -26,12 +25,6 @@ import _difference from 'lodash.difference';
 import _clone from 'lodash.clone';
 import Icon from 'ui/Icon';
 import IconButton from '@material-ui/core/IconButton';
-
-const styles = (theme) => ({
-  nested: {
-    paddingLeft: theme.spacing.unit * 4,
-  },
-});
 
 const defaultAvailableExpanded = true;
 const defaultPickedExpanded = true;
@@ -163,7 +156,7 @@ let GroupedItemPicker = createReactClass({
                         (
                           <ListItem
                             button
-                            className={[classes.nested, classNames({picked: !_includes(picked, id)})]}
+                            className={["nested", classNames({picked: !_includes(picked, id)})]}
                             key={id}
                             onClick={() => this.handleAdd(id)}
                           >
@@ -259,7 +252,7 @@ let GroupedItemPicker = createReactClass({
                                   button
                                   key={id}
                                   onClick={() => this.handleRemove(id)}
-                                  className={classes.nested}
+                                  className="nested"
                                 >
                                   <ListItemIcon>
                                     <Icon fixedWidth={true} name={icon} />
@@ -291,6 +284,4 @@ let GroupedItemPicker = createReactClass({
   },
 });
 
-let module = withStyles(styles)(GroupedItemPicker);
-module.displayName = 'GroupedItemPicker';
-export default module;
+export default GroupedItemPicker;

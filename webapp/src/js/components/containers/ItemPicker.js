@@ -15,18 +15,8 @@ import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import {withStyles} from '@material-ui/core/styles';
 import Icon from 'ui/Icon';
 import Pluralise from 'ui/Pluralise';
-
-const styles = (theme) => ({
-  nested: {
-    paddingLeft: theme.spacing.unit * 4,
-  },
-  nestedMore: {
-    paddingLeft: theme.spacing.unit * 8,
-  },
-});
 
 let ItemPicker = createReactClass({
   displayName: 'ItemPicker',
@@ -181,7 +171,7 @@ let ItemPicker = createReactClass({
         <ListItem
           button
           key={itemId}
-          className={itemGroupId !== undefined && itemGroupId !== '_UNGROUPED_' ? classes.nestedMore : classes.nested}
+          className={itemGroupId !== undefined && itemGroupId !== '_UNGROUPED_' ? "nested-more" : "nested"}
           onClick={() => this.handleAdd({groupId, itemId, payload, itemGroupId})}
         >
           {icon ?
@@ -252,7 +242,7 @@ let ItemPicker = createReactClass({
               <ListItem
                 button
                 onClick={() => this.handleExpandItemGroup(groupId, itemGroupId)}
-                className={classes.nested}
+                className="nested"
               >
                 {itemGroup.icon ?
                   <ListItemIcon>
@@ -369,6 +359,4 @@ let ItemPicker = createReactClass({
   },
 });
 
-let module = withStyles(styles)(ItemPicker);
-module.displayName = 'ItemPicker';
-export default module;
+export default ItemPicker;
