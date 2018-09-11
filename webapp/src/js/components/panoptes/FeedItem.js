@@ -4,7 +4,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import PropTypes from 'prop-types';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import {Card, CardContent, Typography} from '@material-ui/core';
+import {Card, CardContent, CardMedia, Typography} from '@material-ui/core';
 import HTMLWithComponents from './HTMLWithComponents';
 // import 'blog.scss';
 
@@ -35,7 +35,7 @@ let FeedItem = createReactClass({
       return `No post with id ${itemId} found`;
     }
 
-    let {title, pubDate} = item;
+    let {title, pubDate, thumbnail} = item;
 
     const content = item['content:encoded'];
     const creator = item['dc:creator'];
@@ -48,8 +48,8 @@ let FeedItem = createReactClass({
 
     return <div className="page-container">
       <div className="horiz-centering-container vertical stack page-content">
-        <Card style={{maxWidth: '650px'}}>
-          <CardContent>
+        <Card className="blog-list-entry" style={{maxWidth: '650px'}}>
+            <CardContent>
             <Typography className="blog-list-entry-headline" variant="headline">
               {title}
             </Typography>
@@ -57,6 +57,11 @@ let FeedItem = createReactClass({
               {subheader}
             </Typography>
             <Typography component="div" className="paragraph">
+              {thumbnail ?
+                <img
+                  className="blog-article-media"
+                  src={thumbnail.img['@src']}
+                /> : null}
               <HTMLWithComponents>{content}</HTMLWithComponents>
             </Typography>
           </CardContent>
