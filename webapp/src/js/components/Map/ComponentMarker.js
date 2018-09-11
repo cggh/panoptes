@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import DivIcon from 'Map/DivIcon';
+import filterChildren from 'util/filterChildren';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -96,7 +97,7 @@ let ComponentMarker = createReactClass({
         </svg>
       );
     } else {
-      child = React.cloneElement(React.Children.only(children), otherProps);
+      child = React.cloneElement(React.Children.only(filterChildren(this, children)), otherProps);
     }
 
     // NOTE: Using any className (null) to override the default, set by Leaflet CSS, which otherwise causes white squares.

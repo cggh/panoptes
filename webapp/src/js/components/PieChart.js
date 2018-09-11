@@ -21,12 +21,7 @@ let PieChart = createReactClass({
 
   propTypes: {
     chartData: PropTypes.array,
-    map: PropTypes.object,
-    lat: PropTypes.number,
-    lng: PropTypes.number,
     name: PropTypes.string,
-    // originalLat: PropTypes.number,
-    // originalLng: PropTypes.number,
     radius: PropTypes.number,
     hideValues: PropTypes.bool,
     faceText: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -71,7 +66,6 @@ let PieChart = createReactClass({
 
     let pieChart = pie().sort(null);
     let arcDescriptors = pieChart(pieData);
-
     let sectors = sectorsData.map((sectorData, i) =>
       <PieChartSector
         key={i}
@@ -82,21 +76,6 @@ let PieChart = createReactClass({
         className={isHighlighted ? 'panoptes-chart-pie-sector-highlighted' : 'panoptes-chart-pie-sector'}
       />
     );
-
-    // let location = crs.project({lat, lng});
-    //
-    // let line = null;
-    // if (pieData.length && originalLat && originalLng) {
-    //   let originalLocation = crs.project({lat: originalLat, lng: originalLng});
-    //   line = (
-    //     <line
-    //       className="pie-chart-line"
-    //       style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
-    //       x1="0" y1="0"
-    //       x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}
-    //     />
-    //   );
-    // }
 
     const faceTextStyle = {
       fontSize: '10px',
@@ -111,7 +90,7 @@ let PieChart = createReactClass({
 
     return (
       <svg style={{overflow: 'visible', position: 'absolute'}} width={radius} height={radius}>
-        <g transform={'rotate(90)'}>
+        <g>
           {sectors}
         </g>
         {radius > 9 ? <text style={faceTextStyle} x="0" y="0" textAnchor="middle" alignmentBaseline="middle">{faceText}</text> : null}

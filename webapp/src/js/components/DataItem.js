@@ -75,7 +75,7 @@ let DataItem = createReactClass({
             children[0]}
         </div>
         <div>
-          <DataItemActions table={table} primKey={primKey}/>
+          {children.length > 1 ? <DataItemActions table={table} primKey={primKey}/> : null}
         </div>
       </div>
     );
