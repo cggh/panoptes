@@ -15,11 +15,18 @@
   .blog-list-entry-media {
     min-height: 111px;
     min-width: 111px;
+    max-height: 200px;
     width: 131px;
     margin: 16px;
   }
 }
 
+.blog-article-media {
+  max-width: 300px;
+  float: left;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
 
 .page-container {
   background-color: #F7F7F7;
