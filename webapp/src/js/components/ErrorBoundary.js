@@ -22,11 +22,7 @@ class ErrorBoundary extends React.Component {
       return (
         <div>
           <h2>An error has occurred.</h2>
-          <details style={{whiteSpace: 'pre-wrap'}}>
-            {this.state.error && this.state.error.toString()}
-            <br />
-            {this.state.errorInfo.componentStack}
-          </details>
+          Click <a href={window.rootURL}>{window.rootURL}</a> to reset the app.
         </div>
       );
     }
