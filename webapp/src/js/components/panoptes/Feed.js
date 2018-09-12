@@ -126,13 +126,13 @@ let Feed = createReactClass({
       } else {
         cards.push(
           <Card key={itemId} className="blog-list-entry" onClick={() => this.handleClick(id, itemId)}>
-            {thumbnail ?
-              <CardMedia
-                className="blog-list-entry-media"
-                image={thumbnail.img['@src']}
-              /> : null}
             <div className="blog-list-entry-details">
               <CardContent className="blog-list-entry-content">
+                {thumbnail ?
+                  <CardMedia
+                    className="blog-list-entry-media"
+                    image={thumbnail.img['@src']}
+                  /> : null}
                 <Typography className="blog-list-entry-headline" variant="headline">
                   {title}
                 </Typography>
