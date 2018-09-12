@@ -79,7 +79,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
   let promises = [InitialConfig(dataset)];
 
   const remainingPath = datasetURLPathParts.slice(1).join('/');
-
+  window.rootURL = window.location.origin + process.env.DATASET_URL_PATH_PREFIX + dataset;
   // Match the UID and nothing but the UID.
   const HASH_REGEX = /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/;
   const matches = HASH_REGEX.exec(remainingPath);
