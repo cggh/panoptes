@@ -25,6 +25,7 @@ let DataItem = createReactClass({
 
   propTypes: {
     setProps: PropTypes.func,
+    resetScroll: PropTypes.func,
     table: PropTypes.string.isRequired,
     primKey: PropTypes.string.isRequired,
     activeTab: PropTypes.string,
@@ -43,6 +44,14 @@ let DataItem = createReactClass({
 
   title() {
     return `${this.config.tablesById[this.props.table].capNameSingle} "${this.props.primKey}"`;
+  },
+
+  componentWillUpdate(nextProps) {
+    if (this.props.resetScroll && (
+      this.props.table !== nextProps.table ||
+      this.props.primKey !== nextProps.primKey ||
+      this.props.children !== nextProps.children
+    )) this.props.resetScroll();
   },
 
   render() {

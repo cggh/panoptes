@@ -20,6 +20,18 @@ let FeedItem = createReactClass({
   propTypes: {
     feedId: PropTypes.string,
     itemId: PropTypes.string,
+    resetScroll: PropTypes.func
+  },
+
+  componentWillMount() {
+    if (this.props.resetScroll) this.props.resetScroll();
+  },
+
+  componentWillUpdate(nextProps) {
+    if (this.props.resetScroll && (
+      this.props.feedId !== nextProps.feedId ||
+      this.props.itemId !== nextProps.itemId
+    )) this.props.resetScroll();
   },
 
   render() {

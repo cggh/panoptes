@@ -16,6 +16,7 @@ let SessionComponent = createReactClass({
   propTypes: {
     compId: PropTypes.string,
     updateTitleIcon: PropTypes.func,
+    resetScroll: PropTypes.func,
     replaceable: PropTypes.bool
   },
 
@@ -63,7 +64,7 @@ let SessionComponent = createReactClass({
   },
 
   render() {
-    const {compId, replaceable} = this.props;
+    const {compId, replaceable, resetScroll} = this.props;
     let component = this.getFlux().store('SessionStore').getState().getIn(['components', compId]);
     this.lastRendered = component;
     let actions = this.getFlux().actions.session;
@@ -71,7 +72,8 @@ let SessionComponent = createReactClass({
       {component ? React.cloneElement(deserialiseComponent(component, [compId], {
           setProps: actions.componentSetProps,
           replaceSelf: actions.componentReplace,
-          updateTitleIcon: this.updateTitleIcon
+          updateTitleIcon: this.updateTitleIcon,
+          resetScroll
         }), {ref: 'child', replaceable})
         : <span>Component does not exist</span>}
     </ErrorBoundary>;
