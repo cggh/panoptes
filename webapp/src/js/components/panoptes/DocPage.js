@@ -39,6 +39,7 @@ let DocPage = createReactClass({
     path: PropTypes.string,
     replaceSelf: PropTypes.func,
     updateTitleIcon: PropTypes.func,
+    resetScroll: PropTypes.func,
     replaceable: PropTypes.bool,
     dynamicSize: PropTypes.bool,
     setProps: PropTypes.func,
@@ -54,6 +55,7 @@ let DocPage = createReactClass({
   componentWillMount() {
     this.titleFromHTML = 'Loading...';
     this.handlebars = customHandlebars(this.config);
+    if (this.props.resetScroll) this.props.resetScroll();
   },
 
   onConfigChange() {
@@ -109,6 +111,9 @@ let DocPage = createReactClass({
   },
 
   componentWillUpdate(nextProps, nextState) {
+    if (this.props.resetScroll & nextState.content !== this.state.content) {
+      this.props.resetScroll();
+    }
     let inTitle = false;
     let title = 'Untitled';
     const parser = new htmlparser.Parser({

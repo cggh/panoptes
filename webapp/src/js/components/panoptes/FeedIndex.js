@@ -29,12 +29,17 @@ let FeedIndex = createReactClass({
     setProps: PropTypes.func,
     replaceSelf: PropTypes.func,
     replaceParent: PropTypes.func,
+    resetScroll: PropTypes.func
   },
 
   getDefaultProps() {
     return {
       selectedTags: '',
     };
+  },
+
+  componentWillMount() {
+    if (this.props.resetScroll) this.props.resetScroll();
   },
 
   render() {
