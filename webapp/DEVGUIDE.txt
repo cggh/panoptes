@@ -1,16 +1,14 @@
 #Getting started - a little rough at the mo until we come to fix up the build and deploy system
 
-sudo apt-get install -y git gcc gfortran python-dev virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
-
-sudo apt-add-repository "deb http://dev.monetdb.org/downloads/deb/ xenial monetdb"
 wget --output-document=- https://www.monetdb.org/downloads/MonetDB-GPG-KEY | sudo apt-key add -
+sudo apt-add-repository "deb http://dev.monetdb.org/downloads/deb/ bionic monetdb"
 sudo apt-get update
-sudo apt-get install -y --allow-unauthenticated monetdb5-sql monetdb-client
+sudo apt-get install -y git gcc gfortran python-dev virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev monetdb5-sql monetdb-client
 
 git clone git@github.com:cggh/panoptes.git
 cd panoptes
 cp config.py.example config.py
-nano config.py #Edit config for DB, paths
+nano config.py #Edit config for base, source data dirs, etc.
 
 #Install all the things:
 ./scripts/build.sh
