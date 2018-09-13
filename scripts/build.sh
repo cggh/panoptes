@@ -76,14 +76,14 @@ password=monetdb
 EOF
     DB=datasets
     if [ -d $BASEDIR/monetdb ]; then
-        echo -e "${green}  dbfarm exists"
+        echo -e "${green}  dbfarm exists${NC}"
     else
         monetdbd create $BASEDIR/monetdb
     fi
     monetdbd set passphrase=monetdb $BASEDIR/monetdb
     monetdbd set control=True $BASEDIR/monetdb
     if [ -f $BASEDIR/monetdb/merovingian.pid ]; then
-        echo -e "${green}  db server already running"
+        echo -e "${green}  db server already running${NC}"
     else
         monetdbd start $BASEDIR/monetdb
     fi
