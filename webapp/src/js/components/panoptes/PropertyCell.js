@@ -75,9 +75,9 @@ let PropertyCell = createReactClass({
           fixedWidth={false}
           name={val ? 'check' : 'times'}/>;
       }
-    } else if (!noLinks && prop.relation) {
+    } else if (!noLinks && prop.relation && !prop.hideLink) {
       content = <ItemLink table={prop.relation.tableId} primKey={value} />;
-    } else if (!noLinks && prop.isPrimKey) {
+    } else if (!noLinks && prop.isPrimKey && !prop.hideLink) {
       content = <ItemLink table={prop.tableId} primKey={value} />;
     }
     return (

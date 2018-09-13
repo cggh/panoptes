@@ -252,6 +252,13 @@ class ImportSettings:
                                    'required': False,
                                    'description': 'Colour used to display this property. Formatted as ``"rgb(r,g,b)"`` or ``"#HHHHHH"``\n  ',
                                    }),
+                            ('hideLink', {
+                                   'type': 'Boolean',
+                                   'required': False,
+                                   'default': False,
+                                   'description': "Don't show a link for this column if one would usually be shown (related properties etc.)",
+                                   }),
+
                             ('defaultVisible', {
                                                 'type': 'Boolean',
                                                 'required': False,
