@@ -1229,7 +1229,7 @@ bl@^1.0.0:
   dependencies:
     readable-stream "^2.0.5"
 
-blacklist@^1.1.2:
+blacklist@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/blacklist/-/blacklist-1.1.4.tgz#b2dd09d6177625b2caa69835a37b28995fa9a2f2"
 
@@ -2070,6 +2070,14 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
 create-react-class@15.x, create-react-class@^15.5.1, create-react-class@^15.5.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.6.2.tgz#cf1ed15f12aad7f14ef5f2dfe05e6c42f91ef02a"
+  dependencies:
+    fbjs "^0.8.9"
+    loose-envify "^1.3.1"
+    object-assign "^4.1.1"
+
+create-react-class@^15.6.2:
+  version "15.6.3"
+  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.6.3.tgz#2d73237fb3f970ae6ebe011a9e66f46dbca80036"
   dependencies:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
@@ -5867,6 +5875,10 @@ lodash.pickby@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.pickby/-/lodash.pickby-4.6.0.tgz#7dea21d8c18d7703a27c704c15d3b84a67e33aff"
 
+lodash.pull@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/lodash.pull/-/lodash.pull-4.1.0.tgz#60060cc6bd625b4d4567ec27dc45cd1be9eec012"
+
 lodash.reduce@^4.4.0, lodash.reduce@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.reduce/-/lodash.reduce-4.6.0.tgz#f1ab6b839299ad48f784abbf476596f03b914d3b"
@@ -7805,14 +7817,14 @@ react-event-listener@^0.6.0:
   dependencies:
     hammerjs "^2.0.8"
 
-react-highlighter@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/react-highlighter/-/react-highlighter-0.4.0.tgz#593836757348e119b167aa47bcd5288298419fc3"
+react-highlighter@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/react-highlighter/-/react-highlighter-0.4.2.tgz#a3a9a8f6eba4c40809d586ac3bf6bec3e04b1735"
   dependencies:
-    blacklist "^1.1.2"
-    create-react-class "^15.5.2"
+    blacklist "^1.1.4"
+    create-react-class "^15.6.2"
     escape-string-regexp "^1.0.5"
-    prop-types "^15.5.8"
+    prop-types "^15.6.0"
 
 react-hotkeys@^0.10.0:
   version "0.10.0"
