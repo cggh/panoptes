@@ -39,6 +39,7 @@ let GeoJSON = createReactClass({
       weight,
       opacity,
       fillOpacity,
+      interactive: !!onClick
     };
 
     return (
