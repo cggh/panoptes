@@ -71,9 +71,9 @@ let FeedIndex = createReactClass({
 
     return <div className="page-container">
       <div className="horiz-centering-container vertical stack page-content">
-        <h1>{title}</h1>
-        <h2>{description}</h2>
-        <CardStack>
+        {title ? <h1>{title}</h1> : ''}
+        {description ? <h2>{description}</h2> : ''}
+        <CardStack noWrap thin>
           <div>
             {tags.map((tag) => <div key={tag} style={{display: 'inline-block'}}>
               <FormControlLabel
