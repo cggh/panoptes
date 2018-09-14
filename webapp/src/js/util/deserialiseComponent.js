@@ -25,7 +25,7 @@ export default function deserialiseComponent(component, path = null, mappedFunct
     const otherProps = props ? props.delete('children').toJS() : {}; //eslint-disable-line react/prop-types
     if (type.propTypes) {
       _forEach(mappedFunctions, (func, name) => {
-        if (type.propTypes[name]) {
+        if (type.propTypes[name] && func) {
           otherProps[name] = (...args) => func(path, ...args);
         }
       });
