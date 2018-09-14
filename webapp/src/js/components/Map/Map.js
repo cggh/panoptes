@@ -121,45 +121,18 @@ let Map = createReactClass({
   },
 
   // Event handlers
-  handleChangeLayerStatus(payload) {
-
-    let {loadStatus, bounds} = payload;
-
+  handleChangeLayerStatus({loadStatus, bounds}) {
     if (this.state.bounds === undefined && bounds !== undefined)  {
-      this.setState({bounds});
-
+      this.setState({bounds: bounds.pad(0.05)});
     } else if (this.state.bounds !== undefined && bounds !== undefined) {
-
       // Determine whether Map bounds need to be increased to accommodate new Layer bounds.
-
-      let mapNorthEast = this.state.bounds.getNorthEast();
-      let mapSouthWest = this.state.bounds.getSouthWest();
-      let layerNorthEast = bounds.getNorthEast();
-      let layerSouthWest = bounds.getSouthWest();
-
-      let maxNorthEastLat = _max([mapNorthEast.lat, layerNorthEast.lat]);
-      let maxNorthEastLng = _max([mapNorthEast.lng, layerNorthEast.lng]);
-      let minSouthWestLat = _min([mapSouthWest.lat, layerSouthWest.lat]);
-      let minSouthWestLng = _min([mapSouthWest.lng, layerSouthWest.lng]);
-
-      if (
-        maxNorthEastLat !== mapNorthEast.lat
-        || maxNorthEastLng !== mapNorthEast.lng
-        || minSouthWestLat !== mapSouthWest.lat
-        || minSouthWestLng !== mapSouthWest.lng
-      ) {
-        let newSouthWest = window.L.latLng(minSouthWestLat, minSouthWestLng);
-        let newNorthEast = window.L.latLng(maxNorthEastLat, maxNorthEastLng);
-        let newBounds = window.L.latLngBounds(newSouthWest, newNorthEast);
-
+      const newBounds = this.state.bounds.extend(bounds).pad(0.05);
+      if (!this.state.bounds.equals(newBounds)) {
         this.setState({bounds: newBounds});
       }
-
     }
-
     // TODO: spinner on map (allow map interaction while other layers load)
     this.setState({loadStatus});
-
   },
 
   handleDetectResize() {
