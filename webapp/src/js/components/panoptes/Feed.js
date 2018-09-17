@@ -27,7 +27,7 @@ let Feed = createReactClass({
     replaceSelf: PropTypes.func,
     replaceParent: PropTypes.func,
     id: PropTypes.string,
-    feedObj: PropTypes.object, // This will be provided via withAPIData
+    feedObj: PropTypes.object, // This will be provided via this.config.feeds[id]
     templateDocPath: PropTypes.string,
     className: PropTypes.string,
     actionsAreaIsClickable: PropTypes.bool,
