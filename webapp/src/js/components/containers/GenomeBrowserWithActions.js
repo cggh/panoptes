@@ -38,6 +38,7 @@ import DataTableWithActions from 'containers/DataTableWithActions';
 import SQL from 'panoptes/SQL';
 import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
 import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
+import deserialiseComponent from 'util/deserialiseComponent';
 
 let GenomeBrowserWithActions = createReactClass({
   displayName: 'GenomeBrowserWithActions',
@@ -71,6 +72,16 @@ let GenomeBrowserWithActions = createReactClass({
     let {sidebar, setProps, children, ...subProps} = this.props;
     //Insert an extra child to hint to the user how to add tracks
     children = React.Children.toArray(children);
+    if (children.length === 0) {
+      this.config.settings.genomeBrowserChannelSets.forEach(({name, description, channels}) => {
+        if (name === 'Default') {
+          children = channels.map((channel) => deserialiseComponent(Immutable.fromJS(channel), null, {
+            setProps: this.props.setProps,
+          }));
+          return false;
+        }
+      })
+    }
     children.push(<AddChannelMessage key="_ACM_" setProps={this.props.setProps}/>);
     //Add fixed children to the top
     children.push(<ReferenceSequence key="_ref_" fixed/>);
