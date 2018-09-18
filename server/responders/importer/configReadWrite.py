@@ -2,6 +2,7 @@ import csv
 import os
 import sys
 import urllib2
+import httplib
 
 import uuid
 from os import path, listdir
@@ -106,11 +107,22 @@ def readJSONConfig(datasetId):
 
     feeds = {}
     for id, url in settings.get('feeds').items():
-        file = urllib2.urlopen(url)
-        data = file.read()
-        file.close()
-        data = xmltodict.parse(data)
-        feeds[id] = data
+        file = None
+        try:
+            file = urllib2.urlopen(url, timeout=10) # Catch URLs that timeout
+        except urllib2.HTTPError, e: # Catches pages that don't exist, etc., e.g. http://example.com/foobar
+            print('urllib2.HTTPError code {} from feed ID "{}" when trying to open URL {}'.format(e.code, id, url))
+        except urllib2.URLError, e: # Catches websites that don't exist, etc., e.g. http://foo.bar, about:blank
+            print('urllib2.URLError reason {} from feed ID "{}" when trying to open URL {}'.format(e.reason, id, url))
+        except httplib.HTTPException, e: # Catches entirely blank pages, etc. (theoretical). See http://www.voidspace.org.uk/python/articles/urllib2.shtml#badstatusline-and-httpexception
+            print('httplib.HTTPException from feed ID "{}" when trying to open URL {}'.format(id, url))
+        except Exception, e: # Catches strings that are not URLs, etc., e.g. "foo/bar"
+            print('Exception from feed ID "{}" when trying to open URL {}'.format(id, url))
+        if file is not None:
+            data = file.read()
+            file.close()
+            data = xmltodict.parse(data)
+            feeds[id] = data
 
     return {
         'cas': {'service': pnConfig.getCasService(), 'logout': pnConfig.getCasLogout()},
