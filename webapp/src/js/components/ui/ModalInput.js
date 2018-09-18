@@ -28,7 +28,7 @@ let ModalInput = createReactClass({
           <TextField key={input}
             autoFocus
             label={names[i]}
-            ref={input}/>
+            onChange={(e) => this[input] = e.target.value}/>
         )}
         <div className="centering-container horizontal stack">
           <Button
@@ -47,7 +47,7 @@ let ModalInput = createReactClass({
             iconInverse={true}
             onClick={() => {
               let values = {};
-              _map(inputs, (input) => values[input] = this.refs[input].input.value);
+              _map(inputs, (input) => values[input] = this[input] || '');
               onAction(values);
             }}
           />
