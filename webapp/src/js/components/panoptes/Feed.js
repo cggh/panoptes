@@ -55,7 +55,7 @@ let Feed = createReactClass({
     let feedObj = this.config.feeds[id];
 
     if (feedObj === undefined) {
-      return <div>No feed {{id}} defined</div>;
+      return <div>No feed {id} defined</div>;
     }
 
     let items = [];
