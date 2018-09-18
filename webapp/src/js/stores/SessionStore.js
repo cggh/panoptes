@@ -226,9 +226,22 @@ let SessionStore = createStore({
       this.state = this.state.updateIn(['tabs', 'components'],
         (list) => list.filter((tabId) => tabId !== compId).push(compId));
     else {
-      compId = uid(10);
-      this.state = this.state.setIn(['components', compId], component);
-      this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(compId));
+      this.state.get('mostRecentlyUsedComponents', Immutable.List())
+        .forEach((existingCompId) => {
+          if (this.state.getIn(['components', existingCompId, 'type']) === component.get('type')) {
+            compId = existingCompId;
+            return false;
+          } else {
+            return true;
+          }
+        });
+      if (compId) {
+        this.componentSetProps({componentPath: [compId], updater: component.get('props')});
+      } else {
+        compId = uid(10);
+        this.state = this.state.setIn(['components', compId], component);
+        this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(compId));
+      }
     }
     if (switchTo) {
       this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
