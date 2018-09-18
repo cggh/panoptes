@@ -262,7 +262,7 @@ let Criterion = createReactClass({
   handlePropertyChange() {
 
     let {component, onChange} = this.props;
-    component.ColName = this.refs.property.value;
+    component.ColName = this.property.value;
     let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
@@ -296,7 +296,7 @@ let Criterion = createReactClass({
 
   handleOperatorChange() {
     let {component, onChange} = this.props;
-    component.type = this.refs.operator.value;
+    component.type = this.operator.value;
     this.validateOperatorAndValues();
     onChange();
   },
@@ -387,7 +387,7 @@ let Criterion = createReactClass({
     //   }]
     // };
     let propertySelect = (
-      <select ref="property" value={component.ColName} onChange={this.handlePropertyChange}>
+      <select ref={(ref) => this.property = ref} value={component.ColName} onChange={this.handlePropertyChange}>
         {_map(groups, (group) =>
           <optgroup key={group.id} label={group.name}>
             {group.visibleProperties.map((property) => {
@@ -414,7 +414,7 @@ let Criterion = createReactClass({
       operatorSelect = <div className="operator">{validOperators[0].name}</div>;
     } else {
       operatorSelect = (
-        <select ref="operator" value={component.type} onChange={this.handleOperatorChange}>
+        <select ref={(ref) => this.operator = ref} value={component.type} onChange={this.handleOperatorChange}>
           {validOperators.map((operator) => {
             let {ID, name} = operator;
             return (
