@@ -430,7 +430,7 @@ class WhereClause:
             self.querystring_params += querystr.replace('__param__', self.ParameterPlaceHolder)
 
         if not(processed):
-            decoval = statm['CompValue']
+            decoval = statm['CompValue'].encode('utf-8')
             operatorstr = statm['Tpe']
             if operatorstr == 'CONTAINS':
                 operatorstr = 'LIKE'
