@@ -531,7 +531,7 @@ let Criterion = createReactClass({
                   : Formatter(property, this.state.CompValue)
               }
               onChange={(value) => this.handleValueEdit({input: 'value', value})}
-              onBlur={this.handleValueChange}
+              onBlur={(value) => this.handleValueChange({input: 'value', value})}
             />
           </div>
         );
@@ -546,7 +546,7 @@ let Criterion = createReactClass({
                 : Formatter(property, this.state.CompValueMin)
             }
             onChange={(value) => this.handleValueEdit({input: 'min', value})}
-            onBlur={this.handleValueChange}
+            onBlur={(value) => this.handleValueChange({input: 'min', value})}
           />
           <div>and</div>
           <PropertyInput
@@ -556,7 +556,7 @@ let Criterion = createReactClass({
                 : Formatter(property, this.state.CompValueMax)
             }
             onChange={(value) => this.handleValueEdit({input: 'max', value})}
-            onBlur={this.handleValueChange}
+            onBlur={(value) => this.handleValueChange({input: 'max', value})}
           />
         </div>
       );
