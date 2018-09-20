@@ -19,6 +19,7 @@ import _assign from 'lodash.assign';
 import _clone from 'lodash.clone';
 import _find from 'lodash.find';
 import _map from 'lodash.map';
+import numberToString from 'util/numberToString';
 
 class Component extends React.Component {
   static propTypes = {
@@ -241,7 +242,7 @@ let Criterion = createReactClass({
     }
 
     // Copy over the comparison(?) value properties, either from the the current component or otherwise the state, to the new component, to preserve them.
-    ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
+    ['CompValue', 'CompValueMin', 'CompValueMax', 'Factor', 'Offset'].forEach((name) => {
       if (component[name] !== undefined) {
         newComponent[name] = Deformatter(property, Formatter(property, component[name]));
       } else if (this.state[name] !== undefined) {
@@ -301,52 +302,66 @@ let Criterion = createReactClass({
     onChange();
   },
 
-  handleValueChange(payload) {
+  handleValueSet(payload) {
     let {component, onChange} = this.props;
     let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
+    const defaultFactor = 1; // SQL.js has `that.Factor = 1.0;`
+    const defaultOffset = 0; // SQL.js has `that.Offset = 1.0;`
+
+    // NB: this.foo usually (except otherColumn) needs to be formatted (via Formatter, to be user-friendly)
+    // whereas component.fooey usually needs to be deformatted (via Deformatter, to be SQL-friendly)
     if (payload && payload.input) {
+
+      // NB: We always need to reformat the value because handleValueEdit means `this[payload.input] === payload.value` and unformatted
+
       if (payload.input === 'otherColumn') {
         // NB: Formatter(property, payload.value) would return "NULL"
         this[payload.input] = payload.value;
+      } else if (payload.input === 'factor') {
+        // Factor can be float while the property type is integer.
+        const valueAsFloatString = numberToString(payload.value);
+        this[payload.input] = isNaN(valueAsFloatString) ? defaultFactor : valueAsFloatString;
+      } else if (payload.input === 'offset') {
+        // Offset can be float while the property type is integer.
+        const valueAsFloatString = numberToString(payload.value);
+        this[payload.input] = isNaN(valueAsFloatString) ? defaultOffset : valueAsFloatString;
       } else {
         // The payload.value might be badly formatted, so we format it.
         // The this[input] value needs to be formatted, because it needs to be user-friendly.
         this[payload.input] = Formatter(property, Deformatter(property, payload.value));
       }
     }
-
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator) {
       throw Error('SQL criterion operator not valid');
     }
 
+    // NB: Only handle one component value setting (component.fooey = this.foo) at a time below (only one value, i.e. this[payload.input], is being formatted above)
+    // NB: Component values usually (except otherColumn) need to be deformatted, because they need to be SQL-friendly.
+
     if (currentOperator.fieldType === 'value') {
-      // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
       component.CompValue = Deformatter(property, this.value);
       this.setState({CompValue: component.CompValue});
-    } else if (currentOperator.fieldType === 'minMax') {
-      // The CompValues need to be deformatted, because they need to be SQL-friendly.
+    } else if (currentOperator.fieldType === 'minMax' && payload && payload.input === 'min') {
       component.CompValueMin = Deformatter(property, this.min);
+      this.setState({CompValueMin: component.CompValueMin});
+    } else if (currentOperator.fieldType === 'minMax' && payload && payload.input === 'max') {
       component.CompValueMax = Deformatter(property, this.max);
-      this.setState({
-        CompValueMin: component.CompValueMin,
-        CompValueMax: component.CompValueMax
-      });
+      this.setState({CompValueMax: component.CompValueMax});
     } else if (currentOperator.fieldType === 'otherColumn') {
       // NB: Deformatter(property, this.otherColumn) would return null
       component.ColName2 = this.otherColumn;
       this.setState({ColName2: component.ColName2});
-    } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
-      component.ColName2 = this.otherColumn;
-      // The component.Factor and .Offset need to be deformatted, because they need to be SQL-friendly.
-      component.Factor = Deformatter(property, this.scale);
-      component.Offset = Deformatter(property, this.offset);
-      this.setState({
-        Factor: component.Factor,
-        Offset: component.Offset
-      });
+    } else if (currentOperator.fieldType === 'otherColumnWithFactorAndOffset' && payload && payload.input === 'factor') {
+      // NB: Deformatter(property, this.factor) might convert a float to an integer, if property is an integer type
+      component.Factor = this.factor;
+      this.setState({Factor: component.Factor});
+    } else if (currentOperator.fieldType === 'otherColumnWithFactorAndOffset' && payload && payload.input === 'offset') {
+      // NB: Deformatter(property, this.offset) might convert a float to an integer, if property is an integer type
+      component.Offset = this.offset;
+      this.setState({Offset: component.Offset});
     } else if (currentOperator.fieldType === 'subset') {
       component.Subset = this.subset;
     }
@@ -355,7 +370,6 @@ let Criterion = createReactClass({
   },
 
   handleValueEdit(payload) {
-
     // The this[input] value needs to be raw (unformatted) while it's being edited.
     this[payload.input] = payload.value;
   },
@@ -430,7 +444,11 @@ let Criterion = createReactClass({
     }
 
     let otherColumnSelect = () =>
-      <select className="field" value={component.ColName2} onChange={(event) => this.handleValueChange({input: 'otherColumn', value: event.target.value})}>
+      <select
+        className="field"
+        value={component.ColName2}
+        onChange={(event) => this.handleValueSet({input: 'otherColumn', value: event.target.value})}
+      >
         {_map(groups, (group) => {
           if (group.id === 'other') return null;
           const dataTypeColName1 = property.dataType;
@@ -473,7 +491,7 @@ let Criterion = createReactClass({
                   Formatter(property, component.CompValue)
                   : Formatter(property, this.state.CompValue)
               }
-              onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
+              onChange={(event) => this.handleValueSet({input: 'value', value: event.target.value})}
             >
               {property.distinctValues.map((cat) =>
                 <option
@@ -496,7 +514,7 @@ let Criterion = createReactClass({
                   Formatter(property, component.CompValue)
                   : Formatter(property, this.state.CompValue)
               }
-              onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
+              onChange={(event) => this.handleValueSet({input: 'value', value: event.target.value})}
             >
               <option
                 key="null"
@@ -521,7 +539,6 @@ let Criterion = createReactClass({
         );
 
       } else {
-
         fields = (
           <div className="fields">
             <PropertyInput
@@ -531,7 +548,7 @@ let Criterion = createReactClass({
                   : Formatter(property, this.state.CompValue)
               }
               onChange={(value) => this.handleValueEdit({input: 'value', value})}
-              onBlur={(value) => this.handleValueChange({input: 'value', value})}
+              onBlur={(value) => this.handleValueSet({input: 'value', value})}
             />
           </div>
         );
@@ -546,7 +563,7 @@ let Criterion = createReactClass({
                 : Formatter(property, this.state.CompValueMin)
             }
             onChange={(value) => this.handleValueEdit({input: 'min', value})}
-            onBlur={(value) => this.handleValueChange({input: 'min', value})}
+            onBlur={(value) => this.handleValueSet({input: 'min', value})}
           />
           <div>and</div>
           <PropertyInput
@@ -556,7 +573,7 @@ let Criterion = createReactClass({
                 : Formatter(property, this.state.CompValueMax)
             }
             onChange={(value) => this.handleValueEdit({input: 'max', value})}
-            onBlur={(value) => this.handleValueChange({input: 'max', value})}
+            onBlur={(value) => this.handleValueSet({input: 'max', value})}
           />
         </div>
       );
@@ -566,37 +583,37 @@ let Criterion = createReactClass({
           {otherColumnSelect()}
         </div>
       );
-    } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
+    } else if (currentOperator.fieldType === 'otherColumnWithFactorAndOffset') {
     //TODO Number validation for these fields
       fields = (
         <div className="fields">
           {otherColumnSelect()}
           <div>x</div>
-          <input
-            className="field"
+          <PropertyInput
             value={
               component.Factor !== undefined ?
                 Formatter(property, component.Factor)
                 : Formatter(property, this.state.Factor)
             }
-            onChange={(value) => this.handleValueChange({input: 'scale', value})}
+            onChange={(value) => this.handleValueEdit({input: 'factor', value})}
+            onBlur={(value) => this.handleValueSet({input: 'factor', value})}
           />
           <div>+</div>
-          <input
-            className="field"
+          <PropertyInput
             value={
               component.Offset !== undefined ?
                 Formatter(property, component.Offset)
                 : Formatter(property, this.state.Offset)
             }
-            onChange={(value) => this.handleValueChange({input: 'offset', value})}
+            onChange={(value) => this.handleValueEdit({input: 'offset', value})}
+            onBlur={(value) => this.handleValueSet({input: 'offset', value})}
           />
         </div>
       );
     } else if (currentOperator.fieldType === 'subset') {
       fields = (
         <div className="fields">
-          <select className="field" value={component.subset} onChange={(event) => this.handleValueChange({input: 'subset', value: event.target.value})}>
+          <select className="field" value={component.subset} onChange={(event) => this.handleValueSet({input: 'subset', value: event.target.value})}>
             {this.state.subsets.toArray().map((subset) => {
               //TODO CHECK AGAINST ACTUAL SUBSET CONTENT
               let {id, name} = subset;

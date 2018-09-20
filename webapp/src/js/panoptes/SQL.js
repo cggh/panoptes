@@ -1,6 +1,7 @@
 import _cloneDeep from 'lodash.clonedeep';
 import _filter from 'lodash.filter';
 import _assign from 'lodash.assign';
+import numberToString from 'util/numberToString';
 
 let SQL = {};
 
@@ -196,7 +197,7 @@ SQL.WhereClause._fieldComparisonOperators = [
     Create() {
       return SQL.WhereClause.CompareField('<FIELD');
     },
-    fieldType: 'otherColumnWithScaleAndOffset'
+    fieldType: 'otherColumnWithFactorAndOffset'
   },
   {
     ID: '>FIELD', name: '> Column', //Performs a > operation with a linear function of another field
@@ -204,7 +205,7 @@ SQL.WhereClause._fieldComparisonOperators = [
     Create() {
       return SQL.WhereClause.CompareField('>FIELD');
     },
-    fieldType: 'otherColumnWithScaleAndOffset'
+    fieldType: 'otherColumnWithFactorAndOffset'
   },
   {
     ID: '_subset_', name: 'in subset',
@@ -355,24 +356,38 @@ SQL.WhereClause.CompareField = function(icomptype) {
   that.Offset = 0.0;
 
   that.toQueryDisplayString = function(queryData, level) {
+
     let str = `${queryData.fieldInfoMap[that.ColName].name} ${that.type[0]} `;
-    if (Math.abs(that.Factor - 1) > 1.0e-9) {
-      let factorStr;
-      if (that.Factor == 0)
-        factorStr = '0';
-      else {
-        let factorVal = parseFloat(that.Factor);
-        let decimCount = Math.max(0, Math.round(4 - Math.log(Math.abs(factorVal)) / Math.LN10));
-        factorStr = factorVal.toFixed(decimCount);
-      }
-      str += `${factorStr}x`;
+
+    // If there is a factor or an offset, open bracket
+    if ((!isNaN(that.Factor) && that.Factor != 1) || (!isNaN(that.Offset) && that.Offset != 0)) {
+      str += '(';
     }
+
+    let factorStr = numberToString(that.Factor);
+    if (that.Factor != 1) {
+      str += `${factorStr} x `;
+    }
+    // If the factor is one, then don't show it.
+
+    // Show the name of the column being compared
     str += queryData.fieldInfoMap[that.ColName2].name;
-    let offsetStr = queryData.fieldInfoMap[that.ColName].toDisplayString(Math.abs(that.Offset));
-    if (that.Offset > 0)
-      str += `+${offsetStr}`;
-    if (that.Offset < 0)
-      str += `-${offsetStr}`;
+
+    let offsetStr = numberToString(that.Offset);
+    if (that.Offset > 0) {
+      // If the offset is more than zero, then show a plus sign
+      str += ` + ${offsetStr}`;
+    } else if (that.Offset < 0) {
+      // If the offset is less than zero, then show a minus sign
+      str += ` - ${offsetStr}`;
+    }
+    // If the offset is zero, then don't show it.
+
+    // If there is a factor or an offset, close bracket
+    if ((!isNaN(that.Factor) && that.Factor != 1) || (!isNaN(that.Offset) && that.Offset != 0)) {
+      str += ')';
+    }
+
     return str;
   };
 
