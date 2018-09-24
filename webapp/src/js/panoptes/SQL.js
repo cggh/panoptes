@@ -1,7 +1,8 @@
 import _cloneDeep from 'lodash.clonedeep';
 import _filter from 'lodash.filter';
 import _assign from 'lodash.assign';
-import numberToString from 'util/numberToString';
+import {toDataType}  from 'panoptes/Formatter';
+
 
 let SQL = {};
 
@@ -364,7 +365,7 @@ SQL.WhereClause.CompareField = function(icomptype) {
       str += '(';
     }
 
-    let factorStr = numberToString(that.Factor);
+    let factorStr = toDataType('float-string-with-limits', that.Factor);
     if (that.Factor != 1) {
       str += `${factorStr} x `;
     }
@@ -373,7 +374,7 @@ SQL.WhereClause.CompareField = function(icomptype) {
     // Show the name of the column being compared
     str += queryData.fieldInfoMap[that.ColName2].name;
 
-    let offsetStr = numberToString(that.Offset);
+    let offsetStr = toDataType('float-string-with-limits', that.Offset);
     if (that.Offset > 0) {
       // If the offset is more than zero, then show a plus sign
       str += ` + ${offsetStr}`;

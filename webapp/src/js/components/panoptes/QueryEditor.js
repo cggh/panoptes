@@ -9,7 +9,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 import SQL from 'panoptes/SQL';
-import Formatter from 'panoptes/Formatter';
+import Formatter, {toDataType}  from 'panoptes/Formatter';
 import Deformatter from 'panoptes/Deformatter';
 import PropertyInput from 'panoptes/PropertyInput';
 import Button from 'ui/Button';
@@ -19,7 +19,6 @@ import _assign from 'lodash.assign';
 import _clone from 'lodash.clone';
 import _find from 'lodash.find';
 import _map from 'lodash.map';
-import numberToString from 'util/numberToString';
 
 class Component extends React.Component {
   static propTypes = {
@@ -320,12 +319,12 @@ let Criterion = createReactClass({
         // NB: Formatter(property, payload.value) would return "NULL"
         this[payload.input] = payload.value;
       } else if (payload.input === 'factor') {
-        // Factor can be float while the property type is integer.
-        const valueAsFloatString = numberToString(payload.value);
+        // Factor can be float-type even when the property type is integer-type, but there are special restrictions due to issue #1184.
+        let valueAsFloatString = toDataType('float-string-with-limits', payload.value);
         this[payload.input] = isNaN(valueAsFloatString) ? defaultFactor : valueAsFloatString;
       } else if (payload.input === 'offset') {
-        // Offset can be float while the property type is integer.
-        const valueAsFloatString = numberToString(payload.value);
+        // Offset can be float-type even when the property type is integer-type, but there are special restrictions due to issue #1184.
+        const valueAsFloatString = toDataType('float-string-with-limits', payload.value);
         this[payload.input] = isNaN(valueAsFloatString) ? defaultOffset : valueAsFloatString;
       } else {
         // The payload.value might be badly formatted, so we format it.
