@@ -583,7 +583,6 @@ let Criterion = createReactClass({
         </div>
       );
     } else if (currentOperator.fieldType === 'otherColumnWithFactorAndOffset') {
-    //TODO Number validation for these fields
       fields = (
         <div className="fields">
           {otherColumnSelect()}
