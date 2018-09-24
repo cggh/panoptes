@@ -26,6 +26,7 @@ let FeedIndex = createReactClass({
   propTypes: {
     id: PropTypes.string,
     selectedTags: PropTypes.string,
+    hiddenTag: PropTypes.string,
     setProps: PropTypes.func,
     replaceSelf: PropTypes.func,
     replaceParent: PropTypes.func,
@@ -35,6 +36,7 @@ let FeedIndex = createReactClass({
   getDefaultProps() {
     return {
       selectedTags: '',
+      hiddenTag: undefined
     };
   },
 
@@ -43,7 +45,7 @@ let FeedIndex = createReactClass({
   },
 
   render() {
-    let {id, setProps, selectedTags, replaceSelf, replaceParent} = this.props;
+    let {id, setProps, selectedTags, hiddenTag, replaceSelf, replaceParent} = this.props;
 
     let feed = this.config.feeds[id];
     if (feed === undefined) {
@@ -61,7 +63,7 @@ let FeedIndex = createReactClass({
       console.warn('There is no item array or item property in this feedObj.rss.channel: ', id);
     }
 
-    let tags = items.map((ite) => _isArray(ite.category) ? ite.category : [ite.category]);
+    let tags = items.map((ite) => !_includes(ite.category, hiddenTag) ? (_isArray(ite.category) ? ite.category : [ite.category]) : null);
     tags = _union.apply(null, tags);
     selectedTags = selectedTags.split(',').map((tag) => tag.trim());
     if (selectedTags.length === 0) {
@@ -75,7 +77,7 @@ let FeedIndex = createReactClass({
         {description ? <h2>{description}</h2> : ''}
         <CardStack noWrap thin>
           <div>
-            {tags.map((tag) => <div key={tag} style={{display: 'inline-block'}}>
+            {tags.map((tag) => tag && (tag !== hiddenTag) ? <div key={tag} style={{display: 'inline-block'}}>
               <FormControlLabel
                 key={tag}
                 control={
@@ -94,7 +96,7 @@ let FeedIndex = createReactClass({
                 }
                 label={tag}
               />
-            </div>
+            </div> : null
             )}
           </div>
           <Feed id={id} replaceSelf={replaceSelf} replaceParent={replaceParent} tags={selectedTags.join(',')}/>
