@@ -353,8 +353,8 @@ SQL.WhereClause.CompareField = function(icomptype) {
   that.ColName = '';
   that.ColName2 = '';
   that.type = icomptype;
-  that.Factor = 1.0;
-  that.Offset = 0.0;
+  that.Factor = '1';
+  that.Offset = '0';
 
   that.toQueryDisplayString = function(queryData, level) {
 
