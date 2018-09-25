@@ -306,8 +306,8 @@ let Criterion = createReactClass({
     let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
-    const defaultFactor = 1; // SQL.js has `that.Factor = 1.0;`
-    const defaultOffset = 0; // SQL.js has `that.Offset = 1.0;`
+    const defaultFactor = '1'; // TODO: centralize, SQL.js has`that.Factor = '1';`
+    const defaultOffset = '0'; // TODO: centralize, SQL.js has`that.Offset = '0';`
 
     // NB: this.foo usually (except otherColumn) needs to be formatted (via Formatter, to be user-friendly)
     // whereas component.fooey usually needs to be deformatted (via Deformatter, to be SQL-friendly)
@@ -588,21 +588,13 @@ let Criterion = createReactClass({
           {otherColumnSelect()}
           <div>x</div>
           <PropertyInput
-            value={
-              component.Factor !== undefined ?
-                Formatter(property, component.Factor)
-                : Formatter(property, this.state.Factor)
-            }
+            value={component.Factor !== undefined ? component.Factor : this.state.Factor}
             onChange={(value) => this.handleValueEdit({input: 'factor', value})}
             onBlur={(value) => this.handleValueSet({input: 'factor', value})}
           />
           <div>+</div>
           <PropertyInput
-            value={
-              component.Offset !== undefined ?
-                Formatter(property, component.Offset)
-                : Formatter(property, this.state.Offset)
-            }
+            value={component.Offset !== undefined ? component.Offset : this.state.Offset}
             onChange={(value) => this.handleValueEdit({input: 'offset', value})}
             onBlur={(value) => this.handleValueSet({input: 'offset', value})}
           />
