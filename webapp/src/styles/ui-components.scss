@@ -748,15 +748,15 @@ input.invalid {
 
 .card-stack-wrap {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   justify-content: space-evenly;
   align-items: flex-start;
   align-content: flex-start;
 }
 
 .card-stack > div {
-  width: $card-max-width;
   margin: 20px;
+  max-width: $card-max-width;
 }
 
 .nested {
@@ -765,4 +765,14 @@ input.invalid {
 
 .nested-more {
   padding-left: 64px !important;
+}
+
+@media (min-width: 700px) {
+  .card-stack-wrap {
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+  .card-stack > div {
+    width: $card-max-width;
+  }
 }

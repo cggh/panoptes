@@ -6,6 +6,8 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import {Card, CardContent, CardMedia, Typography} from '@material-ui/core';
 import HTMLWithComponents from './HTMLWithComponents';
+import DocTemplate from 'panoptes/DocTemplate';
+
 // import 'blog.scss';
 
 let FeedItem = createReactClass({
@@ -59,25 +61,22 @@ let FeedItem = createReactClass({
     const subheader = 'by ' + creator + ', ' + dateMMDDDDYYYY;
 
     return <div className="page-container">
-      <div className="horiz-centering-container vertical stack page-content">
-        <Card className="blog-list-entry" style={{maxWidth: '650px'}}>
-            <CardContent>
-            <Typography className="blog-list-entry-headline" variant="headline">
-              {title}
-            </Typography>
-            <Typography variant="subheading" color="textSecondary">
-              {subheader}
-            </Typography>
-            <Typography component="div" className="paragraph">
-              {thumbnail ?
-                <img
-                  className="blog-article-media"
-                  src={thumbnail.img['@src']}
-                /> : null}
-              <HTMLWithComponents>{content}</HTMLWithComponents>
-            </Typography>
-          </CardContent>
-        </Card>
+      <div>
+        {thumbnail ?
+          <img
+            className="blog-article-media"
+            src={thumbnail.img['@src']}
+          /> : null}
+        <div className="blog-background">
+          <div className="blog-article">
+            <h1>{title}</h1>
+            <h3>{subheader}</h3>
+            <HTMLWithComponents className="blog-content">{content}</HTMLWithComponents>
+          </div>
+        </div>
+      </div>
+      <div>
+        <DocTemplate path="templates/footer.html"/>
       </div>
     </div>;
   },
@@ -85,3 +84,5 @@ let FeedItem = createReactClass({
 
 
 export default FeedItem;
+
+
