@@ -70,6 +70,10 @@ import {Tabs, Tab} from '@material-ui/core';
 typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
 
+//Lower case entries for use in feed-derived content
+typeByDisplayName['figure'] = typeByDisplayName['Figure'];
+typeByDisplayName['doc-template'] = typeByDisplayName['DocTemplate'];
+
 console.info('Components: %o', typeByDisplayName);
 
 export default function(displayName) {
