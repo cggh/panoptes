@@ -71,7 +71,7 @@ typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
 
 //Lower case entries for use in feed-derived content
-typeByDisplayName['figure'] = typeByDisplayName['Figure'];
+typeByDisplayName['blog-figure'] = typeByDisplayName['BlogFigure'];
 typeByDisplayName['doc-template'] = typeByDisplayName['DocTemplate'];
 
 console.info('Components: %o', typeByDisplayName);
