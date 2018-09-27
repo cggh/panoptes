@@ -8203,7 +8203,11 @@ prompts@^0.1.9:
     kleur "^2.0.1"
     sisteransi "^0.1.1"
 
+<<<<<<< caa2f9d98f686f66924b01e92587fdc9a0c4ee62
 prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2:
+=======
+prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2:
+>>>>>>> Update yarn.lock
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
@@ -8516,6 +8520,13 @@ react-event-listener@^0.6.2:
     prop-types "^15.6.0"
     warning "^4.0.1"
 
+react-ga@^2.5.3:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-2.5.3.tgz#0f447c73664c069a5fc341f6f431262e3d4c23c4"
+  optionalDependencies:
+    prop-types "^15.6.0"
+    react "^15.6.2 || ^16.0"
+
 "react-hammerjs@git+https://github.com/marvelapp/react-hammerjs.git":
   version "1.0.1"
   resolved "git+https://github.com/marvelapp/react-hammerjs.git#f30168d17b997b9b789130011f30ab0664fac2b7"
@@ -8635,7 +8646,7 @@ react-transition-group@^2.2.1:
     warning "^3.0.0"
     react-lifecycles-compat "^3.0.4"
 
-react@^15.4.2||^16.0.0, react@^15.6.1||^16.0.0, react@^16.0.0:
+react@^15.6.2 || ^16.0", react@^16.3.0:
   version "16.5.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.5.2.tgz#19f6b444ed139baa45609eee6dc3d318b3895d42"
   dependencies:
@@ -9314,6 +9325,15 @@ sax@^1.2.4:
 schedule@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/schedule/-/schedule-0.5.0.tgz#c128fffa0b402488b08b55ae74bb9df55cc29cc8"
+<<<<<<< caa2f9d98f686f66924b01e92587fdc9a0c4ee62
+=======
+  dependencies:
+    object-assign "^4.1.1"
+
+schema-utils@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-0.3.0.tgz#f5877222ce3e931edae039f17eb3716e7137f8cf"
+>>>>>>> Update yarn.lock
   dependencies:
     object-assign "^4.1.1"
 
