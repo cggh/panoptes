@@ -12,7 +12,7 @@ class BlogFigure extends React.Component {
 
   render() {
     let {children, title} = this.props;
-    return <Card className="blog-figure">
+    return <Card className="blog-figure centering-container">
       <Typography variant="title">
         {title}
       </Typography>
