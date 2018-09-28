@@ -75,7 +75,7 @@ let FeedItem = createReactClass({
           </div>
         </div>
       </div>
-      <div>
+      <div className="centering-container">
         <DocTemplate path="templates/footer.html"/>
       </div>
     </div>;
