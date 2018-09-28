@@ -55,6 +55,9 @@ div.paragraph {
 .blog-figure {
   max-width: 800px;
   padding: 25px;
+  img {
+    width: 100%;
+  }
 }
 
 .blog-article {
@@ -97,12 +100,12 @@ div.paragraph {
   }
 }
 
-@media (min-width: 800px) {
-  .blog-article-media {
-    padding: 44px 20px 20px;
-    float: right;
-    max-height: unset;
-    max-width: 500px;
-    width: auto;
-  }
-}
+//@media (min-width: 800px) {
+//  .blog-article-media {
+//    padding: 44px 20px 20px;
+//    float: right;
+//    max-height: unset;
+//    max-width: 500px;
+//    width: auto;
+//  }
+//}
