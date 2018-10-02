@@ -29,8 +29,8 @@ let HandlebarsWithComponents = createReactClass({
   },
 
   componentDidMount() {
-    let {children, ...otherProps} = this.props;
-    this.handlebars = customHandlebars(this.config, ...otherProps);
+    let {children} = this.props;
+    this.handlebars = customHandlebars(this.config);
     this.update();
   },
 

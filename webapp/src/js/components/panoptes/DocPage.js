@@ -60,7 +60,7 @@ let DocPage = createReactClass({
 
   onConfigChange() {
     const {path, replaceSelf, updateTitleIcon, replaceable, ...other} = this.props;
-    this.handlebars = customHandlebars(this.config, ...other);
+    this.handlebars = customHandlebars(this.config);
     if (this.config.docs[path]) {
       this.handlebars.compile(this.config.docs[path])({config: this.config})
         .then((rendered) =>

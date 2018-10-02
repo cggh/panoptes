@@ -14,7 +14,6 @@ module.exports = function(env) {
     new webpack.EnvironmentPlugin({
       NODE_ENV: nodeEnv,
     }),
-    new webpack.NamedModulesPlugin(),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/index.html'),
       inject: 'body',
@@ -36,29 +35,28 @@ module.exports = function(env) {
         minimize: true,
         debug: false
       }),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false,
-          screw_ie8: true,
-          conditionals: true,
-          unused: true,
-          comparisons: true,
-          sequences: true,
-          dead_code: true,
-          evaluate: true,
-          if_return: true,
-          join_vars: true,
-        },
-        output: {
-          comments: false,
-        },
-      }),
+      // new webpack.optimize.UglifyJsPlugin({
+      //   compress: {
+      //     warnings: false,
+      //     screw_ie8: true,
+      //     conditionals: true,
+      //     unused: true,
+      //     comparisons: true,
+      //     sequences: true,
+      //     dead_code: true,
+      //     evaluate: true,
+      //     if_return: true,
+      //     join_vars: true,
+      //   },
+      //   output: {
+      //     comments: false,
+      //   },
+      // }),
       new CopyWebpackPlugin([
         //Using this method for the favicons - this method should not be used generally, esp in JS where one can require(IMAGE_PATH)
         {from: 'src/images/favicons', to: 'images/favicons'},
       ]),
       new webpack.ContextReplacementPlugin(/(ansi-color|handlebars-helpers|create-frame)/, /^$/),
-      new webpack.optimize.ModuleConcatenationPlugin()
     );
   } else {
     plugins.push(
@@ -101,6 +99,7 @@ module.exports = function(env) {
   }
 
   return {
+    mode: isProd ? 'production' : 'development',
     devtool: isProd ? 'source-map' : 'eval',
     context: __dirname,
     entry: {
@@ -157,7 +156,7 @@ module.exports = function(env) {
           loader: 'url-loader?prefix=font/&limit=5000&mimetype=application/font-woff'
         },
         {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader?prefix=font/'},
-        {test: /\.json$/, loader: 'file-loader'}
+        // {test: /\.json$/, loader: 'file-loader'}
       ]
     },
     resolve: {
