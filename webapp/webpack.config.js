@@ -156,7 +156,11 @@ module.exports = function(env) {
           loader: 'url-loader?prefix=font/&limit=5000&mimetype=application/font-woff'
         },
         {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader?prefix=font/'},
-        // {test: /\.json$/, loader: 'file-loader'}
+        // {test: /\.json$/, loader: 'file-loader'},
+        {
+          test: path.resolve(__dirname, 'node_modules/moment'),
+          use: 'null-loader'
+        }
       ]
     },
     resolve: {

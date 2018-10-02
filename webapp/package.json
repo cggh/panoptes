@@ -153,6 +153,7 @@
     "lodash.zip": "^4.2.0",
     "lz-string": "git+https://github.com/benjeffery/lz-string.git",
     "normalize-wheel": "^1.0.1",
+    "null-loader": "^0.1.1",
     "performance-now": "^2.1.0",
     "plotly.js": "^1.23.1",
     "promised-handlebars": "^2.0.1",
