@@ -31,8 +31,8 @@ let Plot = createReactClass({
 
   componentWillMount() {
     Promise.all([
-      import('plotly.js/dist/plotly-cartesian'),
-      import('react-plotlyjs'),
+      import(/*webpackChunkName: 'plotly'*/ 'plotly.js/dist/plotly-cartesian.min.js'),
+      import(/*webpackChunkName: 'plotly'*/ 'react-plotlyjs'),
     ]).then(([Plotly, createPlotlyComponent]) => {
       this.setState({
         PlotlyComponent: createPlotlyComponent.default(Plotly),
