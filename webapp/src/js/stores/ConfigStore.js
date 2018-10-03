@@ -19,7 +19,7 @@ const ConfigStore = createStore({
 
   initialize(initConfig) {
     this.state = this.addDerivedConfig(initConfig);
-    console.log("Config:", this.state);
+    console.info('Config:', this.state);
     this.state.loadStatus = 'LOADED';
     this.bindActions(
       APIConst.MODIFY_CONFIG, this.modifyConfig,
