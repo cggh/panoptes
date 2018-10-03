@@ -2483,7 +2483,7 @@ cookie-signature@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
 
-cookie@0.3.1, cookie@^0.3.1:
+cookie@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
 
@@ -6033,6 +6033,7 @@ jest-worker@^23.2.0:
   dependencies:
     merge-stream "^1.0.1"
 
+<<<<<<< 9bbf60f8c089d405159bdb83ec9dcb863d44c3ca
 jest@^23.6.0:
   version "23.6.0"
   resolved "https://registry.yarnpkg.com/jest/-/jest-23.6.0.tgz#ad5835e923ebf6e19e7a1d7529a432edfee7813d"
@@ -6043,6 +6044,15 @@ jest@^23.6.0:
 js-base64@^2.1.8:
   version "2.4.9"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.4.9.tgz#748911fb04f48a60c4771b375cac45a80df11c03"
+=======
+js-cookie@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-2.2.0.tgz#1b2c279a6eece380a12168b92485265b35b1effb"
+
+js-tokens@^3.0.0, js-tokens@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
+>>>>>>> Update yarn lock
 
 js-levenshtein@^1.1.3:
   version "1.1.4"
@@ -8203,6 +8213,7 @@ prompts@^0.1.9:
     kleur "^2.0.1"
     sisteransi "^0.1.1"
 
+<<<<<<< 9bbf60f8c089d405159bdb83ec9dcb863d44c3ca
 <<<<<<< fd7eadb31eef2a8b6c6fabd13cf3b5ce659534f4
 <<<<<<< caa2f9d98f686f66924b01e92587fdc9a0c4ee62
 prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2:
@@ -8212,6 +8223,9 @@ prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2:
 =======
 prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2:
 >>>>>>> Update yarn.lock
+=======
+prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2:
+>>>>>>> Update yarn lock
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
@@ -8458,10 +8472,6 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-addons-clone-with-props@^0.14.8:
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/react-addons-clone-with-props/-/react-addons-clone-with-props-0.14.8.tgz#3d481b9a9d146cf2671562e3627ad7e4c0f6b2e2"
-
 react-addons-create-fragment@^15.4.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/react-addons-create-fragment/-/react-addons-create-fragment-15.6.2.tgz#a394de7c2c7becd6b5475ba1b97ac472ce7c74f8"
@@ -8500,22 +8510,12 @@ react-color@^2.11.1:
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
 
-react-cookie-banner@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/react-cookie-banner/-/react-cookie-banner-4.0.0.tgz#b16ed0c6e8fb93af81f6928e2d7f94894ae43eeb"
+react-cookie-consent@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/react-cookie-consent/-/react-cookie-consent-1.8.0.tgz#1ac3ceb4e4be91ebeb7803a0b4f9665b5cc46160"
   dependencies:
-    classnames "2.2.5"
-    lodash.omit "^4.5.0"
-    react-addons-clone-with-props "^0.14.8"
-    react-cookie "^2.1.2"
-
-react-cookie@^2.1.2:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/react-cookie/-/react-cookie-2.2.0.tgz#0ad91a04db235aa35af97032c388fe902be3560c"
-  dependencies:
-    hoist-non-react-statics "^2.3.1"
-    prop-types "^15.0.0"
-    universal-cookie "^2.2.0"
+    js-cookie "^2.2.0"
+    react "^16.4.0"
 
 react-display-name@^0.2.0:
   version "0.2.4"
@@ -8671,7 +8671,20 @@ react-transition-group@^2.2.1:
     warning "^3.0.0"
     react-lifecycles-compat "^3.0.4"
 
+<<<<<<< 9bbf60f8c089d405159bdb83ec9dcb863d44c3ca
 react@^15.6.2 || ^16.0", react@^16.3.0:
+=======
+react@^15.4.2||^16.0.0, react@^15.6.1||^16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.0.0.tgz#ce7df8f1941b036f02b2cca9dbd0cb1f0e855e2d"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.0"
+
+"react@^15.6.2 || ^16.0", react@^16.3.0, react@^16.4.0:
+>>>>>>> Update yarn lock
   version "16.5.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.5.2.tgz#19f6b444ed139baa45609eee6dc3d318b3895d42"
   dependencies:
@@ -10566,13 +10579,6 @@ unique-slug@^2.0.0:
   resolved "https://registry.yarnpkg.com/unique-slug/-/unique-slug-2.0.1.tgz#5e9edc6d1ce8fb264db18a507ef9bd8544451ca6"
   dependencies:
     imurmurhash "^0.1.4"
-
-universal-cookie@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/universal-cookie/-/universal-cookie-2.2.0.tgz#328dc3883cf0ebd5b4904902033ad4dfdb907ed2"
-  dependencies:
-    cookie "^0.3.1"
-    object-assign "^4.1.0"
 
 unlazy-loader@^0.1.2:
   version "0.1.3"
