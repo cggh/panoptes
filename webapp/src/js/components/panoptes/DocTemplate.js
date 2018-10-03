@@ -32,15 +32,15 @@ let DocTemplate = createReactClass({
     const {path, template, hideEditButton, ...otherProps} = this.props;
     // NOTE: z-index of the Edit modal is currently set to 9997.
     const editButtonZIndex = 9996;
-    return [ this.config.user.isManager && hideEditButton == false ?
-          <IconButton
-            key='icon'
-            aria-label="Edit"
-            className="fa fa-edit"
-            onClick={() => this.getFlux().actions.session.modalOpen(<EditDocPage path={path}/>)}
-            style={{position: 'absolute', left: '0', right: '0', margin: 'auto', zIndex: editButtonZIndex}}
-          />
-          : null,
+    return [this.config.user.isManager && hideEditButton == false ?
+      <IconButton
+        key="icon"
+        aria-label="Edit"
+        className="fa fa-edit"
+        onClick={() => this.getFlux().actions.session.modalOpen(<EditDocPage path={path}/>)}
+        style={{position: 'absolute', left: '0', right: '0', margin: 'auto', zIndex: editButtonZIndex}}
+      />
+      : null,
     template === undefined ? null : React.createElement(HandlebarsWithComponents, {key: 'template', ...otherProps}, template)];
   }
 });
