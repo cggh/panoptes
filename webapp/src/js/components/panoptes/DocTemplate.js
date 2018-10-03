@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import withAPIData from 'hoc/withAPIData';
 import FluxMixin from 'mixins/FluxMixin';
-import ConfigMixin from 'mixins/ConfigMixin'; // Need this?
+import ConfigMixin from 'mixins/ConfigMixin';
 import HandlebarsWithComponents from 'panoptes/HandlebarsWithComponents';
 import IconButton from '@material-ui/core/IconButton';
 import EditDocPage from 'panoptes/EditDocPage';
