@@ -96,7 +96,7 @@ let Panoptes = createReactClass({
   componentDidMount() {
     let store = this.getFlux().store('SessionStore');
     store.on('notify',
-      () => this.refs.notificationSystem.addNotification(
+      () => this.notificationSystem.addNotification(
         _assign(store.getLastNotification(), {position: 'tc'})));
     //We don't need this as it will come to us in page load json
     //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
@@ -180,7 +180,7 @@ let Panoptes = createReactClass({
                 React.cloneElement(modal, {setProps: actions.modalSetProps})
                 : null}
             </Modal>
-            <NotificationSystem ref="notificationSystem"/>
+            <NotificationSystem ref={(ref) => this.notificationSystem = ref}/>
           </div>
         </MuiThemeProvider>
       </DetectResize>
