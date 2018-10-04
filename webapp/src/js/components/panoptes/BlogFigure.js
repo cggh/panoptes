@@ -16,7 +16,7 @@ class BlogFigure extends React.Component {
       <Typography variant="title">
         {title}
       </Typography>
-      <div className="centering-container" style={{padding: 0}}>
+      <div className=" scroll-within" style={{padding: 0}}>
         {children}
       </div>
     </Card>;
