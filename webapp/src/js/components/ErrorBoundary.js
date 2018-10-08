@@ -14,6 +14,9 @@ class ErrorBoundary extends React.Component {
       errorInfo: errorInfo
     });
     // You can also log error messages to an error reporting service here
+    if (window.Rollbar) {
+      window.Rollbar.error("ErrorBoundary triggered", error);
+    }
   }
 
   render() {
