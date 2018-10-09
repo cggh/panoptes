@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import detectResize from 'util/DetectElementResize';
+import {
+  addResizeListener,
+  removeResizeListener
+} from 'util/DetectElementResize';
 
 class DetectResize extends React.Component {
   static displayName = 'DetectResize'
@@ -13,11 +16,11 @@ class DetectResize extends React.Component {
 
   componentDidMount() {
     this._onResize();
-    detectResize.addResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize); //eslint-disable-line react/no-find-dom-node
+    addResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize); //eslint-disable-line react/no-find-dom-node
   }
 
   componentWillUnmount() {
-    detectResize.removeResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize); //eslint-disable-line react/no-find-dom-node
+    removeResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize); //eslint-disable-line react/no-find-dom-node
   }
 
   _onResize = () => {

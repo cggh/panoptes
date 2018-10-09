@@ -144,7 +144,7 @@ let removeResizeListener = function(element, fn) {
   }
 };
 
-module.exports = {
+export {
   addResizeListener,
   removeResizeListener
 };

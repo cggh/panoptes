@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStore} from 'fluxxor';
+import {createStore} from '@demiazz/fluxxor';
 import Immutable from 'immutable';
 import uid from 'uid';
 import Constants from '../constants/Constants';

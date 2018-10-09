@@ -4,6 +4,7 @@ let HtmlWebpackPlugin = require('html-webpack-plugin');
 let autoprefixer = require('autoprefixer');
 let CopyWebpackPlugin = require('copy-webpack-plugin');
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+let UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = function(env) {
   const nodeEnv = env && env.prod ? 'production' : 'development';
@@ -31,39 +32,10 @@ module.exports = function(env) {
 
   if (isProd) {
     plugins.push(
-      new webpack.LoaderOptionsPlugin({
-        minimize: true,
-        debug: false
-      }),
-      // new webpack.optimize.UglifyJsPlugin({
-      //   compress: {
-      //     warnings: false,
-      //     screw_ie8: true,
-      //     conditionals: true,
-      //     unused: true,
-      //     comparisons: true,
-      //     sequences: true,
-      //     dead_code: true,
-      //     evaluate: true,
-      //     if_return: true,
-      //     join_vars: true,
-      //   },
-      //   output: {
-      //     comments: false,
-      //   },
-      // }),
-      new CopyWebpackPlugin([
-        //Using this method for the favicons - this method should not be used generally, esp in JS where one can require(IMAGE_PATH)
-        {from: 'src/images/favicons', to: 'images/favicons'},
-      ]),
-      new webpack.ContextReplacementPlugin(/(ansi-color|handlebars-helpers|create-frame)/, /^$/),
+      // new webpack.ContextReplacementPlugin(/(ansi-color|handlebars-helpers|create-frame)/, /^$/),
     );
   } else {
     plugins.push(
-      new webpack.LoaderOptionsPlugin({
-        minimize: true,
-        debug: false
-      }),
       new BundleAnalyzerPlugin({
         // Can be `server`, `static` or `disabled`.
         // In `server` mode analyzer will start HTTP server to show bundle report.
@@ -99,11 +71,30 @@ module.exports = function(env) {
   }
 
   return {
+    optimization: {
+      minimizer: [
+        new UglifyJsPlugin({
+          cache: true,
+          parallel: true,
+          uglifyOptions: {
+            warnings: false,
+            conditionals: true,
+            unused: true,
+            comparisons: true,
+            sequences: true,
+            dead_code: true,
+            evaluate: true,
+            if_return: true,
+            join_vars: true,
+          },
+        }),
+      ]
+    },
     mode: isProd ? 'production' : 'development',
-    devtool: isProd ? 'source-map' : 'eval',
+    // devtool: isProd ? 'source-map' : 'eval',
     context: __dirname,
     entry: {
-      babel: isProd ? ['babel-polyfill'] : ["webpack-dev-server/client?http://localhost:8080", 'babel-polyfill'],
+      babel: isProd ? ['@babel/polyfill'] : ["webpack-dev-server/client?http://localhost:8080", '@babel/polyfill'],
       panoptes: isProd ? [path.resolve(__dirname, 'src/js/index.js')] : ["webpack-dev-server/client?http://localhost:8080", path.resolve(__dirname, 'src/js/index.js')]
     },
     output: {
@@ -157,8 +148,13 @@ module.exports = function(env) {
         },
         {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader?prefix=font/'},
         // {test: /\.json$/, loader: 'file-loader'},
+        //Filter out this module as it is large and we don't need it (used by "date" handlebars helper)
         {
           test: path.resolve(__dirname, 'node_modules/moment'),
+          use: 'null-loader'
+        },
+        {
+          test: path.resolve(__dirname, 'node_modules/chalk'),
           use: 'null-loader'
         }
       ]

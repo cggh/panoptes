@@ -1,3 +1,4 @@
+import '@babel/polyfill';
 import 'string.prototype.startswith';
 import createHistory from 'history/createBrowserHistory';
 const history = createHistory();
@@ -7,7 +8,7 @@ import ComponentRegistry from 'util/ComponentRegistry';
 import React from 'react'; //eslint-disable-line no-unused-vars
 import ReactDOM from 'react-dom';
 
-import {Flux} from 'fluxxor';
+import {Flux} from '@demiazz/fluxxor';
 import Immutable from 'immutable';
 import Loading from 'components/ui/Loading.js';
 
