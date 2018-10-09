@@ -1,4 +1,4 @@
-import {createStore} from 'fluxxor';
+import {createStore} from '@demiazz/fluxxor';
 import Immutable from 'immutable';
 
 import Constants from '../constants/Constants';

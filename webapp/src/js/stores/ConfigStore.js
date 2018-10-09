@@ -1,4 +1,4 @@
-import {createStore} from 'fluxxor';
+import {createStore} from '@demiazz/fluxxor';
 import {scaleColour} from 'util/Colours';
 
 import Constants from '../constants/Constants';
