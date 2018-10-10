@@ -22,21 +22,20 @@ Please note:
 Compatibility
 -------------
 
-### Compatible server operating systems:
-- Canonical Ubuntu Server 16.04
+### Server operating systems:
+- [x] Canonical Ubuntu Server 16.04.5 LTS (Xenial Xerus), 18.04.1 (Bionic Beaver)
+- [x] Debian GNU/Linux 9 (stretch)
 
-### Compatible client operating systems:
+### Client operating systems:
 - desktop and laptop
-  - Canonical Ubuntu Desktop 12.04, 14.04, 16.04
-  - Microsoft Windows 7, 8, 8.1, 10
-  - Apple Mac OS X 10.10, Mac OS X 10.11, macOS 10.12
-
-### Compatible-pending client operating systems:
+  - [x] Canonical Ubuntu Desktop 14.04, 16.04, 18.04
+  - [ ] Microsoft Windows 7, 8.1, 10
+  - [ ] Apple Mac OS X 10.10, Mac OS X El Capitan, macOS Sierra, macOS High Sierra
 - tablet and mobile
-  - Apple iOS v10
-  - Google Android v7
+  - [ ] Apple iOS 10.3, 11.2, 11.3, 11.4
+  - [ ] Google Android 5.1 Lollipop, 6.0 Marshmallow, 7.0 Nougat, 8.0 Oreo
 
-### Compatible client web browsers (minimum versions):
+### Client web browsers (minimum versions):
 - desktop and laptop
   - Canonical Ubuntu Desktop 12.04, 14.04, 16.04
     - [ ] Google Chrome v29 (latest v54) (expected to work, tests pending, v54 OK)
