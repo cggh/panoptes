@@ -16,7 +16,7 @@ import _values from 'lodash.values';
 let MarkerLayer = createReactClass({
   displayName: 'MarkerLayer',
 
-    propTypes: {
+  propTypes: {
     layout: PropTypes.string,
     cluster: PropTypes.bool,
     children(props, propName, componentName) {
@@ -40,14 +40,15 @@ let MarkerLayer = createReactClass({
       return new Error(
         `${componentName} should have only MarkerLayerMarker and MarkerLayerPopup children, and at most one each.`
       );
-    }
+    },
+    fixedRadius: PropTypes.number,
   },
 
   render() {
     let {layout, children, cluster, fixedRadius, ...data} = this.props;
     children = filterChildren(this, React.Children.toArray(children));
-    if(!_isArray(children)) {
-      children = [children]
+    if (!_isArray(children)) {
+      children = [children];
     }
     let childrenByType = {};
     children.forEach((child) => childrenByType[child.type.displayName] = child);
@@ -56,8 +57,8 @@ let MarkerLayer = createReactClass({
     if (cluster) {
       let clusters = {};
       for (let i = 0; i < data[columns[0]].length; i++) {
-        if (clusters[''+data['lat'][i]+data['lng'][i]]) {
-          let cluster = clusters[''+data['lat'][i]+data['lng'][i]];
+        if (clusters['' + data['lat'][i] + data['lng'][i]]) {
+          let cluster = clusters['' + data['lat'][i] + data['lng'][i]];
           columns.forEach((column) => column === 'lat' || column === 'lng' || column === 'radius'  || column === 'area' ? null : cluster[column].push(data[column][i]));
           cluster.lat = data['lat'][i];
           cluster.lng = data['lng'][i];
@@ -78,8 +79,8 @@ let MarkerLayer = createReactClass({
           if (cluster.area) {
             cluster.area = data['area'][i];
           }
-          cluster.key = ''+data['lat'][i]+data['lng'][i];
-          clusters[''+data['lat'][i]+data['lng'][i]] = cluster;
+          cluster.key = '' + data['lat'][i] + data['lng'][i];
+          clusters['' + data['lat'][i] + data['lng'][i]] = cluster;
         }
       }
       rows = _values(clusters);
@@ -93,43 +94,43 @@ let MarkerLayer = createReactClass({
     }
     rows.forEach((row) => {
       if (row.area !== undefined && row.radius === undefined) {
-        row.radius = Math.sqrt(row.area/Math.PI);
+        row.radius = Math.sqrt(row.area / Math.PI);
       }
     });
     let marker = (row) => null;
     if (childrenByType['MarkerLayerMarker'] && childrenByType['MarkerLayerMarker'].props.children) {
-      marker = (row) => React.cloneElement(filterChildren(this, childrenByType['MarkerLayerMarker'].props.children), {radius: fixedRadius, ...row})
+      marker = (row) => React.cloneElement(filterChildren(this, childrenByType['MarkerLayerMarker'].props.children), {radius: fixedRadius, ...row});
     }
     let popup = (row) => null;
     if (childrenByType['MarkerLayerPopup'] && childrenByType['MarkerLayerPopup'].props.children) {
-      popup = (row) => React.cloneElement(filterChildren(this, childrenByType['MarkerLayerPopup'].props.children), {radius: fixedRadius, ...row})
+      popup = (row) => React.cloneElement(filterChildren(this, childrenByType['MarkerLayerPopup'].props.children), {radius: fixedRadius, ...row});
     }
     return <FeatureGroup>{
       React.createElement(layout === 'force' ? ForceLayouter : OrderLayouter, {nodes: rows},
-          (renderNodes) => {
-            return <FeatureGroup>
-              {
-                renderNodes.map(
-                  (markerData, i) =>
-                    <ComponentMarker
-                      key={`ComponentMarker_${i}`}
-                      position={{lat: markerData.lat, lng: markerData.lng}}
-                      zIndexOffset={i*1000} //https://github.com/Leaflet/Leaflet/issues/5560
-                      popup={popup(markerData)}
-                    >
-                      {marker(markerData)}
-                    </ComponentMarker>
-                ).concat(renderNodes.map(
-                  (markerData, i) =>
-                    <Polyline
-                      className="panoptes-table-markers-layer-polyline"
-                      key={`Polyline_${i}`}
-                      positions={[[markerData.lat, markerData.lng], [markerData.fixedNode.lat, markerData.fixedNode.lng]]}
-                    />
-                ))}
-            </FeatureGroup>;
-          })}
-    </FeatureGroup>
+        (renderNodes) =>
+          <FeatureGroup>
+            {
+              renderNodes.map(
+                (markerData, i) =>
+                  <ComponentMarker
+                    key={`ComponentMarker_${i}`}
+                    position={{lat: markerData.lat, lng: markerData.lng}}
+                    zIndexOffset={i * 1000} //https://github.com/Leaflet/Leaflet/issues/5560
+                    popup={popup(markerData)}
+                  >
+                    {marker(markerData)}
+                  </ComponentMarker>
+              ).concat(renderNodes.map(
+                (markerData, i) =>
+                  <Polyline
+                    className="panoptes-table-markers-layer-polyline"
+                    key={`Polyline_${i}`}
+                    positions={[[markerData.lat, markerData.lng], [markerData.fixedNode.lat, markerData.fixedNode.lng]]}
+                  />
+              ))}
+          </FeatureGroup>
+      )}
+    </FeatureGroup>;
   }
 });
 
