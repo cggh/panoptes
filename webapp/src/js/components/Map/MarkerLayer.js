@@ -120,14 +120,18 @@ let MarkerLayer = createReactClass({
                   >
                     {marker(markerData)}
                   </ComponentMarker>
-              ).concat(renderNodes.map(
-                (markerData, i) =>
-                  <Polyline
-                    className="panoptes-table-markers-layer-polyline"
-                    key={`Polyline_${i}`}
-                    positions={[[markerData.lat, markerData.lng], [markerData.fixedNode.lat, markerData.fixedNode.lng]]}
-                  />
-              ))}
+              ).concat(
+                layout === 'force' ?
+                  renderNodes.map((markerData, i) =>
+                    <Polyline
+                      className="panoptes-table-markers-layer-polyline"
+                      key={`Polyline_${i}`}
+                      positions={[[markerData.lat, markerData.lng], [markerData.fixedNode.lat, markerData.fixedNode.lng]]}
+                    />
+                  )
+                  : []
+              )
+            }
           </FeatureGroup>
       )}
     </FeatureGroup>;
