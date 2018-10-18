@@ -11,11 +11,10 @@ import {
   TableCell,
   TableRow,
 } from '@material-ui/core';
-
 import {colours, propertyColour, isColourDark, scaleColour} from 'util/Colours';
-
 import DocPage from 'panoptes/DocPage';
 import _inRange from 'lodash.inrange';
+import MuiTooltip from 'ui/MuiTooltip';
 
 let ProportionBarChartRow = createReactClass({
   displayName: 'ProportionBarChartRow',
@@ -61,6 +60,9 @@ let ProportionBarChartRow = createReactClass({
     colourRange: PropTypes.array, // Overrides proportionTableColourColumn (any specified property config)
     colourProperty: PropTypes.string,
     showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
+    hideTooltip: PropTypes.bool,
+    tooltipText: PropTypes.string, // Defaults to numeratorAsPercentage + '%'
+    tooltipPlacement: PropTypes.string,
     replaceParent: PropTypes.func,
     children: PropTypes.node,
     config: PropTypes.object, // This will be provided via withAPIData
@@ -83,8 +85,10 @@ let ProportionBarChartRow = createReactClass({
       rowLabelStyle: {margin: 0, padding: 0},
       zeroDenominatorContent: <span style={{paddingLeft: '3px'}}>No data</span>,
       loadingBarContent: <span style={{paddingLeft: '3px'}}>Loading...</span>,
+      rawNumerator: false,
       showMaxValueAsMaxColour: false,
-      rawNumerator: false
+      hideTooltip: false,
+      tooltipPlacement: 'left',
     };
   },
 
@@ -153,8 +157,10 @@ let ProportionBarChartRow = createReactClass({
       numberOfBins,
       colourRange,
       colourProperty,
-
       showMaxValueAsMaxColour,
+      hideTooltip,
+      tooltipText,
+      tooltipPlacement,
     } = this.props;
 
     const cellStyle = {
@@ -333,6 +339,8 @@ let ProportionBarChartRow = createReactClass({
         onClickHandler = (e) => this.handleClickDocLink(e);
       }
 
+      const RowWrapper = hideTooltip ? React.Fragment : MuiTooltip;
+
       return (
         <TableRow
           key={'row_' + rowPrimKeyValue}
@@ -358,56 +366,58 @@ let ProportionBarChartRow = createReactClass({
           >
             {rowLabel}
           </TableCell>
-          <TableCell
-            style={{
-              ...cellStyle,
-              width: '60%',
-              position: 'relative',
-              height: rowHeight,
-              overflow: 'hidden',
-            }}
-            padding="none"
-          >
-            <div
+          <RowWrapper title={tooltipText !== undefined ? tooltipText : numeratorAsPercentage + '%'} placement={tooltipPlacement}>
+            <TableCell
               style={{
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                display: 'table',
-                width: '100%',
-                height: '100%',
-                bottom: '0', // Edge
+                ...cellStyle,
+                width: '60%',
+                position: 'relative',
+                height: rowHeight,
+                overflow: 'hidden',
               }}
+              padding="none"
             >
-              {tickElements}
-            </div>
-            {denominator !== 0 ?
               <div
                 style={{
-                  position: 'relative',
+                  position: 'absolute',
+                  top: '0',
+                  left: '0',
                   display: 'table',
                   width: '100%',
-                  height: barHeight !== undefined ? barHeight : 'auto',
-                  opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
+                  height: '100%',
+                  bottom: '0', // Edge
                 }}
               >
-                <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
-                <div style={{display: 'table-cell', width: (100 - numeratorAsPercentage) + '%', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
+                {tickElements}
               </div>
-              :
-              <div
-                style={{
-                  position: 'relative',
-                  display: 'table',
-                  width: '100%',
-                  height: barHeight !== undefined ? barHeight : 'auto',
-                  opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
-                }}
-              >
-                <div style={{display: 'table-cell'}}>{zeroDenominatorContent}</div>
-              </div>
-            }
-          </TableCell>
+              {denominator !== 0 ?
+                <div
+                  style={{
+                    position: 'relative',
+                    display: 'table',
+                    width: '100%',
+                    height: barHeight !== undefined ? barHeight : 'auto',
+                    opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
+                  }}
+                >
+                  <div style={{display: 'table-cell', width: numeratorAsPercentage + '%', ...leftBarStyle, ...leftBarPadding}}>{leftBarText}</div>
+                  <div style={{display: 'table-cell', width: (100 - numeratorAsPercentage) + '%', ...rightBarStyle, ...rightBarPadding}}>{rightBarText}</div>
+                </div>
+                :
+                <div
+                  style={{
+                    position: 'relative',
+                    display: 'table',
+                    width: '100%',
+                    height: barHeight !== undefined ? barHeight : 'auto',
+                    opacity: sampleSizeWarningMinimum !== undefined && denominator < sampleSizeWarningMinimum ? 0.5 : 'inherit',
+                  }}
+                >
+                  <div style={{display: 'table-cell'}}>{zeroDenominatorContent}</div>
+                </div>
+              }
+            </TableCell>
+          </RowWrapper>
           <TableCell
             style={{
               ...cellStyle,
