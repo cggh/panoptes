@@ -59,6 +59,9 @@ let ProportionBarChart = createReactClass({
     colourRange: PropTypes.array, // Overrides default Colours scaleColours but not propConfig.valueColours
     colourProperty: PropTypes.string, // Overrides default Colours scaleColours but not propConfig.valueColours
     showMaxValueAsMaxColour: PropTypes.bool, // wrt value bins
+    hideRowTooltip: PropTypes.bool,
+    rowTooltipText: PropTypes.string,
+    rowTooltipPlacement: PropTypes.string,
     config: PropTypes.object, // This will be provided via withAPIData
     rowTableData: PropTypes.array, // This will be provided via withAPIData
   },
@@ -66,7 +69,7 @@ let ProportionBarChart = createReactClass({
   getDefaultProps() {
     return {
       rowLabelColumn: 'name',
-      showMaxValueAsMaxColour: false,
+      // Don't set ProportionBarChartRow-specific prop-defaults here. (Set in ProportionBarChartRow.)
     };
   },
 
@@ -107,6 +110,9 @@ let ProportionBarChart = createReactClass({
       colourRange,
       colourProperty,
       showMaxValueAsMaxColour,
+      hideRowTooltip,
+      rowTooltipText,
+      rowTooltipPlacement,
       ...other
     } = this.props;
 
@@ -209,6 +215,9 @@ let ProportionBarChart = createReactClass({
                 colourRange={colourRange}
                 colourProperty={colourProperty}
                 showMaxValueAsMaxColour={showMaxValueAsMaxColour}
+                hideTooltip={hideRowTooltip}
+                tooltipText={rowTooltipText}
+                tooltipPlacement={rowTooltipPlacement}
                 {...other}
               />
             );
