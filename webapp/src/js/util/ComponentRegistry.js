@@ -29,46 +29,49 @@ dynreq.keys().forEach((component) => {
 });
 
 //We now add in specific material-ui classes
-import { Card, CardHeader, CardMedia, CardContent, CardActions } from '@material-ui/core';
-Card.displayName = "Card";
+import {Card, CardHeader, CardMedia, CardContent, CardActions} from '@material-ui/core';
+Card.displayName = 'Card';
 typeByDisplayName['Card'] = Card;
-CardActions.displayName = "CardActions";
+CardActions.displayName = 'CardActions';
 typeByDisplayName['CardActions'] = CardActions;
-CardHeader.displayName = "CardHeader";
+CardHeader.displayName = 'CardHeader';
 typeByDisplayName['CardHeader'] = CardHeader;
-CardMedia.displayName = "CardMedia";
+CardMedia.displayName = 'CardMedia';
 typeByDisplayName['CardMedia'] = CardMedia;
-CardMedia.displayName = "CardMedia";
+CardMedia.displayName = 'CardMedia';
 typeByDisplayName['CardContent'] = CardContent;
 
-import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import {List, ListItem, ListItemIcon, ListItemText} from '@material-ui/core';
 typeByDisplayName['List'] = List;
 typeByDisplayName['ListItem'] = ListItem;
 let wrappedListItemIcon = ({children}) => {
   children = filterChildren(this, children);
   return <ListItemIcon>{children}</ListItemIcon>;
 };
-wrappedListItemIcon.displayName = "ListItemIcon";
+wrappedListItemIcon.displayName = 'ListItemIcon';
 typeByDisplayName['ListItemIcon'] = wrappedListItemIcon;
 
 let wrappedListItemText = ({children}) => {
   children = filterChildren(this, children);
   if (_isArray(children)) {
     return <ListItemText primary={children[0]} secondary={children[1]}/>;
-  }
-  else return <ListItemText primary={children}/>;
+  } else return <ListItemText primary={children}/>;
 };
-wrappedListItemText.displayName = "ListItemText";
+wrappedListItemText.displayName = 'ListItemText';
 typeByDisplayName['ListItemText'] = wrappedListItemText;
 
 import Typography from '@material-ui/core/Typography';
 Typography.displayName = 'Typography';
-
 typeByDisplayName['Typography'] = Typography;
 
 import {Tabs, Tab} from '@material-ui/core';
 typeByDisplayName['Tabs'] = Tabs;
 typeByDisplayName['Tab'] = Tab;
+
+// Tooltip requires one child but templates include whitespace children.
+// import {Tooltip as MaterialTooltip} from '@material-ui/core';
+// MaterialTooltip.displayName = 'MaterialTooltip';
+// typeByDisplayName['MaterialTooltip'] = MaterialTooltip;
 
 //Lower case entries for use in feed-derived content
 typeByDisplayName['blog-figure'] = typeByDisplayName['BlogFigure'];
