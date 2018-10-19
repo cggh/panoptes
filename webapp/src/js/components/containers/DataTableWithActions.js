@@ -343,39 +343,43 @@ let DataTableWithActions = createReactClass({
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
-        <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
-        <Button
-          label={columnPickerLabel}
-          color="primary"
-          onClick={() => actions.session.modalOpen(<GroupedItemPicker
-            groups={this.propertyGroups}
-            initialPick={columns}
-            title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
-            onPick={this.handleColumnChange}
-          />)}
-          iconName="columns"
-        />
-        {searchGUI}
+        <div className="sidebar-body">
+          <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
+          <Button
+            label={columnPickerLabel}
+            color="primary"
+            onClick={() => actions.session.modalOpen(<GroupedItemPicker
+              groups={this.propertyGroups}
+              initialPick={columns}
+              title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
+              onPick={this.handleColumnChange}
+            />)}
+            iconName="columns"
+          />
+          {searchGUI}
+        </div>
         <Divider />
-        <Button
-          label="Download data"
-          disabled={columns === undefined || columns.length === 0}
-          color="primary"
-          onClick={() => this.handleDownload()}
-          iconName="download"
-        />
-        <Button
-          label="Pivot Table"
-          color="primary"
-          onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
-          iconName="table"
-        />
-        <Button
-          label="Plot Table"
-          color="primary"
-          onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
-          iconName="bar-chart"
-        />
+        <div className="sidebar-body">
+          <Button
+            label="Download data"
+            disabled={columns === undefined || columns.length === 0}
+            color="primary"
+            onClick={() => this.handleDownload()}
+            iconName="download"
+          />
+          <Button
+            label="Pivot Table"
+            color="primary"
+            onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
+            iconName="table"
+          />
+          <Button
+            label="Plot Table"
+            color="primary"
+            onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
+            iconName="bar-chart"
+          />
+        </div>
       </div>
     );
 
