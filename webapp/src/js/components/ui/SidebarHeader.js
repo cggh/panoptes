@@ -15,18 +15,16 @@ let SidebarHeader = createReactClass({
 
   render() {
     let {icon, description} = this.props;
+    // TODO test: description = null;
     return (
       <div className="sidebar-header">
         <div className="icon-holder">
           <Icon name={icon}/>
         </div>
-        <span className="description">
-          {description || <i>No description</i>}
-        </span>
-        <div style={ {clear: 'both'} }/>
+        <div className="description">
+          {description}
+        </div>
       </div>
-
-
     );
   },
 });
