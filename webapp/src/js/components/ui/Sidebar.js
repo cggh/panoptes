@@ -63,7 +63,7 @@ class Sidebar extends React.Component {
   constructor(props) {
     super(props);
 
-    this.sidebar_width = (this.props.width || 258) + scrollbarSize(); //From css, sadly. We need to fix it as display:none is interfering with measurement
+    this.sidebarWidth = (this.props.width || 258) + scrollbarSize(); //From css, sadly. We need to fix it as display:none is interfering with measurement
 
     this.state = {
 
@@ -111,7 +111,7 @@ class Sidebar extends React.Component {
       // trigger a change to open if sidebar has been dragged beyond dragToggleDistance
       const touchWidth = this.touchSidebarWidth();
 
-      if (this.props.open && touchWidth < this.sidebar_width - this.props.dragToggleDistance ||
+      if (this.props.open && touchWidth < this.sidebarWidth - this.props.dragToggleDistance ||
           !this.props.open && touchWidth > this.props.dragToggleDistance) {
         this.props.onSetOpen(!this.props.open);
       }
@@ -185,22 +185,22 @@ class Sidebar extends React.Component {
     // we will only drag the distance they moved their finger
     // otherwise we will move the sidebar to be below the finger.
     if (this.props.pullRight) {
-      if (this.props.open && window.innerWidth - this.state.touchStartX < this.sidebar_width) {
+      if (this.props.open && window.innerWidth - this.state.touchStartX < this.sidebarWidth) {
         if (this.state.touchCurrentX > this.state.touchStartX) {
-          return this.sidebar_width + this.state.touchStartX - this.state.touchCurrentX;
+          return this.sidebarWidth + this.state.touchStartX - this.state.touchCurrentX;
         }
-        return this.sidebar_width;
+        return this.sidebarWidth;
       }
-      return Math.min(window.innerWidth - this.state.touchCurrentX, this.sidebar_width);
+      return Math.min(window.innerWidth - this.state.touchCurrentX, this.sidebarWidth);
     }
 
-    if (this.props.open && this.state.touchStartX < this.sidebar_width) {
+    if (this.props.open && this.state.touchStartX < this.sidebarWidth) {
       if (this.state.touchCurrentX > this.state.touchStartX) {
-        return this.sidebar_width;
+        return this.sidebarWidth;
       }
-      return this.sidebar_width - this.state.touchStartX + this.state.touchCurrentX;
+      return this.sidebarWidth - this.state.touchStartX + this.state.touchCurrentX;
     }
-    return Math.min(this.state.touchCurrentX, this.sidebar_width);
+    return Math.min(this.state.touchCurrentX, this.sidebarWidth);
   }
 
   render() {
@@ -234,7 +234,7 @@ class Sidebar extends React.Component {
     }
 
     if (isTouching) {
-      const percentage = this.touchSidebarWidth() / this.sidebar_width;
+      const percentage = this.touchSidebarWidth() / this.sidebarWidth;
 
       // slide open to what we dragged
       if (this.props.pullRight) {
@@ -250,16 +250,16 @@ class Sidebar extends React.Component {
       overlayStyle.visibility = 'visible';
     } else if (this.props.docked) {
       // show sidebar
-      if (this.sidebar_width !== 0) {
+      if (this.sidebarWidth !== 0) {
         sidebarStyle.transform = 'translateX(0%)';
         sidebarStyle.WebkitTransform = 'translateX(0%)';
       }
 
       // make space on the left/right side of the content for the sidebar
       if (this.props.pullRight) {
-        contentStyle.right = `${this.sidebar_width}px`;
+        contentStyle.right = `${this.sidebarWidth}px`;
       } else {
-        contentStyle.left = `${this.sidebar_width}px`;
+        contentStyle.left = `${this.sidebarWidth}px`;
       }
     } else if (this.props.open) {
       // slide open sidebar
@@ -305,7 +305,7 @@ class Sidebar extends React.Component {
 
     return (
       <div {...rootProps}>
-        <div className={this.props.sidebarClassName} style={{width: `${this.sidebar_width}px`, ...sidebarStyle}} ref="sidebar">
+        <div className={this.props.sidebarClassName} style={{width: `${this.sidebarWidth}px`, ...sidebarStyle}}>
           <div style={sidebarContainerStyle}>
             {this.props.sidebar}
           </div>
