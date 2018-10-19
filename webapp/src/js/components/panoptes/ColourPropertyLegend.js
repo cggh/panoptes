@@ -23,11 +23,13 @@ class ColourPropertyLegend extends React.Component {
     hideLegendTitle: PropTypes.bool,
     binTextColour: PropTypes.string,
     noDataText: PropTypes.string,
+    noDataSwatchWidthPixels: PropTypes.number,
+    noDataSwatchSeparatorWidthPixels: PropTypes.number,
     layout: PropTypes.oneOf(['values-inside-colours', 'values-outside-colours']),
     tickLineColour: PropTypes.string,
     tickLineHeight: PropTypes.string,
     valueSuffix: PropTypes.string,
-    binHeight: PropTypes.string,
+    swatchHeight: PropTypes.string, // Only applies when layout = 'values-outside-colours'. When layout = 'values-inside-colours', swatchHeight is forced to 100%.
     colourFillOpacity: PropTypes.number,
     colourBackgroundColour: PropTypes.string,
     showColourBorder: PropTypes.bool,
@@ -38,11 +40,13 @@ class ColourPropertyLegend extends React.Component {
   static defaultProps = {
     hideLegendTitle: false,
     noDataText: 'no data',
+    noDataSwatchWidthPixels: 70,
+    noDataSwatchSeparatorWidthPixels: 5,
     layout: 'values-inside-colours',
     tickLineColour: '#A0A0A0',
     tickLineHeight: '7px',
     valueSuffix: '',
-    binHeight: '10px',
+    swatchHeight: '10px', // Only applies when layout = 'values-outside-colours'. When layout = 'values-inside-colours', swatchHeight is forced to 100%.
     showColourBorder: true,
   };
 
@@ -50,8 +54,9 @@ class ColourPropertyLegend extends React.Component {
     let {
       table, labelProperty, maxLegendItems, colourProperty, config, data,
       hideLegendTitle, binTextColour,
-      noDataText, layout, tickLineColour, valueSuffix,
-      binHeight, tickLineHeight, colourFillOpacity, colourBackgroundColour,
+      noDataText, noDataSwatchWidthPixels, noDataSwatchSeparatorWidthPixels,
+      layout, tickLineColour, valueSuffix,
+      swatchHeight, tickLineHeight, colourFillOpacity, colourBackgroundColour,
       showColourBorder,
     } = this.props;
 
@@ -74,53 +79,84 @@ class ColourPropertyLegend extends React.Component {
     if (colourPropConfig.isNumerical) {
 
       const legendTitle = hideLegendTitle ? null : <div className="legend-title">{labelPropConfig.name}</div>;
-
       let valuesOutsideColours = null;
+      let swatchWidthPercentages = [];
+      if (layout === 'values-outside-colours') {
+        // Convert thresholds to bins
+        let binRanges = [];
+        let totalBinRange = 0;
+        for (let thresholdIndex = 0, binIndex = 0, thresholdCount = thresholds.length; thresholdIndex < thresholdCount - 1; thresholdIndex++, binIndex++) {
+          // Get each bin range by finding the difference between this point and the next.
+          const binRange = thresholds[thresholdIndex + 1] - thresholds[thresholdIndex];
+          binRanges[binIndex] = thresholds[thresholdIndex + 1] - thresholds[thresholdIndex];
+          totalBinRange += binRange;
+        }
 
-      let numberOfBinsIncludingNoData = thresholds.length;
-      const binWidthPercentage = 100 / numberOfBinsIncludingNoData;
-      let binElements = [];
+        if (totalBinRange !== 0) {
+          // Determine the relative bin widths as percentages of the total range.
+          for (let binIndex = 0, binRangeCount = binRanges.length; binIndex < binRangeCount - 1; binIndex++) {
+            swatchWidthPercentages[binIndex] = (binRanges[binIndex] / totalBinRange) * 100;
+          }
+        }
+      } else if (layout === 'values-inside-colours') {
+        const numberOfBins = thresholds.length - 1;
+        if (numberOfBins > 0) {
+          const swatchWidthPercentage = 100 / numberOfBins;
+          for (let binIndex = 0; binIndex < numberOfBins; binIndex++) {
+            // Give each swatch an equal percentage width. (Swatch area will contain text.)
+            swatchWidthPercentages[binIndex] = swatchWidthPercentage;
+          }
+        }
+      } else {
+        throw Error('Unhandled layout:', layout);
+      }
+
+      let noDataSwatchElements = [];
+      let noDataLabelElements = [];
+      let noDataTickElements = [];
+      let swatchElements = [];
       let labelElements = [];
       let tickElements = [];
 
-      const noDataBinBackgroundColourIsDark = isColourDark(nullColour);
-      const noDataBinTextColourAmended = binTextColour !== undefined ? binTextColour : (noDataBinBackgroundColourIsDark === null ? mediumColour : (noDataBinBackgroundColourIsDark ? lightColour : darkColour));
+      const noDataSwatchBackgroundColourIsDark = isColourDark(nullColour);
+      const noDataSwatchTextColourAmended = binTextColour !== undefined ? binTextColour : (noDataSwatchBackgroundColourIsDark === null ? mediumColour : (noDataSwatchBackgroundColourIsDark ? lightColour : darkColour));
       const valueInsideColour = layout === 'values-inside-colours' ? <span>{noDataText}</span> : null;
-      binElements.push(
+      noDataSwatchElements.push(
         <div
-          key={'noDataBinElement'}
+          key="noDataSwatchElement"
           style={{
             position: 'relative',
             display: 'table-cell',
-            width: '' + (binWidthPercentage - 1) + '%',
-            color: noDataBinTextColourAmended,
+            width: '' + noDataSwatchWidthPixels + 'px',
+            color: noDataSwatchTextColourAmended,
             backgroundColor: nullColour,
             padding: '0 3px 0 3px',
             border: 'solid #DEBED8 1px',
+            verticalAlign: 'middle',
           }}
         >
           {valueInsideColour}
         </div>
         ,
         <div
-          key={'noDataBinSeparatorElement'}
+          key="noDataSwatchSeparatorElement"
           style={{
             position: 'relative',
             display: 'table-cell',
-            width: '1%',
+            width: '' + noDataSwatchSeparatorWidthPixels + 'px',
           }}
         >
         </div>
       );
 
       if (layout === 'values-outside-colours') {
-        labelElements.push(
+        noDataLabelElements.push(
           <div
-            key={'noDataLabelElement'}
+            key="noDataLabelElement"
             style={{
               position: 'relative',
               display: 'table-cell',
-              width: '' + (binWidthPercentage - 1) + '%',
+              width: '' + noDataSwatchWidthPixels + 'px',
               color: binTextColour,
               padding: '0 3px 0 3px',
             }}
@@ -129,33 +165,33 @@ class ColourPropertyLegend extends React.Component {
           </div>
           ,
           <div
-            key={'noDataLabelSeparatorElement'}
+            key="noDataLabelSeparatorElement"
             style={{
               position: 'relative',
               display: 'table-cell',
-              width: '1%',
+              width: '' + noDataSwatchSeparatorWidthPixels + 'px',
             }}
           >
           </div>
         );
-        tickElements.push(
+        noDataTickElements.push(
           <div
-            key={'noDataTickElement'}
+            key="noDataTickElement"
             style={{
               position: 'relative',
               display: 'table-cell',
-              width: '' + (binWidthPercentage - 1) + '%',
+              width: '' + noDataSwatchWidthPixels + 'px',
             }}
           >
             <div style={{height: '100%', width: '50%', borderRight: `solid ${tickLineColour} 1px`}}></div>
           </div>
           ,
           <div
-            key={'noDataTickSeparatorElement'}
+            key="noDataTickSeparatorElement"
             style={{
               position: 'relative',
               display: 'table-cell',
-              width: '1%',
+              width: '' + noDataSwatchSeparatorWidthPixels + 'px',
             }}
           >
           </div>
@@ -176,12 +212,13 @@ class ColourPropertyLegend extends React.Component {
           border: 0,
           position: 'relative',
           display: 'table-cell',
-          width: binWidthPercentage + '%',
+          width: swatchWidthPercentages[i] + '%',
           color: binTextColourAmended,
           backgroundColor: binBackgroundColourObj.rgb(), // rgb() gives rgba()
-          padding: '0 3px 0 3px',
+          padding: '1px 3px 1px 3px', // pixel top and bottom balance the noData swatch border
           borderLeft: layout === 'values-outside-colours' ? `solid ${tickLineColour} 1px` : (showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
           borderRight: (i === numberOfBins && layout === 'values-outside-colours') ? `solid ${tickLineColour} 1px` : (i === numberOfBins && showColourBorder ? `solid ${binBackgroundColour} 1px` : 'none'),
+          verticalAlign: 'middle',
         };
         if (interpolate) {
           let gradientColour = `linear-gradient(to right, ${colourFunc(binMin)} 0%`;
@@ -191,7 +228,7 @@ class ColourPropertyLegend extends React.Component {
           gradientColour += ')';
           style.background = gradientColour;
         }
-        binElements.push(
+        swatchElements.push(
           <div
             key={'binElement_' + i}
             style={style}
@@ -207,7 +244,7 @@ class ColourPropertyLegend extends React.Component {
               style={{
                 position: 'relative',
                 display: 'table-cell',
-                width: binWidthPercentage + '%',
+                width: swatchWidthPercentages[i] + '%',
                 color: binTextColour,
                 padding: '0 3px 0 3px',
                 textAlign: 'right', // Edge text-align overrides left, so keep separate.
@@ -229,7 +266,7 @@ class ColourPropertyLegend extends React.Component {
               style={{
                 position: 'relative',
                 display: 'table-cell',
-                width: binWidthPercentage + '%',
+                width: swatchWidthPercentages[i] + '%',
                 borderLeft: `solid ${tickLineColour} 1px`,
                 borderRight: i === numberOfBins - 1 ? `solid ${tickLineColour} 1px` : 'none',
               }}
@@ -251,7 +288,23 @@ class ColourPropertyLegend extends React.Component {
                 textAlign: 'center',
               }}
             >
-              {tickElements}
+              {noDataTickElements}
+              <div
+                key="dataTicksContainer"
+                style={{display: 'table-cell'}}
+              >
+                <div
+                  style={{
+                    display: 'table',
+                    width: '100%',
+                    height: tickLineHeight,
+                    borderRight: 'none',
+                    textAlign: 'center',
+                  }}
+                >
+                  {tickElements}
+                </div>
+              </div>
             </div>
           </div>,
           <div
@@ -270,7 +323,23 @@ class ColourPropertyLegend extends React.Component {
                 textAlign: 'center',
               }}
             >
-              {labelElements}
+              {noDataLabelElements}
+              <div
+                key="dataLabelsContainer"
+                style={{display: 'table-cell'}}
+              >
+                <div
+                  style={{
+                    display: 'table',
+                    width: '100%',
+                    height: '100%',
+                    borderRight: 'none',
+                    textAlign: 'center',
+                  }}
+                >
+                  {labelElements}
+                </div>
+              </div>
             </div>
           </div>
         ];
@@ -280,7 +349,7 @@ class ColourPropertyLegend extends React.Component {
         <div className="legend">
           {legendTitle}
           <div
-            key="binElements"
+            key="swatchElements"
             style={{
               width: layout === 'values-outside-colours' ? 'calc(100% - 3em)' : '100%',
               marginLeft: layout === 'values-outside-colours' ? '1.5em' : 'inherit',
@@ -290,13 +359,30 @@ class ColourPropertyLegend extends React.Component {
               style={{
                 display: 'table',
                 width: '100%',
-                height: layout === 'values-outside-colours' ? binHeight : '100%',
+                height: layout === 'values-inside-colours' ? '100%' : swatchHeight,
                 borderRight: 'none',
                 textAlign: 'center',
                 backgroundColor: colourBackgroundColour !== undefined ? colourBackgroundColour : 'inherit',
               }}
             >
-              {binElements}
+              {noDataSwatchElements}
+              <div
+                key="dataSwatchContainer"
+                style={{display: 'table-cell'}}
+              >
+                <div
+                  style={{
+                    display: 'table',
+                    width: '100%',
+                    height: layout === 'values-inside-colours' ? '100%' : swatchHeight,
+                    borderRight: 'none',
+                    textAlign: 'center',
+                  }}
+                >
+                  {swatchElements}
+                </div>
+              </div>
+
             </div>
           </div>
           {valuesOutsideColours}
