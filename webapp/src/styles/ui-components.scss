@@ -305,18 +305,16 @@
 
 .sidebar {
   width: 273px;
-  padding: 12px 9px;
 }
 
 .sidebar-header {
   line-height: normal;
   .icon-holder {
+    display: inline-block; // Cause auto-width shrink. Prevent auto-width grow.
     border-radius: 9px;
     border: 2px solid $light-primary-color;
-    padding: 5px 5px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    float: left;
+    padding: 5px;
+    margin-left: 15px; // To line up icon with hamburger-icon.
     background-color: $light-background;
     .icon {
       font-size: 30px;
@@ -327,6 +325,13 @@
       }
     }
   }
+  .description {
+
+  }
+}
+
+.sidebar-body {
+  margin-left: 10px; // To line up button icons with hamburger-icon.
 }
 
 .stack {
