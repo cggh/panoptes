@@ -343,6 +343,7 @@ let DataTableWithActions = createReactClass({
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
+        <Divider/>
         <div className="sidebar-body">
           <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
           <Button
@@ -358,7 +359,7 @@ let DataTableWithActions = createReactClass({
           />
           {searchGUI}
         </div>
-        <Divider />
+        <Divider/>
         <div className="sidebar-body">
           <Button
             label="Download data"
