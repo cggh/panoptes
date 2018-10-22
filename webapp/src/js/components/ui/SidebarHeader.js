@@ -15,7 +15,6 @@ let SidebarHeader = createReactClass({
 
   render() {
     let {icon, description} = this.props;
-    // TODO test: description = null;
     return (
       <div className="sidebar-header">
         <div className="icon-holder">
