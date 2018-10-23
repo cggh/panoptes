@@ -308,7 +308,7 @@ let DataTableWithActions = createReactClass({
     );
     if (searchOpen) {
       searchGUI = (
-        <div >
+        <div>
           <Button
             raised="true"
             label="Find text"
