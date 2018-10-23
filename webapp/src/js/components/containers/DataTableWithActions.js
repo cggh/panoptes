@@ -293,7 +293,6 @@ let DataTableWithActions = createReactClass({
     let quickFindFieldsList = '';
     for (let i = 0, len = this.tableConfig().quickFindFields.length; i < len; i++) {
       let quickFindField = this.tableConfig().quickFindFields[i];
-      if (i == 0) quickFindFieldsList += 'Searching: ';
       if (i != 0) quickFindFieldsList += ', ';
       quickFindFieldsList += this.tableConfig().propertiesById[quickFindField].name;
 
@@ -309,7 +308,7 @@ let DataTableWithActions = createReactClass({
     );
     if (searchOpen) {
       searchGUI = (
-        <div>
+        <div >
           <Button
             raised="true"
             label="Find text"
@@ -318,14 +317,18 @@ let DataTableWithActions = createReactClass({
             iconName="search"
             iconInverse={true}
           />
+          <div style={{margin: '8px 0'}}>
+            Searchable columns: {quickFindFieldsList}
+          </div>
           <TextField
             fullWidth={true}
-            label="Search"
+            label="Text to find"
             value={searchText}
             onChange={this.handleSearchChange}
             onBlur={this.handleSearchBlur}
+            variant="outlined"
+            style={{margin: '8px 0'}}
           />
-          <div>{quickFindFieldsList}</div>
         </div>
       );
     }
