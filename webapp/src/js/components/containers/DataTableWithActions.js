@@ -20,6 +20,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import Button from 'ui/Button';
 import TextField from '@material-ui/core/TextField';
 import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import SearchIcon from '@material-ui/icons/Search';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -93,16 +95,6 @@ let DataTableWithActions = createReactClass({
           ({id, name, description, icon}) => ({id, name, description, icon}));
       }
     });
-  },
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.searchOpen && this.props.searchText === '') {
-      // Focus the searchField whenever the search is open and there is no searchText,
-      // e.g. when opened from the Finder, or by clicking on the Find Text button.
-      // FIXME: "Warning: Stateless function components cannot be given refs. Attempts to access this ref will fail."
-      // <TextField ref={(input) => { this.searchField = input; }}
-      // this.searchField.focus();
-    }
   },
 
   icon() {
@@ -464,6 +456,12 @@ let DataTableWithActions = createReactClass({
       );
     }
 
+    const searchIconButton = (
+      <IconButton onClick={this.handleSearchOpen}>
+        <SearchIcon fontSize="small" style={{color: 'white'}}/>
+      </IconButton>
+    );
+
     //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
@@ -479,7 +477,7 @@ let DataTableWithActions = createReactClass({
               title={sidebar ? 'Expand' : 'Sidebar'}
             />
             <span className="block text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
-            <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
+            <span className="block text">{searchText !== '' ? 'Search: ' + searchText : searchIconButton}</span>
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
             <span className="block text">{columns !== undefined ? columns.length : 0} of {this.tableConfig().visibleProperties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{pageForwardNav}{shownRowsMessage}</span>
