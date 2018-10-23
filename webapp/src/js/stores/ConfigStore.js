@@ -159,7 +159,7 @@ const ConfigStore = createStore({
         let pk = config.tablesById[table.id].primKey;
         config.cachedTables[table.id].forEach((row) => {
           config.cachedTablesByPrimKey[table.id][row[pk]] = row;
-        })
+        });
       }
     };
     config.tables.forEach(processTable);
@@ -367,7 +367,7 @@ const ConfigStore = createStore({
         for (let i = 0, l = colours.length; i < l; ++i) {
           if (colours[i] === '...') {
             if (i === 0 || i === l - 1) {
-              console.error(`... cannot be used at start or end of colours ${prop.id}`)
+              console.error(`... cannot be used at start or end of colours ${prop.id}`);
             }
             if (!inGap) {
               inGap = true;
