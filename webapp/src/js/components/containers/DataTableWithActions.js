@@ -237,7 +237,7 @@ let DataTableWithActions = createReactClass({
       for (let i = 0, len = this.tableConfig().quickFindFields.length; i < len; i++) {
         let quickFindField = this.tableConfig().quickFindFields[i];
 
-        let newComponent = SQL.WhereClause.CompareFixed(this.tableConfig().propertiesById[quickFindField].id, 'CONTAINS', searchText);
+        let newComponent = SQL.WhereClause.CompareFixed(this.tableConfig().propertiesById[quickFindField].id, 'CONTAINS_CASE_INSENSITIVE', searchText);
 
         if (i === 0) {
           searchQueryUnencoded = newComponent;
