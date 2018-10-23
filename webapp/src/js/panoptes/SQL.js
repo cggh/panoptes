@@ -120,6 +120,15 @@ SQL.WhereClause._fieldComparisonOperators = [
     allowSubstring: true
   },
   {
+    ID: 'CONTAINS_CASE_INSENSITIVE', name: 'Contains case-insensitive',
+    String: true,
+    Create() {
+      return SQL.WhereClause.CompareFixed('', 'CONTAINS_CASE_INSENSITIVE', '');
+    },
+    fieldType: 'value',
+    allowSubstring: true
+  },
+  {
     ID: 'NOTCONTAINS', name: 'Does not contain',
     String: true,
     Create() {
