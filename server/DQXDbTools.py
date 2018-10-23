@@ -325,7 +325,7 @@ class WhereClause:
 
     def _CreateSelectStatementSub_Comparison(self, statm):
         #TODO: check that statm['ColName'] corresponds to a valid column name in the table (to avoid SQL injection)
-        if not(statm['Tpe'] in ['=', '<>', '<', '>', '<=', '>=', '!=', 'LIKE', 'CONTAINS', 'NOTCONTAINS', 'STARTSWITH', 'ISPRESENT', 'ISABSENT', '=FIELD', '<>FIELD', '<FIELD', '>FIELD', 'between', 'ISEMPTYSTR', 'ISNOTEMPTYSTR', '_subset_', '_note_']):
+        if not(statm['Tpe'] in ['=', '<>', '<', '>', '<=', '>=', '!=', 'LIKE', 'CONTAINS', 'CONTAINS_CASE_INSENSITIVE', 'NOTCONTAINS', 'STARTSWITH', 'ISPRESENT', 'ISABSENT', '=FIELD', '<>FIELD', '<FIELD', '>FIELD', 'between', 'ISEMPTYSTR', 'ISNOTEMPTYSTR', '_subset_', '_note_']):
             raise Exception("Invalid comparison statement {0}".format(statm['Tpe']))
 
         processed = False
@@ -444,11 +444,20 @@ class WhereClause:
             if operatorstr == 'STARTSWITH':
                 operatorstr = 'LIKE'
                 decoval = '{0}%'.format(decoval)
-            self.querystring += DBCOLESC(statm['ColName']) + ' '+ToSafeIdentifier(operatorstr)+' '
-            self.querystring_params += '{0} {1} {2}'.format(
-                DBCOLESC(statm['ColName']),
-                ToSafeIdentifier(operatorstr),
-                self.ParameterPlaceHolder)
+            if operatorstr == 'CONTAINS_CASE_INSENSITIVE':
+                operatorstr = 'LIKE'
+                decoval = '%{0}%'.format(decoval)
+                self.querystring += DBCOLESC(statm['ColName']) + ' ' + ToSafeIdentifier(operatorstr) + ' '
+                self.querystring_params += '{0} {1} {2}'.format(
+                    'UPPER(' + DBCOLESC(statm['ColName']) + ')',
+                    ToSafeIdentifier(operatorstr),
+                    'UPPER(' + self.ParameterPlaceHolder) + ')'
+            else:
+                self.querystring += DBCOLESC(statm['ColName']) + ' ' + ToSafeIdentifier(operatorstr) + ' '
+                self.querystring_params += '{0} {1} {2}'.format(
+                    DBCOLESC(statm['ColName']),
+                    ToSafeIdentifier(operatorstr),
+                    self.ParameterPlaceHolder)
             needquotes = (type(decoval) is not float) and (type(decoval) is not int) and (type(decoval) is not bool)
             needstring = type(decoval) is not bool
             if needquotes:
