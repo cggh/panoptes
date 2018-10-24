@@ -161,7 +161,7 @@ let QueryPicker = createReactClass({
           transitions={false}
           touch={false}
           sidebar={(
-            <div className="sidebar" style={{width: '348px'}}>
+            <div className="sidebar" style={{width: '348px', marginTop: '8px'}}>
               <SidebarHeader icon={this.icon()} description={'Filters can be used to show only the rows that meet specific criteria.'}/>
               <StoredTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
               <Divider/>
