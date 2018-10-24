@@ -346,6 +346,15 @@
   // placeholder
 }
 
+.sidebar-toggle {
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #FFFFFF;
+  color: $primary-color;
+  box-shadow: $z-1-shadow;
+}
+
 .stack {
   display: flex;
   width: 100%;
