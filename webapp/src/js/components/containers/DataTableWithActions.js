@@ -20,6 +20,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import Button from 'ui/Button';
 import TextField from '@material-ui/core/TextField';
 import Divider from '@material-ui/core/Divider';
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 
@@ -479,11 +481,9 @@ let DataTableWithActions = createReactClass({
         sidebar={sidebarContent}>
         <div className="vertical stack">
           <div className="top-bar">
-            <Icon className="pointer icon"
-              name={sidebar ? 'arrow-left' : 'bars'}
-              onClick={() => setProps({sidebar: !sidebar})}
-              title={sidebar ? 'Expand' : 'Sidebar'}
-            />
+            <div onClick={() => setProps({sidebar: !sidebar})} className="sidebar-toggle" title={sidebar ? 'Collapse side-panel' : 'Expand side-panel'}>
+              {sidebar ? <ArrowLeftIcon/> : <ArrowRightIcon/>}
+            </div>
             <span className="block text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">{searchText !== '' ? 'Search: ' + searchText : searchIconButton}</span>
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
