@@ -226,6 +226,15 @@ let DataTableWithActions = createReactClass({
     this.getFlux().actions.session.modalClose();
   },
 
+  handleOpenColumnPicker() {
+    this.getFlux().actions.session.modalOpen(<GroupedItemPicker
+      groups={this.propertyGroups}
+      initialPick={this.props.columns}
+      title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
+      onPick={(columns) => this.handleColumnChange(columns)}
+    />)
+  },
+
   getDefinedQuery(query, table) {
     return (query || this.props.query) ||
       ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
@@ -280,12 +289,21 @@ let DataTableWithActions = createReactClass({
   },
 
   orderDescriptionString(order) {
-    if (order.length === 0) {
-      return 'None';
-    }
-    return _map(order, ([dir, column]) =>
-      `${this.tableConfig().propertiesById[column].name} ${dir === 'asc' ? 'asc' : 'desc'}`)
-      .join(', ');
+    return order.map(([dir, column]) => {
+      const isNumerical = this.tableConfig().propertiesById[column].isNumerical;
+      return (
+        <span key={`order_${this.tableConfig().propertiesById[column].name}`}>
+          {this.tableConfig().propertiesById[column].name}
+          &#160;
+          {
+            dir === 'asc' ?
+              (isNumerical ? <span>0&#8594;9</span> : <span>A&#8594;Z</span>)
+              :
+              (isNumerical ? <span>9&#8594;0</span> : <span>Z&#8594;A</span>)
+          }
+        </span>
+      );
+    }).reduce((previous, current) => [previous, ', ', current]);
   },
 
   render() {
@@ -361,12 +379,7 @@ let DataTableWithActions = createReactClass({
           <Button
             label={columnPickerLabel}
             color="primary"
-            onClick={() => actions.session.modalOpen(<GroupedItemPicker
-              groups={this.propertyGroups}
-              initialPick={columns}
-              title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
-              onPick={this.handleColumnChange}
-            />)}
+            onClick={() => this.handleOpenColumnPicker()}
             iconName="columns"
           />
           {searchGUI}
@@ -500,10 +513,21 @@ let DataTableWithActions = createReactClass({
       <MuiButton
         onClick={this.handleSearchOpen}
         variant="text"
-        style={{padding: 0, color: 'white'}}
+        style={{padding: '0 8px', color: 'white'}}
       >
         <SearchIcon fontSize="small"/>
         <span style={{textTransform: 'none'}}>{searchText !== '' ? 'Searched: ' + searchText : 'Find'}</span>
+      </MuiButton>
+    );
+
+    const columnsIconButton = (
+      <MuiButton
+        onClick={this.handleOpenColumnPicker}
+        variant="text"
+        style={{padding: '0 8px', color: 'white'}}
+      >
+        <Icon name={'columns'} style={{margin: '0 3px 0 0'}}/>
+        <span style={{textTransform: 'none'}}>{columns !== undefined ? columns.length : 0} of {this.tableConfig().visibleProperties.length} columns</span>
       </MuiButton>
     );
 
@@ -521,8 +545,8 @@ let DataTableWithActions = createReactClass({
             </div>
             {filterIconButton}
             {findIconButton}
-            <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
-            <span className="block text">{columns !== undefined ? columns.length : 0} of {this.tableConfig().visibleProperties.length} columns shown</span>
+            {columnsIconButton}
+            <span className="block text">{order.length === 0 ? 'Unsorted' : <span>Sorted: {this.orderDescriptionString(order)}</span>}</span>
             <span className="block text">{pageBackwardNav}{pageForwardNav}{shownRowsMessage}</span>
           </div>
           <div className="grow">
