@@ -174,6 +174,7 @@ let DataTableWithActions = createReactClass({
   },
 
   handleDownload() {
+    const {searchText} = this.props;
     DataDownloader(
       {
         dataset: this.config.dataset,
@@ -181,7 +182,7 @@ let DataTableWithActions = createReactClass({
         tableConfig: this.tableConfig(),
         rowsCount: this.state.totalRowsCount,
         onLimitBreach: this.handleDownloadLimitBreach,
-        query: this.getDefinedQuery(),
+        query: searchText !== undefined && searchText !== '' ? this.createDataTableQuery() : this.getDefinedQuery(),
         columns: this.props.columns,
         order: this.props.order
       }
@@ -217,7 +218,7 @@ let DataTableWithActions = createReactClass({
 
   createDataTableQuery() {
 
-    let {searchText} = this.props;
+    const {searchText} = this.props;
 
     // If there is searchText, then add the searchQuery to the base query, to form the dataTableQuery.
     let dataTableQuery = this.getDefinedQuery();
