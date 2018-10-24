@@ -22,7 +22,6 @@ import TextField from '@material-ui/core/TextField';
 import Divider from '@material-ui/core/Divider';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
-import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import MuiButton from '@material-ui/core/Button';
 
@@ -199,6 +198,7 @@ let DataTableWithActions = createReactClass({
   },
 
   handleSearchOpen() {
+    this.props.setProps({sidebar: true});
     this.setState({searchOpen: true});
   },
 
@@ -211,6 +211,19 @@ let DataTableWithActions = createReactClass({
     if (event.target.value === '') {
       this.setState({searchOpen: false});
     }
+  },
+
+  handleOpenQueryPicker() {
+    this.getFlux().actions.session.modalOpen(<QueryPicker
+      table={this.props.table}
+      initialQuery={this.getDefinedQuery()}
+      onPick={(query) => this.handleCloseQueryPickerAndSetQuery(query)}
+    />);
+  },
+
+  handleCloseQueryPickerAndSetQuery(query) {
+    this.props.setProps({query});
+    this.getFlux().actions.session.modalClose();
   },
 
   getDefinedQuery(query, table) {
@@ -304,7 +317,7 @@ let DataTableWithActions = createReactClass({
     );
     if (searchOpen) {
       searchGUI = (
-        <div>
+        <div style={{margin: '0 18px'}}>
           <Button
             raised="true"
             label="Find text"
@@ -467,22 +480,30 @@ let DataTableWithActions = createReactClass({
         </span>
       );
     }
-    const searchIconButton = (
-      <IconButton onClick={this.handleSearchOpen}>
-        <SearchIcon fontSize="small" style={{color: 'white'}}/>
-      </IconButton>
+
+
+    const definedQuery = this.getDefinedQuery();
+    const noFilter = SQL.WhereClause.decode(definedQuery).isTrivial;
+
     const filterIconButton = (
       <MuiButton
-        onClick={() => this.getFlux().actions.session.modalOpen(<QueryPicker
-          table={table}
-          initialQuery={this.getDefinedQuery()}
-          onPick={this.handleQueryPick}
-        />)}
+        onClick={this.handleOpenQueryPicker}
         variant="text"
-        style={{padding: 0}}
+        style={{padding: '0 8px', color: 'white'}}
       >
-        <Icon name={'filter'}/>
-        <span style={{textTransform: 'none', color: 'white'}}>Filter</span>
+        <Icon name={'filter'} style={{margin: '0 3px 0 0'}}/>
+        <span style={{textTransform: 'none'}}>{noFilter ? 'Filter' : <QueryString prefix="Filtered: " table={table} query={definedQuery}/>}</span>
+      </MuiButton>
+    );
+
+    const findIconButton = (
+      <MuiButton
+        onClick={this.handleSearchOpen}
+        variant="text"
+        style={{padding: 0, color: 'white'}}
+      >
+        <SearchIcon fontSize="small"/>
+        <span style={{textTransform: 'none'}}>{searchText !== '' ? 'Searched: ' + searchText : 'Find'}</span>
       </MuiButton>
     );
 
@@ -498,14 +519,8 @@ let DataTableWithActions = createReactClass({
             <div onClick={() => setProps({sidebar: !sidebar})} className="sidebar-toggle" title={sidebar ? 'Collapse side-panel' : 'Expand side-panel'}>
               {sidebar ? <ArrowLeftIcon/> : <ArrowRightIcon/>}
             </div>
-            <Icon className="pointer icon"
-              name={sidebar ? 'arrow-left' : 'bars'}
-              onClick={() => setProps({sidebar: !sidebar})}
-              title={sidebar ? 'Expand' : 'Sidebar'}
-            />
-            <span className="block text">{filterIconButton}</span>
-            <span className="block text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
-            <span className="block text">{searchText !== '' ? 'Search: ' + searchText : searchIconButton}</span>
+            {filterIconButton}
+            {findIconButton}
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
             <span className="block text">{columns !== undefined ? columns.length : 0} of {this.tableConfig().visibleProperties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{pageForwardNav}{shownRowsMessage}</span>
