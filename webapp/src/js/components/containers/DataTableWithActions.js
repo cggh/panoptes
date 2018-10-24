@@ -24,6 +24,7 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
+import MuiButton from '@material-ui/core/Button';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -40,6 +41,7 @@ import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import FilterButton from 'panoptes/FilterButton';
 import PivotTableWithActions from 'containers/PivotTableWithActions';
 import TablePlotActions from 'components/TablePlotActions';
+import QueryPicker from 'containers/QueryPicker';
 
 let DataTableWithActions = createReactClass({
   displayName: 'DataTableWithActions',
@@ -465,11 +467,23 @@ let DataTableWithActions = createReactClass({
         </span>
       );
     }
-
     const searchIconButton = (
       <IconButton onClick={this.handleSearchOpen}>
         <SearchIcon fontSize="small" style={{color: 'white'}}/>
       </IconButton>
+    const filterIconButton = (
+      <MuiButton
+        onClick={() => this.getFlux().actions.session.modalOpen(<QueryPicker
+          table={table}
+          initialQuery={this.getDefinedQuery()}
+          onPick={this.handleQueryPick}
+        />)}
+        variant="text"
+        style={{padding: 0}}
+      >
+        <Icon name={'filter'}/>
+        <span style={{textTransform: 'none', color: 'white'}}>Filter</span>
+      </MuiButton>
     );
 
     //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
@@ -484,6 +498,12 @@ let DataTableWithActions = createReactClass({
             <div onClick={() => setProps({sidebar: !sidebar})} className="sidebar-toggle" title={sidebar ? 'Collapse side-panel' : 'Expand side-panel'}>
               {sidebar ? <ArrowLeftIcon/> : <ArrowRightIcon/>}
             </div>
+            <Icon className="pointer icon"
+              name={sidebar ? 'arrow-left' : 'bars'}
+              onClick={() => setProps({sidebar: !sidebar})}
+              title={sidebar ? 'Expand' : 'Sidebar'}
+            />
+            <span className="block text">{filterIconButton}</span>
             <span className="block text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">{searchText !== '' ? 'Search: ' + searchText : searchIconButton}</span>
             <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
