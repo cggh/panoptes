@@ -227,12 +227,19 @@ let DataTableWithActions = createReactClass({
   },
 
   handleOpenColumnPicker() {
+
+    let {columns} = this.props;
+    if (!columns) {
+      columns = _filter(this.tableConfig().visibleProperties, (prop) => prop.showByDefault);
+      columns = _map(columns, (prop) => prop.id);
+    }
+
     this.getFlux().actions.session.modalOpen(<GroupedItemPicker
       groups={this.propertyGroups}
-      initialPick={this.props.columns}
+      initialPick={columns}
       title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
       onPick={(columns) => this.handleColumnChange(columns)}
-    />)
+    />);
   },
 
   getDefinedQuery(query, table) {
@@ -308,7 +315,6 @@ let DataTableWithActions = createReactClass({
 
   render() {
 
-    let actions = this.getFlux().actions;
     let {table, columns, columnWidths, order, sidebar, setProps, searchText, maxRowsPerPage} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
     if (!columns) {
@@ -379,7 +385,7 @@ let DataTableWithActions = createReactClass({
           <Button
             label={columnPickerLabel}
             color="primary"
-            onClick={() => this.handleOpenColumnPicker()}
+            onClick={this.handleOpenColumnPicker}
             iconName="columns"
           />
           {searchGUI}
