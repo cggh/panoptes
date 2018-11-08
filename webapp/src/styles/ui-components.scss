@@ -315,6 +315,7 @@
   justify-content: space-between;
   align-items: flex-start;
   align-content: flex-start;
+  margin-top: 10px; // In core colours, prevents collision with element above.
   .icon-holder {
     order: 0;
     flex-basis: auto;
