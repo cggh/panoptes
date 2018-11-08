@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import ReactDOMServer from 'react-dom/server'
 import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
 
 // Lodash
-import _throttle from 'lodash.throttle';
 import _cloneDeep from 'lodash.clonedeep';
 import _some from 'lodash.some';
 import _forEach from 'lodash.foreach';
@@ -39,9 +39,7 @@ import DetectResize from 'utils/DetectResize';
 const MAX_COLOR = Color('#44aafb');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
-const SCROLLBAR_HEIGHT = 15;
-
-const MEASURED_COLUMN_WIDTHS = {};
+const PREDEFINED_COLUMN_WIDTH = 90;
 
 let DataTableView = createReactClass({
   displayName: 'DataTableView',
@@ -60,6 +58,7 @@ let DataTableView = createReactClass({
     startRowIndex: PropTypes.number,
     columns: PropTypes.array,
     columnWidths: PropTypes.object,
+    initialColumnWidthMode: PropTypes.string, // Defaults to 'maxVal-or-pc90Len'. Alternative is 'PropertyHeader' to use calculated heading-width.
     onColumnResize: PropTypes.func,
     onOrderChange: PropTypes.func,
     onShowableRowsCountChange: PropTypes.func,
@@ -80,7 +79,8 @@ let DataTableView = createReactClass({
       order: [],
       startRowIndex: 0,
       columns: [],
-      columnWidths: {}
+      columnWidths: {},
+      initialColumnWidthMode: 'maxVal-or-pc90Len',
     };
   },
 
@@ -91,12 +91,13 @@ let DataTableView = createReactClass({
       width: 0,
       height: 0,
       showableRowsCount: 0,
-      totalRowsCount: 0
+      totalRowsCount: 0,
+      definedColumnWidths: undefined,
     };
   },
 
   componentDidMount() {
-    this.setShowableRows = _throttle(this.setShowableRows, 500);
+    this.calcColumnWidths();
   },
 
   icon() {
@@ -212,11 +213,6 @@ let DataTableView = createReactClass({
 
   handleResize(size) {
     this.setState(size);
-    this.setShowableRows(size);
-  },
-
-  setShowableRows(size) {
-    this.setState({showableRowsCount: size.height ? Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) : 0});
   },
 
   componentDidUpdate(prevProps, prevState) {
@@ -230,58 +226,138 @@ let DataTableView = createReactClass({
     if (this.props.onTotalRowsCountChange && prevState.totalRowsCount !== this.state.totalRowsCount) {
       this.props.onTotalRowsCountChange(this.state.totalRowsCount);
     }
+
+    if (this.state.definedColumnWidths === undefined) {
+      this.calcColumnWidths();
+    }
+
   },
 
-  calcColumnWidthPx(column) {
-    let {columnWidths} = this.props;
-    // If a pixel width for this column is in the props, use that.
-    if (columnWidths[column]) {
-      return columnWidths[column];
+  calcColumnWidths() {
+
+    const {columns, columnWidths, initialColumnWidthMode} = this.props;
+    const {definedColumnWidths} = this.state;
+
+    if (definedColumnWidths !== undefined) {
+      return;
     }
 
-    let columnData = this.propertiesByColumn(column);
+    let calculatedColumnWidths = {};
+    for (let columnIndex = 0, columnCount = columns.length; columnIndex < columnCount; columnIndex++) {
+      const column = columns[columnIndex];
+      const columnData = this.propertiesByColumn(column);
 
-    // If a pixel width for this column is in the config, use that.
-    if (columnData.defaultWidth) {
-      return columnData.defaultWidth;
+      // If a pixel-width for this column is in the props, use that.
+      if (columnWidths[column]) {
+        calculatedColumnWidths[columnData.tableId] = calculatedColumnWidths[columnData.tableId] || {};
+        calculatedColumnWidths[columnData.tableId][columnData.id] = columnWidths[column];
+        continue;
+      }
+
+      // If a pixel-width for this column is in the config, use that.
+      if (columnData.defaultWidth) {
+        calculatedColumnWidths[columnData.tableId] = calculatedColumnWidths[columnData.tableId] || {};
+        calculatedColumnWidths[columnData.tableId][columnData.id] = columnData.defaultWidth;
+        continue;
+      }
+
+      const {isNumerical, maxVal, pc90Len, externalUrl} = columnData;
+
+      let elementToMeasure = undefined;
+      let elementAdditionalWidthPx = undefined;
+      let textToMeasure = undefined;
+
+      if (initialColumnWidthMode === 'maxVal-or-pc90Len') {
+
+        if (isNumerical && maxVal === undefined) {
+          console.error('initialColumnWidthMode is maxVal-or-pc90Len and column isNumerical but maxVal is undefined for column', column);
+          break;
+        }
+
+        if (!isNumerical && pc90Len === undefined) {
+          console.error('initialColumnWidthMode is maxVal-or-pc90Len and column !isNumerical but pc90Len is undefined for column', column);
+          break;
+        }
+
+
+        if (document.getElementsByClassName('table-row-cell') === undefined || document.getElementsByClassName('table-row-cell').length === 0) {
+          // table-row-cell is not available (yet) to measure.
+          break;
+        }
+
+        // Assuming all cells are equal, get the first one.
+        elementToMeasure = document.getElementsByClassName('table-row-cell')[0];
+
+        // TODO: Sync with CSS (.table-row-cell)
+        // Firefox needs an extra 3px compared to Chrome.
+        elementAdditionalWidthPx = 20 + 3 + (externalUrl !== undefined ? 14 : 0);
+
+        if (isNumerical && maxVal !== undefined) {
+
+          const maxValText = '-' + '8'.repeat(maxVal.toString().length);
+          // Incorporate the changes from PropertyCell's formatting
+          const maxValTextRendered = ReactDOMServer.renderToString(<PropertyCell prop={columnData} value={maxValText} flux={this.getFlux()}/>);
+          let virtualElement = document.createElement('div');
+          virtualElement.innerHTML = maxValTextRendered;
+          textToMeasure = virtualElement.textContent || virtualElement.innerText;
+
+        } else if (!isNumerical && pc90Len !== undefined) {
+
+          const pc90Text = 'M' + 'm'.repeat(pc90Len - 1);
+          // Incorporate the changes from PropertyCell's formatting
+          const pc90TextRendered = ReactDOMServer.renderToString(<PropertyCell prop={columnData} value={pc90Text} flux={this.getFlux()}/>);
+          let virtualElement = document.createElement('div');
+          virtualElement.innerHTML = pc90TextRendered;
+          textToMeasure = virtualElement.textContent || virtualElement.innerText;
+
+        } else {
+          console.error('initialColumnWidthMode is maxVal-or-pc90Len but unexpected logic branch for column', column);
+          break;
+        }
+
+
+      } else if (initialColumnWidthMode === 'PropertyHeader') {
+
+        elementToMeasure = document.getElementById(`PropertyHeader_${column}`);
+
+        // NB: Needs to allow for
+        // left-padding (5px)
+        // + sort icon (20px)
+        // + info icon (20px) (if set on this column)
+        // + columnResizerContainer(6px, inc. columnResizerKnob (4px))
+        elementAdditionalWidthPx = 5 + 20 + 6 + (columnData.description ? 20 : 0);
+
+      } else {
+        console.error('Unhandled initialColumnWidthMode', initialColumnWidthMode);
+        break;
+      }
+
+      if (elementToMeasure !== undefined && elementToMeasure !== null) {
+
+        // NB: This method is not supported by IE < v9.0
+        // Also used in GenotypesTable.js
+
+        const element = elementToMeasure.getElementsByClassName('label')[0];
+        const elementStyles = window.getComputedStyle(element);
+        let canvas2dContext = this.canvas2dContext || (this.canvas2dContext = document.createElement('canvas').getContext('2d'));
+        // NB: syntax [font style][font weight][font size][font face]
+        canvas2dContext.font = `${elementStyles['fontStyle']} ${elementStyles['fontWeight']} ${elementStyles['fontSize']} "${elementStyles['fontFamily']}"`;
+        const columnWidthPx = Math.ceil(canvas2dContext.measureText(textToMeasure).width) + elementAdditionalWidthPx;
+        calculatedColumnWidths[columnData.tableId] = calculatedColumnWidths[columnData.tableId] || {};
+        calculatedColumnWidths[columnData.tableId][columnData.id] = columnWidthPx;
+      }
+
     }
 
-    if (MEASURED_COLUMN_WIDTHS[columnData.tableId] && MEASURED_COLUMN_WIDTHS[columnData.tableId][columnData.id]) {
-      return MEASURED_COLUMN_WIDTHS[columnData.tableId][columnData.id];
+    if (Object.keys(calculatedColumnWidths).length !== 0) {
+      // https://reactjs.org/docs/react-component.html "You may call setState() immediately in componentDidMount(). [...] necessary for cases like modals and tooltips when you need to measure a DOM node before rendering something that depends on its size or position."
+      this.setState({definedColumnWidths: calculatedColumnWidths});
     }
-    // NB: Columns need to be initialized with at least a non-null.
-    let columnWidthPx = 0;
-
-    // NB: Needs to allow for
-    // sort icon (20px)
-    // + info icon (20px) (if set on this column)
-    // + columnResizerContainer(6px, inc. columnResizerKnob (4px))
-    let paddingWidthPx = 26 + (columnData.description ? 20 : 0);
-
-    // NB: This method is not supported by IE < v9.0
-    // Also used in GenotypesTable.js
-
-    let propertyHeaderElementId = `PropertyHeader_${column}`;
-    let propertyHeaderElement = document.getElementById(propertyHeaderElementId);
-
-    if (propertyHeaderElement !== undefined && propertyHeaderElement !== null) {
-
-      let propertyHeaderTextElement = propertyHeaderElement.getElementsByClassName('label')[0];
-      let propertyHeaderTextElementStyles = window.getComputedStyle(propertyHeaderTextElement);
-      let canvas2dContext = this.canvas2dContext || (this.canvas2dContext = document.createElement('canvas').getContext('2d'));
-      // NB: syntax [font style][font weight][font size][font face]
-      canvas2dContext.font = `${propertyHeaderTextElementStyles['fontStyle']} ${propertyHeaderTextElementStyles['fontWeight']} ${propertyHeaderTextElementStyles['fontSize']} "${propertyHeaderTextElementStyles['fontFamily']}"`;
-      columnWidthPx = Math.ceil(canvas2dContext.measureText(columnData.name).width) + paddingWidthPx;
-      MEASURED_COLUMN_WIDTHS[columnData.tableId] = MEASURED_COLUMN_WIDTHS[columnData.tableId] || {};
-      MEASURED_COLUMN_WIDTHS[columnData.tableId][columnData.id] = columnWidthPx;
-    }
-
-    return columnWidthPx;
   },
 
   render() {
-    let {className, columns, order, table} = this.props;
-    let {loadStatus, rows, width, height} = this.state;
+    const {className, columns, order, table} = this.props;
+    const {loadStatus, rows, width, height, definedColumnWidths} = this.state;
 
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -307,12 +383,11 @@ let DataTableView = createReactClass({
 
                 let columnData = this.propertiesByColumn(column);
                 let {id, isPrimKey} = columnData;
-                let colTable = columnData.tableId;
                 let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
                 let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
                 return (
                   <Column
-                    width={this.calcColumnWidthPx(column)}
+                    width={definedColumnWidths !== undefined ? definedColumnWidths[columnData.tableId][columnData.id] : PREDEFINED_COLUMN_WIDTH}
                     key={column}
                     columnKey={column}
                     fixed={isPrimKey}
@@ -328,7 +403,6 @@ let DataTableView = createReactClass({
                           'sort-column-ascending': asc,
                           'sort-column-descending': desc
                         })}
-                        style={{width: this.calcColumnWidthPx(column)}}
                         table={table}
                         propId={column}
                         onClick={() => this.handleOrderChange(column)}
@@ -344,7 +418,7 @@ let DataTableView = createReactClass({
                       let background = 'inherit';
                       let {maxVal, minVal, valueColours, showBar, alignment} = columnData;
                       //Qualify foreign names
-                      let cellData = rows[rowIndex][colTable === table ? id : `${colTable}.${id}`];
+                      let cellData = rows[rowIndex][columnData.tableId === table ? id : `${columnData.tableId}.${id}`];
                       if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                         cellData = parseFloat(cellData);
                         let percent = 100 * (cellData - minVal) / (maxVal - minVal);
@@ -368,7 +442,6 @@ let DataTableView = createReactClass({
                         <div className="table-row-cell"
                           style={{
                             textAlign: alignment,
-                            width: this.calcColumnWidthPx(column),
                             height: `${ROW_HEIGHT}px`,
                             background
                           }}>
