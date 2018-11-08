@@ -57,7 +57,7 @@ let PropertyCell = createReactClass({
       content = refs.map((ref, index) => (
         <span key={index}>
           {index === 0 ? externalLinkIcon : null}
-          <a target="_blank" href={prop.externalUrl.replace('{value}', ref)}>
+          <a target="_blank" rel="noopener noreferrer" href={prop.externalUrl.replace('{value}', ref)}>
             {ref}
           </a>
           {index < refs.length - 1 ? ', ' : null}
