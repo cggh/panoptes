@@ -92,7 +92,7 @@ let DataTableView = createReactClass({
       height: 0,
       showableRowsCount: 0,
       totalRowsCount: 0,
-      definedColumnWidths: undefined,
+      calculatedColumnWidths: undefined,
     };
   },
 
@@ -226,8 +226,7 @@ let DataTableView = createReactClass({
     if (this.props.onTotalRowsCountChange && prevState.totalRowsCount !== this.state.totalRowsCount) {
       this.props.onTotalRowsCountChange(this.state.totalRowsCount);
     }
-
-    if (this.state.definedColumnWidths === undefined) {
+    if (this.state.calculatedColumnWidths === undefined) {
       this.calcColumnWidths();
     }
 
@@ -235,32 +234,17 @@ let DataTableView = createReactClass({
 
   calcColumnWidths() {
 
-    const {columns, columnWidths, initialColumnWidthMode} = this.props;
-    const {definedColumnWidths} = this.state;
+    const {columns, initialColumnWidthMode} = this.props;
+    const {calculatedColumnWidths} = this.state;
 
-    if (definedColumnWidths !== undefined) {
+    if (calculatedColumnWidths !== undefined) {
       return;
     }
 
-    let calculatedColumnWidths = {};
+    let calculatingColumnWidths = {};
     for (let columnIndex = 0, columnCount = columns.length; columnIndex < columnCount; columnIndex++) {
       const column = columns[columnIndex];
       const columnData = this.propertiesByColumn(column);
-
-      // If a pixel-width for this column is in the props, use that.
-      if (columnWidths[column]) {
-        calculatedColumnWidths[columnData.tableId] = calculatedColumnWidths[columnData.tableId] || {};
-        calculatedColumnWidths[columnData.tableId][columnData.id] = columnWidths[column];
-        continue;
-      }
-
-      // If a pixel-width for this column is in the config, use that.
-      if (columnData.defaultWidth) {
-        calculatedColumnWidths[columnData.tableId] = calculatedColumnWidths[columnData.tableId] || {};
-        calculatedColumnWidths[columnData.tableId][columnData.id] = columnData.defaultWidth;
-        continue;
-      }
-
       const {isNumerical, maxVal, pc90Len, externalUrl} = columnData;
 
       let elementToMeasure = undefined;
@@ -283,6 +267,7 @@ let DataTableView = createReactClass({
 
         if (document.getElementsByClassName('table-row-cell') === undefined || document.getElementsByClassName('table-row-cell').length === 0) {
           // table-row-cell is not available (yet) to measure.
+          calculatingColumnWidths = {}; // Invalidate any knowns gathered so far.
           break;
         }
 
@@ -344,21 +329,21 @@ let DataTableView = createReactClass({
         // NB: syntax [font style][font weight][font size][font face]
         canvas2dContext.font = `${elementStyles['fontStyle']} ${elementStyles['fontWeight']} ${elementStyles['fontSize']} "${elementStyles['fontFamily']}"`;
         const columnWidthPx = Math.ceil(canvas2dContext.measureText(textToMeasure).width) + elementAdditionalWidthPx;
-        calculatedColumnWidths[columnData.tableId] = calculatedColumnWidths[columnData.tableId] || {};
-        calculatedColumnWidths[columnData.tableId][columnData.id] = columnWidthPx;
+        calculatingColumnWidths[columnData.tableId] = calculatingColumnWidths[columnData.tableId] || {};
+        calculatingColumnWidths[columnData.tableId][columnData.id] = columnWidthPx;
       }
 
     }
 
-    if (Object.keys(calculatedColumnWidths).length !== 0) {
+    if (Object.keys(calculatingColumnWidths).length !== 0) {
       // https://reactjs.org/docs/react-component.html "You may call setState() immediately in componentDidMount(). [...] necessary for cases like modals and tooltips when you need to measure a DOM node before rendering something that depends on its size or position."
-      this.setState({definedColumnWidths: calculatedColumnWidths});
+      this.setState({calculatedColumnWidths: calculatingColumnWidths});
     }
   },
 
   render() {
-    const {className, columns, order, table} = this.props;
-    const {loadStatus, rows, width, height, definedColumnWidths} = this.state;
+    const {className, columns, columnWidths, order, table} = this.props;
+    const {loadStatus, rows, width, height, calculatedColumnWidths} = this.state;
 
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -386,9 +371,17 @@ let DataTableView = createReactClass({
                 let {id, isPrimKey} = columnData;
                 let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
                 let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
+                let columnWidth = PREDEFINED_COLUMN_WIDTH;
+                if (columnWidths[column] !== undefined) {
+                  columnWidth = columnWidths[column];
+                } else if (columnData.defaultWidth !== undefined) {
+                  columnWidth = columnData.defaultWidth;
+                } else if (calculatedColumnWidths !== undefined) {
+                  columnWidth = calculatedColumnWidths[columnData.tableId][columnData.id];
+                }
                 return (
                   <Column
-                    width={definedColumnWidths !== undefined ? definedColumnWidths[columnData.tableId][columnData.id] : PREDEFINED_COLUMN_WIDTH}
+                    width={columnWidth}
                     key={column}
                     columnKey={column}
                     fixed={isPrimKey}
