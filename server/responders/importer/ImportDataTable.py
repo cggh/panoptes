@@ -62,6 +62,9 @@ class ImportDataTable(BaseImport):
                 if 'maxVal' not in prop and prop['dataType'] in valueTypes:
                     result['maxVal'] = \
                     encode(self._dao._execSqlQuery('select max("{0}") from "{1}"'.format(prop_id, table_id))[0][0])
+                if 'pc90Len' not in prop and prop['dataType'] not in valueTypes:
+                    # Not using for valueTypes because 0.00000001 might be reformatted (e.g. for display) as 0.00
+                    result['pc90Len'] = encode(self._dao._execSqlQuery('select sys.quantile(length("{0}"),0.9) from "{1}" where "{0}" is not null'.format(prop_id, table_id))[0][0])
                 if 'minVal' not in prop and prop['dataType'] in valueTypes:
                     result['minVal'] = \
                     encode(self._dao._execSqlQuery('select min("{0}") from "{1}"'.format(prop_id, table_id))[0][0])
