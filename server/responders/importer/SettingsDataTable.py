@@ -457,7 +457,7 @@ containing the relative size of that specific pie'''
                                                            }),
                                                 ('pc90Len', {
                                                            'type': 'Value',
-                                                           'required': True,
+                                                           'required': False,
                                                            'description': 'Value used for 90th percentile character-length'
                                                            }),
                                                 ('blockSizeMin', {
