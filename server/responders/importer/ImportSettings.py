@@ -154,14 +154,19 @@ class ImportSettings:
                             ('minVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'Set automatically from data unless overridden. For *Value* types, upper extent of scale',
+                                   'description': 'Set automatically from data unless overridden. For *Value* types, lower extent of scale',
                                    'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
                                    }),
                             ('maxVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'Set automatically from data unless overridden. For *Value* types, lower extent of scale',
+                                   'description': 'Set automatically from data unless overridden. For *Value* types, upper extent of scale',
                                    'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
+                                   }),
+                            ('pc90Len', {
+                                   'type': 'Value',
+                                   'required': False,
+                                   'description': 'Set automatically from data unless overridden. For non-*Value* types, the 90th percentile character-length.',
                                    }),
                             ('decimDigits', {
                                    'type': 'Value',

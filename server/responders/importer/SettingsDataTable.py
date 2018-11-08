@@ -455,6 +455,11 @@ containing the relative size of that specific pie'''
                                                            'required': True,
                                                            'description': 'Value used for upper extent of scales'
                                                            }),
+                                                ('pc90Len', {
+                                                           'type': 'Value',
+                                                           'required': True,
+                                                           'description': 'Value used for 90th percentile character-length'
+                                                           }),
                                                 ('blockSizeMin', {
                                                              'type': 'Value',
                                                              'required': True,
