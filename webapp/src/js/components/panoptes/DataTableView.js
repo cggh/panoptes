@@ -245,7 +245,7 @@ let DataTableView = createReactClass({
     for (let columnIndex = 0, columnCount = columns.length; columnIndex < columnCount; columnIndex++) {
       const column = columns[columnIndex];
       const columnData = this.propertiesByColumn(column);
-      const {isNumerical, maxVal, pc90Len, externalUrl} = columnData;
+      const {isNumerical, maxVal, pc90Len, externalUrl, isBoolean} = columnData;
 
       let elementToMeasure = undefined;
       let elementAdditionalWidthPx = undefined;
@@ -264,7 +264,6 @@ let DataTableView = createReactClass({
           break;
         }
 
-
         if (document.getElementsByClassName('table-row-cell') === undefined || document.getElementsByClassName('table-row-cell').length === 0) {
           // table-row-cell is not available (yet) to measure.
           calculatingColumnWidths = {}; // Invalidate any knowns gathered so far.
@@ -276,7 +275,8 @@ let DataTableView = createReactClass({
 
         // TODO: Sync with CSS (.table-row-cell)
         // Firefox needs an extra 3px compared to Chrome.
-        elementAdditionalWidthPx = 20 + 3 + (externalUrl !== undefined ? 14 : 0);
+        // NOTE: <Column> has minWidth={50}, which applies to manual resizing.
+        elementAdditionalWidthPx = 20 + 3 + (externalUrl !== undefined ? 14 : 0) + (isBoolean ? 27 : 0);
 
         if (isNumerical && maxVal !== undefined) {
 
