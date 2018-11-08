@@ -276,6 +276,7 @@ let DataTableView = createReactClass({
 
         if (!isNumerical && pc90Len === undefined) {
           console.error('initialColumnWidthMode is maxVal-or-pc90Len and column !isNumerical but pc90Len is undefined for column', column);
+          console.info('pc90Len is set by import');
           break;
         }
 
