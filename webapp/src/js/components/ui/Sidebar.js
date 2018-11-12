@@ -36,7 +36,6 @@ const defaultStyles = {
     left: 0,
     right: 0,
     bottom: 0,
-    overflow: 'auto',
     transition: 'left .3s ease-out, right .3s ease-out',
   },
   overlay: {
