@@ -24,13 +24,13 @@ let PercentMatching = createReactClass({
     childDenominatorProp: PropTypes.string,
     children: PropTypes.node,
     all: PropTypes.number, // Supplied by withAPIData
-    matching: PropTypes.number, // Supplied by withAPIData
+    matching: PropTypes.number, // Supplied by withAPIDataper
   },
 
   getDefaultProps() {
     return {
-      numquery: SQL.nullQuery,
-      domQuery: PropTypes.string,
+      numQuery: SQL.nullQuery,
+      domQuery: SQL.nullQuery,
       childNumeratorProp: 'numerator',
       childDenominatorProp: 'denominator',
     };
