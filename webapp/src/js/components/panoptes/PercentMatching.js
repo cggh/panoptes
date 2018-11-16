@@ -29,8 +29,8 @@ let PercentMatching = createReactClass({
 
   getDefaultProps() {
     return {
-      numquery: SQL.nullQuery,
-      domQuery: PropTypes.string,
+      numQuery: SQL.nullQuery,
+      domQuery: SQL.nullQuery,
       childNumeratorProp: 'numerator',
       childDenominatorProp: 'denominator',
     };
