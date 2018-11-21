@@ -405,7 +405,7 @@ let MuiDataTableView = createReactClass({
                   >
                     {groupOrderedColumns.map((column, columnIndex) => {
                       const columnData = this.propertiesByColumn(column);
-                      let {maxVal, minVal, alignment, valueColours, showBar} = columnData;
+                      let {maxVal, minVal, alignment, valueColours, showBar, showBackgroundColour} = columnData;
                       let cellData = row[columnData.id];
 
                       let background = 'inherit';
@@ -413,7 +413,7 @@ let MuiDataTableView = createReactClass({
                         cellData = parseFloat(cellData);
                         let percent = 100 * (cellData - minVal) / (maxVal - minVal);
                         background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
-                      } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                      } else if (showBackgroundColour && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                         let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
                         background = Color(MAX_COLOR).lighten(0.3 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).string();
                       }
