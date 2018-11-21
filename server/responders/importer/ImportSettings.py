@@ -151,6 +151,12 @@ class ImportSettings:
                                    'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *minVal* & *maxVal* to be defined.',
                                    'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
                                    }),
+                            ('showBackgroundColour', {
+                                   'type': 'Boolean',
+                                   'required': False,
+                                   'description': 'Paints a colour in the background of the table cell, indicating the value.\n  Requires *minVal* & *maxVal* to be defined.',
+                                   'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
+                                   }),
                             ('minVal', {
                                    'type': 'Value',
                                    'required': False,
