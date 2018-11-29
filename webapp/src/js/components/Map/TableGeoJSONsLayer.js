@@ -140,7 +140,7 @@ let TableGeoJSONsLayer = createReactClass({
                   weight={geoJSON.weight}
                   opacity={geoJSON.opacity}
                   fillOpacity={geoJSON.fillOpacity}
-                  onClick={disableClick ? undefined : geoJSON.onClick}
+                  onClick={disableClick ? (geoJSON.popup ? () => null : undefined) : geoJSON.onClick}
                   popup={disableClick ? undefined : geoJSON.popup}
                 />
             )
