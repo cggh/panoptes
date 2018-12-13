@@ -146,7 +146,7 @@ let StoredTableQueries = createReactClass({
     // TODO: Fix icon position and font-size style for stacked icons, being overridden by .icon style.
     return (
       <List>
-        <ListSubheader>Stored filters:</ListSubheader>
+        <ListSubheader>{this.config.user.isManager ? 'Stored filters' : 'Predefined filters'}:</ListSubheader>
         <ListItem
           button
           onClick={(e) => this.handleClick(e, SQL.nullQuery)}
