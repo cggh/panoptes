@@ -149,18 +149,6 @@ let StoredTableQueries = createReactClass({
         <ListSubheader>{this.config.user.isManager ? 'Stored filters' : 'Predefined filters'}:</ListSubheader>
         <ListItem
           button
-          onClick={(e) => this.handleClick(e, SQL.nullQuery)}
-          onDoubleClick={(e) => this.handleDoubleClick(e, SQL.nullQuery)}
-        >
-          <ListItemIcon>
-            <div><span className={'fa-stack'}><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'} /></span></div>
-          </ListItemIcon>
-          <ListItemText
-            primary="No filter"
-          />
-        </ListItem>
-        <ListItem
-          button
           onClick={(e) => this.handleClick(e, defaultQuery)}
           onDoubleClick={(e) => this.handleDoubleClick(e, defaultQuery)}
         >
