@@ -14,6 +14,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import Button from 'ui/Button';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
+import {List, ListItem, ListItemText, ListItemIcon} from '@material-ui/core';
 
 // UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -163,6 +164,21 @@ let QueryPicker = createReactClass({
           sidebar={(
             <div className="sidebar" style={{width: '348px', marginTop: '8px'}}>
               <SidebarHeader icon={this.icon()} description={'Filters can be used to show only the rows that meet specific criteria.'}/>
+              <List>
+                <ListItem
+                  button
+                  onClick={(e) => this.handleQueryChange(SQL.nullQuery)}
+                  onDoubleClick={(e) => this.handlePick(SQL.nullQuery)}
+                >
+                  <ListItemIcon>
+                    <div><span className={'fa-stack'}><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'} /></span></div>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Clear filter"
+                  />
+                </ListItem>
+              </List>
+              <Divider/>
               <StoredTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
               <Divider/>
               <RecentlyUsedTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
