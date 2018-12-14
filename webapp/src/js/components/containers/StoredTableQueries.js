@@ -142,27 +142,41 @@ let StoredTableQueries = createReactClass({
 
     });
 
+    let defaultQueryAsObj = {};
+    try {
+      defaultQueryAsObj = JSON.parse(defaultQuery);
+    } catch (e) {
+      throw Error(`Can't parse ${defaultQuery} to object`);
+    }
 
-    // TODO: Fix icon position and font-size style for stacked icons, being overridden by .icon style.
-    return (
-      <List>
-        <ListSubheader>{this.config.user.isManager ? 'Stored filters' : 'Predefined filters'}:</ListSubheader>
-        <ListItem
-          button
-          onClick={(e) => this.handleClick(e, defaultQuery)}
-          onDoubleClick={(e) => this.handleDoubleClick(e, defaultQuery)}
-        >
-          <ListItemIcon>
-            <div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} inverse={true} /></span></div>
-          </ListItemIcon>
-          <ListItemText
-            primary="Default filter"
-            secondary={<span className="list-string"><QueryString className="text" table={table} query={defaultQuery} /></span>}
-          />
-        </ListItem>
-        {storedQueriesListItems}
-      </List>
-    );
+    if (defaultQueryAsObj.isTrivial && storedQueriesListItems.length === 0) {
+      return null;
+    } else {
+      // TODO: Fix icon position and font-size style for stacked icons, being overridden by .icon style.
+      return (
+        <List>
+          <ListSubheader>{this.config.user.isManager ? 'Stored filters' : 'Predefined filters'}:</ListSubheader>
+          {!defaultQueryAsObj.isTrivial ?
+            <ListItem
+              button
+              onClick={(e) => this.handleClick(e, defaultQuery)}
+              onDoubleClick={(e) => this.handleDoubleClick(e, defaultQuery)}
+            >
+              <ListItemIcon>
+                <div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} inverse={true} /></span></div>
+              </ListItemIcon>
+              <ListItemText
+                primary="Default filter"
+                secondary={<span className="list-string"><QueryString className="text" table={table} query={defaultQuery} /></span>}
+              />
+            </ListItem>
+            :
+            null
+          }
+          {storedQueriesListItems}
+        </List>
+      );
+    }
 
   },
 });
