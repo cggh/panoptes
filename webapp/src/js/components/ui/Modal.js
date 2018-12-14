@@ -99,7 +99,7 @@ let Modal = createReactClass({
             <div className="popup-header">
               {icon ? <Icon name={icon}/> : null}
               <div className="title">{title}</div>
-              {!uncloseable ? <Icon className="pointer close" name="close" onClick={this.handleClose}/> : null}
+              {!uncloseable ? <Icon className="pointer close" name="close" onClick={this.handleClose} title="Cancel and close"/> : null}
             </div>
             <div className="popup-body">
               {React.cloneElement(children, {ref: (ref) => this.child = ref})}
