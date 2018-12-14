@@ -80,9 +80,6 @@
         transform: translate(0px, 3px);
       }
     }
-    .icon.close:hover {
-      opacity: 1;
-    }
   }
 }
 
@@ -91,14 +88,6 @@
 }
 
 .icon:hover {
-  opacity: 1;
-}
-
-.icon.close {
-  opacity: .3;
-}
-
-.icon.close:hover {
   opacity: 1;
 }
 
