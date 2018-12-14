@@ -237,7 +237,7 @@ let QueryPicker = createReactClass({
               }
               <Button
                 raised="true"
-                label="Use"
+                label="Apply"
                 color="primary"
                 onClick={this.handlePick}
                 iconName="check"
