@@ -4,6 +4,16 @@ let DateTime2JD = function(date) {
   return date.getTime() / (24.0 * 60 * 60 * 1000) + 2440587.5;
 };
 
+const thousandsSeparator = (function(){
+  if (typeof Number.prototype.toLocaleString === 'function') {
+    const num = 1000;
+    const numStr = num.toLocaleString();
+    if (numStr.length === 5) {
+      return numStr.substr(1, 1);
+    }
+  }
+  return ","; // fall-back
+})();
 
 export default function(property, string) {
   if (property.isBoolean) {
@@ -27,7 +37,7 @@ export default function(property, string) {
     if ((string == 'NULL'))
       return null;
     else {
-      let value = parseFloat(string);
+      let value = parseFloat(string.replace(new RegExp(thousandsSeparator, 'g'),''));
       if (isNaN(value))
         return null;
       else
@@ -38,7 +48,7 @@ export default function(property, string) {
     if ((string == 'NULL'))
       return null;
     else {
-      let value = parseInt(string);
+      let value = parseInt(string.replace(new RegExp(thousandsSeparator, 'g'),''));
       if (isNaN(value))
         return null;
       else
