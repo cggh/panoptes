@@ -269,9 +269,12 @@ let Criterion = createReactClass({
     // If the currentOperator is one of the validOperators for the new property,
     // then continue to use it.
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
+
     // Otherwise use the first of the validOperators for the new property.
-    if (!currentOperator)
+    if (!currentOperator) {
+      currentOperator = validOperators[0];
       component.type = validOperators[0].ID;
+    }
 
     // If there is still no operator, then throw a wobbly.
     if (!currentOperator)
