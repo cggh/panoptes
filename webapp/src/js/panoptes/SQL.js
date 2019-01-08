@@ -156,6 +156,15 @@ SQL.WhereClause._fieldComparisonOperators = [
     allowSubstring: true
   },
   {
+    ID: 'ENDSWITH', name: 'ends with',
+    String: true,
+    Create() {
+      return SQL.WhereClause.CompareFixed('', 'ENDSWITH', '');
+    },
+    fieldType: 'value',
+    allowSubstring: true
+  },
+  {
     ID: 'LIKE', name: 'matches the pattern',
     String: true,
     Create() {
@@ -294,6 +303,9 @@ SQL.WhereClause.CompareFixed = function(icolname, icomptype, ivalue) {
     break;
   case 'STARTSWITH':
     displayType = 'starts with';
+    break;
+  case 'ENDSWITH':
+    displayType = 'ends with';
     break;
   case 'LIKE':
     displayType = 'matches the pattern';
