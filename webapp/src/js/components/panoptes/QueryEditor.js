@@ -589,13 +589,13 @@ let Criterion = createReactClass({
       fields = (
         <div className="fields">
           {otherColumnSelect()}
-          <div>x</div>
+          <div>multiplied by</div>
           <PropertyInput
             value={component.Factor !== undefined ? component.Factor : this.state.Factor}
             onChange={(value) => this.handleValueEdit({input: 'factor', value})}
             onBlur={(value) => this.handleValueSet({input: 'factor', value})}
           />
-          <div>+</div>
+          <div>plus</div>
           <PropertyInput
             value={component.Offset !== undefined ? component.Offset : this.state.Offset}
             onChange={(value) => this.handleValueEdit({input: 'offset', value})}
