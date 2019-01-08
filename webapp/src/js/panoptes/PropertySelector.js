@@ -8,7 +8,7 @@ import Divider from '@material-ui/core/Divider';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import uid from 'uid';
-import {FormControl, FormHelperText} from '@material-ui/core';
+import {FormControl} from '@material-ui/core';
 import {Input, InputLabel} from '@material-ui/core';
 
 
@@ -82,7 +82,7 @@ const PropertySelector = createReactClass({
     }
 
     return (
-      <FormControl style={{minWidth:'100px'}} fullWidth={true}>
+      <FormControl style={{minWidth: '100px'}} fullWidth={true}>
         <InputLabel htmlFor={this.state.uid}>{label}</InputLabel>
         <Select
           autoWidth={true}
@@ -93,7 +93,7 @@ const PropertySelector = createReactClass({
           {propertyMenu}
         </Select>
       </FormControl>
-  );
+    );
   },
 });
 
