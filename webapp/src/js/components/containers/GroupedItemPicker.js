@@ -61,9 +61,6 @@ let GroupedItemPicker = createReactClass({
     };
   },
 
-  componentWillMount() {
-  },
-
   icon() {
     return 'check-square-o';
   },
@@ -133,7 +130,7 @@ let GroupedItemPicker = createReactClass({
 
   render() {
     let {picked, search} = this.state;
-    let {groups, classes} = this.props;
+    let {groups} = this.props;
     let count = _sumBy(groups, (group) => group.properties.length);
     return (
       <div className="large-modal item-picker">
@@ -156,7 +153,7 @@ let GroupedItemPicker = createReactClass({
                         (
                           <ListItem
                             button
-                            className={["nested", classNames({picked: !_includes(picked, id)})]}
+                            className={['nested', classNames({picked: !_includes(picked, id)})]}
                             key={id}
                             onClick={() => this.handleAdd(id)}
                           >
