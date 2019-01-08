@@ -153,7 +153,7 @@ let GroupedItemPicker = createReactClass({
                         (
                           <ListItem
                             button
-                            className={['nested', classNames({picked: !_includes(picked, id)})]}
+                            className={['nested', classNames({'not-picked': _includes(picked, id)})]}
                             key={id}
                             onClick={() => this.handleAdd(id)}
                           >
@@ -188,6 +188,7 @@ let GroupedItemPicker = createReactClass({
                               <ListItemSecondaryAction>
                                 <IconButton
                                   aria-label="Add group"
+                                  title="Add group"
                                   onClick={() => this.handleAddAll(id)}
                                 >
                                   <PlaylistAddIcon />
@@ -233,6 +234,7 @@ let GroupedItemPicker = createReactClass({
                             <ListItemSecondaryAction>
                               <IconButton
                                 aria-label="Remove group"
+                                title="Remove group"
                                 onClick={() => this.handleRemoveAll(id)}
                               >
                                 <DeleteIcon />
