@@ -187,8 +187,8 @@ let GroupedItemPicker = createReactClass({
                             <span style={{marginLeft: '50px'}}>
                               <ListItemSecondaryAction>
                                 <IconButton
-                                  aria-label="Add group"
-                                  title="Add group"
+                                  aria-label="Select all columns in this group"
+                                  title="Select all columns in this group"
                                   onClick={() => this.handleAddAll(id)}
                                 >
                                   <PlaylistAddIcon />
@@ -233,8 +233,8 @@ let GroupedItemPicker = createReactClass({
                           <span style={{marginLeft: '50px'}}>
                             <ListItemSecondaryAction>
                               <IconButton
-                                aria-label="Remove group"
-                                title="Remove group"
+                                aria-label="Unselect all columns in this group"
+                                title="Unselect all columns in this group"
                                 onClick={() => this.handleRemoveAll(id)}
                               >
                                 <DeleteIcon />
