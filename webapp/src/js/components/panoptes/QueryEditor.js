@@ -642,7 +642,7 @@ let Criterion = createReactClass({
         </div>
         <div className="actions">
           <div>
-            <Icon className="pointer close" name="close" onClick={this.handleRemove}/>
+            <Icon className="pointer close" name="trash" onClick={this.handleRemove}/>
           </div>
           <div className="action" onClick={this.handleAddOr}>
             OR
