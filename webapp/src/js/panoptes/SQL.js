@@ -287,7 +287,7 @@ SQL.WhereClause.CompareFixed = function(icolname, icomptype, ivalue) {
     displayType = '≠';
     break;
   case 'CONTAINS':
-    displayType = 'contains case-sensitive';
+    displayType = 'contains c.s.';
     break;
   case 'NOTCONTAINS':
     displayType = 'does not contain c.s.';
