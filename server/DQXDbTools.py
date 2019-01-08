@@ -325,7 +325,7 @@ class WhereClause:
 
     def _CreateSelectStatementSub_Comparison(self, statm):
         #TODO: check that statm['ColName'] corresponds to a valid column name in the table (to avoid SQL injection)
-        if not(statm['Tpe'] in ['=', '<>', '<', '>', '<=', '>=', '!=', 'LIKE', 'CONTAINS', 'CONTAINS_CASE_INSENSITIVE', 'NOTCONTAINS', 'STARTSWITH', 'ISPRESENT', 'ISABSENT', '=FIELD', '<>FIELD', '<FIELD', '>FIELD', 'between', 'ISEMPTYSTR', 'ISNOTEMPTYSTR', '_subset_', '_note_']):
+        if not(statm['Tpe'] in ['=', '<>', '<', '>', '<=', '>=', '!=', 'LIKE', 'CONTAINS', 'CONTAINS_CASE_INSENSITIVE', 'NOTCONTAINS', 'NOT_CONTAINS_CASE_INSENSITIVE', 'STARTSWITH', 'ISPRESENT', 'ISABSENT', '=FIELD', '<>FIELD', '<FIELD', '>FIELD', 'between', 'ISEMPTYSTR', 'ISNOTEMPTYSTR', '_subset_', '_note_']):
             raise Exception("Invalid comparison statement {0}".format(statm['Tpe']))
 
         processed = False
@@ -446,6 +446,14 @@ class WhereClause:
                 decoval = '{0}%'.format(decoval)
             if operatorstr == 'CONTAINS_CASE_INSENSITIVE':
                 operatorstr = 'LIKE'
+                decoval = '%{0}%'.format(decoval)
+                self.querystring += DBCOLESC(statm['ColName']) + ' ' + ToSafeIdentifier(operatorstr) + ' '
+                self.querystring_params += '{0} {1} {2}'.format(
+                    'UPPER(' + DBCOLESC(statm['ColName']) + ')',
+                    ToSafeIdentifier(operatorstr),
+                    'UPPER(' + self.ParameterPlaceHolder) + ')'
+            if operatorstr == 'NOT_CONTAINS_CASE_INSENSITIVE':
+                operatorstr = 'NOT LIKE'
                 decoval = '%{0}%'.format(decoval)
                 self.querystring += DBCOLESC(statm['ColName']) + ' ' + ToSafeIdentifier(operatorstr) + ' '
                 self.querystring_params += '{0} {1} {2}'.format(
