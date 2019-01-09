@@ -132,6 +132,9 @@ let GroupedItemPicker = createReactClass({
     let {picked, search} = this.state;
     let {groups} = this.props;
     let count = _sumBy(groups, (group) => group.properties.length);
+    // Don't show the ungrouped group name if the ungrouped group is the only group (onlyUngrouped)
+    // i.e. show the group name if there isn't only one group and that is the ungrouped group (!onlyUngrouped)
+    const onlyUngrouped = (Object.keys(groups).length === 1 && groups['_UNGROUPED_'] !== undefined);
     return (
       <div className="large-modal item-picker">
         <div className="horizontal stack">
@@ -154,7 +157,7 @@ let GroupedItemPicker = createReactClass({
                           <ListItem
                             button
                             className={['nested', classNames({'not-picked': _includes(picked, id)})]}
-                            key={id}
+                            key={`available_group_subItem_${id}`}
                             onClick={() => this.handleAdd(id)}
                           >
                             <ListItemIcon>
@@ -196,6 +199,36 @@ let GroupedItemPicker = createReactClass({
                               </ListItemSecondaryAction>
                             </span>
                           </ListItem>
+=======
+                        <div
+                          key={`available_group_${id}`}
+                        >
+                          {!onlyUngrouped ?
+                            <ListItem
+                              button
+                            >
+                              <ListItemText
+                                primary={name}
+                                onClick={() => this.handleToggleAvailableExpand(id)}
+                              />
+                              {this.isAvailableExpanded(id) ?
+                                <ExpandMore onClick={() => this.handleToggleAvailableExpand(id)} />
+                                : <ExpandLess onClick={() => this.handleToggleAvailableExpand(id)} />
+                              }
+                              <span style={{marginLeft: '50px'}}>
+                                <ListItemSecondaryAction>
+                                  <IconButton
+                                    aria-label="Add group"
+                                    onClick={() => this.handleAddAll(id)}
+                                  >
+                                    <PlaylistAddIcon />
+                                  </IconButton>
+                                </ListItemSecondaryAction>
+                              </span>
+                            </ListItem>
+                            : null
+                          }
+>>>>>>> Hide ungrouped group in GroupedItemPicker when no other groups. Fix component keys. Lint: quotes; unused func, prop.
                           <Collapse in={this.isAvailableExpanded(id)} >
                             {subItems}
                           </Collapse>
@@ -217,6 +250,7 @@ let GroupedItemPicker = createReactClass({
                     let {id, name, properties} = group;
                     // Note: onClick on ListItem would confuse the SecondaryAction.
                     return ( _intersection(picked, _map(properties, 'id')).length > 0 ?
+<<<<<<< 5e2be31f5db43b2de77983f87b03dd6c15bf7b3f
                       <div>
                         <ListItem
                           button
@@ -242,6 +276,36 @@ let GroupedItemPicker = createReactClass({
                             </ListItemSecondaryAction>
                           </span>
                         </ListItem>
+=======
+                      <div
+                        key={`selected_group_${id}`}
+                      >
+                        {!onlyUngrouped ?
+                          <ListItem
+                            button
+                          >
+                            <ListItemText
+                              primary={name}
+                              onClick={() => this.handleTogglePickedExpand(id)}
+                            />
+                            {this.isPickedExpanded(id) ?
+                              <ExpandMore onClick={() => this.handleTogglePickedExpand(id)} />
+                              : <ExpandLess onClick={() => this.handleTogglePickedExpand(id)} />
+                            }
+                            <span style={{marginLeft: '50px'}}>
+                              <ListItemSecondaryAction>
+                                <IconButton
+                                  aria-label="Remove group"
+                                  onClick={() => this.handleRemoveAll(id)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </ListItemSecondaryAction>
+                            </span>
+                          </ListItem>
+                          : null
+                        }
+>>>>>>> Hide ungrouped group in GroupedItemPicker when no other groups. Fix component keys. Lint: quotes; unused func, prop.
                         <Collapse in={this.isPickedExpanded(id)} >
                           {
                             _map(properties, (prop) => {
@@ -249,7 +313,7 @@ let GroupedItemPicker = createReactClass({
                               return _includes(picked, id) ? (
                                 <ListItem
                                   button
-                                  key={id}
+                                  key={`selected_group_subItem_${id}`}
                                   onClick={() => this.handleRemove(id)}
                                   className="nested"
                                 >
