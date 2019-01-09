@@ -391,6 +391,7 @@ let Criterion = createReactClass({
       );
 
     let groups = _clone(this.tableConfig().propertyGroupsById);
+    const onlyUngrouped = (Object.keys(groups).length === 1 && groups['_UNGROUPED_'] !== undefined);
 
     //Disabled until full subset implementation
     // groups.other = {
@@ -404,21 +405,19 @@ let Criterion = createReactClass({
     // };
     let propertySelect = (
       <select ref={(ref) => this.property = ref} value={component.ColName} onChange={this.handlePropertyChange}>
-        {_map(groups, (group) =>
-          <optgroup key={group.id} label={group.name}>
-            {group.visibleProperties.map((property) => {
-              let {id, disabled, name} = property;
-              return (
-                <option key={id}
-                  value={id}
-                  disabled={disabled}>
-                  {name}
-                </option>
-              );
-            })
-            }
-          </optgroup>
-        )}
+        {_map(groups, (group) => {
+          const options = group.visibleProperties.map((property) => {
+            let {id, disabled, name} = property;
+            return (
+              <option key={id}
+                value={id}
+                disabled={disabled}>
+                {name}
+              </option>
+            );
+          });
+          return onlyUngrouped ? options : <optgroup key={group.id} label={group.name}>{options}</optgroup>;
+        })}
       </select>
     );
 
