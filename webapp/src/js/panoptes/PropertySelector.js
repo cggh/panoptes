@@ -65,6 +65,9 @@ const PropertySelector = createReactClass({
     let i = 0;
     if (table) {
       const propertyGroups = this.config.tablesById[table].propertyGroups;
+      // Don't show the ungrouped group name if the ungrouped group is the only group (onlyUngrouped)
+      // i.e. show the group name if there isn't only one group and that is the ungrouped group (!onlyUngrouped)
+      const onlyUngrouped = (propertyGroups.length === 1 && propertyGroups[0].id === '_UNGROUPED_');
       propertyGroups.forEach((group) => {
         let filteredProps = group.visibleProperties.filter(filter);
         if (filteredProps.length === 0) return;
@@ -73,9 +76,7 @@ const PropertySelector = createReactClass({
         }
         let {id, name} = group;
         let groupId = id;
-        // Don't show the ungrouped group name if the ungrouped group is the only group
-        // i.e. show the group name if there isn't only one group and that is the ungrouped group
-        if (!(propertyGroups.length === 1 && propertyGroups[0].id === '_UNGROUPED_')) {
+        if (!onlyUngrouped) {
           propertyMenu.push(<MenuItem disabled value={id} key={`group_${groupId}`} >{name}</MenuItem>);
         }
         filteredProps.forEach((property) => {
