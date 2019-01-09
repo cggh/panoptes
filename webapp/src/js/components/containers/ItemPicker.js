@@ -316,11 +316,11 @@ let ItemPicker = createReactClass({
               <List>
                 {
                   _map(picked, (item, index) => {
-                    let {groupId, itemGroupId, itemId} = item;
-                    let groupName = groups[groupId].name;
-                    let itemGroupName = itemGroupId ? groups[groupId].itemGroups[itemGroupId].name : '';
-                    let {description, name, icon} = itemGroupId ? groups[groupId].itemGroups[itemGroupId].items[itemId] : groups[groupId].items[itemId];
-                    let primaryText = itemGroupId ? `${groupName} - ${itemGroupName} - ${name}` : `${groupName} - ${name}`;
+                    const {groupId, itemGroupId, itemId} = item;
+                    const groupName = groups[groupId].name;
+                    const itemGroupName = itemGroupId ? groups[groupId].itemGroups[itemGroupId].name : '';
+                    const {description, name, icon} = itemGroupId ? groups[groupId].itemGroups[itemGroupId].items[itemId] : groups[groupId].items[itemId];
+                    const primaryText = itemGroupId ? `${groupName} - ${itemGroupName} - ${name}` : `${groupName} - ${name}`;
 
                     return (
                       <ListItem
