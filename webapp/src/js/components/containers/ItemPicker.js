@@ -164,14 +164,13 @@ let ItemPicker = createReactClass({
 
   convertItemTolistItem(item, itemId, search, groupId, itemGroupId) {
     let {name, description, icon, payload} = item;
-    const classes = this.props.classes;
     // Exclude this ListItem if this item's name and description doesn't contain the search text.
     return (`${name}#${description || ''}`).toLowerCase().indexOf(search.toLowerCase()) !== -1 ?
       (
         <ListItem
           button
           key={itemId}
-          className={itemGroupId !== undefined && itemGroupId !== '_UNGROUPED_' ? "nested-more" : "nested"}
+          className={itemGroupId !== undefined && itemGroupId !== '_UNGROUPED_' ? 'nested-more' : 'nested'}
           onClick={() => this.handleAdd({groupId, itemId, payload, itemGroupId})}
         >
           {icon ?
@@ -191,7 +190,6 @@ let ItemPicker = createReactClass({
   render() {
     let {picked, search} = this.state;
     let {itemName, pickVerb, groups} = this.props;
-    const classes = this.props.classes;
     let totalItemsCount = 0;
     let listItems = _map(groups, (group, groupId) => {
       let {name, icon, items, itemGroups} = group;
