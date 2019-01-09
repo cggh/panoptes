@@ -320,7 +320,7 @@ let ItemPicker = createReactClass({
                     const groupName = groups[groupId].name;
                     const itemGroupName = itemGroupId ? groups[groupId].itemGroups[itemGroupId].name : '';
                     const {description, name, icon} = itemGroupId ? groups[groupId].itemGroups[itemGroupId].items[itemId] : groups[groupId].items[itemId];
-                    const primaryText = itemGroupId ? `${groupName} - ${itemGroupName} - ${name}` : `${groupName} - ${name}`;
+                    const primaryText = itemGroupId && itemGroupId !== '_UNGROUPED_' ? `${groupName} - ${itemGroupName} - ${name}` : `${groupName} - ${name}`;
 
                     return (
                       <ListItem
