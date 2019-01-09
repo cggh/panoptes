@@ -68,12 +68,16 @@ const PropertySelector = createReactClass({
       propertyGroups.forEach((group) => {
         let filteredProps = group.visibleProperties.filter(filter);
         if (filteredProps.length === 0) return;
-        if (propertyMenu.length ) {
+        if (propertyMenu.length) {
           propertyMenu.push(<Divider key={i++}/>);
         }
         let {id, name} = group;
         let groupId = id;
-        propertyMenu.push(<MenuItem disabled value={id} key={`group_${groupId}`} >{name}</MenuItem>);
+        // Don't show the ungrouped group name if the ungrouped group is the only group
+        // i.e. show the group name if there isn't only one group and that is the ungrouped group
+        if (!(propertyGroups.length === 1 && propertyGroups[0].id === '_UNGROUPED_')) {
+          propertyMenu.push(<MenuItem disabled value={id} key={`group_${groupId}`} >{name}</MenuItem>);
+        }
         filteredProps.forEach((property) => {
           let {id, name} = property;
           propertyMenu.push(<MenuItem value={id} key={`group_${groupId}_item_${id}`} >{name}</MenuItem>);
