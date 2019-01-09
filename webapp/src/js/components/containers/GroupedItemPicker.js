@@ -174,32 +174,6 @@ let GroupedItemPicker = createReactClass({
                     );
                     return _filter(subItems, (i) => i).length > 0 ?
                       (
-                        <div>
-                          <ListItem
-                            button
-                            key={id}
-                          >
-                            <ListItemText
-                              primary={name}
-                              onClick={() => this.handleToggleAvailableExpand(id)}
-                            />
-                            {this.isAvailableExpanded(id) ?
-                              <ExpandMore onClick={() => this.handleToggleAvailableExpand(id)} />
-                              : <ExpandLess onClick={() => this.handleToggleAvailableExpand(id)} />
-                            }
-                            <span style={{marginLeft: '50px'}}>
-                              <ListItemSecondaryAction>
-                                <IconButton
-                                  aria-label="Select all columns in this group"
-                                  title="Select all columns in this group"
-                                  onClick={() => this.handleAddAll(id)}
-                                >
-                                  <PlaylistAddIcon />
-                                </IconButton>
-                              </ListItemSecondaryAction>
-                            </span>
-                          </ListItem>
-=======
                         <div
                           key={`available_group_${id}`}
                         >
@@ -228,7 +202,6 @@ let GroupedItemPicker = createReactClass({
                             </ListItem>
                             : null
                           }
->>>>>>> Hide ungrouped group in GroupedItemPicker when no other groups. Fix component keys. Lint: quotes; unused func, prop.
                           <Collapse in={this.isAvailableExpanded(id)} >
                             {subItems}
                           </Collapse>
@@ -250,33 +223,6 @@ let GroupedItemPicker = createReactClass({
                     let {id, name, properties} = group;
                     // Note: onClick on ListItem would confuse the SecondaryAction.
                     return ( _intersection(picked, _map(properties, 'id')).length > 0 ?
-<<<<<<< 5e2be31f5db43b2de77983f87b03dd6c15bf7b3f
-                      <div>
-                        <ListItem
-                          button
-                          key={id}
-                        >
-                          <ListItemText
-                            primary={name}
-                            onClick={() => this.handleTogglePickedExpand(id)}
-                          />
-                          {this.isPickedExpanded(id) ?
-                            <ExpandMore onClick={() => this.handleTogglePickedExpand(id)} />
-                            : <ExpandLess onClick={() => this.handleTogglePickedExpand(id)} />
-                          }
-                          <span style={{marginLeft: '50px'}}>
-                            <ListItemSecondaryAction>
-                              <IconButton
-                                aria-label="Unselect all columns in this group"
-                                title="Unselect all columns in this group"
-                                onClick={() => this.handleRemoveAll(id)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </ListItemSecondaryAction>
-                          </span>
-                        </ListItem>
-=======
                       <div
                         key={`selected_group_${id}`}
                       >
@@ -305,7 +251,6 @@ let GroupedItemPicker = createReactClass({
                           </ListItem>
                           : null
                         }
->>>>>>> Hide ungrouped group in GroupedItemPicker when no other groups. Fix component keys. Lint: quotes; unused func, prop.
                         <Collapse in={this.isPickedExpanded(id)} >
                           {
                             _map(properties, (prop) => {
