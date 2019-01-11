@@ -804,6 +804,7 @@ input.invalid {
 @media (min-width: 700px) {
   .card-stack-wrap {
     flex-wrap: wrap;
+    align-items: flex-start;
     flex-direction: row;
   }
   .card-stack > div {
