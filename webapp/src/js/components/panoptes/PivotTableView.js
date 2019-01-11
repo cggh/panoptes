@@ -3,6 +3,12 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
+import {Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell
+} from '@material-ui/core';
 
 // Lodash
 import _uniq from 'lodash.uniq';
@@ -18,12 +24,6 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-import {Table,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell
-} from '@material-ui/core';
 // Panoptes components
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
@@ -150,8 +150,6 @@ let PivotTableView = createReactClass({
       query: this.getDefinedQuery(query, table),
       orderBy: order,
       groupBy,
-      start: 0,
-      stop: 1000,
       transpose: false
     };
 
@@ -168,7 +166,6 @@ let PivotTableView = createReactClass({
         let columnData = data[columnProperty];
         let rowData = data[rowProperty];
         let countData = data['count'];
-
         let uniqueColumns = columnData ? _uniq(columnData) : [];
         let uniqueRows = rowData ? _uniq(rowData) : [];
 
@@ -181,10 +178,13 @@ let PivotTableView = createReactClass({
         uniqueRows.unshift('_all_');
 
         let dataByColumnRow = {};
+
+        // For each unique column initialize the aggregate count value of all rows in that column to 0.
         uniqueColumns.forEach(
           (columnValue) => dataByColumnRow[columnValue] = {'_all_': {count: 0}}
         );
-        dataByColumnRow['_all_'] = {};
+
+        // For each unique row initialize the aggregate count value of all columns in that row to 0.
         uniqueRows.forEach(
           (rowValue) => dataByColumnRow['_all_'][rowValue] = {count: 0}
         );
@@ -401,7 +401,7 @@ let PivotTableView = createReactClass({
   },
 
   render() {
-    let {style, className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table, hasClickableCells} = this.props;
+    let {className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table, hasClickableCells} = this.props;
     let {uniqueRows, uniqueColumns, dataByColumnRow} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -413,7 +413,7 @@ let PivotTableView = createReactClass({
     if (hasClickableCells) {
       tableOnCellClick = (rowNumber, columnId) => {
         this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId]);
-      }
+      };
     }
 
     return (
@@ -511,11 +511,11 @@ let PivotTableView = createReactClass({
                       prop={rowPropConfig}
                       value={rowHeading === '__NULL__' ? null : rowHeading}/>}
                 </TableCell>
-                {uniqueColumns.map((columnHeading,j) =>
+                {uniqueColumns.map((columnHeading, j) =>
                   <TableCell
                     key={columnHeading}
                     style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}
-                    onClick={() => tableOnCellClick(i,j)}
+                    onClick={() => tableOnCellClick(i, j)}
                   >
                     {dataByColumnRow[columnHeading][rowHeading].displayValue.toLocaleString()}
                   </TableCell>
