@@ -401,13 +401,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 5px;
 }
 
 .horiz-centering-container {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 5px;
 }
 
 .scroll-within {
@@ -768,12 +768,11 @@ input.invalid {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  align-items: flex-start;
   align-content: flex-start;
 }
 
 .card-stack > div {
-  margin: 20px;
+  margin: 10px;
   max-width: $card-max-width;
 }
 
