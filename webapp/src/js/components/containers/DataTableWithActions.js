@@ -193,7 +193,7 @@ let DataTableWithActions = createReactClass({
 
   handleDownloadLimitBreach(payload) {
     let {totalDataPoints, maxDataPoints} = payload;
-    let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${maxDataPoints}. Please use a stricter filter or fewer columns, or contact us directly.`;
+    let message = `You have asked to download ${totalDataPoints.toLocaleString()} data points, which is more than our current limit of ${maxDataPoints.toLocaleString()}. Please use a stricter filter or fewer columns, or contact us directly.`;
     this.getFlux().actions.session.modalOpen(<Alert title="Warning" message={message}/>);
   },
 
