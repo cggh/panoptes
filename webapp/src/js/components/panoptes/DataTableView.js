@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server'
+import ReactDOMServer from 'react-dom/server';
 import createReactClass from 'create-react-class';
 import classNames from 'classnames';
 import Color from 'color';
@@ -226,7 +226,7 @@ let DataTableView = createReactClass({
     if (this.props.onTotalRowsCountChange && prevState.totalRowsCount !== this.state.totalRowsCount) {
       this.props.onTotalRowsCountChange(this.state.totalRowsCount);
     }
-    if((this.props.columns || []).join() !== (prevProps.columns || []).join())  {
+    if ((this.props.columns || []).join() !== (prevProps.columns || []).join())  {
       this.calcColumnWidths();
     }
   },
@@ -234,7 +234,6 @@ let DataTableView = createReactClass({
   calcColumnWidths() {
 
     const {columns, initialColumnWidthMode} = this.props;
-    const {calculatedColumnWidths} = this.state;
 
     let calculatingColumnWidths = {};
     for (let columnIndex = 0, columnCount = columns.length; columnIndex < columnCount; columnIndex++) {
