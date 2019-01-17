@@ -2,20 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import scrollbarSize from 'scrollbar-size';
-import Sidebar from 'ui/Sidebar';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
+import _map from 'lodash.map';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-// Lodash
-import _map from 'lodash.map';
-
 // Panoptes
+import Sidebar from 'ui/Sidebar';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import PivotTableView from 'panoptes/PivotTableView';
@@ -145,7 +143,12 @@ let PivotTableWithActions = createReactClass({
             <span className="block text">Row sort: {this.orderDescriptionString(rowSortOrder)}</span>
           </div>
           <div className="grow scroll-within">
-            <PivotTableView {...this.props} style={{height: '100%', overflow: 'hidden'}} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
+            <PivotTableView
+              {...this.props}
+              style={{height: '100%', overflow: 'hidden'}}
+              onOrderChange={this.handleOrderChange}
+              query={this.getDefinedQuery()}
+            />
           </div>
         </div>
       </Sidebar>
