@@ -5,6 +5,8 @@ import scrollbarSize from 'scrollbar-size';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
 import _map from 'lodash.map';
 
 // Mixins
@@ -101,29 +103,35 @@ let PivotTableWithActions = createReactClass({
           <PropertySelector table={table}
             key="columnProperty"
             value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
-            label="Column"
+            label="Columns"
             allowNull={true}
             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
             onSelect={(v) => setProps({columnProperty: v, columnSortOrder: undefined})}/>
           <PropertySelector table={table}
             key="rowProperty"
             value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
-            label="Row"
+            label="Rows"
             allowNull={true}
             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
             onSelect={(v) => setProps({rowProperty: v, rowSortOrder: undefined})}/>
-          <Select
-            fullWidth={true}
-            label="Display"
-            onChange={(e) => setProps({display: e.target.value})}
-            value={display}
-            input={<Input id="display" />}
-          >
-            <MenuItem key={'Counts'} value={'counts'}>Counts</MenuItem>
-            <MenuItem key={'All'} value={'percentAll'}>Percentage of total</MenuItem>
-            <MenuItem key={'Column'} value={'percentColumn'}>Percentage of column total</MenuItem>
-            <MenuItem key={'Row'} value={'percentRow'}>Percentage of row total</MenuItem>
-          </Select>
+          <FormControl>
+            <InputLabel htmlFor="values">Values</InputLabel>
+            <Select
+              fullWidth={true}
+              onChange={(e) => setProps({display: e.target.value})}
+              value={display}
+              input={<Input id="display" />}
+              inputProps={{
+                name: 'values',
+                id: 'values',
+              }}
+            >
+              <MenuItem key={'Counts'} value={'counts'}>Counts</MenuItem>
+              <MenuItem key={'All'} value={'percentAll'}>Percentage of total</MenuItem>
+              <MenuItem key={'Column'} value={'percentColumn'}>Percentage of column total</MenuItem>
+              <MenuItem key={'Row'} value={'percentRow'}>Percentage of row total</MenuItem>
+            </Select>
+          </FormControl>
         </div>
       </div>
     );
