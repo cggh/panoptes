@@ -301,6 +301,7 @@ function importDataset(dataset) {
 function rowsCount(options) {
   options.transpose = true;
   options.columns = [{expr: JSON.parse(JSON.stringify(['count', ['*']])), as: 'TotalRecordCount'}];
+  options.groupBy = [];
   options.orderBy = [];
   options.start = undefined;
   options.stop = undefined;
