@@ -451,7 +451,7 @@ let PivotTableView = createReactClass({
                 columnHeadingDisplayValue = 'All columns';
                 noLinks = true;
               } else if (columnHeading === '__NULL__') {
-                columnHeadingDisplayValue = true;
+                columnHeadingDisplayValue = 'NULL';
               }
               return (
                 <TableCell
@@ -503,7 +503,7 @@ let PivotTableView = createReactClass({
               rowHeadingDisplayValue = 'All rows';
               noLinks = true;
             } else if (rowHeading === '__NULL__') {
-              rowHeadingDisplayValue = true;
+              rowHeadingDisplayValue = 'NULL';
             }
             return (
               <TableRow key={rowHeading} hover>
