@@ -31,6 +31,7 @@ let PropertyCell = createReactClass({
     prop: PropTypes.object,
     value: PropTypes.any,
     noLinks: PropTypes.bool,
+    noFormatting: PropTypes.bool,
     prefix: PropTypes.node,
     onClick: PropTypes.func,
     className: PropTypes.string,
@@ -39,7 +40,7 @@ let PropertyCell = createReactClass({
   },
 
   render() {
-    let {prop, value, noLinks, prefix, onClick, className, nullReplacement, nanReplacement, ...other} = this.props;
+    let {prop, value, noLinks, noFormatting, prefix, onClick, className, nullReplacement, nanReplacement, ...other} = this.props;
     let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
     let descriptionIcon = !noLinks && prop.valueDescriptions && prop.valueDescriptions[value] ?
       <Tooltip placement="bottom"
@@ -48,37 +49,42 @@ let PropertyCell = createReactClass({
         <Icon className="info" name="info-circle"/>
       </Tooltip> :
       null;
-    let content = Formatter(prop, value, nullReplacement, nanReplacement);
-    if (prop.externalUrl && !noLinks) {
-      if (prop.valueDisplays) {
-        console.error(`Properties cannot have externalUrl and valueDisplays: ${prop.id}`);
+    let content = undefined;
+    if (noFormatting) {
+      content = value;
+    } else {
+      content = Formatter(prop, value, nullReplacement, nanReplacement);
+      if (prop.externalUrl && !noLinks) {
+        if (prop.valueDisplays) {
+          console.error(`Properties cannot have externalUrl and valueDisplays: ${prop.id}`);
+        }
+        let refs = value.split(';');
+        content = refs.map((ref, index) => (
+          <span key={index}>
+            {index === 0 ? externalLinkIcon : null}
+            <a target="_blank" rel="noopener noreferrer" href={prop.externalUrl.replace('{value}', ref)}>
+              {ref}
+            </a>
+            {index < refs.length - 1 ? ', ' : null}
+          </span>
+        ));
+      } else if (prop.valueDisplays && prop.valueDisplays[value]) {
+        //Wrap as can only have one tag passed to html-to-react
+        content = htmlToReactParser.parse(`<span>${prop.valueDisplays[value]}</span>`);
+      } else if (prop.dispDataType == 'Boolean' && value !== '') {
+        if (value === null) {
+          content = 'NULL';
+        } else {
+          let val = (value === 1 || value === 'True');
+          content = <Icon className={(val ? 'prop bool true' : 'prop bool false')}
+            fixedWidth={false}
+            name={val ? 'check' : 'times'}/>;
+        }
+      } else if (!noLinks && prop.relation && !prop.hideLink) {
+        content = <ItemLink table={prop.relation.tableId} primKey={value} />;
+      } else if (!noLinks && prop.isPrimKey && !prop.hideLink) {
+        content = <ItemLink table={prop.tableId} primKey={value} />;
       }
-      let refs = value.split(';');
-      content = refs.map((ref, index) => (
-        <span key={index}>
-          {index === 0 ? externalLinkIcon : null}
-          <a target="_blank" rel="noopener noreferrer" href={prop.externalUrl.replace('{value}', ref)}>
-            {ref}
-          </a>
-          {index < refs.length - 1 ? ', ' : null}
-        </span>
-      ));
-    } else if (prop.valueDisplays && prop.valueDisplays[value]) {
-      //Wrap as can only have one tag passed to html-to-react
-      content = htmlToReactParser.parse(`<span>${prop.valueDisplays[value]}</span>`);
-    } else if (prop.dispDataType == 'Boolean' && value !== '') {
-      if (value === null) {
-        content = 'NULL';
-      } else {
-        let val = (value === 1 || value === 'True');
-        content = <Icon className={(val ? 'prop bool true' : 'prop bool false')}
-          fixedWidth={false}
-          name={val ? 'check' : 'times'}/>;
-      }
-    } else if (!noLinks && prop.relation && !prop.hideLink) {
-      content = <ItemLink table={prop.relation.tableId} primKey={value} />;
-    } else if (!noLinks && prop.isPrimKey && !prop.hideLink) {
-      content = <ItemLink table={prop.tableId} primKey={value} />;
     }
     return (
       <span
