@@ -434,7 +434,6 @@ let PivotTableView = createReactClass({
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    //style={style} className={classNames('load-container', className)}
 
     let tableOnCellClick = null;
     if (hasClickableCells) {
