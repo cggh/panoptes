@@ -55,7 +55,6 @@ let Icon = createReactClass({
     let defaultStyle = {
       height: 'inherit',
       verticalAlign: 'middle',
-      lineHeight: 'inherit',
     };
 
     if (!name)
