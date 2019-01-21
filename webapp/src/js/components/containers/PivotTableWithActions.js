@@ -83,13 +83,28 @@ let PivotTableWithActions = createReactClass({
     }
   },
 
-  orderDescriptionString(order) {
-    if (order.length === 0) {
-      return 'None';
-    }
-    return _map(order, ([direction, value]) =>
-      `${value === '__NULL__' ? 'NULL' : value === '_all_' ? 'All' : value} ${direction === 'asc' ? 'asc' : 'desc'}`)
-      .join(', ');
+  orderDescriptionString(property, order) {
+    const isNumerical = this.tableConfig().propertiesById[property].isNumerical;
+    return order.map(([direction, value]) => {
+      let displayValue = value;
+      if (value == '_all_') {
+        displayValue = 'All';
+      } else if (value === '__NULL__') {
+        displayValue = 'NULL';
+      }
+      let displayDirection = direction;
+      if (direction === 'asc') {
+        displayDirection = isNumerical ? <span>0&#8594;9</span> : <span>A&#8594;Z</span>;
+      } else {
+        displayDirection = isNumerical ? <span>9&#8594;0</span> : <span>Z&#8594;A</span>;
+      }
+      return (
+        <span key={`order_${property}_${displayValue}`}>
+          {displayValue}&#160;{displayDirection}
+        </span>
+      );
+    }).reduce((previous, current) => [previous, ', ', current]);
+
   },
 
   render() {
@@ -147,8 +162,8 @@ let PivotTableWithActions = createReactClass({
               title={sidebar ? 'Expand' : 'Sidebar'}
               onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text"><QueryString prefix="Filter: " table={table} query={this.getDefinedQuery()}/></span>
-            <span className="block text">Column sort: {this.orderDescriptionString(columnSortOrder)}</span>
-            <span className="block text">Row sort: {this.orderDescriptionString(rowSortOrder)}</span>
+            <span className="block text">{columnSortOrder.length === 0 ? 'Unsorted columns' : <span>Sorted columns: {this.orderDescriptionString(columnProperty, columnSortOrder)}</span>}</span>
+            <span className="block text">{rowSortOrder.length === 0 ? 'Unsorted rows' : <span>Sorted rows: {this.orderDescriptionString(rowProperty, rowSortOrder)}</span>}</span>
           </div>
           <div className="grow scroll-within">
             <PivotTableView
