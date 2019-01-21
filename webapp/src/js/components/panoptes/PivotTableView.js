@@ -446,28 +446,38 @@ let PivotTableView = createReactClass({
               let desc = _some(columnSortOrder, ([dir, val]) => dir === 'desc' && val === columnHeading);
               let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
                 name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+              let columnHeadingDisplayValue = columnHeading;
+              let noLinks = false;
+              if (columnHeading == '_all_') {
+                columnHeadingDisplayValue = 'All';
+                noLinks = true;
+              } else if (columnHeading === '__NULL__') {
+                columnHeadingDisplayValue = true;
+              }
               return (
                 <TableCell
-                  key={columnHeading}>
-                  { columnHeading == '_all_' ?
-                    'All' :
-                    <PropertyCell
-                      className={classNames({
-                        'table-row-cell': true,
-                        'pointer': true,
-                        'table-row-header': true,
-                        'sort-column-ascending': asc,
-                        'sort-column-descending': desc
-                      })}
-                      style={{
-                        // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
-                        background,
-                        boxShadow: 'none'
-                      }}
-                      onClick={() => this.handleOrderChange('column', columnHeading)}
-                      prefix={icon}
-                      prop={colPropConfig}
-                      value={columnHeading === '__NULL__' ? null : columnHeading}/>}
+                  key={columnHeading}
+                  style={{cursor: 'pointer'}}
+                  onClick={() => this.handleOrderChange('column', columnHeading)}
+                >
+                  <PropertyCell
+                    className={classNames({
+                      'table-row-cell': true,
+                      'pointer': true,
+                      'table-row-header': true,
+                      'sort-column-ascending': asc,
+                      'sort-column-descending': desc
+                    })}
+                    style={{
+                      // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
+                      background,
+                      boxShadow: 'none'
+                    }}
+                    prefix={icon}
+                    prop={colPropConfig}
+                    value={columnHeadingDisplayValue}
+                    noLinks={noLinks}
+                  />
                 </TableCell>
               );
             })}
@@ -489,29 +499,39 @@ let PivotTableView = createReactClass({
             let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
             let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px', transform: 'rotate(-90deg)'}} className="sort"
               name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+            let rowHeadingDisplayValue = rowHeading;
+            let noLinks = false;
+            if (rowHeading == '_all_') {
+              rowHeadingDisplayValue = 'All';
+              noLinks = true;
+            } else if (rowHeading === '__NULL__') {
+              rowHeadingDisplayValue = true;
+            }
             return (
               <TableRow key={rowHeading} hover>
                 <TableCell
-                  key={rowHeading}>
-                  { rowHeading == '_all_' ?
-                    'All' :
-                    <PropertyCell
-                      className={classNames({
-                        'table-row-cell': true,
-                        'pointer': true,
-                        'table-row-header': true,
-                        'sort-column-ascending': asc,
-                        'sort-column-descending': desc
-                      })}
-                      style={{
-                        // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
-                        background,
-                        boxShadow: 'none'
-                      }}
-                      onClick={() => this.handleOrderChange('row', rowHeading)}
-                      prefix={icon}
-                      prop={rowPropConfig}
-                      value={rowHeading === '__NULL__' ? null : rowHeading}/>}
+                  key={rowHeading}
+                  style={{cursor: 'pointer'}}
+                  onClick={() => this.handleOrderChange('row', rowHeading)}
+                >
+                  <PropertyCell
+                    className={classNames({
+                      'table-row-cell': true,
+                      'pointer': true,
+                      'table-row-header': true,
+                      'sort-column-ascending': asc,
+                      'sort-column-descending': desc
+                    })}
+                    style={{
+                      // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
+                      background,
+                      boxShadow: 'none',
+                    }}
+                    prefix={icon}
+                    prop={rowPropConfig}
+                    value={rowHeadingDisplayValue}
+                    noLinks={noLinks}
+                  />
                 </TableCell>
                 {uniqueColumns.map((columnHeading, j) =>
                   <TableCell
