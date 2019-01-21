@@ -446,12 +446,13 @@ let PivotTableView = createReactClass({
               let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
                 name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
               let columnHeadingDisplayValue = columnHeading;
-              let noLinks = false;
+              let noFormatting = false;
               if (columnHeading == '_all_') {
                 columnHeadingDisplayValue = 'All columns';
-                noLinks = true;
+                noFormatting = true;
               } else if (columnHeading === '__NULL__') {
                 columnHeadingDisplayValue = 'NULL';
+                noFormatting = true;
               }
               return (
                 <TableCell
@@ -474,7 +475,7 @@ let PivotTableView = createReactClass({
                     prefix={icon}
                     prop={colPropConfig}
                     value={columnHeadingDisplayValue}
-                    noLinks={noLinks}
+                    noFormatting={noFormatting}
                   />
                 </TableCell>
               );
@@ -498,12 +499,13 @@ let PivotTableView = createReactClass({
             let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px', transform: 'rotate(-90deg)'}} className="sort"
               name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
             let rowHeadingDisplayValue = rowHeading;
-            let noLinks = false;
+            let noFormatting = false;
             if (rowHeading == '_all_') {
               rowHeadingDisplayValue = 'All rows';
-              noLinks = true;
+              noFormatting = true;
             } else if (rowHeading === '__NULL__') {
               rowHeadingDisplayValue = 'NULL';
+              noFormatting = true;
             }
             return (
               <TableRow key={rowHeading} hover>
@@ -527,7 +529,7 @@ let PivotTableView = createReactClass({
                     prefix={icon}
                     prop={rowPropConfig}
                     value={rowHeadingDisplayValue}
-                    noLinks={noLinks}
+                    noFormatting={noFormatting}
                   />
                 </TableCell>
                 {uniqueColumns.map((columnHeading, j) =>
