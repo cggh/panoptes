@@ -401,7 +401,7 @@ let PivotTableView = createReactClass({
   },
 
   render() {
-    let {style, className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table, hasClickableCells} = this.props;
+    let {className, height, columnProperty, rowProperty, columnSortOrder, rowSortOrder, table, hasClickableCells} = this.props;
     let {uniqueRows, uniqueColumns, dataByColumnRow} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -413,7 +413,7 @@ let PivotTableView = createReactClass({
     if (hasClickableCells) {
       tableOnCellClick = (rowNumber, columnId) => {
         this.handleOpenTableForCell(uniqueRows[rowNumber], uniqueColumns[columnId]);
-      }
+      };
     }
 
     return (
@@ -511,11 +511,11 @@ let PivotTableView = createReactClass({
                       prop={rowPropConfig}
                       value={rowHeading === '__NULL__' ? null : rowHeading}/>}
                 </TableCell>
-                {uniqueColumns.map((columnHeading,j) =>
+                {uniqueColumns.map((columnHeading, j) =>
                   <TableCell
                     key={columnHeading}
                     style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}
-                    onClick={() => tableOnCellClick(i,j)}
+                    onClick={() => tableOnCellClick(i, j)}
                   >
                     {dataByColumnRow[columnHeading][rowHeading].displayValue.toLocaleString()}
                   </TableCell>
