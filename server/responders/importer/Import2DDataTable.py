@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
@@ -7,9 +9,9 @@ import os
 import DQXDbTools
 import DQXUtils
 import zarr
-import ImpUtils
-from BaseImport import BaseImport
-from SettingsDataTable import SettingsDataTable
+from . import ImpUtils
+from .BaseImport import BaseImport
+from .SettingsDataTable import SettingsDataTable
 
 class Import2DDataTable(BaseImport):
 
@@ -85,7 +87,7 @@ class Import2DDataTable(BaseImport):
                     os.remove(path_join)
                 except OSError:
                     pass
-                print "Symlinking 2D data"
+                print("Symlinking 2D data")
                 os.symlink(data_file, path_join)
 
     def importAll2DTables(self):

@@ -1,6 +1,12 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
+from builtins import zip
+from builtins import str
+from builtins import map
+from builtins import range
 import json
 
 import DQXDbTools
@@ -11,11 +17,11 @@ import dask.array as da
 import numpy as np
 import config
 import arraybuffer
-from gzipstream import gzip
+from .gzipstream import gzip
 
 #curl 'http://localhost:8000/app01?datatype=custom&respmodule=2d_server&respid=2d_query&dataset=Genotypes&col_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&row_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&datatable=genotypes&property=first_allele&col_order=SnpName&row_order=ID' -H 'Pragma: no-cache' -H 'Accept-Encoding: gzip,deflate,sdch' --compressed
-from importer.SettingsDataTable import SettingsDataTable
-from importer.Settings2Dtable import Settings2Dtable
+from .importer.SettingsDataTable import SettingsDataTable
+from .importer.Settings2Dtable import Settings2Dtable
 from DQXDbTools import desciptionToDType
 from cache import getCache
 
@@ -55,7 +61,7 @@ def index_table_query(dataset, cur, table, fields, query, order, limit, offset, 
     try:
         rows, description = cache[cacheKey]
     except KeyError:
-        print '2D', sqlquery, params
+        print('2D', sqlquery, params)
         pass
 
     if rows is None:
@@ -74,7 +80,7 @@ def index_table_query(dataset, cur, table, fields, query, order, limit, offset, 
 
 def select_by_list(properties, row_idx, col_idx):
     result = {}
-    for prop, array in properties.items():
+    for prop, array in list(properties.items()):
         dask_task = array[col_idx][:, row_idx]
         result[prop] = dask_task.compute()
     return result
@@ -95,7 +101,7 @@ def extract2D(dataset, datatable, row_idx, col_idx, two_d_properties):
     two_d_properties = dict((prop, da.from_array(root_group[prop], chunks=root_group[prop].chunks, fancy=False)) for prop in two_d_properties)
     if len(col_idx) == 0 or len(row_idx) == 0:
         two_d_result = {}
-        for prop in two_d_properties.keys():
+        for prop in list(two_d_properties.keys()):
             two_d_result[prop] = np.array([], dtype=two_d_properties[prop].dtype)
     else:
         two_d_result = select_by_list(two_d_properties, row_idx, col_idx)
@@ -115,7 +121,7 @@ def summarise_call(calls):
             call = 1 #HET
             break
         call = c
-    return str(call) + ''.join(map(lambda a: str(a).zfill(2), calls))
+    return str(call) + ''.join([str(a).zfill(2) for a in calls])
 
 def handler(start_response, request_data):
     datatable = request_data['table']
@@ -185,7 +191,7 @@ def handler(start_response, request_data):
     try:
         data = cache[cache_key]
     except KeyError:
-        print '2D Cache miss'
+        print('2D Cache miss')
         pass
 
     if data is None:
@@ -236,7 +242,7 @@ def handler(start_response, request_data):
             del row_result[row_index_field]
             if len(col_idx) == col_fail_limit:
                 result_set = [('_over_col_limit', np.array([0], dtype='i1'))]
-                for name, array in row_result.items():
+                for name, array in list(row_result.items()):
                     result_set.append((('row_'+name), array))
             else:
                 if len(row_order_columns) > 0 and len(row_idx) > 0:
@@ -248,13 +254,13 @@ def handler(start_response, request_data):
                         col_field=DQXDbTools.ToSafeIdentifier(col_key))
                     idx_for_col = dict((k, v) for k,v in cur.fetchall())
                     #Sort by the order specified - reverse so last clicked is major sort
-                    sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
+                    sort_col_idx = list(reversed([idx_for_col[key] for key in row_order_columns]))
                     #grab the data needed to sort
                     sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, [row_sort_property])
-                    rows = zip(row_idx, sort_data[row_sort_property])
+                    rows = list(zip(row_idx, sort_data[row_sort_property]))
                     if sort_mode == 'call':
                         polyploid_key_func = lambda row: ''.join(summarise_call(calls) for calls in row[1])
-                        haploid_key_func = lambda row: ''.join(map(lambda c: str(c).zfill(2), row[1]))
+                        haploid_key_func = lambda row: ''.join([str(c).zfill(2) for c in row[1]])
                         if len(rows[0][1].shape) == 1:
                             rows.sort(key=haploid_key_func, reverse=True)
                         else:
@@ -268,24 +274,24 @@ def handler(start_response, request_data):
                                 return str(1-float(row[1][i][0])/sum(row[1][i]))+str(sum(row[1][i])).zfill(4)
                             rows.sort(key=key_func, reverse=True)
                     else:
-                        print "Unimplemented sort_mode"
-                    row_pos_for_idx = dict(zip(row_idx, range(len(row_idx))))
+                        print("Unimplemented sort_mode")
+                    row_pos_for_idx = dict(list(zip(row_idx, list(range(len(row_idx))))))
                     #Now just get the row_idx to pass to 2d extract for the slice we need
                     row_idx = np.array(map(itemgetter(0), rows)[row_offset: row_offset+row_limit])
                     #Use this row idx to retieve the row data from the initial query
-                    for name, array in row_result.items():
+                    for name, array in list(row_result.items()):
                         row_result[name] = array[[row_pos_for_idx[idx] for idx in row_idx]]
 
                 two_d_result = extract2D(dataset, datatable, row_idx, col_idx, two_d_properties)
 
                 result_set = []
-                for name, array in col_result.items():
+                for name, array in list(col_result.items()):
                     result_set.append((('col_'+name), array))
-                for name, array in row_result.items():
+                for name, array in list(row_result.items()):
                     result_set.append((('row_'+name), array))
-                for name, array in two_d_result.items():
+                for name, array in list(two_d_result.items()):
                     result_set.append((('2D_'+name), array))
-        data = gzip(data=''.join(arraybuffer.encode_array_set(result_set)))
+        data = gzip(data=b''.join(arraybuffer.encode_array_set(result_set)))
         cache[cache_key] = data
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),

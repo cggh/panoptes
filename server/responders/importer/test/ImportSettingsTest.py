@@ -1,3 +1,6 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 import unittest
 import os
 from SettingsDataTable import SettingsDataTable
@@ -8,7 +11,7 @@ from SettingsRefGenome import SettingsRefGenome
 from SettingsGraph import SettingsGraph
 from SettingsDataset import SettingsDataset
 from SettingsMapLayer import SettingsMapLayer
-from __builtin__ import file
+from builtins import file
 
 ''' Not doing it anymore....
 	def testConvertBoolean(self):
@@ -319,7 +322,7 @@ class ImportSettingsTest(unittest.TestCase):
 			json1 = simplejson.dumps(settings1._settings, sort_keys=True, indent=4 * ' ')
 		except AttributeError as ae:
 			#Catches plugin settings ({}) - '_settings' in {} just seems to hang
-			print "No _settings for:" + settingsType + ':' + file
+			print("No _settings for:" + settingsType + ':' + file)
 			return settings1
 		
 		#Can't serialize as that excludes fields

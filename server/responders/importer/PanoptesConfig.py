@@ -1,9 +1,14 @@
-import ConfigParser
-from StringIO import StringIO
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+import configparser
+from io import StringIO
 import os
 import config
 from DQXDbTools import ToSafeIdentifier
-from ConfigParser import NoOptionError
+from configparser import NoOptionError
         
 class PanoptesConfig(object):
     
@@ -11,7 +16,7 @@ class PanoptesConfig(object):
                
         self._calculationObject = calculationObject
 
-        self._config = ConfigParser.ConfigParser(allow_no_value= True)
+        self._config = configparser.ConfigParser(allow_no_value= True)
         self._globalSectionName = 'Global'
         self._importSectionName = 'Import DB Credentials'
         global config
@@ -43,13 +48,13 @@ class PanoptesConfig(object):
         try:
             var = self._config.get(self._globalSectionName, name).strip("'\"")
         except NoOptionError:
-            print "Missing setting:" + name
+            print("Missing setting:" + name)
             if optional:
                 pass
             else:
-                print "Global settings:" + str(self._config.items(self._globalSectionName))
-                print "Import settings:" + str(self._config.items(self._importSectionName))
-                print self._content
+                print("Global settings:" + str(self._config.items(self._globalSectionName)))
+                print("Import settings:" + str(self._config.items(self._importSectionName)))
+                print(self._content)
                 raise 
         
         return var      

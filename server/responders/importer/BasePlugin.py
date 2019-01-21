@@ -1,9 +1,11 @@
-import ImpUtils
-from PluginSettings import PluginSettings
-from PanoptesConfig import PanoptesConfig
-from SettingsDAO import SettingsDAO
+from __future__ import absolute_import
+from builtins import object
+from . import ImpUtils
+from .PluginSettings import PluginSettings
+from .PanoptesConfig import PanoptesConfig
+from .SettingsDAO import SettingsDAO
 
-class BasePlugin:
+class BasePlugin(object):
     
     def __init__(self, calculationObject, datasetId, settings, dirPath):
         self._dirPath = dirPath

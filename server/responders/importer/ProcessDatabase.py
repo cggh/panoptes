@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+from builtins import str
 import logging
 import linecache
 import os
 
-from BaseImport import BaseImport
-from LoadTable import LoadTable
-import ImpUtils
+from .BaseImport import BaseImport
+from .LoadTable import LoadTable
+from . import ImpUtils
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

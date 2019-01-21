@@ -1,3 +1,4 @@
+from builtins import str
 from DQXDbTools import DBCOLESC
 
 decoders = {
@@ -14,7 +15,7 @@ for _op in ['qualtile', 'corr', 'sql_min', 'sql_max']:
     decoders[_op] = (lambda op: lambda a,b: 'sys.' + op + '(' + _decode(a) + ',' + _decode(b) + ')')(_op)
 
 def _decode(column):
-    if isinstance(column, (str, unicode)):
+    if isinstance(column, (str, str)):
         return DBCOLESC(column)
     elif isinstance(column, (int, float)):
         return str(column)
@@ -22,14 +23,14 @@ def _decode(column):
         return decoders[column[0]](*column[1])
 
 def decode(column):
-    if isinstance(column, (str, unicode, int, float, list, tuple)):
+    if isinstance(column, (str, str, int, float, list, tuple)):
         return _decode(column)
     elif isinstance(column, object):
         return _decode(column['expr']) + ' AS ' + DBCOLESC(column['as'])
 
 
 def name(column, descName):
-    if isinstance(column, (str, unicode)):
+    if isinstance(column, (str, str)):
         return str(column)
     if isinstance(column, (int, float, list, tuple)):
         return str(descName)

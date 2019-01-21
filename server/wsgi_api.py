@@ -2,7 +2,7 @@
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 
 import config
 from os.path import join
@@ -67,11 +67,11 @@ def application(environ, start_response):
                                 ('Access-Control-Allow-Origin','*'),
                                 ('Content-Length', str(len(response)))]
             start_response(status, response_headers)
-            yield response
+            yield bytes(response, 'utf-8')
     except Exception as e:
         traceback.print_exc()
         start_response('500 Server Error', [])
-        yield str(e)
+        yield bytes(str(e), 'utf-8')
 
 
     DQXUtils.LogServer('{0}: in wall={1}s cpu={2}s'.format(request_type, round(tm.Elapsed(),2),round(tm.ElapsedCPU(),2)))

@@ -1,3 +1,6 @@
+from builtins import str
+from builtins import range
+from builtins import object
 import re
 import numpy
 
@@ -26,10 +29,10 @@ class Numpy_to_SQL(object):
             'S\d+': lambda d: 'VARCHAR(' + d.replace('S', '') + ')',
             'U\d+': lambda d: 'VARCHAR(' + d.replace('S', '') + ') UNICODE'
         }
-        for key, func in func_convert.items():
+        for key, func in list(func_convert.items()):
             if re.search('^' + key + '$', dtype) is not None:
                 return func(dtype)
-        for i, o in simple_conversion.items():
+        for i, o in list(simple_conversion.items()):
             if dtype == i:
                 return o
         raise ValueError('Unknown dtype:' + dtype)
@@ -39,9 +42,9 @@ class Numpy_to_SQL(object):
         column_type = self.dtype_to_column_type(str(array.dtype))
         sql = 'CREATE TABLE "{0}" ("{1}" {2})'.format(table_name, column_name, column_type)
         yield lambda cur: cur.execute(sql)
-        for start in xrange(0, len(array), 500):
+        for start in range(0, len(array), 500):
             end = min(start + 500, len(array))
             sql = 'INSERT INTO "{0}" ("{1}") VALUES (%s)'.format(table_name, column_name)
-            data = [(ele,) for ele in array[start: end]]
+            data = [line.decode('utf-8') for line in array[start: end].tolist()]
             yield lambda cur: cur.executemany(sql,
                                               data)

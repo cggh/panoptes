@@ -1,10 +1,13 @@
+from __future__ import absolute_import
+from __future__ import division
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from past.utils import old_div
 import DQXDbTools
 import DQXUtils
-import asyncresponder
+from . import asyncresponder
 import os
 import config
 import Utils
@@ -65,7 +68,7 @@ def ResponseExecute(returndata, calculationObject):
                     if len(keysublist) >= 200:
                         delkeys(keysublist)
                         keysublist = []
-                        calculationObject.SetInfo('Removing', keyNr*1.0/len(keys))
+                        calculationObject.SetInfo('Removing', old_div(keyNr*1.0,len(keys)))
                     keyNr += 1
                 delkeys(keysublist)
 
@@ -99,7 +102,7 @@ def ResponseExecute(returndata, calculationObject):
                         if len(keysublist) >= 500:
                             submitkeys(keysublist)
                             keysublist = []
-                            calculationObject.SetInfo('Storing', keyNr*1.0/len(keys))
+                            calculationObject.SetInfo('Storing', old_div(keyNr*1.0,len(keys)))
                         keyNr += 1
                 submitkeys(keysublist)
 

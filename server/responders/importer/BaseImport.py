@@ -1,13 +1,17 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 import os
-import ImportSettings
+from . import ImportSettings
 import simplejson
 import logging
 import sys
-from SettingsDAO import SettingsDAO
-from PanoptesConfig import PanoptesConfig
-from SettingsDataTable import SettingsDataTable
-from Settings2Dtable import Settings2Dtable
-from SettingsDataset import SettingsDataset
+from .SettingsDAO import SettingsDAO
+from .PanoptesConfig import PanoptesConfig
+from .SettingsDataTable import SettingsDataTable
+from .Settings2Dtable import Settings2Dtable
+from .SettingsDataset import SettingsDataset
 
 class BaseImport(object):
     
@@ -207,7 +211,7 @@ class BaseImport(object):
                 if directory not in datatables:
                     datatables.append(directory)
         
-        print 'Data tables: ' + str(datatables)
+        print('Data tables: ' + str(datatables))
         return datatables
 
     def _getImportDir(self, datatable):
@@ -242,7 +246,7 @@ class BaseImport(object):
 import DQXUtils
 #This is repeated from servermodule/panoptesserver/asyncresponder.py due to the different requirements around logging
 #with the multi-threaded/MPI approach
-class CalcLogHeader:
+class CalcLogHeader(object):
     def __init__(self, calcObject, title):
         self.calcObject = calcObject
         self.title = title

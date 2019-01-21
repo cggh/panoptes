@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import uuid
 
 import os
@@ -13,12 +17,11 @@ import abc
 from abc import ABCMeta
 import ruamel.yaml
 import portalocker
+from future.utils import with_metaclass
 
 valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date', 'GeoLatitude', 'GeoLongitude']
 
-class ImportSettings:
-
-    __metaclass__ = ABCMeta
+class ImportSettings(with_metaclass(ABCMeta, object)):
 
     _propertiesDefault = OrderedDict((
                             ('id', {
@@ -444,7 +447,7 @@ class ImportSettings:
                 if not (type(value) is int or type(value) is float):
                     self._errors.append("{} must be a Value is {}\n".format(pkey, value))
             elif pdef['type'] == 'Text' or pdef['type'] == 'DatatableID':
-                if not (type(value) is str or type(value) is unicode):
+                if not (type(value) is str or type(value) is str):
                     self._errors.append("{} must be a str is {}\n".format(pkey, value))
             elif pdef['type'] == 'Text or List':
                 if not (type(value) is str or type(value) is list):
@@ -485,7 +488,7 @@ class ImportSettings:
                     else:
                         options.append(msg)
                 if not valid:
-                    self._errors.append("When " + pkey + " one of following must be set " + ",".join(map(lambda x: x['name'] + "=" + x['value'], pdef['siblingRequired'])) + " for " + str(testDict)[:100] + '\n')
+                    self._errors.append("When " + pkey + " one of following must be set " + ",".join([x['name'] + "=" + x['value'] for x in pdef['siblingRequired']]) + " for " + str(testDict)[:100] + '\n')
 
             else:
                 msg = self._checkSiblingRequired(testDict, pkey, pdef['siblingRequired'], siblings)
@@ -572,7 +575,7 @@ class ImportSettings:
                 else:
                     del self._settings['properties'][i]
             #Add entries for those props only referenced in a list.
-            for propid, propDetails in self._propidMap.items():
+            for propid, propDetails in list(self._propidMap.items()):
                 if propid not in copied:
                     self._settings['properties'].append(propDetails)
 
@@ -612,7 +615,7 @@ class ImportSettings:
     def _prepareSerialization(self, settings, defn):
         tosave = copy.deepcopy(settings)
         def setDefaults(subSettings, subDefn):
-            for key, value in subDefn.items():
+            for key, value in list(subDefn.items()):
                 if 'default' in value:
                     includeDefault = True
                     if 'siblingOptional' in value:
@@ -644,7 +647,7 @@ class ImportSettings:
         self.loadProps(parsed, False)
 
     def getPropertyNames(self):
-        return self._propidMap.keys()
+        return list(self._propidMap.keys())
 
     def updateAndWriteBack(self, action, updatePath, newConfig, validate=True):
         if action not in ['replace', 'merge', 'delete']:
@@ -867,11 +870,11 @@ the *Properties* block of the data table settings.
 
 if __name__ == '__main__':
 
-    from Settings2Dtable import Settings2Dtable
-    from SettingsRefGenome import SettingsRefGenome
-    from SettingsDataTable import SettingsDataTable
-    from SettingsDataset import SettingsDataset
-    from SettingsGraph import SettingsGraph
+    from .Settings2Dtable import Settings2Dtable
+    from .SettingsRefGenome import SettingsRefGenome
+    from .SettingsDataTable import SettingsDataTable
+    from .SettingsDataset import SettingsDataset
+    from .SettingsGraph import SettingsGraph
 
     #Settings Global is the same as dataset so no need to generateDocs
 

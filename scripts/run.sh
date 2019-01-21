@@ -12,7 +12,7 @@ cd `dirname ${SCRIPT_PATH}`
 #We are now at the dir of the script go one up to project
 cd ..
 PROJECT_ROOT=`pwd`;
-BASEDIR=`python -c "import config;print config.BASEDIR"`
+BASEDIR=`python -c "import config;print(config.BASEDIR)"`
 monetdbd start $BASEDIR/monetdb || true  #Fails if already started
 
 source panoptes_virtualenv/bin/activate

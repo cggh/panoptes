@@ -1,7 +1,12 @@
+from __future__ import print_function
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import threading
 import uuid
 import DQXDbTools
@@ -15,7 +20,7 @@ import sys
 
 
 
-class CalculationThreadList:
+class CalculationThreadList(object):
     def __init__(self):
         self.threads = {}
         self.lock = threading.Lock()
@@ -243,7 +248,7 @@ class CalculationThread (threading.Thread):
             if retval != 0:
                 raise Exception('An error occurred while running subprocess (return value: {0}) '.format(retval)+cmd)
 
-class CalcLogHeader:
+class CalcLogHeader(object):
     def __init__(self, calcObject, title):
         self.calcObject = calcObject
         self.title = title
@@ -256,7 +261,7 @@ class CalcLogHeader:
             self.calcObject.Log('<==Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
 
 
-class CalcLogSubHeader:
+class CalcLogSubHeader(object):
     def __init__(self, calcObject, title):
         self.calcObject = calcObject
         self.title = title
@@ -268,7 +273,7 @@ class CalcLogSubHeader:
         if value is None:
             self.calcObject.Log('<--Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
 
-class CalcLogDataDump:
+class CalcLogDataDump(object):
     def __init__(self, calcObject):
         self.calcObject = calcObject
         self.calcObject.Log('DD>')

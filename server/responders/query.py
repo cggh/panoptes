@@ -1,20 +1,25 @@
+from __future__ import absolute_import
 # This file is part of DQXServer - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
+from builtins import zip
+from builtins import str
+from builtins import map
 import json
 
 import DQXDbTools
 import DQXUtils
 import arraybuffer
 import numpy as np
+
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 from DQXDbTools import desciptionToDType
 
 import config
 from cache import getCache
-from columnDecode import decode, name
-from gzipstream import gzip
+from .columnDecode import decode, name
+from .gzipstream import gzip
 from dates import datetimeToJulianDay
 
 NULL_VALUES = {
@@ -34,7 +39,7 @@ def handler(start_response, requestData):
         length = int(requestData['environ'].get('CONTENT_LENGTH', '0'))
     except ValueError:
         length = 0
-    content = requestData['environ']['wsgi.input'].read(length)
+    content = requestData['environ']['wsgi.input'].read(length).decode("utf-8")
     content = json.loads(content) if len(content) > 0 else None
     if not content:
         raise SyntaxError('No query parameters supplied')
@@ -43,7 +48,7 @@ def handler(start_response, requestData):
     orderBy = json.loads(content.get('orderBy', '[]'))
     distinct = content.get('distinct', 'false') == 'true'
     rawColumns = json.loads(content['columns'])
-    columns = map(decode, rawColumns)
+    columns = list(map(decode, rawColumns))
     groupBy = content.get('groupBy', None)
     database = content['database']
     startRow, endRow = None, None
@@ -112,7 +117,7 @@ def handler(start_response, requestData):
                     result[col_name] = np.array([datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
                 else:
                     result[col_name] = np.array([row[i] for row in rows], dtype=dtype)
-            data = gzip(data=''.join(arraybuffer.encode_array_set(result.items())))
+            data = gzip(data=b''.join(arraybuffer.encode_array_set(list(result.items()))))
             if cacheData:
                 cache[cacheKey] = data
     status = '200 OK'

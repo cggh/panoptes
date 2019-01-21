@@ -19,13 +19,7 @@ def response(returndata):
         for line in content_file:
             strippedline = line.lstrip()
             if (strippedline[0:3]!='@@@'):
-                try:
-                    content += line.encode('ascii', 'ignore')
-                except UnicodeDecodeError:
-                    line = unidecode.unidecode(line)
-                    if line[0:6] == 'Unable':
-                        line = 'WARNING: ' + line
-                    content += line
+                content += line
 
     returndata['Content'] = content
 

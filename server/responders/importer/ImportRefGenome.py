@@ -1,20 +1,23 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import str
 import os
 import uuid
 from os.path import join
 
 import errno
 
-import ImpUtils
+from . import ImpUtils
 import shutil
-from PanoptesConfig import PanoptesConfig
-from SettingsDAO import SettingsDAO
-from SettingsRefGenome import SettingsRefGenome
+from .PanoptesConfig import PanoptesConfig
+from .SettingsDAO import SettingsDAO
+from .SettingsRefGenome import SettingsRefGenome
 import json
-from readChromLengths import readChromLengths
+from .readChromLengths import readChromLengths
 import simplejson
 from Bio import SeqIO
 
@@ -40,7 +43,7 @@ def ImportRefGenome(calculationObject, datasetId, sourceFolder, importSettings):
         settings = SettingsRefGenome(join(folder, 'settings'), validate=True)
         print('Settings: '+str(settings))
 
-        for token in settings.getLoadedSettings().keys():
+        for token in list(settings.getLoadedSettings().keys()):
             val = settings[token]
             if (type(val) is list) or (type(val) is dict):
                 val = json.dumps(val)

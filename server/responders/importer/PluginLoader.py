@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+from builtins import str
 import imp
 import os
 import sys
-from BaseImport import BaseImport
-from PluginSettings import PluginSettings
+from .BaseImport import BaseImport
+from .PluginSettings import PluginSettings
 
 class PluginLoader(BaseImport):
     

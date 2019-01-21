@@ -1,5 +1,10 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import map
+from builtins import object
 import warnings
-from SettingsDataTable import SettingsDataTable
+from .SettingsDataTable import SettingsDataTable
 try:
     import DQXDbTools
 except:
@@ -10,11 +15,11 @@ from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
 from DQXDbTools import ToSafeIdentifier
 import DQXUtils
-from PanoptesConfig import PanoptesConfig
+from .PanoptesConfig import PanoptesConfig
 import time
 import math
 import sqlparse
-from Numpy_to_SQL import Numpy_to_SQL
+from .Numpy_to_SQL import Numpy_to_SQL
 import pymonetdb.control
 
 class SettingsDAO(object):
@@ -245,7 +250,7 @@ class SettingsDAO(object):
             with self.getDBCursor() as cur:
                 for i, command in enumerate(commands):
                     if i < 5:
-                        self._log(self._datasetId+';'+command.func_closure[-1].cell_contents)
+                        self._log(self._datasetId+';'+command.__closure__[-1].cell_contents)
                     if i == 5:
                         self._log(self._datasetId+'; Commands truncated...')
                     command(cur)

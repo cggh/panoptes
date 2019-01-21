@@ -1,12 +1,15 @@
+from __future__ import absolute_import
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import str
 import config
-import asyncresponder
+from . import asyncresponder
 
-import importer.ImportFiles
-import importer.ImportError
+from .importer import ImportFiles
+from .importer import ImportError
+
 
 def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
@@ -17,13 +20,13 @@ def ResponseExecute(data, calculationObject):
     importSettings['ScopeStr'] = data['ScopeStr']
     importSettings['SkipTableTracks'] = data['SkipTableTracks']
     try:
-        importer.ImportFiles.ImportDataSet(
+        ImportFiles.ImportDataSet(
             calculationObject,
             config.SOURCEDATADIR + '/datasets',
             datasetid,
             importSettings
         )
-    except importer.ImportError.ImportException as e:
+    except ImportError.ImportException as e:
         calculationObject.fail(str(e))
 
 def response(returndata):

@@ -2,6 +2,8 @@
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import str
+from builtins import object
 import DQXDbTools
 import config
 #As the db is local to panoptes set this here:
@@ -72,7 +74,7 @@ def VerifyIsDataSetManager(credInfo, databaseName):
     raise DQXDbTools.CredentialException('No managament privileges for database ' + databaseName)
 
 
-class PnAuthRule:
+class PnAuthRule(object):
     read = 1
     edit = 2
     manage = 3
@@ -103,7 +105,7 @@ class PnAuthRule:
 
 
 
-class PnAuthRuleSet:
+class PnAuthRuleSet(object):
 
     def __init__(self):
         self.rules = []

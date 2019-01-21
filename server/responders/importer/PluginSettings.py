@@ -1,4 +1,5 @@
-from ImportSettings import ImportSettings
+from __future__ import absolute_import
+from .ImportSettings import ImportSettings
 
 class PluginSettings(ImportSettings):
     
