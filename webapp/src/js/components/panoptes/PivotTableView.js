@@ -407,7 +407,6 @@ let PivotTableView = createReactClass({
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    //style={style} className={classNames('load-container', className)}
 
     let tableOnCellClick = null;
     if (hasClickableCells) {
@@ -449,7 +448,7 @@ let PivotTableView = createReactClass({
               let columnHeadingDisplayValue = columnHeading;
               let noLinks = false;
               if (columnHeading == '_all_') {
-                columnHeadingDisplayValue = 'All';
+                columnHeadingDisplayValue = 'All columns';
                 noLinks = true;
               } else if (columnHeading === '__NULL__') {
                 columnHeadingDisplayValue = true;
@@ -469,7 +468,6 @@ let PivotTableView = createReactClass({
                       'sort-column-descending': desc
                     })}
                     style={{
-                      // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
                       background,
                       boxShadow: 'none'
                     }}
@@ -502,7 +500,7 @@ let PivotTableView = createReactClass({
             let rowHeadingDisplayValue = rowHeading;
             let noLinks = false;
             if (rowHeading == '_all_') {
-              rowHeadingDisplayValue = 'All';
+              rowHeadingDisplayValue = 'All rows';
               noLinks = true;
             } else if (rowHeading === '__NULL__') {
               rowHeadingDisplayValue = true;
@@ -523,7 +521,6 @@ let PivotTableView = createReactClass({
                       'sort-column-descending': desc
                     })}
                     style={{
-                      // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
                       background,
                       boxShadow: 'none',
                     }}
