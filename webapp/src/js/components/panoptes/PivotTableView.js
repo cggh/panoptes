@@ -461,7 +461,8 @@ let PivotTableView = createReactClass({
                       })}
                       style={{
                         // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
-                        background
+                        background,
+                        boxShadow: 'none'
                       }}
                       onClick={() => this.handleOrderChange('column', columnHeading)}
                       prefix={icon}
@@ -504,7 +505,8 @@ let PivotTableView = createReactClass({
                       })}
                       style={{
                         // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
-                        background
+                        background,
+                        boxShadow: 'none'
                       }}
                       onClick={() => this.handleOrderChange('row', rowHeading)}
                       prefix={icon}
