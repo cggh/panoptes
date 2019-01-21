@@ -450,14 +450,15 @@ let PivotTableView = createReactClass({
           height={height}
         >
           <TableHead>
-            <TableRow>
+            <TableRow style={{height: '20px'}}>
+              <TableCell style={{border: 'none'}}>&#8203;</TableCell>
+              <TableCell style={{border: 'none'}}>
+                {columnProperty ? <PropertyHeader className="table-row-header" style={{display: 'flex', justifyContent: 'flex-start', height: '20px'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
+              </TableCell>
+            </TableRow>
+            <TableRow style={{height: '20px'}}>
               <TableCell style={{overflow: 'hidden'}}>
-                <div>
-                  {columnProperty ? <PropertyHeader className="table-row-header" style={{display: 'flex', justifyContent: 'flex-end'}} table={table} propId={columnProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
-                </div>
-                <div>
-                  {rowProperty ? <PropertyHeader className="table-row-header"  style={{display: 'flex', justifyContent: 'flex-start'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
-                </div>
+                {rowProperty ? <PropertyHeader className="table-row-header"  style={{display: 'flex', justifyContent: 'flex-start', height: '20px'}} table={table} propId={rowProperty} tooltipPlacement={'bottom'} tooltipTrigger={['click']}/> : ''}
               </TableCell>
               {uniqueColumns.map((columnHeading) => {
                 const colPropConfig = this.tableConfig().propertiesById[columnProperty] || {};
@@ -474,27 +475,38 @@ let PivotTableView = createReactClass({
                 let desc = _some(columnSortOrder, ([dir, val]) => dir === 'desc' && val === columnHeading);
                 let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
                   name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+                let columnHeadingDisplayValue = columnHeading;
+                let noFormatting = false;
+                if (columnHeading == '_all_') {
+                  columnHeadingDisplayValue = 'All columns';
+                  noFormatting = true;
+                } else if (columnHeading === '__NULL__') {
+                  columnHeadingDisplayValue = 'NULL';
+                  noFormatting = true;
+                }
                 return (
                   <TableCell
-                    key={columnHeading}>
-                    { columnHeading == '_all_' ?
-                      'All' :
-                      <PropertyCell
-                        className={classNames({
-                          'table-row-cell': true,
-                          'pointer': true,
-                          'table-row-header': true,
-                          'sort-column-ascending': asc,
-                          'sort-column-descending': desc
-                        })}
-                        style={{
-                          // textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
-                          background
-                        }}
-                        onClick={() => this.handleOrderChange('column', columnHeading)}
-                        prefix={icon}
-                        prop={colPropConfig}
-                        value={columnHeading === '__NULL__' ? null : columnHeading}/>}
+                    key={columnHeading}
+                    style={{cursor: 'pointer'}}
+                    onClick={() => this.handleOrderChange('column', columnHeading)}
+                  >
+                    <PropertyCell
+                      className={classNames({
+                        'table-row-cell': true,
+                        'pointer': true,
+                        'table-row-header': true,
+                        'sort-column-ascending': asc,
+                        'sort-column-descending': desc
+                      })}
+                      style={{
+                        background,
+                        boxShadow: 'none'
+                      }}
+                      prefix={icon}
+                      prop={colPropConfig}
+                      value={columnHeadingDisplayValue}
+                      noFormatting={noFormatting}
+                    />
                   </TableCell>
                 );
               })}
@@ -516,34 +528,46 @@ let PivotTableView = createReactClass({
               let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
               let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px', transform: 'rotate(-90deg)'}} className="sort"
                 name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+              let rowHeadingDisplayValue = rowHeading;
+              let noFormatting = false;
+              if (rowHeading == '_all_') {
+                rowHeadingDisplayValue = 'All rows';
+                noFormatting = true;
+              } else if (rowHeading === '__NULL__') {
+                rowHeadingDisplayValue = 'NULL';
+                noFormatting = true;
+              }
               return (
                 <TableRow key={rowHeading} hover>
                   <TableCell
-                    key={rowHeading}>
-                    { rowHeading == '_all_' ?
-                      'All' :
-                      <PropertyCell
-                        className={classNames({
-                          'table-row-cell': true,
-                          'pointer': true,
-                          'table-row-header': true,
-                          'sort-column-ascending': asc,
-                          'sort-column-descending': desc
-                        })}
-                        style={{
-                          // textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
-                          background
-                        }}
-                        onClick={() => this.handleOrderChange('row', rowHeading)}
-                        prefix={icon}
-                        prop={rowPropConfig}
-                        value={rowHeading === '__NULL__' ? null : rowHeading}/>}
+                    key={rowHeading}
+                    style={{cursor: 'pointer'}}
+                    onClick={() => this.handleOrderChange('row', rowHeading)}
+                  >
+                    <PropertyCell
+                      className={classNames({
+                        'table-row-cell': true,
+                        'pointer': true,
+                        'table-row-header': true,
+                        'sort-column-ascending': asc,
+                        'sort-column-descending': desc
+                      })}
+                      style={{
+                        background,
+                        boxShadow: 'none',
+                      }}
+                      prefix={icon}
+                      prop={rowPropConfig}
+                      value={rowHeadingDisplayValue}
+                      noFormatting={noFormatting}
+                    />
                   </TableCell>
                   {uniqueColumns.map((columnHeading, j) =>
                     <TableCell
                       key={columnHeading}
                       style={{cursor: hasClickableCells ? 'pointer' : 'inherit', backgroundColor: dataByColumnRow[columnHeading][rowHeading].backgroundColor}}
                       onClick={() => tableOnCellClick(i, j)}
+                      title={hasClickableCells ? 'Click to open the table for this cell' : null}
                     >
                       {dataByColumnRow[columnHeading][rowHeading].displayValue.toLocaleString()}
                     </TableCell>
