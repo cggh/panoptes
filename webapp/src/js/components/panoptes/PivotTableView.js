@@ -486,7 +486,7 @@ let PivotTableView = createReactClass({
 
             let asc = _some(rowSortOrder, ([dir, val]) => dir === 'asc' && val === rowHeading);
             let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
-            let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort"
+            let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px', transform: 'rotate(-90deg)'}} className="sort"
               name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
             return (
               <TableRow key={rowHeading} hover>
