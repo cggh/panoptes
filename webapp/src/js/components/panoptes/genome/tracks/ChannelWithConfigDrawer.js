@@ -74,7 +74,7 @@ let ChannelWithConfigDrawer = createReactClass({
             </div>
             : null }
           {legendComponent ?
-            <div className="legend button" ref="legendToggle">
+            <div className="legend button">
               <Icon className={classnames({open: legendOpen})}
                 name="info" onClick={this.handleLegendToggle}/>
             </div>
@@ -82,8 +82,8 @@ let ChannelWithConfigDrawer = createReactClass({
         </div>
         <div className="channel-stack">
           {configComponent ?
-            <div className={classnames({open: controlsOpen, 'tray-container': true, 'config-container': true})} ref="controlsContainer">
-              <div ref="controls" style={{width: `${effWidth}px`}}>
+            <div className={classnames({open: controlsOpen, 'tray-container': true, 'config-container': true})}>
+              <div style={{width: `${effWidth}px`}}>
                 {configComponent}
               </div>
             </div> : null }
@@ -91,8 +91,8 @@ let ChannelWithConfigDrawer = createReactClass({
             {this.props.children}
           </div>
           {legendComponent ?
-            <div className={classnames({open: legendOpen, 'tray-container': true, 'legend-container': true})} ref="legendContainer">
-              <div ref="legend" style={{width: `${effWidth}px`}}>
+            <div className={classnames({open: legendOpen, 'tray-container': true, 'legend-container': true})}>
+              <div style={{width: `${effWidth}px`}}>
                 {legendComponent}
               </div>
             </div> : null }
@@ -113,7 +113,3 @@ export default ChannelWithConfigDrawer;
 //<div className="channel-data" style={{width: `${effWidth}px`}}>
 //  {this.props.children}
 //</div>
-
-
-
-
