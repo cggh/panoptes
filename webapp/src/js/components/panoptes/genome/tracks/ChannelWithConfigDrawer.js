@@ -114,12 +114,3 @@ let ChannelWithConfigDrawer = createReactClass({
 });
 
 export default ChannelWithConfigDrawer;
-
-//          {this.props.onClose ? <Icon className="close" name="times" onClick={this.handleClose}/> : null}
-
-
-//
-
-//<div className="channel-data" style={{width: `${effWidth}px`}}>
-//  {this.props.children}
-//</div>
