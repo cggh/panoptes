@@ -309,15 +309,14 @@ class Legend extends React.Component {
     if (sequenceText !== null) {
       const copyControl = (
         <CopyToClipboard text={sequenceText}>
-          <Button
-            color="inherit"
-            style={{textTransform: 'none'}}
-          >
-            <div style={{textAlign: 'center'}}>
-              <div style={{overflowWrap: 'break-word', overflow: 'auto', maxWidth: '500px'}}>{sequenceText}</div>
-              <div>Click to copy to clipboard</div>
-            </div>
-          </Button>
+          <div style={{textAlign: 'center'}}>
+            <div style={{overflowWrap: 'break-word', overflow: 'auto', maxWidth: '500px'}}>{sequenceText}</div>
+            <Button
+              color="inherit"
+              style={{textTransform: 'none'}}
+              label="Click here to copy to clipboard"
+            />
+          </div>
         </CopyToClipboard>
       );
       this.setState({copyControl});
