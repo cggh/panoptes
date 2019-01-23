@@ -1,21 +1,25 @@
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
 import io
 from DQXTableUtils import VTTable
 import sys
-reload(sys)
-sys.setdefaultencoding('UTF8')
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 
 def appendfeatproperty(feat, prop, value):
-    value = urllib.unquote_plus(value)
+    value = urllib.parse.unquote_plus(value)
     if len(value) > 0:
         if len(feat[prop]) > 0:
             feat[prop] += ';'
         feat[prop] += value
 
 
-class GFFParser:
+class GFFParser(object):
     def __init__(self):
         self.maxrowcount = -1
         self.targetfeaturelist = ['gene', 'pseudogene']
@@ -179,7 +183,7 @@ class GFFParser:
                 featnr+=1
         
         print('building index')
-        for i in xrange(len(self.features)):
+        for i in range(len(self.features)):
             self.features[i]['nr']=i
             #Build an index
         self.featindex={}
@@ -252,25 +256,25 @@ class GFFParser:
                 f.write('gene'+'\t')
                 f.write(feat['name']+'\t')
                 names = []
-                for key, val in feat['names'].items():
+                for key, val in list(feat['names'].items()):
                     for altname in val.split(','):
-                        altname = urllib.unquote(altname)
+                        altname = urllib.parse.unquote(altname)
                         names.append(altname.split(';')[0]) #Just grab the name, not data associated to it
                 f.write(', '.join(sorted(names))+'\t')
                 desc = []
                 for key in self.attriblist_descr:
                     if key in feat['descr']:
-                        desc.append(unicode(key) + unicode(': ') + urllib.unquote(feat['descr'][key]))
+                        desc.append(str(key) + str(': ') + urllib.parse.unquote(feat['descr'][key]))
                     else:
                         if '.' in key:
                             first, second = key.split('.')
                             try:
-                                decoded = urllib.unquote(feat['descr'][first])
+                                decoded = urllib.parse.unquote(feat['descr'][first])
                                 for data in decoded.split(';'):
                                     if ('=') in data:
                                         key_2, val = data.split('=')[:2]  #Often = appears in value
                                         if key_2 == second:
-                                            desc.append(unicode(first) + unicode(': ') + urllib.unquote(val))
+                                            desc.append(str(first) + str(': ') + urllib.parse.unquote(val))
                             except KeyError:
                                 pass
 
@@ -355,7 +359,7 @@ parser.exonid = arg_exonid.split(',')
 parser.attriblist_name = arg_attrib_genename.split(',')
 parser.attriblist_names = arg_attriblist_genenames.split(',')
 parser.attriblist_descr = arg_attrib_descr.split(',')
-parser.attriblist_top_level_descr = set(map(lambda descr: descr.split('.')[0], parser.attriblist_descr))
+parser.attriblist_top_level_descr = set([descr.split('.')[0] for descr in parser.attriblist_descr])
 
 if arg_format == 'GTF':
     parser.parseGTF(filelist)

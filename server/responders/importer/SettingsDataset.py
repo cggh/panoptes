@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from ImportSettings import ImportSettings
+from __future__ import absolute_import
+from .ImportSettings import ImportSettings
 from collections import OrderedDict
 
 class SettingsDataset(ImportSettings):

@@ -1,14 +1,18 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # This file is part of DQXServer - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import str
+from builtins import object
 import math
 import os
 import simplejson
 import sys
 import math
 
-import DQXEncoder
+from . import DQXEncoder
 
 basedir = '.'
 
@@ -32,7 +36,7 @@ blockSizeIncrFactor = int(sys.argv[5])
 blockSizeMax = int(sys.argv[6])
 maxrowcount = int(sys.argv[7])
 
-class Level:
+class Level(object):
     def __init(self):
         self.blocksize = None
         self.currentblockend = 0
@@ -43,7 +47,7 @@ class Level:
         self.outputfile = None
 
 
-class Summariser:
+class Summariser(object):
     def __init__(self, chromosome, encoder, blockSizeStart, blockSizeIncrFactor, blockSizeMax, outputFolder):
         print('Chrom '+chromosome)
         self.encoder = encoder

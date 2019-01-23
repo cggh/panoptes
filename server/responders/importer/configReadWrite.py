@@ -1,8 +1,14 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import csv
 import os
 import sys
-import urllib2
-import httplib
+import urllib.request, urllib.error, urllib.parse
+import http.client
 
 import uuid
 from os import path, listdir
@@ -13,13 +19,13 @@ from os.path import exists
 import xmltodict
 from responders.importer import ImpUtils
 from simplejson import load, loads, dumps
-from PanoptesConfig import PanoptesConfig
-from SettingsDataset import SettingsDataset
-from SettingsDataTable import SettingsDataTable
-from Settings2Dtable import Settings2Dtable
-from SettingsRefGenome import SettingsRefGenome
-from SettingsMapLayer import SettingsMapLayer
-from readChromLengths import readChromLengths
+from .PanoptesConfig import PanoptesConfig
+from .SettingsDataset import SettingsDataset
+from .SettingsDataTable import SettingsDataTable
+from .Settings2Dtable import Settings2Dtable
+from .SettingsRefGenome import SettingsRefGenome
+from .SettingsMapLayer import SettingsMapLayer
+from .readChromLengths import readChromLengths
 
 pnConfig = PanoptesConfig(None)
 sourceDir = join(pnConfig.getSourceDataDir(), 'datasets')
@@ -61,20 +67,20 @@ def readJSONConfig(datasetId):
     tables = readSetOfSettings(join(dataset_folder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     cachedTables = []
     try:
-        for tableId, table_config in tables.items():
+        for tableId, table_config in list(tables.items()):
             config_file = join(base_folder, tableId, 'dataConfig.json')
             if exists(config_file):
                 with open(config_file, 'r') as f:
                     data_config = load(f)
                     for prop in table_config['properties']:
                         if prop['id'] in data_config:
-                            for key, value in data_config[prop['id']].items():
+                            for key, value in list(data_config[prop['id']].items()):
                                 if key not in prop:
                                     prop[key] = value
 
     except IOError:
         print('Cached data derived config not found - skipping')
-    for tableId, table_config in tables.items():
+    for tableId, table_config in list(tables.items()):
         graph_file = join(base_folder, tableId, 'graphConfig.json')
         if exists(graph_file):
             with open(graph_file, 'r') as f:
@@ -100,23 +106,23 @@ def readJSONConfig(datasetId):
 
     cachedTables = {}
     csv.field_size_limit(sys.maxsize)
-    for tableId, table_config in tables.items():
+    for tableId, table_config in list(tables.items()):
         if table_config['cacheTableInConfig']:
             with open(join(dataset_folder, 'datatables', tableId, 'data')) as csvfile:
                 cachedTables[tableId] = list(csv.DictReader(csvfile, delimiter='\t'))
 
     feeds = {}
-    for id, url in settings.get('feeds').items():
+    for id, url in list(settings.get('feeds').items()):
         file = None
         try:
-            file = urllib2.urlopen(url, timeout=10) # Catch URLs that timeout
-        except urllib2.HTTPError, e: # Catches pages that don't exist, etc., e.g. http://example.com/foobar
+            file = urllib.request.urlopen(url, timeout=10) # Catch URLs that timeout
+        except urllib.error.HTTPError as e: # Catches pages that don't exist, etc., e.g. http://example.com/foobar
             print('urllib2.HTTPError code {} from feed ID "{}" when trying to open URL {}'.format(e.code, id, url))
-        except urllib2.URLError, e: # Catches websites that don't exist, etc., e.g. http://foo.bar, about:blank
+        except urllib.error.URLError as e: # Catches websites that don't exist, etc., e.g. http://foo.bar, about:blank
             print('urllib2.URLError reason {} from feed ID "{}" when trying to open URL {}'.format(e.reason, id, url))
-        except httplib.HTTPException, e: # Catches entirely blank pages, etc. (theoretical). See http://www.voidspace.org.uk/python/articles/urllib2.shtml#badstatusline-and-httpexception
+        except http.client.HTTPException as e: # Catches entirely blank pages, etc. (theoretical). See http://www.voidspace.org.uk/python/articles/urllib2.shtml#badstatusline-and-httpexception
             print('httplib.HTTPException from feed ID "{}" when trying to open URL {}'.format(id, url))
-        except Exception, e: # Catches strings that are not URLs, etc., e.g. "foo/bar"
+        except Exception as e: # Catches strings that are not URLs, etc., e.g. "foo/bar"
             print('Exception from feed ID "{}" when trying to open URL {}'.format(id, url))
         if file is not None:
             data = file.read()
@@ -137,13 +143,13 @@ def readJSONConfig(datasetId):
         'feeds': feeds
     }
 
-class ReadOnlyErrorWriter:
+class ReadOnlyErrorWriter(object):
     def __init__(self, name):
         self.name = name
     def updateAndWriteBack(self, action, updatePath, newConfig, validate=True):
         raise Exception("The config at:"+'.'.join([self.name]+updatePath)+" is read-only")
 
-class DocsWriter:
+class DocsWriter(object):
     def __init__(self, datasetId):
         self.datasetId = datasetId
     def updateAndWriteBack(self, action, path, content, validate=True):

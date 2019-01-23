@@ -1,7 +1,12 @@
+from __future__ import print_function
+from __future__ import division
 # This file is part of DQXServer - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import str
+from builtins import object
+from past.utils import old_div
 import sys
 import os
 import simplejson
@@ -26,7 +31,7 @@ hwinsize = int(sys.argv[4])
 
 
 
-class Handler:
+class Handler(object):
     def __init__(self, chromosome, baseliststr, ignorebaseliststr, hwinsize, ofl):
         print('Chrom '+chromosome)
         self.chromosome = chromosome
@@ -60,7 +65,7 @@ class Handler:
 
     def WriteWindow(self):
         if self.totct > 0:
-            self.ofl.write('{0}\t{1}\t{2}\n'.format(self.chromosome, self.curwincent, self.ct*1.0/self.totct))
+            self.ofl.write('{0}\t{1}\t{2}\n'.format(self.chromosome, self.curwincent, old_div(self.ct*1.0,self.totct)))
 
 
     def Finalise(self):

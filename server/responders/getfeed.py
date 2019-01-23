@@ -1,7 +1,9 @@
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+import urllib.request, urllib.error, urllib.parse
 import xmltodict
 import DQXbase64
 import json
@@ -22,7 +24,7 @@ def response(returndata):
             pass
     
     if returndata['content'] is None:
-        file = urllib2.urlopen(url)
+        file = urllib.request.urlopen(url)
         data = file.read()
         file.close()
         data = xmltodict.parse(data)

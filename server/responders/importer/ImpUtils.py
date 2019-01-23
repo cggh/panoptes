@@ -1,9 +1,11 @@
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
+from builtins import str
+from builtins import range
 import numbers
 import os
-from itertools import izip, imap
+
 from math import isnan
 
 
@@ -86,7 +88,7 @@ def tabFileFromHDF5(settings, file):
         for prop in props:
             arrays[prop['id']] = h5[path][prop['id']]
         array_length = arrays[props[0]['id']].shape[0]
-        if any(array.shape[0] is not array_length for array in arrays.values()):
+        if any(array.shape[0] is not array_length for array in list(arrays.values())):
             raise Exception('HDF5 arrays are not all same size')
         outFileName = GetTempFileName()
         with open(outFileName, 'w') as outFile:
@@ -95,6 +97,6 @@ def tabFileFromHDF5(settings, file):
             step_size = 1000
             for start in range(0, array_length, step_size):
                 end = min(start + step_size, array_length)
-                for line in izip(*[array[start:end] for array in arrays.values()]):
-                    outFile.writelines('\t'.join(imap(valueToString, line))+'\n')
+                for line in zip(*[array[start:end] for array in list(arrays.values())]):
+                    outFile.writelines('\t'.join(map(valueToString, line))+'\n')
     return outFileName

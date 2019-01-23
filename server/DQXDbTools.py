@@ -7,6 +7,7 @@ import simplejson
 import DQXbase64
 import pymonetdb.sql
 import config
+
 #As we created the DB and it is only listening on localhost set these here
 config.DBUSER = 'monetdb'
 config.DBPASS = 'monetdb'
@@ -430,10 +431,7 @@ class WhereClause:
             self.querystring_params += querystr.replace('__param__', self.ParameterPlaceHolder)
 
         if not(processed):
-            if type(statm['CompValue']) is unicode:
-                decoval = statm['CompValue'].encode('utf-8')
-            else:
-                decoval = statm['CompValue']
+            decoval = statm['CompValue']
             operatorstr = statm['Tpe']
             if operatorstr == 'CONTAINS':
                 operatorstr = 'LIKE'

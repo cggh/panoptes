@@ -1,7 +1,14 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import zip
+from builtins import str
+from builtins import map
+from past.utils import old_div
 import os
 import shutil
 
@@ -13,14 +20,14 @@ import multiprocessing
 import multiprocessing.dummy
 
 
-from ProcessDatabase import ProcessDatabase
-from BaseImport import BaseImport
-from SettingsGraph import SettingsGraph
-from PanoptesConfig import PanoptesConfig
-from ImportSettings import valueTypes
+from .ProcessDatabase import ProcessDatabase
+from .BaseImport import BaseImport
+from .SettingsGraph import SettingsGraph
+from .PanoptesConfig import PanoptesConfig
+from .ImportSettings import valueTypes
 from dates import datetimeToJulianDay
 
-pool = multiprocessing.dummy.Pool(max(int(multiprocessing.cpu_count()/2),1))
+pool = multiprocessing.dummy.Pool(max(int(old_div(multiprocessing.cpu_count(),2)),1))
 
 class ImportDataTable(BaseImport):
 
@@ -57,8 +64,8 @@ class ImportDataTable(BaseImport):
                         'select count(distinct "{0}") from "{1}"'.format(prop_id, table_id))[0][0] < 50 and prop['dataType'] != 'GeoJSON':
                     result['isCategorical'] = True
                 if ((result.get('isCategorical', False) or prop.get('isCategorical', False))):
-                    result['distinctValues'] = map(lambda a: encode(a[0]), self._dao._execSqlQuery(
-                        'select distinct "{0}" from "{1}" order by "{0}"'.format(prop_id, table_id)))
+                    result['distinctValues'] = [encode(a[0]) for a in self._dao._execSqlQuery(
+                        'select distinct "{0}" from "{1}" order by "{0}"'.format(prop_id, table_id))]
                 if 'maxVal' not in prop and prop['dataType'] in valueTypes:
                     result['maxVal'] = \
                     encode(self._dao._execSqlQuery('select max("{0}") from "{1}"'.format(prop_id, table_id))[0][0])
@@ -70,7 +77,7 @@ class ImportDataTable(BaseImport):
                     encode(self._dao._execSqlQuery('select min("{0}") from "{1}"'.format(prop_id, table_id))[0][0])
                 return result
             prop_ids = self._settingsLoader.getPropertyNames()
-            results = map(getDataDerivedConfigForProp, prop_ids)
+            results = list(map(getDataDerivedConfigForProp, prop_ids))
             data_derived_config = {}
             for prop_id, result in zip(prop_ids, results):
                 data_derived_config[prop_id] = result

@@ -1,11 +1,15 @@
+from __future__ import print_function
 # This file is part of DQXServer - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import str
+from builtins import range
+from builtins import object
 from DQXTableUtils import VTTable
 import sys
 
-class GFFParser:
+class GFFParser(object):
     def __init__(self):
         self.targetfeaturelist=['gene', 'pseudogene']
         self.features=[]
@@ -148,7 +152,7 @@ class GFFParser:
                 featnr+=1
 
         print('building index')
-        for i in xrange(len(self.features)):
+        for i in range(len(self.features)):
             self.features[i]['nr']=i
             #Build an index
         self.featindex={}

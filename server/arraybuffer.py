@@ -5,12 +5,13 @@
 import numpy as np
 import struct
 from operator import mul
+from functools import reduce
 
 NATIVE_ENDIAN = '<' if (np.dtype("<i").byteorder == '=') else '>'
 
 def _strict_dtype_string(dtype):
     if dtype.str[1] == 'S' or dtype.str[1] == 'U':
-        return 'S'
+        return b'S'
     if not dtype.isbuiltin:
         raise Exception("Only scalar builtin dtypes (ie not structured with fields or user-defined) or strings currently supported")
 #Old method commented out as length is platform dependant
@@ -19,32 +20,30 @@ def _strict_dtype_string(dtype):
 #		byte_order = NATIVE_ENDIAN
 #	return byte_order + dtype.char
 	#New method gives explicit num bytes and endianness
-    return dtype.str
+    return bytes(dtype.str, 'utf-8')
 
 #Convert a string array to a chain of null terminated strings
 def pack_string_array(array):
-    result = ''
+    result = b''
     if len(array) > 0:
-        for string in np.nditer(array):
-            result += str(string)
-            result += chr(0)
+        for string in array.flatten().tolist():
+            result += string
+            result += b'\0'
     return result
 
 def _encode_numpy_array(array):
-    dtype = _strict_dtype_string(array.dtype)
-    for char in dtype:
-        yield char
-    yield chr(0)
+    dtype =_strict_dtype_string(array.dtype)
+    yield dtype
+    yield b'\0'
     yield struct.pack('<B', len(array.shape))
     for dim in array.shape:
         yield struct.pack('<L', dim)
-    if dtype == 'S':
+    if dtype == b'S':
         data = pack_string_array(array)
     else:
         data = array.tobytes('C')
     yield struct.pack('<L', reduce(mul,array.shape))
-    for byte in data:
-        yield byte
+    yield data
 
 def encode_array(array, dtype=None):
     """Encode an array for a JS arraybuffer
@@ -69,11 +68,9 @@ def encode_array(array, dtype=None):
     except AttributeError:
         raise Exception("Non-numpy array passed, but with no numpy dtype to convert to")
     dtype = np.dtype(dtype)
-    yield 'A'
-    yield 'B'
-    for byte in _encode_numpy_array(np.asarray(array, dtype)):
-        yield byte
-	
+    yield b'AB'
+    yield _encode_numpy_array(np.asarray(array, dtype))
+
 def encode_array_set(array_set):
     """Encode a set of named arrays for a set of JS arraybuffer
 
@@ -94,15 +91,13 @@ def encode_array_set(array_set):
 
     """
     array_set = list(array_set)
-    yield 'A'
-    yield 'S'
+    yield b'AS'
     yield struct.pack('<B', len(array_set))
     for name, array in array_set:
-        for char in name:
-            yield char
-        yield chr(0)
-        for byte in _encode_numpy_array(array):
-            yield byte
+        yield bytes(name, 'utf-8')
+        yield b'\0'
+        for chunk in _encode_numpy_array(array):
+            yield chunk
 
 	
 		

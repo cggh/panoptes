@@ -24,7 +24,7 @@ echo -e "${green}  Fetching dependancies${NC}"
 echo -e "${green}    Python dependancies${NC}"
 if [ ! -d panoptes_virtualenv ]
 then
-  virtualenv panoptes_virtualenv
+  virtualenv -p python3 panoptes_virtualenv
 fi
 
 source panoptes_virtualenv/bin/activate
@@ -37,7 +37,7 @@ echo -e "${green}      gunicorn...${NC}"
 pip install  gunicorn==19.1.0 #For testing and instant run, not a strict requirement
 
 echo pythoncommand = \'`which python`\' >> config.py
-BASEDIR=`python -c "import config;print config.BASEDIR"`
+BASEDIR=`python -c "import config;print(config.BASEDIR)"`
 echo -e "${green}  Basedir is ${BASEDIR} - making if it doesn't exist"
 mkdir -p $BASEDIR
 mkdir -p $BASEDIR/temp
@@ -106,7 +106,7 @@ rm -rf Maps
 ln -sf $BASEDIR/Maps Maps
 
 cd $PROJECT_ROOT
-SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
+SOURCEDATADIR=`python -c "import config;print(config.SOURCEDATADIR)"`
 echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist${NC}"
 mkdir -p $SOURCEDATADIR
 mkdir -p $SOURCEDATADIR/datasets

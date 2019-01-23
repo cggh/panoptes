@@ -75,7 +75,7 @@ def b64decode(s, altchars=None):
         s = _translate(s, {altchars[0]: '+', altchars[1]: '/'})
     try:
         return binascii.a2b_base64(s)
-    except binascii.Error, msg:
+    except binascii.Error as msg:
         # Transform this exception for consistency
         raise TypeError(msg)
 
@@ -130,10 +130,10 @@ _b32alphabet = {
     8: 'I', 17: 'R', 26: '2',
     }
 
-_b32tab = _b32alphabet.items()
+_b32tab = list(_b32alphabet.items())
 _b32tab.sort()
 _b32tab = [v for k, v in _b32tab]
-_b32rev = dict([(v, long(k)) for k, v in _b32alphabet.items()])
+_b32rev = dict([(v, int(k)) for k, v in _b32alphabet.items()])
 
 
 def b32encode(s):
@@ -332,13 +332,13 @@ def test():
     import sys, getopt
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'deut')
-    except getopt.error, msg:
+    except getopt.error as msg:
         sys.stdout = sys.stderr
-        print msg
-        print """usage: %s [-d|-e|-u|-t] [file|-]
+        print(msg)
+        print("""usage: %s [-d|-e|-u|-t] [file|-]
         -d, -u: decode
         -e: encode (default)
-        -t: encode and decode string 'Aladdin:open sesame'"""%sys.argv[0]
+        -t: encode and decode string 'Aladdin:open sesame'"""%sys.argv[0])
         sys.exit(2)
     func = encode
     for o, a in opts:
@@ -363,7 +363,7 @@ def test1():
     s0 = "Aladdin:open sesame"
     s1 = encodestring(s0)
     s2 = decodestring(s1)
-    print s0, repr(s1), s2
+    print(s0, repr(s1), s2)
 
 
 if __name__ == '__main__':

@@ -2,11 +2,13 @@
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from builtins import range
+from builtins import object
 import B64
 import config
 import DQXUtils
 
-class PositionIndex:
+class PositionIndex(object):
     def __init__(self,datadir,ichromoid):
         self.chromoid=ichromoid
         DQXUtils.LogServer('Loading position index {0} {1}'.format(datadir,self.chromoid))

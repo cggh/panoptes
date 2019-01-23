@@ -1,7 +1,9 @@
+from __future__ import division
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
+from past.utils import old_div
 import DQXDbTools
 import B64
 import math
@@ -53,11 +55,11 @@ def response(returndata):
             optimalbincount = int(math.sqrt(count))
             optimalbincount = max(optimalbincount, 2)
             optimalbincount = min(optimalbincount, 200)
-            optimalbinsize = (maxval-minval)*1.0/optimalbincount
+            optimalbinsize = old_div((maxval-minval)*1.0,optimalbincount)
             mindist = 1.0e99
             binsize = 1
             for jumpPrototype in jumpPrototypes:
-                q=math.floor(math.log10(optimalbinsize/jumpPrototype))
+                q=math.floor(math.log10(old_div(optimalbinsize,jumpPrototype)))
                 TryJump1A = math.pow(10, q) * jumpPrototype
                 TryJump1B = math.pow(10, q + 1) * jumpPrototype
                 if abs(TryJump1A - optimalbinsize) < mindist:

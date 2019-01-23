@@ -1,10 +1,11 @@
+from __future__ import absolute_import
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import DQXDbTools
 import json
-from importer import configReadWrite
+from .importer import configReadWrite
 
 # curl -H "content-Type: application/json" -X POST -d '{"propertyGroups":[{"id":"Value", "name":"WTF"}]' 'http://localhost:8000/api?datatype=custom&respmodule=panoptesserver&respid=setconfig&dataset=Samples_and_Variants&action=merge&path=tablesById.variants'
 
@@ -17,7 +18,7 @@ def response(returndata):
         length = int(returndata['environ'].get('CONTENT_LENGTH', '0'))
     except ValueError:
         length = 0
-    content = returndata['environ']['wsgi.input'].read(length)
+    content = returndata['environ']['wsgi.input'].read(length).decode('utf-8')
     content = json.loads(content) if len(content) > 0 else None
     sendBackDocs = configReadWrite.writeJSONConfig(datasetId, action, path, content)
     sendBack = configReadWrite.readJSONConfig(returndata['dataset'])
