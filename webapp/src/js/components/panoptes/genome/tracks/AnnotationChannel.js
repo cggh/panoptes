@@ -201,7 +201,7 @@ let AnnotationChannel = createReactClass({
     const {width, sideWidth, start, end, hoverPos} = props || this.props;
     const {height} = this.state;
     const hovers = [];
-    const canvas = this.refs.canvas;
+    const canvas = this.canvas;
     if (!canvas)
       return;
     const ctx = canvas.getContext('2d');
@@ -275,7 +275,7 @@ let AnnotationChannel = createReactClass({
   },
 
   convertXY(e) {
-    let rect = this.refs.canvas.getBoundingClientRect();
+    let rect = this.canvas.getBoundingClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top];
   },
 
@@ -298,7 +298,7 @@ let AnnotationChannel = createReactClass({
   },
 
   handleClick(e) {
-    if (!this.refs.canvas) return;
+    if (!this.canvas) return;
     let [x, y] = this.convertXY(e);
     let gene = this.xyToGene(x, y);
     if (gene) {
@@ -320,14 +320,14 @@ let AnnotationChannel = createReactClass({
   },
 
   handleMouseMove(e) {
-    if (!this.refs.canvas) return;
+    if (!this.canvas) return;
     let [x, y] = this.convertXY(e);
     let id = this.xyToGene(x, y);
     this.setHover(id);
   },
 
   handleMouseOver(e) {
-    if (!this.refs.canvas) return;
+    if (!this.canvas) return;
     let [x, y] = this.convertXY(e);
     let id = this.xyToGene(x, y);
     this.setHover(id);
@@ -383,7 +383,7 @@ let AnnotationChannel = createReactClass({
       >
         <div className="canvas-container">
           <Hammer onTap={this.handleClick}>
-            <canvas ref="canvas"
+            <canvas ref={(ref) => this.canvas = ref}
               style={{cursor: clickIndex !== null ? 'pointer' : 'inherit'}}
               width={width} height={height}
               onClick={this.handleClick}
