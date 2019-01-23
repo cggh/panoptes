@@ -1,7 +1,10 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
+import PropTypes from 'prop-types';
+import Tooltip from 'rc-tooltip';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -9,14 +12,11 @@ import FluxMixin from 'mixins/FluxMixin';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
-
 import ErrorReport from 'panoptes/ErrorReporter';
 import LegendElement from 'panoptes/LegendElement';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import Button from 'ui/Button';
-import PropTypes from 'prop-types';
-import Tooltip from 'rc-tooltip';
 
 const HEIGHT = 27;
 const SEQ_LOOKUP = {
@@ -206,12 +206,12 @@ let ReferenceSequence = createReactClass({
 
   draw(props) {
     const {start, end, width, sideWidth} = props;
-    if (!this.refs.canvas) {
+    if (!this.canvas) {
       return;
     }
     const xScaleFactor = (width - sideWidth) / (end - start);
     const pixelWindowSize = this.summaryWindow * xScaleFactor;
-    const canvas = this.refs.canvas;
+    const canvas = this.canvas;
     const ctx = canvas.getContext('2d', {alpha: false});
     //Squares
     ctx.fillStyle = 'white';
@@ -264,7 +264,7 @@ let ReferenceSequence = createReactClass({
       });
       return seq;
     } else {
-      return 'Zoom in until sequence is not summarised';
+      return null;
     }
   },
 
@@ -278,7 +278,7 @@ let ReferenceSequence = createReactClass({
         sideComponent={<Side />}
         legendComponent={<Legend getSeq={this.getSeq}/>}
       >
-        <canvas ref="canvas" width={width - sideWidth} height={HEIGHT}/>
+        <canvas ref={(ref) => this.canvas = ref} width={width - sideWidth} height={HEIGHT}/>
       </ChannelWithConfigDrawer>
     );
   },
@@ -291,10 +291,39 @@ class Side extends React.Component {
 }
 
 class Legend extends React.Component {
-  state = {seq: ''};
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      copyControl: <div></div>,
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextState.seq !== this.state.seq;
+    return nextState.copyControl !== this.state.copyControl;
+  }
+
+  handleClick() {
+    const sequenceText = this.props.getSeq();
+    if (sequenceText !== null) {
+      const copyControl = (
+        <CopyToClipboard text={sequenceText}>
+          <Button
+            color="inherit"
+            style={{textTransform: 'none'}}
+          >
+            <div style={{textAlign: 'center'}}>
+              <div style={{overflowWrap: 'break-word', overflow: 'auto', maxWidth: '500px'}}>{sequenceText}</div>
+              <div>Click to copy to clipboard</div>
+            </div>
+          </Button>
+        </CopyToClipboard>
+      );
+      this.setState({copyControl});
+    } else {
+      this.setState({copyControl: <div>Zoom in until the sequence is not summarised, then try again.</div>});
+    }
   }
 
   render() {
@@ -309,19 +338,24 @@ class Legend extends React.Component {
         <LegendElement key={base} name={base} colour={colour}/>
       ))}
       <div style={{paddingLeft: '10px'}}>(Majority base over window)</div>
-      <Tooltip placement={'bottom'}
+      <Tooltip
+        placement={'bottom'}
         trigger={'click'}
-        overlay={<div style={{overflowWrap: 'break-word', overflow: 'auto', maxWidth: '500px'}}>{this.state.seq}</div>}>
+        overlay={this.state.copyControl}
+      >
         <Button
-          label="Copy sequence"
+          label="Get sequence"
           color="primary"
-          onClick={() => this.setState({seq: this.props.getSeq()})}
+          onClick={this.handleClick}
+          iconName="copy"
         />
       </Tooltip>
-
-
     </div>;
   }
 }
+
+Legend.propTypes = {
+  getSeq: PropTypes.func
+};
 
 export default ReferenceSequence;
