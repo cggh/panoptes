@@ -51,7 +51,8 @@ let GenomeBrowserWithActions = createReactClass({
     chromosome: PropTypes.string,
     start: PropTypes.number,
     end: PropTypes.number,
-    childrenHash: PropTypes.number
+    childrenHash: PropTypes.number,
+    disableAnnotationChannelClick: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -69,7 +70,7 @@ let GenomeBrowserWithActions = createReactClass({
   },
 
   render() {
-    let {sidebar, setProps, children, ...subProps} = this.props;
+    let {sidebar, setProps, children, disableAnnotationChannelClick, ...subProps} = this.props;
     //Insert an extra child to hint to the user how to add tracks
     children = React.Children.toArray(children);
     if (children.length === 0) {
@@ -80,12 +81,12 @@ let GenomeBrowserWithActions = createReactClass({
           }));
           return false;
         }
-      })
+      });
     }
     children.push(<AddChannelMessage key="_ACM_" setProps={this.props.setProps}/>);
     //Add fixed children to the top
     children.push(<ReferenceSequence key="_ref_" fixed/>);
-    children.push(<AnnotationChannel key="_annot_" fixed/>);
+    children.push(<AnnotationChannel key="_annot_" fixed disableClick={disableAnnotationChannelClick}/>);
 
     return (
       <Sidebar
