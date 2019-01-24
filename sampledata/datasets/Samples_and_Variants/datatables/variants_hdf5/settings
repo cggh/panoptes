@@ -118,12 +118,15 @@ properties:
   maxVal: 1
 
 - id: NRAF_WAF
+  name: Non-ref AF in WAF
   description: Non-reference allele frequency in West Africa
 
 - id: NRAF_EAF
+  name: Non-ref AF in EAF
   description: Non-reference allele frequency in East Africa
 
 - id: NRAF_SAF
+  name: Non-ref AF in SAF
   description: Non-reference allele frequency in South Africa
 
 - id: int8
