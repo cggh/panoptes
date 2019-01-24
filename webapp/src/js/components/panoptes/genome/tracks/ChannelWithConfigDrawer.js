@@ -68,6 +68,7 @@ let ChannelWithConfigDrawer = createReactClass({
                 name="times"
                 onClick={this.handleClose}
                 style={{cursor: 'pointer'}}
+                title="Close channel"
               />
             </div>
             : null }
@@ -77,6 +78,7 @@ let ChannelWithConfigDrawer = createReactClass({
                 className={classnames({open: controlsOpen})}
                 name="cog" onClick={this.handleControlToggle}
                 style={{cursor: 'pointer'}}
+                title="Show/hide channel configuration"
               />
             </div>
             : null }
@@ -86,6 +88,7 @@ let ChannelWithConfigDrawer = createReactClass({
                 className={classnames({open: legendOpen})}
                 name="info" onClick={this.handleLegendToggle}
                 style={{cursor: 'pointer'}}
+                title="Show/hide channel information"
               />
             </div>
             : null }
