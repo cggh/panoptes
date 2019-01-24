@@ -209,9 +209,8 @@ let AnnotationChannel = createReactClass({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!(this.data && this.data.starts)) return;
     const {ids, names, sizes, starts, types, rows, altNames} = this.data;
-    ctx.strokeStyle = '#000';
-    ctx.fillStyle = '#000';
-    ctx.font = '10px monospace';
+    ctx.strokeStyle = '#000'; // gene onHover border colour
+    ctx.font = '10px monospace'; // gene text normal font
     let maxRow = 0;
     let scaleFactor = ((width - sideWidth) / (end - start));
     let lastTextAt = [];
@@ -232,7 +231,7 @@ let AnnotationChannel = createReactClass({
             grd.addColorStop(1.000, 'rgba(255, 255, 255, 1.000)');
             ctx.fillStyle = grd;
             ctx.fillRect(x1 - 12, (rows[i] * ROW_HEIGHT) + 4, 12 + text.length * 6, 10);
-            ctx.fillStyle = '#000';
+            ctx.fillStyle = '#3d8bd5'; // gene text normal colour
             ctx.fillText(text, x1, (rows[i] * ROW_HEIGHT) + 14);
           }
           if (rows[i] > maxRow)
@@ -240,7 +239,7 @@ let AnnotationChannel = createReactClass({
         }
       }
     }
-    ctx.fillStyle = '#3d8bd5';
+    ctx.fillStyle = '#3d8bd5'; // coding region background colour
     for (let i = 0, l = starts.length; i < l; ++i) {
       if (types[i] === 'CDS') {
         const x1 = scaleFactor * (starts[i] - start);
@@ -263,10 +262,10 @@ let AnnotationChannel = createReactClass({
       }
       if (altNames[hoverIndex]) text += `, ${altNames[hoverIndex]}`;
       if (text) {
-        ctx.fillStyle = '#FFF';
+        ctx.fillStyle = '#FFF'; // gene text onHover background colour
         ctx.fillRect(x1 - 12, (rows[hoverIndex] * ROW_HEIGHT) + 4, 14 + text.length * 6, 10);
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 10px monospace';
+        ctx.fillStyle = '#000'; // gene text onHover colour
+        ctx.font = '10px monospace'; // gene text onHover font
         ctx.fillText(text, x1, (rows[hoverIndex] * ROW_HEIGHT) + 14);
       }
     });
@@ -409,9 +408,9 @@ class Legend extends React.Component {
     return <div className="legend">
       <div className="legend-element">
         <svg width="50" height="26">
-          <rect x="0" y="12" width="50" height="2" style={{fill: '#000'}}/>
+          <rect x="0" y="12" width="50" height="2" style={{fill: '#3d8bd5'}}/>
         </svg>
-        <div className="label">
+        <div style={{marginLeft: '5px'}}>
           Gene
         </div>
       </div>
@@ -419,7 +418,7 @@ class Legend extends React.Component {
         <svg width="50" height="26">
           <rect x="0" y="8" width="50" height="10" style={{fill: '#3d8bd5'}}/>
         </svg>
-        <div className="label">
+        <div style={{marginLeft: '5px'}}>
           Coding Sequence
         </div>
       </div>
