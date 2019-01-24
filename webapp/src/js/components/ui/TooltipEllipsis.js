@@ -11,6 +11,7 @@ let TooltipEllipsis = createReactClass({
 
   propTypes: {
     className: PropTypes.string,
+    style: PropTypes.object,
     children: PropTypes.any
   },
 
@@ -25,9 +26,10 @@ let TooltipEllipsis = createReactClass({
   },
 
   render() {
+    const {className, style, children} = this.props;
     return (
-      <span className={`${this.props.className} tooltip-ellipsis`} ref={(node) => this.element = node}>
-        {this.props.children}
+      <span className={className !== undefined ? `${className} tooltip-ellipsis` : 'tooltip-ellipsis'} style={style} ref={(node) => this.element = node}>
+        {children}
       </span>
     );
   },
