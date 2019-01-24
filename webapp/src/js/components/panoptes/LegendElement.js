@@ -49,9 +49,9 @@ let LegendElement = createReactClass({
             colours={colours}
             onPick={this.handlePickColour}
           />}>
-          <i className="fa fa-square" style={{color: colour, cursor: (onPickColour ? 'pointer' : 'inherit')}}/>
+          <i className="fa fa-square" style={{color: colour, cursor: (onPickColour ? 'pointer' : 'inherit')}} title="Click to pick colour"/>
         </Tooltip>
-        <TooltipEllipsis className="label">
+        <TooltipEllipsis style={{marginLeft: '5px'}}>
           {name}
         </TooltipEllipsis>
       </div>
