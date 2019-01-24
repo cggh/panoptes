@@ -213,7 +213,7 @@ let Side = createReactClass({
     let trackNames = ValidComponentChildren.map(children, (child, i) =>
       <LegendElement
         key={child.props.track}
-        name={<PropertyHeader
+        name={<PropertyHeader className="table-row-header"
           table={table}
           propId={child.props.track}
           tooltipPlacement={'bottom'}
