@@ -22,7 +22,6 @@ import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack'
 import filterChildren from 'util/filterChildren';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import ItemPicker from 'containers/ItemPicker';
-import {findBlock} from 'util/PropertyRegionCache';
 import SQL from 'panoptes/SQL';
 // import DataTableWithActions from 'containers/DataTableWithActions';
 import {categoryColours} from 'util/Colours';
@@ -214,7 +213,7 @@ let Side = createReactClass({
     let trackNames = ValidComponentChildren.map(children, (child, i) =>
       <LegendElement
         key={child.props.track}
-        name={<PropertyHeader className="table-row-header"
+        name={<PropertyHeader
           table={table}
           propId={child.props.track}
           tooltipPlacement={'bottom'}
@@ -263,7 +262,7 @@ let Legend = createReactClass({
       {React.Children.map(filterChildren(this, this.props.children),
         (child, i) => <LegendElement
           key={child.props.track}
-          name={child.props.track}
+          name={child.props.trackName}
           colour={child.props.colour}
           onPickColour={(colour) =>
             this.redirectedProps.setProps(
