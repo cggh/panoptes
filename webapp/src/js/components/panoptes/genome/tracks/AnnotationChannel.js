@@ -54,7 +54,8 @@ let AnnotationChannel = createReactClass({
     name: PropTypes.string,
     onChangeLoadStatus: PropTypes.func,
     onClose: PropTypes.func,
-    hoverPos: PropTypes.number
+    hoverPos: PropTypes.number,
+    disableClick: PropTypes.bool,
   },
 
   getInitialState() {
@@ -338,7 +339,7 @@ let AnnotationChannel = createReactClass({
   },
 
   render() {
-    let {start, end, width, sideWidth, name, hoverPos} = this.props;
+    let {width, sideWidth, name, disableClick} = this.props;
     let {height, clickIndex} = this.state;
     const hovers = [];
     //Disabled for now as it covers over channels below and we can show the same info in the track
@@ -384,9 +385,9 @@ let AnnotationChannel = createReactClass({
         <div className="canvas-container">
           <Hammer onTap={this.handleClick}>
             <canvas ref={(ref) => this.canvas = ref}
-              style={{cursor: clickIndex !== null ? 'pointer' : 'inherit'}}
+              style={{cursor: clickIndex !== null && !disableClick ? 'pointer' : 'inherit'}}
               width={width} height={height}
-              onClick={this.handleClick}
+              onClick={!disableClick ? this.handleClick : null}
               onMouseOver={this.handleMouseOver}
               onMouseMove={this.handleMouseMove}
               onMouseOut={this.handleMouseOut}
