@@ -431,7 +431,7 @@ let PerRowNumericalTrackControls = createReactClass({
         }
 
         <div className="control">
-          <div className="label">Auto Y Scale:</div>
+          <div className="label">Auto Y-scale:</div>
           <Checkbox
             color="primary"
             name="autoYScale"

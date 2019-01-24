@@ -394,7 +394,7 @@ let NumericalTrackGroupControls = createReactClass({
         </div>
         <div className="control-group">
           <div className="control">
-            <div className="label">Auto Y Scale:</div>
+            <div className="label">Auto Y-scale:</div>
             <Checkbox
               name="autoYScale"
               value="toggleValue1"

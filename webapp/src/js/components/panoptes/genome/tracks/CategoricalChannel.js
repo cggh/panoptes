@@ -416,7 +416,7 @@ let CategoricalTrackControls = createReactClass({
         </div>
         <div className="control-group">
           <div className="control">
-            <div className="label">Auto Y Scale:</div>
+            <div className="label">Auto Y-scale:</div>
             <Checkbox
               color="primary"
               name="autoYScale"
@@ -492,5 +492,3 @@ let Side = createReactClass({
 
 
 export default CategoricalChannel;
-
-
