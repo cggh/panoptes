@@ -210,6 +210,7 @@ let AnnotationChannel = createReactClass({
     if (!(this.data && this.data.starts)) return;
     const {ids, names, sizes, starts, types, rows, altNames} = this.data;
     ctx.strokeStyle = '#000'; // gene onHover border colour
+    ctx.fillStyle = '#3d8bd5'; // gene line normal colour
     ctx.font = '10px monospace'; // gene text normal font
     let maxRow = 0;
     let scaleFactor = ((width - sideWidth) / (end - start));
