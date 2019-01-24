@@ -189,7 +189,7 @@ let AddChannelsButton = createReactClass({
                 description: prop.description,
                 icon: prop.icon,
                 payload: serialiseComponent(<NumericalTrackGroupChannel table={table.id}>
-                  <NumericalSummaryTrack table={table.id} track={prop.id}/>
+                  <NumericalSummaryTrack table={table.id} track={prop.id} trackName={prop.name}/>
                 </NumericalTrackGroupChannel>)
               });
             }
