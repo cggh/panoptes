@@ -218,6 +218,7 @@ let Side = createReactClass({
           propId={child.props.track}
           tooltipPlacement={'bottom'}
           tooltipTrigger={['click']}
+          style={{paddingLeft: 0}}
         />}
         colour={child.props.colour}
         onPickColour={(colour) =>
