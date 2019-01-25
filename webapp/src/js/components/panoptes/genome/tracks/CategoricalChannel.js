@@ -10,7 +10,6 @@ import _sum from 'lodash.sum';
 import _sortedIndex from 'lodash.sortedindex';
 import _sortedLastIndex from 'lodash.sortedlastindex';
 
-
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
@@ -83,7 +82,7 @@ let CategoricalChannel = createReactClass({
   },
 
   render() {
-    let {table, track, width, sideWidth, name, query} = this.props;
+    let {table, track, width, sideWidth, query} = this.props;
     const {knownValues} = this.state;
     query = this.getDefinedQuery(query, table);
     return (
@@ -279,10 +278,10 @@ let CategoricalTrack = createReactClass({
 
   draw(props) {
     const {yMin, yMax, height, start, end, width, fractional, table, track} = props;
-    if (!this.refs.canvas) {
+    if (!this.canvas) {
       return;
     }
-    const canvas = this.refs.canvas;
+    const canvas = this.canvas;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!this.summaryWindow || !this.blocks || this.blocks.length < 1 || !_isFinite(yMin) || !_isFinite(yMax)
@@ -359,7 +358,7 @@ let CategoricalTrack = createReactClass({
   render() {
     let {width, height} = this.props;
     return (
-      <canvas className="categorical" ref="canvas" width={width} height={height}/>
+      <canvas className="categorical" ref={(ref) => this.canvas = ref} width={width} height={height}/>
     );
   },
 });
@@ -425,13 +424,13 @@ let CategoricalTrackControls = createReactClass({
               onChange={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
           </div>
           {!autoYScale ? <div className="control">
-            <div className="label">Y Min:</div>
+            <div className="label">Y min:</div>
             <input className="numeric-input"
-              ref="yMin"
+              ref={(ref) => this.yMin = ref}
               type="number"
               value={yMin}
               onChange={() => {
-                let value = parseFloat(this.refs.yMin.value);
+                let value = parseFloat(this.yMin.value);
                 if (_isFinite(value))
                   this.redirectedProps.setProps({yMin: value});
               }
@@ -439,13 +438,13 @@ let CategoricalTrackControls = createReactClass({
           </div>
             : null}
           {!autoYScale ? <div className="control">
-            <div className="label">Y Max:</div>
+            <div className="label">Y max:</div>
             <input className="numeric-input"
-              ref="yMax"
+              ref={(ref) => this.yMax = ref}
               type="number"
               value={yMax}
               onChange={() => {
-                let value = parseFloat(this.refs.yMax.value);
+                let value = parseFloat(this.yMax.value);
                 if (_isFinite(value))
                   this.redirectedProps.setProps({yMax: value});
               }
@@ -492,5 +491,3 @@ let Side = createReactClass({
 
 
 export default CategoricalChannel;
-
-

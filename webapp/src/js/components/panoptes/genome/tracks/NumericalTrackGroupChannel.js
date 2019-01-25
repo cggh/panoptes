@@ -2,36 +2,32 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
-
 import _isFinite from 'lodash.isfinite';
 import _forEach from 'lodash.foreach';
 import _min from 'lodash.min';
 import _max from 'lodash.max';
 import _map from 'lodash.map';
 import _some from 'lodash.some';
+import _filter from 'lodash.filter';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
 import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Button from 'ui/Button';
 import serialiseComponent from 'util/serialiseComponent';
 import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
 import filterChildren from 'util/filterChildren';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import ItemPicker from 'containers/ItemPicker';
-import {findBlock} from 'util/PropertyRegionCache';
 import SQL from 'panoptes/SQL';
-// import DataTableWithActions from 'containers/DataTableWithActions';
 import {categoryColours} from 'util/Colours';
 import LegendElement from 'panoptes/LegendElement';
-import _filter from 'lodash.filter';
 import QueryString from 'panoptes/QueryString';
 import FilterButton from 'panoptes/FilterButton';
 import PropertyHeader from 'panoptes/PropertyHeader';
-
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
@@ -403,13 +399,13 @@ let NumericalTrackGroupControls = createReactClass({
               onChange={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
           </div>
           {!autoYScale ? <div className="control">
-            <div className="label">Y Min:</div>
+            <div className="label">Y min:</div>
             <input className="numeric-input"
-              ref="yMin"
+              ref={(ref) => this.yMin = ref}
               type="number"
               value={yMin}
               onChange={() => {
-                let value = parseFloat(this.refs.yMin.value);
+                let value = parseFloat(this.yMin.value);
                 if (_isFinite(value))
                   this.redirectedProps.setProps({yMin: value});
               }
@@ -417,13 +413,13 @@ let NumericalTrackGroupControls = createReactClass({
           </div>
             : null}
           {!autoYScale ? <div className="control">
-            <div className="label">Y Max:</div>
+            <div className="label">Y max:</div>
             <input className="numeric-input"
-              ref="yMax"
+              ref={(ref) => this.yMax = ref}
               type="number"
               value={yMax}
               onChange={() => {
-                let value = parseFloat(this.refs.yMax.value);
+                let value = parseFloat(this.yMax.value);
                 if (_isFinite(value))
                   this.redirectedProps.setProps({yMax: value});
               }

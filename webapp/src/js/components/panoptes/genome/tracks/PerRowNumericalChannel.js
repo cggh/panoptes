@@ -440,7 +440,7 @@ let PerRowNumericalTrackControls = createReactClass({
             onChange={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
         </div>
         {!autoYScale ? <div className="control">
-          <div className="label">Y Min:</div>
+          <div className="label">Y min:</div>
           <input className="numeric-input"
             ref="yMin"
             type="number"
@@ -454,7 +454,7 @@ let PerRowNumericalTrackControls = createReactClass({
         </div>
           : null}
         {!autoYScale ? <div className="control">
-          <div className="label">Y Max:</div>
+          <div className="label">Y max:</div>
           <input className="numeric-input"
             ref="yMax"
             type="number"
