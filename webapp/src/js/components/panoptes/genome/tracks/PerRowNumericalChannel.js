@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import {line, area} from 'd3-shape';
+import {line} from 'd3-shape';
 import _isFinite from 'lodash.isfinite';
 import _map from 'lodash.map';
 import _debounce from 'lodash.debounce';
@@ -442,11 +442,11 @@ let PerRowNumericalTrackControls = createReactClass({
         {!autoYScale ? <div className="control">
           <div className="label">Y min:</div>
           <input className="numeric-input"
-            ref="yMin"
+            ref={(ref) => this.yMin = ref}
             type="number"
             value={yMin}
             onChange={() => {
-              let value = parseFloat(this.refs.yMin.value);
+              let value = parseFloat(this.yMin.value);
               if (_isFinite(value))
                 this.redirectedProps.setProps({yMin: value});
             }
@@ -456,11 +456,11 @@ let PerRowNumericalTrackControls = createReactClass({
         {!autoYScale ? <div className="control">
           <div className="label">Y max:</div>
           <input className="numeric-input"
-            ref="yMax"
+            ref={(ref) => this.yMax = ref}
             type="number"
             value={yMax}
             onChange={() => {
-              let value = parseFloat(this.refs.yMax.value);
+              let value = parseFloat(this.yMax.value);
               if (_isFinite(value))
                 this.redirectedProps.setProps({yMax: value});
             }
