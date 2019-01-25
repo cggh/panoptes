@@ -2,12 +2,20 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import {line} from 'd3-shape';
+import Slider from 'rc-slider';
+
+import Checkbox from '@material-ui/core/Checkbox';
+import Select from '@material-ui/core/Select';
+import Input from '@material-ui/core/Input';
+import MenuItem from '@material-ui/core/MenuItem';
+
 import _isFinite from 'lodash.isfinite';
 import _map from 'lodash.map';
 import _debounce from 'lodash.debounce';
 import _min from 'lodash.min';
 import _max from 'lodash.max';
 import _uniq from 'lodash.uniq';
+import _assign from 'lodash.assign';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -23,15 +31,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import PropertyLegend from 'panoptes/PropertyLegend';
 import PropertySelector from 'panoptes/PropertySelector';
 import {propertyColour, categoryColours} from 'util/Colours';
-
-import Checkbox from '@material-ui/core/Checkbox';
-import Select from '@material-ui/core/Select';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import Slider from 'rc-slider';
 import FilterButton from 'panoptes/FilterButton';
-import _assign from 'lodash.assign';
-
 
 const INTERPOLATIONS = [
   {payload: 'linear', text: 'Linear'},

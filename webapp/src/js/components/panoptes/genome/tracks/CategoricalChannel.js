@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
+import Checkbox from '@material-ui/core/Checkbox';
+
 import _isFinite from 'lodash.isfinite';
 import _debounce from 'lodash.debounce';
 import _map from 'lodash.map';
@@ -26,9 +28,6 @@ import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import QueryString from 'panoptes/QueryString';
 import FilterButton from 'panoptes/FilterButton';
 import TooltipEllipsis from 'ui/TooltipEllipsis';
-
-import Checkbox from '@material-ui/core/Checkbox';
-
 
 let CategoricalChannel = createReactClass({
   displayName: 'CategoricalChannel',
