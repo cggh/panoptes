@@ -339,7 +339,7 @@ let AnnotationChannel = createReactClass({
   },
 
   render() {
-    let {width, sideWidth, name, disableClick} = this.props;
+    let {width, sideWidth, name, hoverPos, disableClick} = this.props;
     let {height, clickIndex} = this.state;
     const hovers = [];
     //Disabled for now as it covers over channels below and we can show the same info in the track
