@@ -5,23 +5,10 @@ from __future__ import absolute_import
 
 import os
 import DQXDbTools
-from cache import getCache
 from .importer import configReadWrite
 
 def response(returndata):
     DQXDbTools.CredentialInformation(returndata).VerifyCanDo(DQXDbTools.DbOperationRead(returndata['dataset']))
-
-    cache = getCache()
-    cacheKey = 'config' + returndata['dataset']
-
-    if not os.getenv('STAGING', '') and not os.getenv('DEVELOPMENT', ''):
-        try:
-            result = cache[cacheKey]
-        except KeyError:
-            result = configReadWrite.readJSONConfig(returndata['dataset'])
-            cache.set(cacheKey, result, expire=5*60)
-    else:
-        result = configReadWrite.readJSONConfig(returndata['dataset'])
-
+    result = configReadWrite.getJSONConfig(returndata['dataset'], not os.getenv('STAGING', '') and not os.getenv('DEVELOPMENT', ''))
     returndata['config'] = result
     return returndata

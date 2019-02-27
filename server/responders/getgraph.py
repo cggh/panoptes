@@ -16,6 +16,8 @@ def response(returndata):
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     graphid = DQXDbTools.ToSafeIdentifier(returndata['graphid'])
 
+    DQXDbTools.CredentialInformation(returndata).VerifyCanDo(DQXDbTools.DbOperationRead(databaseName))
+
     filename = join(config.BASEDIR, 'Graphs', databaseName, tableid, graphid)
     if not(exists(filename)):
         returndata['Error'] = 'Unable to find graph data'

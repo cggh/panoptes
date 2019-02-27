@@ -105,7 +105,17 @@ class SettingsDataset(ImportSettings):
                                         'description': '''A list of feeds (RSS, Atom, etc.), their identifiers and their URLs, for the dataset.''',
                                         'default': {}
                                     }),
-
+                                    ('authUnrestrictedValue', {
+                                        'type': 'Text',
+                                        'required': False,
+                                        'description': 'If this value is found in any ``authColumn`` (see datatable settings) then it will be visible to all users who have access to the dataset',
+                                        'default': 'all'
+                                    }),
+                                    ('authGroups', {
+                                        'type': 'Block',
+                                        'required': False,
+                                        'description': 'A mapping of auth groups from SSO to a list of ``authColumn`` values which that group is allowed to see.',
+                                    }),
             ))
             return datasetSettings
 

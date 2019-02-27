@@ -126,6 +126,10 @@ def summarise_call(calls):
 def handler(start_response, request_data):
     datatable = request_data['table']
     dataset = request_data['dataset']
+
+    #Due to caching we check for auth here, as otherwise auth is only checked on DB read.
+    DQXDbTools.CredentialInformation(request_data).VerifyCanDo(DQXDbTools.DbOperationRead(dataset))
+
     two_d_properties = request_data['2DProperties'].split('~')
     col_properties = request_data['colProperties'].split('~')
     row_properties = request_data['rowProperties'].split('~')

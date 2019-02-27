@@ -9,6 +9,7 @@ import os
 import sys
 import urllib.request, urllib.error, urllib.parse
 import http.client
+from cache import getCache
 
 import uuid
 from os import path, listdir
@@ -42,6 +43,20 @@ def readSetOfSettings(dirPath, loader, wanted_names=None):
             with open(settings_file, 'r') as yaml:
                 result[name]['_yaml'] = yaml.read()
     return result
+
+def getJSONConfig(datasetId, cache=True):
+    if cache:
+        cache = getCache()
+        cacheKey = 'config' + datasetId
+        try:
+            result = cache[cacheKey]
+        except KeyError:
+            result = readJSONConfig(datasetId)
+            cache.set(cacheKey, result, expire=5*60)
+    else:
+        result = readJSONConfig(datasetId)
+    return result
+
 
 def readJSONConfig(datasetId):
     dataset_folder = join(sourceDir, datasetId)
@@ -167,6 +182,10 @@ class DocsWriter(object):
 
 
 def writeJSONConfig(datasetId, action, path, newConfig):
+    cache = getCache()
+    cacheKey = 'config' + datasetId
+    del cache[cacheKey]
+
     dataset_folder = join(sourceDir, datasetId)
     #We have a path in the combined JSON object - we now follow the path until we hit a subset confined to one YAML handler
     writers = {
@@ -185,6 +204,10 @@ def writeJSONConfig(datasetId, action, path, newConfig):
     return writer.updateAndWriteBack(action, path, newConfig, validate=True)
 
 def writeYAMLConfig(datasetId, path, newConfig):
+    cache = getCache()
+    cacheKey = 'config' + datasetId
+    del cache[cacheKey]
+
     dataset_folder = join(sourceDir, datasetId)
     temp_settings_filename = ImpUtils.GetTempFileName()
     with open(temp_settings_filename, 'w') as temp_settings_file:

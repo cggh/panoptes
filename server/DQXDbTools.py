@@ -314,6 +314,8 @@ class WhereClause:
             raise Exception("Invalid compound statement {0}".format(statm['Tpe']))
         first = True
         for comp in statm['Components']:
+            if comp['whcClass'] == 'trivial' or comp.get('isTrivial', False):
+                continue
             if not first:
                 self.querystring += " "+statm['Tpe']+" "
                 self.querystring_params += " "+statm['Tpe']+" "

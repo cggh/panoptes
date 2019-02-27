@@ -26,6 +26,7 @@ def response(returndata):
     if 'orderBy' in returndata:
         orderBy = json.loads(returndata['orderBy'])
 
+    #Auth is checked when this context is entered
     with DQXDbTools.DBCursor(returndata, database, read_timeout = config.TIMEOUT) as cur:
         whc = DQXDbTools.WhereClause()
         whc.ParameterPlaceHolder = '%s' # NOTE: MySQL PyODDBC seems to require this nonstardard coding
