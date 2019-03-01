@@ -21,8 +21,6 @@ from cache import getCache
 from .columnDecode import decode, name
 from .gzipstream import gzip
 from dates import datetimeToJulianDay
-from .importer import configReadWrite
-import os
 
 NULL_VALUES = {
     'i1': -128,
@@ -51,21 +49,6 @@ def handler(start_response, requestData):
     # Due to caching we check for auth here, as otherwise auth is only checked on DB read.
     credentials = DQXDbTools.CredentialInformation(requestData)
     credentials.VerifyCanDo(DQXDbTools.DbOperationRead(database))
-    dataset_config = configReadWrite.getJSONConfig(database,
-                                                   not os.getenv('STAGING', '') and not os.getenv('DEVELOPMENT', ''))
-
-    authGroups = dataset_config['settings'].get('authGroups', {})
-    allowed_auth_values = {dataset_config['settings']['authUnrestrictedValue']}
-    for group_id in credentials.groupids:
-        allowed_for_this_group = authGroups.get(group_id, None)
-        if allowed_for_this_group:
-            if allowed_for_this_group == 'all':
-                allowed_auth_values = 'all'
-            elif isinstance(allowed_for_this_group, list):
-                allowed_auth_values.update(allowed_for_this_group)
-            else:
-                SyntaxError('authGroups setting contains an entry that is not "all" or a list of allowed values')
-    allowed_auth_values = tuple(allowed_auth_values)
 
     tableId = content['table']
     query = content['query']
@@ -89,31 +72,7 @@ def handler(start_response, requestData):
     cacheData = content.get('cache', True)
     joins = json.loads(content.get('joins', '[]'))
 
-    auth_subqueries = []
-    for table in [join['foreignTable'] for join in joins] + [tableId]:
-        authProperty = dataset_config['tablesById'][table].get('authProperty', None)
-        if authProperty:
-            auth_subqueries.append({
-                "whcClass": "compound",
-                "isCompound": True,
-                "Tpe": "OR",
-                "Components": [{
-                    "whcClass": "comparefixed",
-                    "isCompound": False,
-                    "ColName": "{}.{}".format(DBCOLESC(table), DBCOLESC(authProperty)),
-                    "CompValue": allowed_value,
-                    "Tpe": "="
-                } for allowed_value in allowed_auth_values]
-            })
-    if auth_subqueries:
-        auth_query = {
-            "whcClass": "compound",
-            "isCompound": True,
-            "Tpe": "AND",
-            "Components": auth_subqueries
-        }
-    else:
-        auth_query = None
+    auth_query = credentials.get_auth_query(database, [join['foreignTable'] for join in joins] + [tableId])
 
     cache = getCache()
     cacheKey = json.dumps([tableId, query, orderBy, distinct, columns, groupBy,

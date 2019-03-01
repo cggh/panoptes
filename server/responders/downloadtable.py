@@ -8,7 +8,7 @@ import DQXDbTools
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 import config
-import lzstring
+from lzstring import LZString
 import json
 import DQXUtils
 
@@ -16,7 +16,7 @@ def response(returndata):
 
     tableId = returndata['table']
     query = returndata['query']
-    columns = DQXDbTools.ParseColumnEncoding(lzstring.decompressFromEncodedURIComponent(returndata['columns']))
+    columns = DQXDbTools.ParseColumnEncoding(LZString.decompressFromEncodedURIComponent(returndata['columns']))
     database = None
     orderBy = None
 
@@ -26,11 +26,24 @@ def response(returndata):
     if 'orderBy' in returndata:
         orderBy = json.loads(returndata['orderBy'])
 
+    auth_query = DQXDbTools.CredentialInformation(returndata).get_auth_query(database, [tableId])
+
     #Auth is checked when this context is entered
     with DQXDbTools.DBCursor(returndata, database, read_timeout = config.TIMEOUT) as cur:
         whc = DQXDbTools.WhereClause()
         whc.ParameterPlaceHolder = '%s' # NOTE: MySQL PyODDBC seems to require this nonstardard coding
         whc.Decode(query)
+        if auth_query:
+            whc.query = {
+                "whcClass": "compound",
+                "isCompound": True,
+                "isRoot": True,
+                "Components": [
+                    whc.query,
+                    auth_query
+                ],
+                "Tpe": "AND"
+            }
         whc.CreateSelectStatement()
         sqlquery = "SELECT {0} FROM {1}" . format(','.join([DBCOLESC(x['Name']) for x in columns]), DBTBESC(tableId))
         if len(whc.querystring_params) > 0:
@@ -38,9 +51,9 @@ def response(returndata):
         if orderBy is not None:
             sqlquery += " ORDER BY {0}" . format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
         cur.execute(sqlquery, whc.queryparams)
-        yield '\t'.join(str(col[0]) for col in cur.description) + '\n'
+        yield b'\t'.join(col[0].encode('ascii', 'replace') for col in cur.description) + b'\n'
         for row in cur.fetchall() :
-            line = '\t'.join([x.encode('ascii', 'replace') if isinstance(x, basestring) else str(x) for x in row]) + '\n'
+            line = b'\t'.join([str(x).encode('ascii', 'replace') for x in row]) + b'\n'
             yield line
         if DQXDbTools.LogRequests:
             DQXUtils.LogServer('###QRY:' + sqlquery)
