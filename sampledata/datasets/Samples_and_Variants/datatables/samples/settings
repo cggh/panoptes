@@ -17,7 +17,7 @@ primKey: key
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
 quickFindFields: key,Site_ID,SampleTypeID
 
-
+authProperty: Auth
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all data table columns
@@ -96,13 +96,17 @@ properties:
   showInTable: true
   search: Pattern
 
-
 - id: ExternalRef
   name: External Reference
   description: Reference on some other site with a link
   dataType: Text
   showInTable: true
   externalUrl: http://en.wikipedia.org/wiki/{value}
+
+- id: Auth
+  name: Authorisation group
+  description: Who is allowed to see this row
+  dataType: Text
 
 
 # The following block declares that this data table contains genome values for each item in the table

@@ -1,7 +1,7 @@
-key	Site ID	SampleDate	Contributor ID	Value1	InUse	Value2	SampleTypeID	Comment	ExternalRef
-S0001	St01	2015-06-22	C0001	0.75	True	2.3	St1	This is a very long comment, taking up a rather large space in the record. The import routine will automatically reserve the right space for this.	Emmy Noether
-S0002	St01	2015-06-22	C0001		True	9.8	St1†	A shorter comment on sample 2	Turing
-S0003	St02	2015-06-20	C0001	0.23	False	9.2	St1	Uncertain origin	von Neumann
-S0004	St02		C0001	0.61	True		St1	Uncertain origin	David Hume
-S000.5	St03	2015-06-21	C0002		False	0.6	St2	Status pending	Socrates
-S0006	St03	2015-06-27	C0002	0.62	True	0.3	St2	-	Karl Popper; David Hilbert
+key	Site ID	SampleDate	Contributor ID	Value1	InUse	Value2	SampleTypeID	Comment	ExternalRef	Auth
+S0001	St01	2015-06-22	C0001	0.75	True	2.3	St1	This is a very long comment, taking up a rather large space in the record. The import routine will automatically reserve the right space for this.	Emmy Noether	public
+S0002	St01	2015-06-22	C0001		True	9.8	St1†	A shorter comment on sample 2	Turing	public
+S0003	St02	2015-06-20	C0001	0.23	False	9.2	St1	Uncertain origin	von Neumann	public
+S0004	St02		C0001	0.61	True		St1	Uncertain origin	David Hume	public
+S000.5	St03	2015-06-21	C0002		False	0.6	St2	Status pending	Socrates	spies_only
+S0006	St03	2015-06-27	C0002	0.62	True	0.3	St2	-	Karl Popper; David Hilbert	public

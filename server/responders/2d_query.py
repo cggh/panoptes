@@ -25,12 +25,23 @@ from .importer.Settings2Dtable import Settings2Dtable
 from DQXDbTools import desciptionToDType
 from cache import getCache
 
-def index_table_query(dataset, cur, table, fields, query, order, limit, offset, fail_limit, index_field, sample):
+def index_table_query(dataset, cur, table, fields, query, auth_query, order, limit, offset, fail_limit, index_field, sample):
     if limit and fail_limit:
         raise Exception("Only one type of limit can be specified")
     where = DQXDbTools.WhereClause()
     where.ParameterPlaceHolder = '%s'#NOTE!: MySQL PyODDBC seems to require this nonstardard coding
     where.Decode(query)
+    if auth_query:
+        where.query = {
+            "whcClass": "compound",
+            "isCompound": True,
+            "isRoot": True,
+            "Components": [
+                where.query,
+                auth_query
+            ],
+            "Tpe": "AND"
+        }
     where.CreateSelectStatement()
     if index_field not in fields:
         fields.append(index_field)
@@ -126,6 +137,11 @@ def summarise_call(calls):
 def handler(start_response, request_data):
     datatable = request_data['table']
     dataset = request_data['dataset']
+
+    # Due to caching we check for auth here, as otherwise auth is only checked on DB read.
+    credentials = DQXDbTools.CredentialInformation(request_data)
+    credentials.VerifyCanDo(DQXDbTools.DbOperationRead(dataset))
+
     two_d_properties = request_data['2DProperties'].split('~')
     col_properties = request_data['colProperties'].split('~')
     row_properties = request_data['rowProperties'].split('~')
@@ -183,10 +199,16 @@ def handler(start_response, request_data):
     col_properties.append(col_index_field)
     row_properties.append(row_index_field)
 
+    with DQXDbTools.DBCursor(request_data, dataset, read_timeout=config.TIMEOUT) as cur:
+        col_tablename, row_tablename = get_table_ids(cur, dataset, datatable)
+
+    col_auth_query = credentials.get_auth_query(dataset, [col_tablename])
+    row_auth_query = credentials.get_auth_query(dataset, [row_tablename])
+
     cache = getCache()
     cache_key = json.dumps([datatable, dataset, two_d_properties, col_properties, row_properties, col_qry, col_order,
                            row_qry, row_order, row_order_columns, row_random_sample, col_limit, row_limit, col_offset,
-                           row_offset, col_fail_limit, row_sort_property, col_key, sort_mode])
+                           row_offset, col_fail_limit, row_sort_property, col_key, sort_mode, col_auth_query, row_auth_query])
     data = None
     try:
         data = cache[cache_key]
@@ -196,12 +218,12 @@ def handler(start_response, request_data):
 
     if data is None:
         with DQXDbTools.DBCursor(request_data, dataset, read_timeout=config.TIMEOUT) as cur:
-            col_tablename, row_tablename = get_table_ids(cur, dataset, datatable)
             col_result = index_table_query(dataset,
                                            cur,
                                            col_tablename,
                                            col_properties,
                                            col_qry,
+                                           col_auth_query,
                                            col_order,
                                            col_limit,
                                            col_offset,
@@ -216,6 +238,7 @@ def handler(start_response, request_data):
                                                row_tablename,
                                                row_properties,
                                                row_qry,
+                                               row_auth_query,
                                                row_order,
                                                None,
                                                None,
@@ -229,6 +252,7 @@ def handler(start_response, request_data):
                                                row_tablename,
                                                row_properties,
                                                row_qry,
+                                               row_auth_query,
                                                row_order,
                                                row_limit,
                                                row_offset,

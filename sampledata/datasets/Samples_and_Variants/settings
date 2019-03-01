@@ -28,6 +28,10 @@ constants:
   office: '#0FF1CE'
   access: '#ACCE55'
 
+authGroups:
+    serverAdmin.ag1000G.projects.groups.malariagen.net : ['spies_only']
+authUnrestrictedValue: public
+
 feeds:
   WordPress: https://en.blog.wordpress.com/feed/
   malariageninformatics: https://malariageninformatics.wordpress.com/feed/

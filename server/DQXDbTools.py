@@ -7,6 +7,7 @@ import simplejson
 import DQXbase64
 import pymonetdb.sql
 import config
+import os
 
 #As we created the DB and it is only listening on localhost set these here
 config.DBUSER = 'monetdb'
@@ -170,6 +171,57 @@ class CredentialInformation:
     def GetUserId(self):
         return self.userid
 
+    def get_auth_query(self, database, tables):
+        from responders.importer import configReadWrite
+        if database != 'datasets':
+            dataset_config = configReadWrite.getJSONConfig(database,
+                                                           not os.getenv('STAGING', '') and not os.getenv('DEVELOPMENT',
+                                                                                                          ''))
+            auth_groups = dataset_config['settings'].get('authGroups', {})
+            allowed_auth_values = {dataset_config['settings']['authUnrestrictedValue']}
+        else:
+            auth_groups = {}
+            allowed_auth_values = set()
+        for group_id in self.groupids:
+            allowed_for_this_group = auth_groups.get(group_id, None)
+            if allowed_for_this_group:
+                if allowed_for_this_group == 'all':
+                    allowed_auth_values = 'all'
+                elif isinstance(allowed_for_this_group, list):
+                    allowed_auth_values.update(allowed_for_this_group)
+                else:
+                    SyntaxError('authGroups setting contains an entry that is not "all" or a list of allowed values')
+        allowed_auth_values = tuple(allowed_auth_values)
+        auth_subqueries = []
+        for table in tables:
+            if database != 'datasets' and table not in  ["_sequence_", "annotation"]: #Ref seq table and annotation doesn't have config. FIXME: Not a good idea that annotation table has a potentially colliding name
+                auth_property = dataset_config['tablesById'][table].get('authProperty', None)
+            else:
+                auth_property = None
+            if auth_property:
+                auth_subqueries.append({
+                    "whcClass": "compound",
+                    "isCompound": True,
+                    "Tpe": "OR",
+                    "Components": [{
+                        "whcClass": "comparefixed",
+                        "isCompound": False,
+                        "ColName": "{}.{}".format(DBCOLESC(table), DBCOLESC(auth_property)),
+                        "CompValue": allowed_value,
+                        "Tpe": "="
+                    } for allowed_value in allowed_auth_values]
+                })
+        if auth_subqueries:
+            auth_query = {
+                "whcClass": "compound",
+                "isCompound": True,
+                "Tpe": "AND",
+                "Components": auth_subqueries
+            }
+        else:
+            auth_query = None
+        return auth_query
+
 class Timeout(Exception):
     pass
 
@@ -314,6 +366,8 @@ class WhereClause:
             raise Exception("Invalid compound statement {0}".format(statm['Tpe']))
         first = True
         for comp in statm['Components']:
+            if comp['whcClass'] == 'trivial' or comp.get('isTrivial', False):
+                continue
             if not first:
                 self.querystring += " "+statm['Tpe']+" "
                 self.querystring_params += " "+statm['Tpe']+" "

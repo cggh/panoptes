@@ -60,6 +60,11 @@ class SettingsDataTable(ImportSettings):
                              'required': False,
                              'description': 'Specifies the default query used thoughout the app for this table.'
                          }),
+                         ('authProperty', {
+                             'type': 'Text',
+                             'required': False,
+                             'description': 'Specifies the property ID (i.e. column name) which contains strings to be used to restrict access to rows of the table to given users. See also ``authGroups`` in the dataset settings, the strings in this column will be looked up in ``authGroups`` to determine which auth group gets to see which rows. If not set the table is readable by any user who has access to the dataset'
+                         }),
                          ('storedQueries', {
                              'type': 'List',
                              'required': False,
