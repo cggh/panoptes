@@ -88,18 +88,6 @@ let DataTableWithActions = createReactClass({
     };
   },
 
-  componentWillMount() {
-    this.propertyGroups = {};
-    _forEach(this.tableConfig().propertyGroupsById, (val, key) => {
-      let filteredProps = val.visibleProperties;
-      if (filteredProps.length > 0) {
-        this.propertyGroups[key] = _clone(val);
-        this.propertyGroups[key].properties = _map(filteredProps,
-          ({id, name, description, icon}) => ({id, name, description, icon}));
-      }
-    });
-  },
-
   icon() {
     return this.tableConfig().icon;
   },
@@ -234,8 +222,18 @@ let DataTableWithActions = createReactClass({
       columns = _map(columns, (prop) => prop.id);
     }
 
+    let propertyGroups = {};
+    _forEach(this.tableConfig().propertyGroupsById, (val, key) => {
+      let filteredProps = val.visibleProperties;
+      if (filteredProps.length > 0) {
+        propertyGroups[key] = _clone(val);
+        propertyGroups[key].properties = _map(filteredProps,
+          ({id, name, description, icon}) => ({id, name, description, icon}));
+      }
+    });
+
     this.getFlux().actions.session.modalOpen(<GroupedItemPicker
-      groups={this.propertyGroups}
+      groups={propertyGroups}
       initialPick={columns}
       title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
       onPick={(columns) => this.handleColumnChange(columns)}
@@ -297,10 +295,10 @@ let DataTableWithActions = createReactClass({
 
   orderDescriptionString(order) {
     return order.map(([dir, column]) => {
-      const isNumerical = this.tableConfig().propertiesById[column].isNumerical;
+      const isNumerical = this.config.tableById[this.props.table].propertiesById[column].isNumerical;
       return (
-        <span key={`order_${this.tableConfig().propertiesById[column].name}`}>
-          {this.tableConfig().propertiesById[column].name}
+        <span key={`order_${this.config.tableById[this.props.table].propertiesById[column].name}`}>
+          {this.config.tableById[this.props.table].propertiesById[column].name}
           &#160;
           {
             dir === 'asc' ?
@@ -333,7 +331,7 @@ let DataTableWithActions = createReactClass({
     let searchGUI = (
       <Button
         label="Find text"
-        disabled={columns === undefined || columns.length === 0}
+        disabled={columns.length === 0}
         color="primary"
         onClick={this.handleSearchOpen}
         iconName="search"
@@ -345,7 +343,7 @@ let DataTableWithActions = createReactClass({
           <Button
             raised="true"
             label="Find text"
-            disabled={columns === undefined || columns.length === 0}
+            disabled={columns.length === 0}
             color="primary"
             iconName="search"
             iconInverse={true}
@@ -371,9 +369,9 @@ let DataTableWithActions = createReactClass({
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let columnPickerLabel = 'Pick columns';
-    if (columns !== undefined && columns.length === this.tableConfig().visibleProperties.length) {
+    if (columns && columns.length === this.tableConfig().visibleProperties.length) {
       columnPickerLabel = 'Hide columns';
-    } else if (columns !== undefined && columns.length === 0) {
+    } else if (columns && columns.length === 0) {
       columnPickerLabel = 'Show columns';
     }
     let sidebarContent = (
@@ -394,7 +392,7 @@ let DataTableWithActions = createReactClass({
         <div className="sidebar-body">
           <Button
             label="Download data"
-            disabled={columns === undefined || columns.length === 0}
+            disabled={columns.length === 0}
             color="primary"
             onClick={() => this.handleDownload()}
             iconName="download"
@@ -533,7 +531,7 @@ let DataTableWithActions = createReactClass({
         style={{padding: '0 8px', color: 'white'}}
       >
         <Icon name={'columns'} style={{margin: '0 3px 0 0'}}/>
-        <span style={{textTransform: 'none'}}>{columns !== undefined ? columns.length : 0} of {this.tableConfig().visibleProperties.length} columns</span>
+        <span style={{textTransform: 'none'}}>{columns ? columns.length : 0} of {this.tableConfig().visibleProperties.length} columns</span>
       </MuiButton>
     );
 

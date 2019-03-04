@@ -20,6 +20,7 @@ import _union from 'lodash.union';
 import _without from 'lodash.without';
 import _forEach from 'lodash.foreach';
 import _sumBy from 'lodash.sumby';
+import _values from 'lodash.values';
 import _filter from 'lodash.filter';
 import _difference from 'lodash.difference';
 import _clone from 'lodash.clone';
@@ -131,7 +132,7 @@ let GroupedItemPicker = createReactClass({
   render() {
     let {picked, search} = this.state;
     let {groups} = this.props;
-    let count = _sumBy(groups, (group) => group.properties.length);
+    let count = _sumBy(_values(groups), (group) => group.properties.length);
     // Don't show the ungrouped group name if the ungrouped group is the only group (onlyUngrouped)
     // i.e. show the group name if there isn't only one group and that is the ungrouped group (!onlyUngrouped)
     const onlyUngrouped = (Object.keys(groups).length === 1 && groups['_UNGROUPED_'] !== undefined);
@@ -156,7 +157,7 @@ let GroupedItemPicker = createReactClass({
                         (
                           <ListItem
                             button
-                            className={['nested', classNames({'not-picked': _includes(picked, id)})]}
+                            className={classNames({'nested': true, 'not-picked': _includes(picked, id)})}
                             key={`available_group_subItem_${id}`}
                             onClick={() => this.handleAdd(id)}
                           >
