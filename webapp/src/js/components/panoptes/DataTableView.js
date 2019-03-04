@@ -118,6 +118,9 @@ let DataTableView = createReactClass({
   fetchData(props, requestContext) {
     let {table, columns, order, startRowIndex, query, maxRowsPerPage, joins} = props;
     let {showableRowsCount} = this.state;
+    if (table !== this.props.table) {
+      this.setState({rows: [], totalRowsCount: 0})
+    }
 
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
@@ -226,7 +229,7 @@ let DataTableView = createReactClass({
     if (this.props.onTotalRowsCountChange && prevState.totalRowsCount !== this.state.totalRowsCount) {
       this.props.onTotalRowsCountChange(this.state.totalRowsCount);
     }
-    if ((this.props.columns || []).join() !== (prevProps.columns || []).join())  {
+    if (this.props.table !== prevProps.table || (this.props.columns || []).join() !== (prevProps.columns || []).join())  {
       this.calcColumnWidths();
     }
   },
@@ -370,7 +373,7 @@ let DataTableView = createReactClass({
                   columnWidth = columnWidths[column];
                 } else if (columnData.defaultWidth !== undefined) {
                   columnWidth = columnData.defaultWidth;
-                } else if (calculatedColumnWidths !== undefined) {
+                } else if (calculatedColumnWidths !== undefined && calculatedColumnWidths[columnData.tableId] !== undefined) {
                   columnWidth = calculatedColumnWidths[columnData.tableId][columnData.id] || PREDEFINED_COLUMN_WIDTH;
                 }
                 return (
