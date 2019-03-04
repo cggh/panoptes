@@ -114,7 +114,7 @@ class SettingsDataset(ImportSettings):
                                     ('authGroups', {
                                         'type': 'Block',
                                         'required': False,
-                                        'description': 'A mapping of auth groups from SSO to a list of ``authColumn`` values which that group is allowed to see.',
+                                        'description': 'A mapping of auth groups from SSO to a list of ``authColumn`` values which that group is allowed to see. The group can be a regex with capture groups, which will be interpolated into the auth values (by \\1, \\2 etc.)',
                                     }),
             ))
             return datasetSettings

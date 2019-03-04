@@ -1,7 +1,7 @@
 # This file is part of DQXServer - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-
+import re
 
 import simplejson
 import DQXbase64
@@ -183,14 +183,15 @@ class CredentialInformation:
             auth_groups = {}
             allowed_auth_values = set()
         for group_id in self.groupids:
-            allowed_for_this_group = auth_groups.get(group_id, None)
-            if allowed_for_this_group:
-                if allowed_for_this_group == 'all':
-                    allowed_auth_values = 'all'
-                elif isinstance(allowed_for_this_group, list):
-                    allowed_auth_values.update(allowed_for_this_group)
-                else:
-                    SyntaxError('authGroups setting contains an entry that is not "all" or a list of allowed values')
+            for group_id_pattern, allowed_for_this_group in auth_groups.items():
+                if re.search(group_id_pattern, group_id):
+                    if allowed_for_this_group == 'all':
+                        allowed_auth_values = 'all'
+                    elif isinstance(allowed_for_this_group, list):
+                        allowed_auth_values.update(
+                            re.sub(group_id_pattern, entry, group_id) for entry in allowed_for_this_group)
+                    else:
+                        SyntaxError('authGroups setting contains an entry that is not "all" or a list of allowed values')
         allowed_auth_values = tuple(allowed_auth_values)
         auth_subqueries = []
         for table in tables:
