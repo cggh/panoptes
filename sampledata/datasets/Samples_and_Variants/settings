@@ -30,6 +30,7 @@ constants:
 
 authGroups:
     serverAdmin.ag1000G.projects.groups.malariagen.net : ['spies_only']
+    ([A-Za-z]*).ag1000G.projects.groups.malariagen.net : ['\1']
 authUnrestrictedValue: public
 
 feeds:
