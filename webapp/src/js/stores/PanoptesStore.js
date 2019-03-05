@@ -15,7 +15,8 @@ let PanoptesStore = createStore({
 
     this.bindActions(
       API.FETCH_USER_SUCCESS, this.fetchUserSuccess,
-      API.FETCH_USER_FAIL, this.fetchUserFail
+      API.FETCH_USER_FAIL, this.fetchUserFail,
+      API.UPDATE_URL, this.updateURL
     );
   },
 
@@ -25,6 +26,11 @@ let PanoptesStore = createStore({
   },
   fetchUserFail(payload) {
     console.error('fetchUserFail: %o', payload);
+  },
+
+  updateURL(payload) {
+    this.state = this.state.set('url', payload);
+    this.emit('change');
   },
 
   getState() {

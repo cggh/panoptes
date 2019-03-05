@@ -120,7 +120,7 @@ let Panoptes = createReactClass({
 
   render() {
     let actions = this.getFlux().actions.session;
-    let {tabs, popups, modal} = this.state;
+    let {tabs, popups, modal, panoptes} = this.state;
     let config = this.config;
     // NB: initialConfig is actually defined (in index.html)
     return (
@@ -131,7 +131,7 @@ let Panoptes = createReactClass({
               <div className="spinner" />
             </div>
             <div className="page">
-              <Header dataset={config.dataset} name={config.settings.nameBanner} logo={initialConfig.logo}/>
+              <Header dataset={config.dataset} url={panoptes.get('url')} name={config.settings.nameBanner} logo={initialConfig.logo}/>
               <div className="body">
                 <TabbedArea activeTab={tabs.get('selectedTab')}
                   unclosableTabs={tabs.get('unclosableTabs')}
@@ -194,12 +194,13 @@ let Header = createReactClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
-    FluxMixin,
+    FluxMixin
   ],
 
   propTypes: {
     dataset: PropTypes.string,
     name: PropTypes.string,
+    url: PropTypes.string,
     logo: PropTypes.string
   },
 
@@ -226,7 +227,7 @@ let Header = createReactClass({
   },
 
   render() {
-    let {dataset, name, logo} = this.props;
+    let {dataset, name, logo, url} = this.props;
     let actions = this.getFlux().actions;
     const userId = this.config.user.id;
     return (
@@ -234,7 +235,7 @@ let Header = createReactClass({
         <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
         <div className="username">
           { this.config.cas.service ? (userId == 'anonymous' ?
-            <a href={`${this.config.cas.service}?service=${window.location.href}`}>Login</a>
+            <a href={`${this.config.cas.service}?service=${url}`}>Login</a>
             : <span>
               {userId}
               <a className="logout" href={this.config.cas.logout}>logout</a>
