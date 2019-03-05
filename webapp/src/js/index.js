@@ -158,7 +158,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
       //Listen to the stores and update the URL after storing the state, when it changes.
       const stores = {
         PanoptesStore: new PanoptesStore({
-          storedSubsets: {}
+          url: window.location.href
         }),
         SessionStore: new SessionStore(appState.session),
         ConfigStore: new ConfigStore(config)
@@ -223,7 +223,9 @@ if (dataset === undefined || dataset === null || dataset === '') {
             API.storeData(newState.toJS()).then((hash) => {
               if (ourPushCount === historyChangeCount) {
                 //If we are still relevant then update the URL
-                history.replace(baseURLPath + hash, newState.toJS());
+                const url = baseURLPath + hash;
+                history.replace(url, newState.toJS());
+                stores.PanoptesStore.updateURL(window.location.origin + url)
               }
             }
             );
@@ -236,17 +238,24 @@ if (dataset === undefined || dataset === null || dataset === '') {
 
               const selectedTabTable = selectedTabComponent.get('props').get('table');
               const selectedTabTablePrimKey = selectedTabComponent.get('props').get('selectedPrimKey');
-              history.push(baseURLPath + selectedTabTable + '/' + selectedTabTablePrimKey, newState.toJS());
+              const url = baseURLPath + selectedTabTable + '/' + selectedTabTablePrimKey;
+              history.push(url, newState.toJS());
+              stores.PanoptesStore.updateURL(window.location.origin + url)
+
 
             } else if (selectedTabComponent.get('type') === 'DocPage') {
 
               const selectedTabDocPagePath = selectedTabComponent.get('props').get('path');
-              history.push(baseURLPath + selectedTabDocPagePath, newState.toJS());
+              const url = baseURLPath + selectedTabDocPagePath;
+              history.push(url, newState.toJS());
+              stores.PanoptesStore.updateURL(window.location.origin + url)
+
 
             } else {
               // This may be a new, blank tab.
               //console.warn('selectedTab has no state or path');
               history.push(baseURLPath, newState.toJS());
+              stores.PanoptesStore.updateURL(window.location.origin + baseURLPath);
             }
 
           }
@@ -264,6 +273,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
           if (stores.SessionStore.modal) {
             stores.SessionStore.modalClose();
             history.push(location, action);
+            stores.PanoptesStore.updateURL(location);
           } else {
             historyChangeCount += 1;
             const newState = Immutable.fromJS((location.state ? location.state.session : {}));
@@ -271,6 +281,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
               stores.SessionStore.state = newState;
               stores.SessionStore.emit('change');
             }
+            stores.PanoptesStore.updateURL(window.location.href);
           }
         }
       });

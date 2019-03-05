@@ -39,7 +39,8 @@ let api = keyMirror({
   FETCH_USER_SUCCESS: null,
   MODIFY_CONFIG: null,
   MODIFY_CONFIG_SUCCESS: null,
-  MODIFY_CONFIG_FAIL: null
+  MODIFY_CONFIG_FAIL: null,
+  UPDATE_URL: null
 });
 
 
