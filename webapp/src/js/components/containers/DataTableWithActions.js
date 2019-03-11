@@ -295,10 +295,10 @@ let DataTableWithActions = createReactClass({
 
   orderDescriptionString(order) {
     return order.map(([dir, column]) => {
-      const isNumerical = this.config.tableById[this.props.table].propertiesById[column].isNumerical;
+      const isNumerical = this.config.tablesById[this.props.table].propertiesById[column].isNumerical;
       return (
-        <span key={`order_${this.config.tableById[this.props.table].propertiesById[column].name}`}>
-          {this.config.tableById[this.props.table].propertiesById[column].name}
+        <span key={`order_${this.config.tablesById[this.props.table].propertiesById[column].name}`}>
+          {this.config.tablesById[this.props.table].propertiesById[column].name}
           &#160;
           {
             dir === 'asc' ?
