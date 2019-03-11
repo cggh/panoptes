@@ -184,6 +184,8 @@ class CredentialInformation:
             allowed_auth_values = set()
         for group_id in self.groupids:
             for group_id_pattern, allowed_for_this_group in auth_groups.items():
+                if allowed_auth_values == 'all':
+                    continue
                 if re.search(group_id_pattern, group_id):
                     if allowed_for_this_group == 'all':
                         allowed_auth_values = 'all'
@@ -192,14 +194,14 @@ class CredentialInformation:
                             re.sub(group_id_pattern, entry, group_id) for entry in allowed_for_this_group)
                     else:
                         SyntaxError('authGroups setting contains an entry that is not "all" or a list of allowed values')
-        allowed_auth_values = tuple(allowed_auth_values)
+        allowed_auth_values = 'all' if allowed_auth_values == 'all' else tuple(allowed_auth_values)
         auth_subqueries = []
         for table in tables:
             if database != 'datasets' and table not in  ["_sequence_", "annotation"]: #Ref seq table and annotation doesn't have config. FIXME: Not a good idea that annotation table has a potentially colliding name
                 auth_property = dataset_config['tablesById'][table].get('authProperty', None)
             else:
                 auth_property = None
-            if auth_property:
+            if auth_property and allowed_auth_values != 'all':
                 auth_subqueries.append({
                     "whcClass": "compound",
                     "isCompound": True,
