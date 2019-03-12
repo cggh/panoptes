@@ -102,8 +102,8 @@ let DocPage = createReactClass({
         content: rendered
       }))
       .catch((error) => {
-        this.setState({loadStatus: 'error', content: ''});
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(this.props, requestContext));
+        this.setState({loadStatus: 'error', content: error.statusText});
+        ErrorReport(this.getFlux(), error.statusText, () => this.fetchData(this.props, requestContext));
         console.error(error);
         throw error;
       })
@@ -169,7 +169,7 @@ let DocPage = createReactClass({
           />
         </div>
         : null}
-      <Loading status={loadStatus}/>
+      <Loading status={loadStatus}>{content}</Loading>
     </div>;
   },
 });
