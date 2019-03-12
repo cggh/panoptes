@@ -9,7 +9,7 @@ def application(environ, start_response):
     if environ['PATH_INFO'][:14] == '/panoptes/Docs':
         #A 404 for an unfound Doc file
         start_response('404 ' + 'Error: ' + environ['PATH_INFO'] + ' not found', [('Content-type', 'text/html')])
-        yield bytes('Error: ' + environ['PATH_INFO'] + ' not found', 'utf-8')
+        yield bytes('Error: ' + environ['PATH_INFO'] + ' not found (if it is present an import maybe needed)', 'utf-8')
         return
     #Whatever the path we return index.html as API and static requests are not passed to us
     start_response('200 OK', [('Content-type', 'text/html')])

@@ -312,6 +312,25 @@ class ImportSettings(with_metaclass(ABCMeta, object)):
                     print('ERROR: yaml parsing error: ' + str(e))
                     raise Exception('Error while parsing yaml file {0}'.format(fileName))
 
+            try:
+                if self._logLevel:
+                    self._log('Loading settings from: '+fileName)
+
+                with open(self.fileName+'.local', 'r') as configfile:
+                    try:
+                        text = configfile.read()
+                        local_settings = yaml.load(text) or {}
+                        if type(local_settings) != dict:
+                            raise Exception("YAML contains only a string - should be dict with keys and values")
+
+                    except Exception as e:
+                        print('ERROR: yaml parsing error: ' + str(e))
+                        raise Exception('Error while parsing yaml file {0}'.format(fileName+'.local'))
+                self._settings.update(local_settings)
+            except FileNotFoundError:
+                pass
+
+
             self._load(validate)
 #            if self._logLevel:
 #                self._log('Settings: '+str(self._settings))
