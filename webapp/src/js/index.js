@@ -55,7 +55,7 @@ const datasetURLPath = initialUrlPath.replace(datasetURLPathPrefix, '');
 // Get the datasetURLPathParts and filter out empty strings (and other falseys).
 const datasetURLPathParts = _filter(datasetURLPath.split('/'));
 const dataset = datasetURLPathParts[0];
-const baseURLPath = `${datasetURLPathPrefix}${dataset}/`;
+const baseURLPath = `${datasetURLPathPrefix}/${dataset}/`;
 
 if (dataset === undefined || dataset === null || dataset === '') {
 
@@ -80,7 +80,7 @@ if (dataset === undefined || dataset === null || dataset === '') {
   let promises = [InitialConfig(dataset)];
 
   const remainingPath = datasetURLPathParts.slice(1).join('/');
-  window.rootURL = window.location.origin + process.env.DATASET_URL_PATH_PREFIX + dataset;
+  window.rootURL = window.location.origin + process.env.DATASET_URL_PATH_PREFIX + '/' + dataset;
   // Match the UID and nothing but the UID.
   const HASH_REGEX = /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/;
   const matches = HASH_REGEX.exec(remainingPath);
@@ -213,7 +213,6 @@ if (dataset === undefined || dataset === null || dataset === '') {
               return;
             }
           });
-
 
           if (hasState) {
             //Push with current URL until we get the hash from the server

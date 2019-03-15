@@ -94,7 +94,7 @@ let EditDocPage = createReactClass({
       LRUCache.get(
         `staticContent${path}`,
         (cacheCancellation) =>
-          API.staticContent({cancellation: cacheCancellation, url: `/panoptes/Docs/${dataset}/${path}`}),
+          API.staticContent({cancellation: cacheCancellation, url: `${process.env.DATASET_URL_PATH_PREFIX}/panoptes/Docs/${dataset}/${path}`}),
         componentCancellation
       )
     )

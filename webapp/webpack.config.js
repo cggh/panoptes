@@ -25,7 +25,7 @@ module.exports = function(env) {
       {from: 'src/images/favicons', to: 'images/favicons'},
     ]),
     new webpack.DefinePlugin({
-      // Include leading and trailing forward slashes when not empty.
+      // Include a leading trailing forward slash and *no* trailing forward slash, when not empty.
       'process.env.DATASET_URL_PATH_PREFIX': JSON.stringify(datasetUrlPathPrefix),
     }),
   ];

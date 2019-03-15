@@ -531,7 +531,7 @@ MuiDataTableView = withAPIData(MuiDataTableView, ({config, props}) => {
     requests.onClickComponentTemplate = {
       method: 'staticContent',
       args: {
-        url: `/panoptes/Docs/${config.dataset}/${onClickComponentTemplateDocPath}`
+        url: `${process.env.DATASET_URL_PATH_PREFIX}/panoptes/Docs/${config.dataset}/${onClickComponentTemplateDocPath}`
       }
     };
   }
