@@ -208,15 +208,15 @@ module.exports = function(env) {
         // }
       },
       proxy: {
-        '/panoptes/api': {
+        [datasetUrlPathPrefix + '/panoptes/api']: {
           target: 'http://localhost:8000/',
           secure: false
         },
-        '/panoptes/Docs': {
+        [datasetUrlPathPrefix + '/panoptes/Docs']: {
           target: 'http://localhost:8000/',
           secure: false
         },
-        '/panoptes/Maps': {
+        [datasetUrlPathPrefix + '/panoptes/Maps']: {
           target: 'http://localhost:8000/',
           secure: false
         }
