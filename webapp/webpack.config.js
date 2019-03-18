@@ -18,7 +18,8 @@ module.exports = function(env) {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/index.html'),
       inject: 'body',
-      hash: true
+      hash: true,
+      datasetUrlPathPrefix: datasetUrlPathPrefix
     }),
     new CopyWebpackPlugin([
       //Using this method for the favicons - this method should not be used generally, esp in JS where one can require(IMAGE_PATH)
