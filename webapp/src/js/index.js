@@ -39,10 +39,10 @@ import 'console-polyfill';
 import 'normalize.css';
 
 
-// NOTE: process.env.DATASET_URL_PATH_PREFIX is defined in webpack.config.js
+// NOTE: process.env.URL_PATH_PREFIX is defined in webpack.config.js
 // Alternatively, (slower but more adaptive) could call the server for env vars,
 // but env seems unlikely to change and need a dynamic adaption between builds.
-const datasetURLPathPrefix = process.env.DATASET_URL_PATH_PREFIX; // eslint-disable-line no-undef
+const datasetURLPathPrefix = process.env.URL_PATH_PREFIX; // eslint-disable-line no-undef
 const initialUrlPath  = window.location.pathname;
 
 if (initialUrlPath.indexOf(datasetURLPathPrefix) != 0) {
@@ -78,9 +78,8 @@ if (dataset === undefined || dataset === null || dataset === '') {
   );
 
   let promises = [InitialConfig(dataset)];
-
   const remainingPath = datasetURLPathParts.slice(1).join('/');
-  window.rootURL = window.location.origin + process.env.DATASET_URL_PATH_PREFIX + '/' + dataset;
+  window.rootURL = window.location.origin + process.env.URL_PATH_PREFIX + '/' + dataset;
   // Match the UID and nothing but the UID.
   const HASH_REGEX = /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/;
   const matches = HASH_REGEX.exec(remainingPath);
