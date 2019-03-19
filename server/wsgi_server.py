@@ -13,12 +13,14 @@ from werkzeug.contrib.sessions import FilesystemSessionStore
 from werkzeug.wrappers import Response
 
 # logging.basicConfig(level=logging.DEBUG)
-
+url_path_prefix = os.getenv('URL_PATH_PREFIX', '')
+webapp_base_path = 'webapp/dist' + url_path_prefix
+api_base_path = url_path_prefix + '/panoptes/api'
 general_with_static = SharedDataMiddleware(wsgi_general.application, {
-    '/': os.path.join(os.path.dirname(config.__file__), 'webapp/dist')
+    '/': os.path.join(os.path.dirname(config.__file__), webapp_base_path)
 }, cache_timeout=60*60)
 api_application = DispatcherMiddleware(general_with_static, {
-    '/panoptes/api':        wsgi_api.application,
+    api_base_path:        wsgi_api.application,
 })
 
 #Wrap in cas service if configured
