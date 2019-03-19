@@ -42,29 +42,29 @@ import 'normalize.css';
 // NOTE: process.env.URL_PATH_PREFIX is defined in webpack.config.js
 // Alternatively, (slower but more adaptive) could call the server for env vars,
 // but env seems unlikely to change and need a dynamic adaption between builds.
-const datasetURLPathPrefix = process.env.URL_PATH_PREFIX; // eslint-disable-line no-undef
+const urlPathPrefix = process.env.URL_PATH_PREFIX; // eslint-disable-line no-undef
 const initialUrlPath  = window.location.pathname;
 
-if (initialUrlPath.indexOf(datasetURLPathPrefix) != 0) {
-  console.warn('initialUrlPath did not start with the specified datasetURLPathPrefix: ', datasetURLPathPrefix);
+if (initialUrlPath.indexOf(urlPathPrefix) != 0) {
+  console.warn('initialUrlPath did not start with the specified urlPathPrefix: ', urlPathPrefix);
 }
 
 // NOTE: only the first occurrence will be (and should be) replaced.
-const datasetURLPath = initialUrlPath.replace(datasetURLPathPrefix, '');
+const datasetURLPath = initialUrlPath.replace(urlPathPrefix, '');
 
 // Get the datasetURLPathParts and filter out empty strings (and other falseys).
 const datasetURLPathParts = _filter(datasetURLPath.split('/'));
 const dataset = datasetURLPathParts[0];
-const baseURLPath = `${datasetURLPathPrefix}/${dataset}/`;
+const baseURLPath = `${urlPathPrefix}/${dataset}/`;
 
 if (dataset === undefined || dataset === null || dataset === '') {
 
-  const datasetURLPathPrefixHtml = <span> after <em>{datasetURLPathPrefix}</em></span>;
+  const urlPathPrefixHtml = <span> after <em>{urlPathPrefix}</em></span>;
 
   ReactDOM.render(
     <div>
       <Loading status="error">
-        <div>No dataset specified in the URL{datasetURLPathPrefix ? datasetURLPathPrefixHtml : null}</div>
+        <div>No dataset specified in the URL{urlPathPrefix ? urlPathPrefixHtml : null}</div>
       </Loading>
     </div>
     , document.getElementById('main')
