@@ -9,7 +9,7 @@ import DataDecoders from 'panoptes/DataDecoders';
 import Base64 from 'panoptes/Base64';
 import _assign from 'lodash.assign';
 
-const serverURL = process.env.DATASET_URL_PATH_PREFIX + '/panoptes/api';
+const serverURL = process.env.URL_PATH_PREFIX + '/panoptes/api';
 
 //TODO: Refactor server errors to closer to HTTP standard
 function _filterError(json) {

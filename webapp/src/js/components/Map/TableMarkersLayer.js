@@ -259,11 +259,11 @@ let TableMarkersLayer = createReactClass({
     };
 
     let onClickSingleTemplateAPIargs = {
-      url: `${process.env.DATASET_URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/${onClickSingleComponentTemplateDocPath}`
+      url: `${process.env.URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/${onClickSingleComponentTemplateDocPath}`
     };
 
     let onClickClusterTemplateAPIargs = {
-      url: `${process.env.DATASET_URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/${onClickClusterComponentTemplateDocPath}`
+      url: `${process.env.URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/${onClickClusterComponentTemplateDocPath}`
     };
 
     requestContext.request(

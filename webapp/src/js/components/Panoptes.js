@@ -232,7 +232,7 @@ let Header = createReactClass({
     const userId = this.config.user.id;
     return (
       <div className="header">
-        <div className="title"><a href={`${process.env.DATASET_URL_PATH_PREFIX}/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
+        <div className="title"><a href={`${process.env.URL_PATH_PREFIX}/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
         <div className="username">
           { this.config.cas.service ? (userId == 'anonymous' ?
             <a href={`${this.config.cas.service}?service=${url}`}>Login</a>

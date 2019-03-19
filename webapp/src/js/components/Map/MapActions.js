@@ -236,7 +236,7 @@ let MapActions = createReactClass({
 
       // NB: Leaflet uses [[south, west], [north, east]] bounds.
       let bounds = overlayLayerConfig.bounds !== undefined ? [[overlayLayerConfig.bounds.southLat, overlayLayerConfig.bounds.westLng], [overlayLayerConfig.bounds.northLat, overlayLayerConfig.bounds.eastLng]] : undefined;
-      let mapLayerServerPath = `${process.env.DATASET_URL_PATH_PREFIX}/panoptes/Maps/${this.config.dataset}/${overlayLayer}/`;
+      let mapLayerServerPath = `${process.env.URL_PATH_PREFIX}/panoptes/Maps/${this.config.dataset}/${overlayLayer}/`;
       let absoluteURLPattern = /^https?:\/\/|^\/\//i;
 
       let overlayLayerProps = {

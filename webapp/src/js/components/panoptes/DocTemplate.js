@@ -51,7 +51,7 @@ DocTemplate = withAPIData(DocTemplate, function({props}) {
       template: {
         method: 'staticContent',
         args: {
-          url: `${process.env.DATASET_URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/${props.path}`
+          url: `${process.env.URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/${props.path}`
         },
       },
     },

@@ -117,7 +117,7 @@ let Icon = createReactClass({
     style = {...defaultStyle, ...style};
 
     if (_startsWith(name, 'docimage:')) {
-      baseURL = `${process.env.DATASET_URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/images/`;
+      baseURL = `${process.env.URL_PATH_PREFIX}/panoptes/Docs/${this.config.dataset}/images/`;
     }
 
     if (_startsWith(name, 'bitmap:') || _startsWith(name, 'image:') || _startsWith(name, 'docimage:')) {
