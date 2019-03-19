@@ -9,7 +9,7 @@ let UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = function(env) {
   const nodeEnv = env && env.prod ? 'production' : 'development';
   const isProd = nodeEnv === 'production';
-  const datasetUrlPathPrefix = env && env.DATASET_URL_PATH_PREFIX ? env.DATASET_URL_PATH_PREFIX : '';
+  const urlPathPrefix = env && env.URL_PATH_PREFIX ? env.URL_PATH_PREFIX : '';
 
   const plugins = [
     new webpack.EnvironmentPlugin({
@@ -19,7 +19,7 @@ module.exports = function(env) {
       template: path.resolve(__dirname, 'src/index.html'),
       inject: 'body',
       hash: true,
-      datasetUrlPathPrefix: datasetUrlPathPrefix
+      urlPathPrefix: urlPathPrefix
     }),
     new CopyWebpackPlugin([
       //Using this method for the favicons - this method should not be used generally, esp in JS where one can require(IMAGE_PATH)
@@ -27,7 +27,7 @@ module.exports = function(env) {
     ]),
     new webpack.DefinePlugin({
       // Include a leading trailing forward slash and *no* trailing forward slash, when not empty.
-      'process.env.DATASET_URL_PATH_PREFIX': JSON.stringify(datasetUrlPathPrefix),
+      'process.env.URL_PATH_PREFIX': JSON.stringify(urlPathPrefix),
     }),
   ];
 
@@ -99,10 +99,10 @@ module.exports = function(env) {
       panoptes: isProd ? [path.resolve(__dirname, 'src/js/index.js')] : ["webpack-dev-server/client?http://localhost:8080", path.resolve(__dirname, 'src/js/index.js')]
     },
     output: {
-      path: path.resolve(__dirname, 'dist/panoptes'),
+      path: path.resolve(__dirname, 'dist' + urlPathPrefix + '/panoptes'),
       filename: '[name].js',
       chunkFilename: '[chunkhash].js',
-      publicPath: isProd ? '/panoptes/' : '/'
+      publicPath: isProd ? urlPathPrefix + '/panoptes/' : (urlPathPrefix === '' ?  '/' : urlPathPrefix)
     },
     node: {
       fs: 'empty' //Needed for handlebars-helper
@@ -185,7 +185,7 @@ module.exports = function(env) {
       contentBase: 'dist',
       headers: {'Access-Control-Allow-Origin': '*'},
       historyApiFallback: {
-        index: '/index.html',
+        index: urlPathPrefix === '' ? '/index.html' : urlPathPrefix,
         rewrites: [
           {from: /.html$/, to: '/index.html'}
         ]
@@ -208,15 +208,15 @@ module.exports = function(env) {
         // }
       },
       proxy: {
-        [datasetUrlPathPrefix + '/panoptes/api']: {
+        [urlPathPrefix + '/panoptes/api']: {
           target: 'http://localhost:8000/',
           secure: false
         },
-        [datasetUrlPathPrefix + '/panoptes/Docs']: {
+        [urlPathPrefix + '/panoptes/Docs']: {
           target: 'http://localhost:8000/',
           secure: false
         },
-        [datasetUrlPathPrefix + '/panoptes/Maps']: {
+        [urlPathPrefix + '/panoptes/Maps']: {
           target: 'http://localhost:8000/',
           secure: false
         }
