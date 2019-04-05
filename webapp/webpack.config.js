@@ -94,8 +94,8 @@ module.exports = function(env) {
     // devtool: isProd ? 'source-map' : 'eval',
     context: __dirname,
     entry: {
-      babel: isProd ? ['@babel/polyfill'] : ["webpack-dev-server/client?http://localhost:8080", '@babel/polyfill'],
-      panoptes: isProd ? [path.resolve(__dirname, 'src/js/index.js')] : ["webpack-dev-server/client?http://localhost:8080", path.resolve(__dirname, 'src/js/index.js')]
+      babel: isProd ? ['@babel/polyfill'] : ["webpack-dev-server/client?http://localhost:8000", '@babel/polyfill'],
+      panoptes: isProd ? [path.resolve(__dirname, 'src/js/index.js')] : ["webpack-dev-server/client?http://localhost:8000", path.resolve(__dirname, 'src/js/index.js')]
     },
     output: {
       path: path.resolve(__dirname, 'dist/panoptes'),
@@ -181,6 +181,8 @@ module.exports = function(env) {
     },
 
     devServer: {
+      public: 'panoptes-testing:8000',
+      port: 8000,
       contentBase: 'dist',
       headers: {'Access-Control-Allow-Origin': '*'},
       historyApiFallback: {
@@ -208,15 +210,15 @@ module.exports = function(env) {
       },
       proxy: {
         '/panoptes/api': {
-          target: 'http://localhost:8000/',
+          target: 'http://localhost:7000/',
           secure: false
         },
         '/panoptes/Docs': {
-          target: 'http://localhost:8000/',
+          target: 'http://localhost:7000/',
           secure: false
         },
         '/panoptes/Maps': {
-          target: 'http://localhost:8000/',
+          target: 'http://localhost:7000/',
           secure: false
         }
       }
