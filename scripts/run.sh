@@ -18,13 +18,13 @@ monetdbd start $BASEDIR/monetdb || true  #Fails if already started
 source panoptes_virtualenv/bin/activate
 cd server
 if [ -z "$1" ]; then
-    echo "No address specified - using localhost:8000"
-    BIND="localhost:8000"
+    echo "No address specified - using localhost:7000"
+    BIND="localhost:7000"
 else
 	BIND=${1}
 fi  
 if [ -z "$2" ]; then
-    NUM_WORKERS=10
+    NUM_WORKERS=1
 else
 	NUM_WORKERS=${2}
 fi

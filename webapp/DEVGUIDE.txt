@@ -13,16 +13,16 @@ nano config.py #Edit config for base, source data dirs, etc.
 #Install all the things:
 ./scripts/build.sh
 
-#Then you can run panoptes:
+#Then you can run panoptes: (this method should only be used for development, production should use WSGI apache or similar)
 DEVELOPMENT=TRUE ./scripts/run.sh
 
-#Datasets are hosted at http://localhost:8000/{DATASET_ID}
+#Datasets are hosted at http://localhost:7000/{DATASET_ID}
 #If you're using the sampledata (by default you are) then several are available for example
-#Navigate to http://localhost:8000/Samples_and_Variants - error messages will appear as the dataset hasn't been loaded
+#Navigate to http://localhost:7000/Samples_and_Variants - error messages will appear as the dataset hasn't been loaded
 #Click on the Dataset Manager button to open that view.
 #Click on the Reimport Everything button to import the Samples_and_Variants dataset.
 #Wait for the import to finish and then close the Dataset Manager tab and refresh the page.
-#http://localhost:8000/Samples_and_Variants should now show the dataset!
+#http://localhost:7000/Samples_and_Variants should now show the dataset!
 
 #Now if you want to edit the JS, we need to setup the JS build env.
 #In another terminal window:
@@ -42,5 +42,10 @@ yarn
 #Now run the dev html/js server
 npm run dev          #(options are dev, build, serveprod)
 
-#Navigate to (NOTE DIFFERENT PORT) http://localhost:8080/Samples_and_Variants
+#Navigate to (NOTE DIFFERENT PORT) http://localhost:8000/Samples_and_Variants
 #Any changes you save to files will now be detected and applied on refresh, experimental hot loading is via "npm run devhot"
+
+
+#SSO Testing
+Modify your /etc/hosts file so that panoptes-testing points to localhost
+and use http://panoptes-testing:8000/ as the URL
