@@ -136,7 +136,7 @@ class LoadTable(threading.Thread):
         colTokens = []
 
         #Get names in header file
-        with open(self._sourceFileName, 'r') as sourceFile:
+        with open(self._sourceFileName, 'r', encoding='utf-8') as sourceFile:
             header_names = sourceFile.readline().strip().replace(' ', '_').split(self._separator)
         for col in self._loadSettings.getPropertyNames():
             if '.' in col:
@@ -195,12 +195,12 @@ class LoadTable(threading.Thread):
             self._destFileName = ImpUtils.GetTempFileName()
             if (self._maxLineCount > 0):
                 headFileName = ImpUtils.GetTempFileName()
-                hfp = open(headFileName, 'w')
+                hfp = open(headFileName, 'w', encoding='utf-8')
         
-            with open(sourceFileName, 'r') as ifp:
+            with open(sourceFileName, 'r', encoding='utf-8') as ifp:
                 if ifp is None:
                     raise Exception('Unable to read file '+sourceFileName)
-                with open(self._destFileName, 'w') as ofp:
+                with open(self._destFileName, 'w', encoding='utf-8') as ofp:
                     if ofp is None:
                         raise Exception('Unable to write to temporary file ' + self._destFileName)
 
