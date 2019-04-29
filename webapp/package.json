@@ -40,7 +40,7 @@
     "require-dir": "^1.1.0",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.0",
-    "uglifyjs-webpack-plugin": "^2.0.1",
+    "terser-webpack-plugin": "^1.2.3",
     "unlazy-loader": "^0.1.2",
     "url-loader": "^1.1.1",
     "webpack": "^4.20.2",

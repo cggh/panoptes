@@ -4,7 +4,7 @@ let HtmlWebpackPlugin = require('html-webpack-plugin');
 let autoprefixer = require('autoprefixer');
 let CopyWebpackPlugin = require('copy-webpack-plugin');
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-let UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+let TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = function(env) {
   const nodeEnv = env && env.prod ? 'production' : 'development';
@@ -73,20 +73,9 @@ module.exports = function(env) {
   return {
     optimization: {
       minimizer: [
-        new UglifyJsPlugin({
+        new TerserPlugin({
           cache: true,
           parallel: true,
-          uglifyOptions: {
-            warnings: false,
-            conditionals: true,
-            unused: true,
-            comparisons: true,
-            sequences: true,
-            dead_code: true,
-            evaluate: true,
-            if_return: true,
-            join_vars: true,
-          },
         }),
       ]
     },
