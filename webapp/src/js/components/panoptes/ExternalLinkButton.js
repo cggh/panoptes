@@ -30,7 +30,7 @@ let ExternalLinkButton = createReactClass({
       style={{margin: '7px', color: 'white'}}
       label={label}
       color="primary"
-      icon={<Icon name="external-link" />}
+      icon={<Icon name="external-link-alt" />}
       labelStyle={{textTransform: 'inherit'}}
       onClick={this.handleClick}
     />;

@@ -69,7 +69,7 @@ let DatasetManagerActions = createReactClass({
         <ConfirmButton
           label="Reimport everything"
           color="primary"
-          iconName="refresh"
+          iconName="redo"
           message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
           onConfirm={() => this.handleReimport()}
           style={buttonStyle}

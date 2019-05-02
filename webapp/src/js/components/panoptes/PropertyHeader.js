@@ -54,7 +54,7 @@ let PropertyHeader = createReactClass({
         /></div></div>
       </div>
       }>
-      <Icon className="info" name="info-circle" style={{cursor: 'pointer'}} title="Click for more information"/>
+      <Icon className="info" name="info" style={{cursor: 'pointer'}} title="Click for more information"/>
     </Tooltip>;
     return (
       <span onClick={(event) => {

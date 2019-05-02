@@ -41,12 +41,12 @@ let PropertyCell = createReactClass({
 
   render() {
     let {prop, value, noLinks, noFormatting, prefix, onClick, className, nullReplacement, nanReplacement, ...other} = this.props;
-    let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
+    let externalLinkIcon = <i className="fa fa-external-link-alt external-link-icon"></i>;
     let descriptionIcon = !noLinks && prop.valueDescriptions && prop.valueDescriptions[value] ?
       <Tooltip placement="bottom"
         trigger={['click']}
         overlay={htmlToReactParser.parse(`<span>${prop.valueDescriptions[value]}</span>`)}>
-        <Icon className="info" name="info-circle"/>
+        <Icon className="info" name="info"/>
       </Tooltip> :
       null;
     let content = undefined;

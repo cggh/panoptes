@@ -65,7 +65,7 @@ let TablePlotActions = createReactClass({
   },
 
   icon() {
-    return 'bar-chart';
+    return 'chart-bar';
   },
 
   title() {

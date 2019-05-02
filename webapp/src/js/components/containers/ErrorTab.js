@@ -19,7 +19,7 @@ let ErrorTab = createReactClass({
   },
 
   icon() {
-    return 'warning';
+    return 'exclamation-circle';
   },
 
   title() {

@@ -249,7 +249,7 @@ let Header = createReactClass({
             placement="bottom"
           >
             <IconButton
-              className="fa fa-floppy-o"
+              className="fa fa-save"
               onClick={this.handleSaveInitialSession}
             />
           </Tooltip>

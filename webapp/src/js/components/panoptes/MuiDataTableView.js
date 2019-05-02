@@ -300,7 +300,7 @@ let MuiDataTableView = createReactClass({
                         </div>
                       </div>}
                     >
-                      <Icon name="info-circle"/>
+                      <Icon name="info"/>
                     </Tooltip>
                     :
                     null

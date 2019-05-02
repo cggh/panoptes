@@ -148,7 +148,7 @@ let DocPage = createReactClass({
   },
 
   icon() {
-    return 'file-text-o';
+    return 'file-alt';
   },
 
   render() {

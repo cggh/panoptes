@@ -117,7 +117,7 @@ let TabbedArea = createReactClass({
 
     let closeIcon = '';
     if (this.props.onClose) {
-      closeIcon = <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>;
+      closeIcon = <Icon className="action close" name="times" onClick={this.handleClose.bind(this, id)}/>;
     }
 
     let tabMarkup = (

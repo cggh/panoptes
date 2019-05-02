@@ -212,19 +212,19 @@ const ConfigStore = createStore({
       prop.icon = 'font';
       if (prop.isFloat || prop.isInt) {
         prop.dispDataType = 'Value';
-        prop.icon = 'line-chart';
+        prop.icon = 'chart-line';
       }
       if (prop.isCategorical) {
         prop.dispDataType = 'Categorical';
-        prop.icon = 'bar-chart';
+        prop.icon = 'chart-bar';
       }
       if (prop.isBoolean) {
         prop.dispDataType = 'Boolean';
-        prop.icon = 'check-square-o';
+        prop.icon = 'check-square';
       }
       if (prop.isDate) {
         prop.dispDataType = 'Date';
-        prop.icon = 'calendar';
+        prop.icon = 'calendar-alt';
       }
       if (prop.dataType == 'GeoLongitude') {
         prop.dispDataType = 'Longitude';

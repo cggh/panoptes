@@ -407,7 +407,7 @@ let DataTableWithActions = createReactClass({
             label="Plot Table"
             color="primary"
             onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
-            iconName="bar-chart"
+            iconName="chart-bar"
           />
         </div>
       </div>

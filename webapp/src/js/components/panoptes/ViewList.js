@@ -91,7 +91,7 @@ let ViewList = createReactClass({
           disabled={!hasShowableTables}
         >
           <ListItemIcon>
-            <Icon fixedWidth={true} name="area-chart" />
+            <Icon fixedWidth={true} name="chart-area" />
           </ListItemIcon>
           <ListItemText
             primary="Table Plotter"

@@ -34,7 +34,7 @@ let ModalInput = createReactClass({
           <Button
             label="Cancel"
             color="primary"
-            iconName="close"
+            iconName="times"
             onClick={onCancel}
           />
           <Button

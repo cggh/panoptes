@@ -64,7 +64,7 @@ let Confirm = createReactClass({
           <Button
             label={cancelButtonLabel}
             color="primary"
-            iconName="close"
+            iconName="times"
             onClick={this.handleCancel}
           />
           <Button

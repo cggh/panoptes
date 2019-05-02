@@ -4,7 +4,7 @@ nameSingle: contributor
 namePlural: contributors
 description: The entities that contributed the samples
 
-icon: fa-institution # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
+icon: fa-university # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
 
 disableNotes: true
 

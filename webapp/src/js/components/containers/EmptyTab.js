@@ -22,7 +22,7 @@ let EmptyTab = createReactClass({
   },
 
   icon() {
-    return 'folder-o';
+    return 'folder';
   },
 
   title() {

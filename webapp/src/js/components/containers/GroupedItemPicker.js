@@ -63,7 +63,7 @@ let GroupedItemPicker = createReactClass({
   },
 
   icon() {
-    return 'check-square-o';
+    return 'check-square';
   },
 
   title() {

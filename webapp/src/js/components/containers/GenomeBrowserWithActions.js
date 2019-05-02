@@ -366,7 +366,7 @@ let SidebarContent = createReactClass({
           <Button
             label="Save channel set"
             color="primary"
-            iconName="floppy-o"
+            iconName="save"
             onClick={() => actions.session.modalOpen(
               <ModalInput
                 inputs={['name', 'description']}

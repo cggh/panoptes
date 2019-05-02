@@ -97,7 +97,7 @@ let DatasetImportStatusListView = createReactClass({
             let iconSpin = false;
             let iconStyle = {};
             if (row.failed) {
-              iconName = 'warning';
+              iconName = 'exclamation-circle';
               iconStyle = {color: 'orange'};
             } else if (row.completed) {
               iconName = 'check';

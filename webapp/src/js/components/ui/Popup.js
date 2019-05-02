@@ -139,8 +139,8 @@ let Popup = createReactClass({
             <div className="popup-header">
               {icon ? <Icon name={icon}/> : null}
               <div className="title">{title}</div>
-              <Icon className="pointer close" name="folder-o" onClick={this.handleMaximise}/>
-              <Icon className="pointer close" name="close" onClick={this.handleClose}/>
+              <Icon className="pointer close" name="folder" onClick={this.handleMaximise}/>
+              <Icon className="pointer close" name="times" onClick={this.handleClose}/>
             </div>
             <div onClick={this.handleClick} className="popup-body" style={{width: width - 2, height: height - TOPBAR_HEIGHT - 2}}>
               {React.cloneElement(children, {ref: 'child'})}
