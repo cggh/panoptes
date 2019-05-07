@@ -22,7 +22,7 @@ class PluginLoader(BaseImport):
             testDir = os.path.join(path,'responders','importer','plugins')
             if os.path.isdir(testDir):
                 plugin_folders.append(testDir)
-        
+        plugin_folders = set(plugin_folders)
         for plugin_folder in plugin_folders:
             self._log('Looking for plugins in ' + plugin_folder)
             possibleplugins = os.listdir(plugin_folder)
