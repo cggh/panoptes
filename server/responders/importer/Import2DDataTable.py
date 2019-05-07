@@ -41,7 +41,7 @@ class Import2DDataTable(BaseImport):
             table_settings = self.getSettings(tableid)
 
 
-            settingsFile, data_file = self._getDataFiles(tableid)
+            settingsFile, data_file, isView = self._getDataFiles(tableid)
             zarr_file = zarr.DirectoryStore(data_file)
             zarr_file = zarr.group(zarr_file)
             #Check that the referenced tables exist and have the primary key specified.

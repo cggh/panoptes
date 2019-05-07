@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class LoadTable(threading.Thread):
     
-    def __init__(self, responder, sourceFileName, datasetId, tableId, loadSettings, importSettings, createSubsets = False):
+    def __init__(self, responder, sourceFileName, datasetId, tableId, loadSettings, importSettings, createSubsets = False, isView = False):
         
         threading.Thread.__init__(self)
         
@@ -40,6 +40,7 @@ class LoadTable(threading.Thread):
         self._separator = '\t'
         self._lineSeparator = '\n'
         self._createSubsets = createSubsets
+        self._isView = isView
         
         self._loadSettings = loadSettings
      
@@ -268,7 +269,18 @@ class LoadTable(threading.Thread):
             
             databaseid = self._datasetId
             tableid = self._tableId
-            
+
+            if self._isView:
+                self._log('Creating view {0} from {1}'.format(tableid, sourceFileName))
+                try:
+                    self._dao.dropTable(tableid)
+                except:
+                    self._log("{} doesn't exist".format(tableid))
+                with open(sourceFileName, 'r') as viewFile:
+                    viewSpec = viewFile.read()
+                self._dao._execSql('CREATE VIEW {0} AS {1}'.format(tableid, viewSpec))
+                return
+
             self._log('Loading table {0} from {1}'.format(tableid, sourceFileName))
         
             sourceFileName = self._preprocessFile(sourceFileName, tableid)

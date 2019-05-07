@@ -39,7 +39,7 @@ class BaseImport(object):
             raise Exception('dataDir must be either datatables or 2D_datatables')
       
         self._dataFile = 'data'
-        
+        self._viewFile = 'view'
         
         if dataDir == 'datatables':
             datasetFolder = os.path.join(baseFolder, datasetId)
@@ -114,6 +114,7 @@ class BaseImport(object):
     #Return the list of tables to process either as specified in the settings file or by looking at the directories
     def _getTables(self):
         ret = []
+        views = [] #Do them last as they depend on non-view tables
         
         self._log(str(self))
         if self._globalSettings[self._tablesToken]:
@@ -123,9 +124,11 @@ class BaseImport(object):
                 return ret
             for folder in os.listdir(os.path.join(self._datasetFolder, self._dataDir)):
                 if os.path.isdir(os.path.join(self._datasetFolder, self._dataDir, folder)):
-                    ret.append(folder)            
-
-        return ret
+                    if os.path.exists(os.path.join(self._datasetFolder, self._dataDir, folder, 'view')):
+                        views.append(folder)
+                    else:
+                        ret.append(folder)
+        return ret + views
     
     def _getGlobalSettingList(self, name):
         retval = None
@@ -169,6 +172,9 @@ class BaseImport(object):
         if not os.path.isfile(settings):
             self._log("Missing settings file {} from {} {} ".format(settings, self._datatablesFolder, datatable))
 #            raise Exception("Missing settings {}".format(settings))
+        view = os.path.join(folder, self._viewFile)
+        if os.path.isfile(view):
+            return settings, view, True
         data = os.path.join(folder, self._dataFile)
         data_gz = data + '.gz'
         data_hdf = data + '.hdf5'
@@ -186,11 +192,11 @@ class BaseImport(object):
                     self._log("Missing data file {} from {} {} ".format(data, self._datatablesFolder, datatable))
     #                raise Exception("Missing data {}".format(data))
         
-        return settings, data
+        return settings, data, False
     
     def _fetchSettings(self, datatable):
                 
-        settings, data = self._getDataFiles(datatable)
+        settings, data, isView = self._getDataFiles(datatable)
         
         tableSettings = self._settingsLoader
         tableSettings.loadFile(settings)

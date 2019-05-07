@@ -12,6 +12,9 @@ The first line of the file serves as a header, specifying the identifiers for al
 (`example file
 <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/variants/data>`_).
 
+Alternatively a ``view`` file can be provided instead of a ``data`` file. The contents of the ``view`` file should be a MonetDB SQL Select statement that
+references other tables in the dataset.
+
 In addition, a yaml ``settings`` file should be present in the *data table* folder.
 This file can contain a number of settings, both at the level of the *data table*,
 as at the level of individual *properties* (see :ref:`def-settings-datatable`).
