@@ -1,4 +1,5 @@
 import DataStream from 'datastream';
+import utf8 from 'utf8';
 
 function decodeSingleArray(stream) {
   let dtype = stream.readCString();
@@ -54,7 +55,7 @@ function decodeSingleArray(stream) {
   case 'S':
     array = [];
     for (let i = 0; i < arrayLen; ++i) {
-      array.push(stream.readCString());
+      array.push(utf8.decode(stream.readCString()))
     }
     break;
   default:
