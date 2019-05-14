@@ -39,19 +39,21 @@ let PropertyHeader = createReactClass({
 
   render() {
     const {table, propId, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
-    const {name, description} = this.propertiesByColumn(propId);
+    const {name, description, isNumerical, isCategorical} = this.propertiesByColumn(propId);
     delete other.columnKey;
     const tooltip = <Tooltip placement={tooltipPlacement}
       trigger={tooltipTrigger}
       overlay={<div className="vertical stack">
         <div className="tooltip-description"><HTMLWithComponents>{description}</HTMLWithComponents></div>
-        <div className="grow"><div className="tooltip-plot"><TablePlot
+        {isCategorical || isNumerical ?
+        <div className="grow">Summary:
+          <div className="tooltip-plot"><TablePlot
           table={table}
           plotType="histogram"
           // query={this.getDefinedQuery()}
           horizontal={propId}
           // randomSubsetSize={randomSubsetSize}
-        /></div></div>
+        /></div></div> : null }
       </div>
       }>
       <Icon className="info" name="info" style={{cursor: 'pointer'}} title="Click for more information"/>
