@@ -15,7 +15,7 @@ def response(returndata):
         return returndata
 
     content = ''
-    with open(filename, 'r') as content_file:
+    with open(filename, 'r', encoding='utf8') as content_file:
         for line in content_file:
             strippedline = line.lstrip()
             if (strippedline[0:3]!='@@@'):

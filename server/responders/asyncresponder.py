@@ -146,7 +146,7 @@ class CalculationThread (threading.Thread):
         self.logfilename = os.path.join(config.BASEDIR, 'temp', 'log_'+self.id)
         sys.stdout = self
         sys.stderr = self
-        with open(self.logfilename, 'w') as logfile:
+        with open(self.logfilename, 'w', encoding='utf8') as logfile:
             logfile.write('Log start\n')
 
     def CloseLog(self):
@@ -182,7 +182,7 @@ class CalculationThread (threading.Thread):
             if self.logfilename is None:
                 self.orig_stdout.write(line)
             else:
-                with open(self.logfilename, 'a') as logfile:
+                with open(self.logfilename, 'a', encoding='utf8') as logfile:
                     logfile.write(line)
 
 
