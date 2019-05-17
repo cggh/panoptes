@@ -64,11 +64,6 @@ TableData = withAPIData(TableData, ({config, props}) => {
 
   columns = _map(columns, (expr, as) => ({expr, as}));
 
-  let tableConfig = config.tablesById[table];
-  if (tableConfig === undefined) {
-    throw Error('tableConfig === undefined');
-  }
-
   let groupBySet = new Set(groupBy);
 
   const resolvedArgs = resolveJoins({
@@ -81,7 +76,7 @@ TableData = withAPIData(TableData, ({config, props}) => {
     randomSample, cache, joins,
     //We need individual rows as objects if we are interating so transpose here
     transpose: iterate
-  }, tableConfig);
+  }, config);
   return {
     requests: {
       data: {
