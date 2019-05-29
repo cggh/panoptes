@@ -11,6 +11,8 @@ import _keys from 'lodash.keys';
 import _values from 'lodash.values';
 import _pick from 'lodash.pick';
 import _includes from 'lodash.includes';
+import _isFunction from 'lodash.isfunction';
+import _pickBy from 'lodash.pickby';
 
 let TableData = createReactClass({
   displayName: 'TableData',
@@ -42,12 +44,21 @@ let TableData = createReactClass({
   },
 
   render() {
-    let {children, config, table, iterate} = this.props;
+    let {
+      children, table, query, orderBy, groupBy, clientGroupBy, start, stop, distinct,
+      randomSample, cache, joins, iterate, ...columns
+    } = this.props;
     let {data} = this.props;
 
     if (data === undefined) {
       return null;
     }
+
+    //Resolve any functional props TODO This, but for non-grouped or iterated, we do this in render as they may contain closures that have changed after fetch which the logic of withAPIdata will not see as a change, so a recalc will not be triggered
+    _keys(_pickBy(columns, (func, column) => _isFunction(func))).forEach((column) => {
+      data[column] = columns[column](data);
+    });
+
 
     const filteredChildren = filterChildren(this, children); // Remove spaces.
     if (iterate) {
@@ -65,7 +76,7 @@ TableData = withAPIData(TableData, ({config, props}) => {
     randomSample, cache, joins, iterate, ...columns
   } = props;
 
-  let requestColumns = _map(columns, (expr, as) => ({expr, as}));
+  let requestColumns = _map(_pickBy(columns, (expr, as) => !_isFunction(expr)), (expr, as) => ({expr, as}));
   let groupBySet = new Set(groupBy);
 
   const resolvedArgs = resolveJoins({
