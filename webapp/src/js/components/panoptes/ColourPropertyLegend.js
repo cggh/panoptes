@@ -6,6 +6,7 @@ import withAPIData from 'hoc/withAPIData';
 import LegendElement from 'panoptes/LegendElement';
 import {propertyColour, isColourDark} from 'util/Colours';
 import Color from 'color';
+import {fillGapsInColourSpec} from "../../util/Colours";
 
 class ColourPropertyLegend extends React.Component {
 
@@ -33,6 +34,7 @@ class ColourPropertyLegend extends React.Component {
     colourFillOpacity: PropTypes.number,
     colourBackgroundColour: PropTypes.string,
     showColourBorder: PropTypes.bool,
+    overrideConfig: PropTypes.object,
     config: PropTypes.object, // This will be provided via withAPIData
     data: PropTypes.array // This will be provided via withAPIData
   };
@@ -48,6 +50,7 @@ class ColourPropertyLegend extends React.Component {
     valueSuffix: '',
     swatchHeight: '10px', // Only applies when layout = 'values-outside-colours'. When layout = 'values-inside-colours', swatchHeight is forced to 100%.
     showColourBorder: true,
+    overrideConfig: {}
   };
 
   render() {
@@ -57,7 +60,7 @@ class ColourPropertyLegend extends React.Component {
       noDataText, noDataSwatchWidthPixels, noDataSwatchSeparatorWidthPixels,
       layout, tickLineColour, valueSuffix,
       swatchHeight, tickLineHeight, colourFillOpacity, colourBackgroundColour,
-      showColourBorder,
+      showColourBorder, overrideConfig
     } = this.props;
 
     // NOTE: render() is still called when isRequired props are undefined.
@@ -68,8 +71,8 @@ class ColourPropertyLegend extends React.Component {
     // If a labelProperty has not been provided, then use the colourProperty
     labelProperty = labelProperty === undefined ? colourProperty : labelProperty;
 
-    const labelPropConfig = config.tablesById[table].propertiesById[labelProperty];
-    const colourPropConfig = config.tablesById[table].propertiesById[colourProperty];
+    const labelPropConfig = {...config.tablesById[table].propertiesById[labelProperty], ...overrideConfig};
+    const colourPropConfig = {...config.tablesById[table].propertiesById[colourProperty], ...overrideConfig};
     let {colours, thresholds, nullColour, interpolate} = colourPropConfig.scaleColours;
     const colourFunc = propertyColour(colourPropConfig);
     const lightColour = '#F0F0F0';
@@ -431,7 +434,7 @@ ColourPropertyLegend = withAPIData(ColourPropertyLegend, ({config, props}) => {
     SQL.nullQuery;
 
 
-  let columns = [colourProperty, (labelProperty === undefined ? config.tablesById[table].primKey : labelProperty)];
+  let columns = [colourProperty, labelProperty || colourProperty];
 
   return {
     requests: {
@@ -442,7 +445,8 @@ ColourPropertyLegend = withAPIData(ColourPropertyLegend, ({config, props}) => {
           table,
           columns,
           query,
-          transpose: true
+          transpose: true,
+          distinct: true
         }
       }
     }
