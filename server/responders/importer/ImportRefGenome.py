@@ -27,17 +27,15 @@ def flattenarglist(arg):
     else:
         return arg
 
-def ImportRefGenome(calculationObject, datasetId, sourceFolder, importSettings):
+def ImportRefGenome(calculationObject, datasetId, sourceFolder, importSettings, dao):
     config = PanoptesConfig(calculationObject)
-    baseFolder = join(config.getBaseDir(), 'config', datasetId)
+    baseFolder = join(config.getBaseDir(), 'config','_import_' + datasetId)
     datasetFolder = join(sourceFolder, datasetId)
     folder = join(datasetFolder, 'refgenome')
 
     if not os.path.exists(folder):
         return False
 
-    dao = SettingsDAO(calculationObject, datasetId)
-            
     with calculationObject.LogHeader('Importing reference genome data'):
 
         settings = SettingsRefGenome(join(folder, 'settings'), validate=True)
@@ -77,7 +75,7 @@ def ImportRefGenome(calculationObject, datasetId, sourceFolder, importSettings):
                             for i, base in enumerate(record.seq[maxBaseCount]):
                                 o.write('\t'.join([chrom, str(i), str(ord(base.lower()))])+'\n')
                 dao._execSql('CREATE TABLE "_sequence_" ("chrom" text, "pos" int, "base" tinyint);')
-                dao._execSql("COPY INTO _sequence_ from '%s' USING DELIMITERS '\t','\n' NULL AS '' LOCKED" % (tempFile))
+                dao._execSql("COPY INTO _sequence_ from '%s' USING DELIMITERS '\t','\n' NULL AS '' " % (tempFile))
                 os.remove(tempFile)
             else:
                 calculationObject.Log('WARNING: missing reference sequence file')

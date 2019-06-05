@@ -1,5 +1,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
+
 from builtins import str
 from builtins import map
 from builtins import object
@@ -24,13 +25,11 @@ import pymonetdb.control
 
 class SettingsDAO(object):
     
-    def __init__ (self, calculationObject, datasetId, logCache = None):
-               
+    def __init__ (self, calculationObject, datasetId, logCache=None, schema=None):
         self._calculationObject = calculationObject
         self._datasetId = datasetId
-
+        self._schema = schema
         self._config = PanoptesConfig(self._calculationObject)
-        
         self._logCache = logCache 
     
     def _log(self, message):
@@ -56,6 +55,8 @@ class SettingsDAO(object):
         self._log('SQLQuery:' + (self._datasetId or 'no dataset') + ';' + sql % args)
         
         with self.getDBCursor() as cur:
+            if self._schema:
+                cur.execute("SET SCHEMA %s" % DBTBESC(self._schema))
             cur.execute(sql, args)
             return cur.fetchall()
     
@@ -67,29 +68,25 @@ class SettingsDAO(object):
         
         with self.getDBCursor() as cur:
             cur.db.set_autocommit(True)
+            if self._schema:
+                cur.execute("SET SCHEMA %s" % DBTBESC(self._schema))
             cur.execute(sql, args)
 
     def createDatabase(self):
-        
-        db = self._datasetId
-        self._datasetId = None
-        
-        DQXUtils.CheckValidDatabaseIdentifier(db)
+        DQXUtils.CheckValidDatabaseIdentifier(self._datasetId)
         control = pymonetdb.control.Control(passphrase='monetdb', hostname='localhost')
         try:
-            control.stop(db)
+            #Check for DB existance - we get an exception if it doesn't
+            control.status(self._datasetId)
         except pymonetdb.exceptions.OperationalError:
-            pass
-        try:
-            control.destroy(db)
-        except pymonetdb.exceptions.OperationalError:
-            pass
-        control.create(db)
-        control.release(db)
-        self._datasetId = db
-        self._execSql('CREATE SCHEMA "%s"' % db)
-        self._execSql('ALTER USER "monetdb" SET SCHEMA "%s"' % db)
-        self._execSql('SET SCHEMA "%s"' % db)
+            control.create(self._datasetId)
+            control.release(self._datasetId)
+        if self._schema:
+            dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
+            self.__updateConnectionSettings(dbCursor, local_file=0, database=self._datasetId)
+            with self.getDBCursor() as cur:
+                cur.db.set_autocommit(True)
+                cur.execute('CREATE SCHEMA %s' % DBTBESC(self._schema))
 
     def setDatabaseVersion(self, major, minor):
         self._checkPermissions('settings', None)
@@ -122,8 +119,9 @@ class SettingsDAO(object):
         self.__updateConnectionSettings(dbCursor, local_file = 0, database = self._datasetId)
         
         with dbCursor as cur:
+            if self._schema:
+                cur.execute("SET SCHEMA %s" % DBTBESC(self._schema))
             cur.db.set_autocommit(False)
-            
             sql_parts = sqlparse.split(commands)
             i = 0
             for sql_part in sql_parts:
@@ -142,13 +140,10 @@ class SettingsDAO(object):
         sql = open(filename).read()
         self._multiStatementExecSql(sql)
                 
-    def dropTable(self, tableid, cur = None):
+    def dropTable(self, tableid, cur = None, isView = False):
         self._checkPermissions('', tableid)
-        
-        try:
-            self._execSql('DROP TABLE {}'.format(DBTBESC(tableid)))
-        except:
-            pass
+        self._execSql('DROP {} IF EXISTS {} {}'.format(
+                'VIEW' if isView else 'TABLE', DBTBESC(tableid)))
 
     #Check if the user has permission to write
     #The settingsTable is the global table
@@ -210,7 +205,6 @@ class SettingsDAO(object):
             modifier = 'UNIQUE'
 
         self._execSql('create ' + modifier + ' index {} ON {}({})'.format(DBCOLESC(indexName), DBTBESC(tableid), ",".join(map(DBCOLESC, cols))))
-            
 
     def insert2DIndexes(self, zarr_file, dimension, tableid, table_settings, primKey, max_line_count):
         
@@ -248,6 +242,8 @@ class SettingsDAO(object):
             commands = Numpy_to_SQL().create_table(tempTable, table_settings[indexField], idx)
             
             with self.getDBCursor() as cur:
+                if self._schema:
+                    cur.execute("SET SCHEMA %s" % DBTBESC(self._schema))
                 for i, command in enumerate(commands):
                     if i < 5:
                         self._log(self._datasetId+';'+command.__closure__[-1].cell_contents)
@@ -315,6 +311,13 @@ class SettingsDAO(object):
         if not configOnly:
             importtime = time.time()
         db = self._datasetId
+        schema = self._schema
         self._datasetId = None
-        self._execSql("INSERT INTO datasetindex VALUES (%s, %s, %s)", db, name, str(math.ceil(importtime)))
+        self._schema = None
+        self._execSql("START TRANSACTION; "
+                      "DELETE FROM datasetindex WHERE id = %s;"
+                      "INSERT INTO datasetindex VALUES (%s, %s, %s);"
+                      "COMMIT;"
+                      , db, db, name, str(math.ceil(importtime)))
         self._datasetId = db
+        self._schema = schema

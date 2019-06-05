@@ -45,7 +45,7 @@ class ImportDataTable(BaseImport):
         
         with self._logHeader('Importing datatable {0}'.format(tableid)):
             tableSettings = self.getSettings(tableid)
-            importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings)
+            importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings, dao=self._dao)
             importer.importData(tableid, createSubsets = True)
             importer.cleanUp()
             #Disabled till implemented in monet
@@ -56,7 +56,7 @@ class ImportDataTable(BaseImport):
     def storeDataDerivedConfig(self, table_id):
         with self._logHeader('Storing data derived config'):
             config = PanoptesConfig(self._calculationObject)
-            base_folder = join(config.getBaseDir(), 'config', self._datasetId, table_id)
+            base_folder = join(config.getBaseDir(), 'config', '_import_' + self._datasetId, table_id)
             def getDataDerivedConfigForProp(prop_id):
                 result = {}
                 prop = self._settingsLoader.getProperty(prop_id)
@@ -106,7 +106,7 @@ class ImportDataTable(BaseImport):
                         if not os.path.exists(destFolder):
                             os.makedirs(destFolder)
                         shutil.copyfile(os.path.join(graphfolder, 'data'), os.path.join(destFolder, graphid))
-        graph_config_dir = join(config.getBaseDir(), 'config', self._datasetId, tableid)
+        graph_config_dir = join(config.getBaseDir(), 'config', '_import_' + self._datasetId, tableid)
         graph_config_file = join(graph_config_dir, 'graphConfig.json')
         try:
             os.remove(graph_config_file)
@@ -123,15 +123,10 @@ class ImportDataTable(BaseImport):
                 simplejson.dump(trees, f)
 
     def importAllDataTables(self):
-        
         datatables = self._getTables()
-        
         datatables = self._getDatasetFolders(datatables)
-
         for datatable in datatables:
-            
             self.ImportDataTable(datatable)
         
         return datatable
-    
     

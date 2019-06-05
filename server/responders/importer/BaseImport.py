@@ -15,7 +15,7 @@ from .SettingsDataset import SettingsDataset
 
 class BaseImport(object):
     
-    def __init__ (self, calculationObject, datasetId, importSettings, baseFolder = None, dataDir = 'datatables'):
+    def __init__ (self, calculationObject, datasetId, importSettings, baseFolder = None, dataDir = 'datatables', dao = None):
         
         self._calculationObject = calculationObject
         self._config = PanoptesConfig(self._calculationObject)
@@ -81,7 +81,7 @@ class BaseImport(object):
         #This allows the use of the python logging api
         self._logger = logging.getLogger()
         
-        self._dao = SettingsDAO(self._calculationObject, self._datasetId)
+        self._dao = dao or SettingsDAO(self._calculationObject, self._datasetId)
 
     #This changes the message displayed in the Server calcuations section on the web page
     def setInfo(self, message):
