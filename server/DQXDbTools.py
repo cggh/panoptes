@@ -331,6 +331,9 @@ def DBCOLESC(arg):
         return '"'+ToSafeIdentifier(arg)+'"'
 
 def DBTBESC(arg):
+    if '.' in arg:
+        schema, table = arg.split('.')
+        return '"'+ToSafeIdentifier(schema)+'"."'+ToSafeIdentifier(table)+'"'
     return '"'+ToSafeIdentifier(arg)+'"'
 
 def DBDBESC(arg):

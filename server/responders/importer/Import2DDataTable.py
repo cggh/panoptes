@@ -27,7 +27,6 @@ class Import2DDataTable(BaseImport):
         return tableSettings
             
     def ImportDataTable(self, tableid):
-              
         with self._calculationObject.LogHeader('Importing 2D datatable {0}'.format(tableid)):
 
             DQXUtils.CheckValidTableIdentifier(tableid)

@@ -3,6 +3,8 @@ from __future__ import absolute_import
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
+import random
+import string
 from builtins import str
 from cache import getCache
 from os.path import join
@@ -77,23 +79,17 @@ def ImportMaps(calculationObject, datasetFolder, datasetId):
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
         calculationObject.Log('Import settings: '+str(importSettings))
-
         datasetFolder = join(baseFolder, datasetId)
-
-        dao = SettingsDAO(calculationObject, datasetId)
-        dao.removeDatasetMasterRef()
+        # Monetdb doesn't allow renames of non-empty schemas, so we import to a random, then set it as the user's default
+        schema = ''.join(random.choice(string.ascii_letters) for i in range(10))
+        dao = SettingsDAO(calculationObject, datasetId, schema=schema)
 
         if not importSettings['ConfigOnly']:
-            # Dropping existing database
-            dao = SettingsDAO(calculationObject, datasetId)
-            calculationObject.SetInfo('Dropping database')
+            calculationObject.SetInfo('Creating database')
             dao.createDatabase()
-
             # Creating new database
             scriptPath = os.path.dirname(os.path.realpath(__file__))
-            calculationObject.SetInfo('Creating database')
             dao.loadFile(scriptPath + "/createdataset.sql")
-
             dao.setDatabaseVersion(schemaversion.major, schemaversion.minor)
         else:
             #Raises an exception if not present
@@ -104,26 +100,40 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
                 raise Exception("The database schema of this dataset is outdated. Actualise it by running a full data import or or top N preview import.")
 
 
-        dao.clearDatasetCatalogs()
+        # dao.clearDatasetCatalogs()
 
 
-        modules = PluginLoader(calculationObject, datasetId, importSettings)
+        modules = PluginLoader(calculationObject, datasetId, importSettings, dao = dao)
         modules.importAll('pre')
 
-        importer = ImportDataTable(calculationObject, datasetId, importSettings, baseFolder = baseFolder)
+        importer = ImportDataTable(calculationObject, datasetId, importSettings, baseFolder = baseFolder, dao = dao)
         importer.importAllDataTables()
 
-        import2D = Import2DDataTable(calculationObject, datasetId, importSettings, baseFolder, dataDir = '2D_datatables')
+        import2D = Import2DDataTable(calculationObject, datasetId, importSettings, baseFolder, dataDir = '2D_datatables', dao = dao)
         import2D.importAll2DTables()
 
         globalSettings = importer._globalSettings
 
-        if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
+        if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings, dao):
             globalSettings['hasGenomeBrowser'] = True
 
         ImportDocs(calculationObject, datasetFolder, datasetId)
         ImportMaps(calculationObject, datasetFolder, datasetId)
         ImportCustomComponents(calculationObject, datasetFolder, datasetId)
+
+        #Swap the live default schema
+        dao._execSql('ALTER USER monetdb SET SCHEMA "%s"' % (schema))
+
+        #Move the config files to live
+        config = PanoptesConfig(calculationObject)
+        try:
+            os.rename(join(config.getBaseDir(), 'config', '_import_' + datasetId),
+                      join(config.getBaseDir(), 'config', datasetId))
+        except OSError:
+            # Not atomic but I can't se how to make it atomic easily
+            shutil.rmtree(join(config.getBaseDir(), 'config', datasetId))
+            os.rename(join(config.getBaseDir(), 'config', '_import_' + datasetId),
+                      join(config.getBaseDir(), 'config', datasetId))
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
@@ -131,6 +141,9 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         with calculationObject.LogHeader('Clear cache'):
             getCache().clear()
+
+        for old_schema in dao._execSqlQuery("SELECT name FROM sys.schemas WHERE system=False AND name<>%s", schema):
+            dao._execSql('DROP SCHEMA "%s" CASCADE' % (old_schema))
 
         modules.importAll('post')
 

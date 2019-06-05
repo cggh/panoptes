@@ -47,7 +47,7 @@ class ProcessDatabase(BaseImport):
         if hdf:
             data = ImpUtils.tabFileFromHDF5(loadSettings, data)
             self._toDelete = data
-        self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, loadSettings, self._importSettings, createSubsets, isView)
+        self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, loadSettings, self._importSettings, createSubsets, isView, self._dao)
         if not self._importSettings['ConfigOnly']:
             self._log(("Preparing to load {} to {}.{}").format(data, self._datasetId, tableid))
             self._dbloader.start()
