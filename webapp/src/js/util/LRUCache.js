@@ -12,6 +12,11 @@ let LRUCache = {
   cancellers: {},
   numberWaitingFor: {},
 
+  clear() {
+    LRUCache.cache =  {};
+    LRUCache.lru = [];
+  },
+
   get(key, method, cancellation = null, fetchIfAbsent = true) {
     let present = _has(this.cache, key);
     if (!present && !fetchIfAbsent)
