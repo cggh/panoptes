@@ -35,7 +35,7 @@ function filterAborted(xhr) {
 }
 
 function errorMessage(xhr) {
-  return `Error: ${xhr.statusText || xhr.message}`;
+  return `Error: ${xhr.statusText || xhr.message || xhr.response}`;
 }
 
 function encodeQuery(query) {
