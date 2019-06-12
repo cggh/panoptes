@@ -50,6 +50,7 @@ def response(returndata):
             sqlquery += " WHERE {0}" . format(whc.querystring_params)
         if orderBy is not None:
             sqlquery += " ORDER BY {0}" . format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
+        print(sqlquery)
         cur.execute(sqlquery, whc.queryparams)
         yield b'\t'.join(col[0].encode('ascii', 'replace') for col in cur.description) + b'\n'
         for row in cur.fetchall() :

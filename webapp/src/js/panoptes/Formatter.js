@@ -1,8 +1,4 @@
 
-let JD2DateTime = function(JD) {
-  return new Date((JD - 2440587.5) * 24 * 60 * 60 * 1000);
-};
-
 export default function(property, value, nullReplacement = 'NULL', nanReplacement = 'NULL') {
   return toDataType('property', value, nullReplacement, nanReplacement, property.decimDigits, property);
 }
@@ -17,22 +13,26 @@ function toDataType(dataType, value, nullReplacement = 'NULL', nanReplacement = 
     return nullReplacement;
   }
 
-  if (isNaN(value)) {
-    return nanReplacement;
+  if (dataType === 'date-string' || (dataType === 'property' && property.isDate)) {
+    let year = parseInt(value.substring(0, 4));
+    let month = parseInt(value.substring(5, 7));
+    let day = parseInt(value.substring(8, 10));
+    if (isNaN(year)) year = 2000;
+    if (isNaN(month)) month = 1;
+    if (isNaN(day)) day = 1;
+    let dt = new Date(year, month - 1, day, 6, 0, 0)
+    let pad = function(n) {
+      return n < 10 ? `0${n}` : n;
+    };
+    return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
   }
 
   if (dataType === 'boolean-string' || (dataType === 'property' && property.isBoolean)) {
     return value ? 'True' : 'False';
   }
 
-  if (dataType === 'date-string' || (dataType === 'property' && property.isDate)) {
-    let dt = JD2DateTime(parseFloat(value));
-    if (isNaN(dt.getTime()))
-      return '2000-01-01';
-    let pad = function(n) {
-      return n < 10 ? `0${n}` : n;
-    };
-    return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
+  if (isNaN(value)) {
+    return nanReplacement;
   }
 
   // FIXME: An isFloat property with decimDigits should probably be called an isDecimal, rather than an isFloat

@@ -20,7 +20,6 @@ import config
 from cache import getCache
 from .columnDecode import decode, name
 from .gzipstream import gzip
-from dates import datetimeToJulianDay
 
 NULL_VALUES = {
     'i1': -128,
@@ -138,12 +137,9 @@ def handler(start_response, requestData):
                 dtype = desciptionToDType(desc[1])
                 if dtype in ['i1', 'i2', 'i4', 'S']:
                     null_value = NULL_VALUES[dtype]
-                    result[col_name] = np.array([(row[i].encode('utf-8') if dtype == 'S' else row[i]) if row[
+                    result[col_name] = np.array([(str(row[i]).encode('utf-8') if dtype == 'S' else row[i]) if row[
                                                                                                                         i] is not None else null_value
                                                  for row in rows], dtype=dtype)
-                elif desc[1] == 'timestamp':
-                    result[col_name] = np.array(
-                        [datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
                 else:
                     result[col_name] = np.array([row[i] for row in rows], dtype=dtype)
             data = gzip(data=b''.join(arraybuffer.encode_array_set(list(result.items()))))

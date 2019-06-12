@@ -582,6 +582,6 @@ def desciptionToDType(col_type):
         'real': 'f4',
         'wrd': 'i4', #Monet returns this type for count(*) - it is 64bit but that is not supported by JS
         'clob': 'S',
-        'timestamp': 'f8' #We convert to this in query.py
+        'timestamp': 'S'
     }
     return dtype[col_type]

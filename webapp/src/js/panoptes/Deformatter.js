@@ -1,9 +1,5 @@
 import _indexOf from 'lodash.indexof';
 
-let DateTime2JD = function(date) {
-  return date.getTime() / (24.0 * 60 * 60 * 1000) + 2440587.5;
-};
-
 const thousandsSeparator = (function(){
   if (typeof Number.prototype.toLocaleString === 'function') {
     const num = 1000;
@@ -24,13 +20,14 @@ export default function(property, string) {
     let year = parseInt(string.substring(0, 4));
     let month = parseInt(string.substring(5, 7));
     let day = parseInt(string.substring(8, 10));
-    if (isNaN(year) && isNaN(month) && isNaN(day)) {
-      return null;
-    }
     if (isNaN(year)) year = 2000;
     if (isNaN(month)) month = 1;
     if (isNaN(day)) day = 1;
-    return DateTime2JD(new Date(year, month - 1, day, 6, 0, 0));
+    let dt = new Date(year, month - 1, day, 6, 0, 0)
+    let pad = function(n) {
+      return n < 10 ? `0${n}` : n;
+    };
+    return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
   }
 
   if (property.isFloat) {

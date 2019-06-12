@@ -26,7 +26,6 @@ from .BaseImport import BaseImport
 from .SettingsGraph import SettingsGraph
 from .PanoptesConfig import PanoptesConfig
 from .ImportSettings import valueTypes
-from dates import datetimeToJulianDay
 
 pool = multiprocessing.dummy.Pool(max(int(old_div(multiprocessing.cpu_count(),2)),1))
 
@@ -60,7 +59,7 @@ class ImportDataTable(BaseImport):
             def getDataDerivedConfigForProp(prop_id):
                 result = {}
                 prop = self._settingsLoader.getProperty(prop_id)
-                encode = datetimeToJulianDay if prop['dataType'] == 'Date' else lambda a: a
+                encode = str if prop['dataType'] == 'Date' else lambda a: a
                 if 'isCategorical' not in prop and self._dao._execSqlQuery(
                         'select count(distinct "{0}") from "{1}"'.format(prop_id, table_id))[0][0] < 50 and prop['dataType'] != 'GeoJSON':
                     result['isCategorical'] = True

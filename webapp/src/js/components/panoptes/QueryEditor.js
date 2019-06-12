@@ -170,7 +170,9 @@ let Criterion = createReactClass({
     if (currentOperator.fieldType === 'value') {
       // The defaultValue might be badly formatted, so we format it.
       // The CompValue needs to be deformatted, because it needs to be SQL-friendly.
-      newComponent.CompValue = Deformatter(property, Formatter(property, property.defaultValue));
+      ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
+        newComponent[name] = Deformatter(property, Formatter(property, property.defaultValue));
+      });
     }
 
     return newComponent;
@@ -291,7 +293,9 @@ let Criterion = createReactClass({
 
     // Set the CompValue to the property's default.
     // The defaultValue might be badly formatted, so we format it.
-    component.CompValue = Deformatter(property, Formatter(property, property.defaultValue));
+    ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
+      component[name] = Deformatter(property, Formatter(property, property.defaultValue));
+    });
 
     this.validateOperatorAndValues();
     onChange();
@@ -300,6 +304,10 @@ let Criterion = createReactClass({
   handleOperatorChange() {
     let {component, onChange} = this.props;
     component.type = this.operator.value;
+    let property = this.tableConfig().propertiesById[component.ColName];
+    ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
+      component[name] = component[name] || Deformatter(property, Formatter(property, property.defaultValue));
+    });
     this.validateOperatorAndValues();
     onChange();
   },

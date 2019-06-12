@@ -279,13 +279,14 @@ const ConfigStore = createStore({
         'Boolean': 'String',
         'GeoLatitude': 'FloatH',
         'GeoLongitude': 'FloatH',
-        'Date': 'FloatH',
+        'Date': 'Date',
         'GeoJSON': 'String'
       }[prop.dataType];
 
-      let encodingTypes = {
+      let encodingTypes = {      //NO LONGER USED FOR ENCODING - ONLY QueryEditor USES THIS
         'Generic': 'String',     //returns string data, also works for other data
         'String': 'String',      //returns string data
+        'Date': 'Float',         //returns string data
         'Float2': 'Float',       //returns floats in 2 base64 bytes
         'Float3': 'Float',       //returns floats in 3 base64 bytes
         'Float4': 'Float',       //returns floats in 4 base64 bytes
@@ -298,6 +299,7 @@ const ConfigStore = createStore({
       let fetchEncodingTypes = {
         'Generic': 'GN',
         'String': 'ST',
+        'Date': 'ST',
         'Float2': 'F2',
         'Float3': 'F3',
         'Float4': 'F4',
@@ -309,6 +311,7 @@ const ConfigStore = createStore({
       let displayEncodingTypes = {
         'Generic': 'GN',
         'String': 'ST',
+        'Date': 'ST',
         'Float2': 'FH',
         'Float3': 'FH',
         'Float4': 'FH',
@@ -349,7 +352,7 @@ const ConfigStore = createStore({
         'Boolean': true,
         'GeoLatitude': 0,
         'GeoLongitude': 0,
-        'Date': 0,
+        'Date': '2000-01-01',
         'GeoJSON': ''
       }[prop.dataType];
       if (prop.scaleColours) {
