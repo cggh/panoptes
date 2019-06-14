@@ -1,5 +1,4 @@
 import {createStore} from '@demiazz/fluxxor';
-import {scaleColour} from 'util/Colours';
 
 import Constants from '../constants/Constants';
 
@@ -14,6 +13,7 @@ import _map from 'lodash.map';
 import _sortBy from 'lodash.sortby';
 import _keys from 'lodash.keys';
 import _cloneDeep from 'lodash.clonedeep';
+import {fillGapsInColourSpec} from "../util/Colours";
 
 const ConfigStore = createStore({
 
@@ -356,36 +356,8 @@ const ConfigStore = createStore({
         if (!prop.scaleColours.thresholds) {
           prop.scaleColours.thresholds = [prop.minVal, prop.maxVal];
         }
-
-        //Interpolate thresholds where .. has been used.
-        let {thresholds, colours, interpolate} = prop.scaleColours;
-        if ((colours.length !== thresholds.length && interpolate) || (colours.length !== thresholds.length - 1 && !interpolate)) {
-          console.error(`thresholds and colours are incompatible lengths for ${prop.id}`);
-        }
-        let gaps = [];
-        let inGap = false;
-        for (let i = 0, l = colours.length; i < l; ++i) {
-          if (colours[i] === '...') {
-            if (i === 0 || i === l - 1) {
-              console.error(`... cannot be used at start or end of colours ${prop.id}`);
-            }
-            if (!inGap) {
-              inGap = true;
-              gaps.push({start: i - 1, end: i + 1});
-            } else {
-              gaps[gaps.length - 1].end = i + 1;
-            }
-          } else {
-            inGap = false;
-          }
-        }
-        for (let i = 0, l = gaps.length; i < l; ++i) {
-          let {start, end} = gaps[i];
-          let colourFunc = scaleColour([start, end], [colours[start], colours[end]]);
-          for (let j = start + 1; j < end; ++j) {
-            colours[j] = colourFunc(j);
-          }
-        }
+        prop.scaleColours = {...prop.scaleColours,
+          ...fillGapsInColourSpec({prop_id: prop.id, ...prop.scaleColours})};
       }
     });
     table.visibleProperties = _filter(table.properties, (property) => property.showInTable);

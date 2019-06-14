@@ -218,6 +218,66 @@ export function booleanColours() {
   };
 }
 
+export function fillGapsInColourSpec({colours, thresholds, interpolate, prop_id}) {
+//Interpolate thresholds where ... has been used.
+  if ((colours.length !== thresholds.length && interpolate) || (colours.length !== thresholds.length - 1 && !interpolate)) {
+    console.error(`thresholds and colours are incompatible lengths for ${prop_id}`);
+  }
+  let gaps = [];
+  let inGap = false;
+  for (let i = 0, l = colours.length; i < l; ++i) {
+    if (colours[i] === '...') {
+      if (i === 0 || i === l - 1) {
+        console.error(`... cannot be used at start or end of colours ${prop_id}`);
+      }
+      if (!inGap) {
+        inGap = true;
+        gaps.push({start: i - 1, end: i + 1});
+      } else {
+        gaps[gaps.length - 1].end = i + 1;
+      }
+    } else {
+      inGap = false;
+    }
+  }
+  for (let i = 0, l = gaps.length; i < l; ++i) {
+    let {start, end} = gaps[i];
+    let colourFunc = scaleColour([start, end], [colours[start], colours[end]]);
+    for (let j = start + 1; j < end; ++j) {
+      colours[j] = colourFunc(j);
+    }
+  }
+  return {colours, thresholds, interpolate, prop_id};
+}
+
+export function thresholdFunc({thresholds, interpolate, colours, nullColour, prop_id}) {
+  if (thresholds.length === 2) {
+    if (interpolate) {
+      let scale = scaleColour(thresholds, colours);
+      return (value) => value === undefined || value === null || _isNan(value) ? nullColour : scale(value);
+    } else {
+      return (value) => value === undefined || value === null || _isNan(value) ? nullColour : colours[0];
+    }
+  } else {
+    if (interpolate) {
+      let scales = [];
+      for (let i = 0, l = colours.length - 1; i < l; ++i) {
+        scales.push(scaleColour([thresholds[i], thresholds[i + 1]], [colours[i], colours[i + 1]]));
+      }
+      return (value) => {
+        let index = Math.max(0, Math.min(scales.length - 1, _sortedIndex(thresholds, value) - 1));
+        return value === undefined || value === null || _isNan(value) ? nullColour : scales[index](value);
+      }
+    } else {
+      return (value) => {
+        let index = Math.max(0, Math.min(colours.length - 1, _sortedLastIndex(thresholds, value) - 1));
+        if (value === thresholds[index] && index > 0) index -= 1;
+        return value === undefined || value === null || _isNan(value) ? nullColour : colours[index];
+      }
+    }
+  }
+}
+
 export function propertyColour(propConfig) {
   if (!propConfig) {
     return () => 'inherit';
@@ -240,31 +300,7 @@ export function propertyColour(propConfig) {
   let {colours, thresholds, nullColour, interpolate} = propConfig.scaleColours;
 
   //Special case the simplest to avoid invoking all the sortedIndex machinery without need
-  if (thresholds.length === 2) {
-    if (interpolate) {
-      let scale = scaleColour(thresholds, colours);
-      return (value) => value === undefined || value === null || _isNan(value) ? nullColour : scale(value);
-    } else {
-      return (value) => value === undefined || value === null || _isNan(value) ? nullColour : colours[0];
-    }
-  } else {
-    if (interpolate) {
-      let scales = [];
-      for(let i = 0, l = colours.length-1; i < l; ++i) {
-        scales.push(scaleColour([thresholds[i], thresholds[i+1]], [colours[i], colours[i+1]]));
-      }
-      return (value) => {
-        let index = Math.max(0,Math.min(scales.length - 1, _sortedIndex(thresholds, value) - 1));
-        return value === undefined || value === null || _isNan(value) ? nullColour : scales[index](value);
-      }
-    } else {
-      return (value) => {
-        let index = Math.max(0,Math.min(colours.length - 1, _sortedLastIndex(thresholds, value) - 1));
-        if (value === thresholds[index] && index > 0) index -= 1;
-        return value === undefined || value === null || _isNan(value) ? nullColour : colours[index];
-      }
-    }
-  }
+  return thresholdFunc({thresholds, interpolate, colours, nullColour, prop_id: propConfig.id});
 }
 
 // Credit: https://gist.github.com/olmokramer/82ccce673f86db7cda5e
