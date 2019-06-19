@@ -15,13 +15,22 @@ export default class MapControlComponent extends MapControl {
     let con = control({position});
     con.onAdd = (map) => {
       this.div = DomUtil.create('div', `map-custom-control ${className}`);
-      ReactDOM.render(React.cloneElement(React.Children.only(children), {flux: this.context.flux}), this.div);
       return this.div;
     };
     con.onRemove = (map) => {
       ReactDOM.unmountComponentAtNode(this.div);
     };
     return con;
+  }
+
+  render() {
+    if (this.div)
+      return ReactDOM.createPortal(
+        this.props.children,
+        this.div
+      );
+    else
+      return null;
   }
 }
 
