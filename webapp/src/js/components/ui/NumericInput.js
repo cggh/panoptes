@@ -20,6 +20,8 @@ let NumericInput = createReactClass({
   propTypes: {
     label: PropTypes.string,
     value: PropTypes.number,
+    min: PropTypes.number,
+    max: PropTypes.number,
     debounce: PropTypes.bool,
     disabled: PropTypes.bool,
     onChange: PropTypes.func.isRequired
@@ -56,10 +58,21 @@ let NumericInput = createReactClass({
   },
 
   handleChange(event) {
+    let {max, min} = this.props;
     let value = event.target.value;
     let valueNumber = parseFloat(value);
     let error = undefined;
     if (_isFinite(valueNumber)) {
+      if (min && valueNumber < min) {
+        valueNumber = min;
+        value = min.toString();
+        error = `Minimum is ${min}`
+      }
+      if (max && valueNumber > max) {
+        valueNumber = max;
+        value = max.toString();
+        error = `Maximum is ${max}`
+      }
       (this.props.debounce ? this.debouncedNotify : this.notify)(valueNumber);
     } else {
       error = 'Not a number';
