@@ -132,10 +132,10 @@ let Feed = createReactClass({
                     className="blog-list-entry-media"
                     image={thumbnail.img['@src']}
                   /> : null}
-                <Typography className="blog-list-entry-headline" variant="headline">
+                <Typography className="blog-list-entry-headline" variant="h5">
                   {title}
                 </Typography>
-                <Typography variant="subheading" color="textSecondary" paragraph={true}>
+                <Typography variant="subtitle1" color="textSecondary" paragraph={true}>
                   {subheader}
                 </Typography>
                 <Typography >

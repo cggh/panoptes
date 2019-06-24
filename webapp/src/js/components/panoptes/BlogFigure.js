@@ -13,7 +13,7 @@ class BlogFigure extends React.Component {
   render() {
     let {children, title} = this.props;
     return <Card className="blog-figure ">
-      <Typography variant="title">
+      <Typography variant="h6">
         {title}
       </Typography>
       <div className=" scroll-within" style={{padding: 0}}>
