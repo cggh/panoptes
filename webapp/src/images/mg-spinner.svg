@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="9.2502mm"
+   width="41.284mm"
+   version="1.1"
+   viewBox="0 0 146.28086 32.776332"
+   id="svg3533"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="mg-spinner2.svg">
+  <metadata
+     id="metadata3597">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3595" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2880"
+     inkscape:window-height="1681"
+     id="namedview3593"
+     showgrid="false"
+     inkscape:zoom="18.635253"
+     inkscape:cx="70.311729"
+     inkscape:cy="19.796316"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g3537" />
+  <style
+     id="style3535">
+    /* <![CDATA[ */
+
+      @-webkit-keyframes grow-right {
+        from {
+          -webkit-transform: scaleX(0.05);
+        }
+        to {
+          -webkit-transform: scaleX(1);
+        }
+      }
+
+      @-webkit-keyframes grow-left {
+        from {
+          -webkit-transform: scaleX(0.05);
+          -webkit-transform-origin: 35.918px;
+        }
+        to {
+          -webkit-transform: scaleX(1);
+          -webkit-transform-origin: 35.918px;
+        }
+      }
+      @keyframes grow-right {
+        from {
+          transform: scaleX(0.05);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      @keyframes grow-left {
+        from {
+          transform: scaleX(0.05);
+          transform-origin: 35.918px;
+        }
+        to {
+          transform: scaleX(1);
+          transform-origin: 35.918px;
+        }
+      }
+
+      @keyframes grow-right {
+        from {
+          transform: scaleX(0.05);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      @keyframes grow-left {
+        from {
+          transform: scaleX(0.05);
+          transform-origin: 35.918px;
+        }
+        to {
+          transform: scaleX(1);
+          transform-origin: 35.918px;
+        }
+      }
+
+      .right-bar {
+        -webkit-animation: grow-right 2s infinite ease-out;
+        animation: grow-right 2s infinite ease-out;
+      }
+
+      .left-bar {
+        -webkit-animation: grow-left 2s infinite ease-out;
+        animation: grow-left 2s infinite ease-out;
+      }
+
+    /* ]]> */
+
+  </style>
+  <g
+     transform="translate(-188.89 -38.337)"
+     fill="#36454f"
+     id="g3537">
+    <g
+       transform="translate(138.82 -5.6769)"
+       id="g3539">
+      <path
+         d="m63.547 44.489h7.125v18h-5.3v-5.5q0-2 0.3-5.05l0.075-1h-0.05l-3.275 11.55h-4.1l-3.275-11.55h-0.05q0.2 1.825 0.275 3.35 0.1 1.525 0.1 2.1v6.1h-5.3v-18h7.125l3.175 11.225 3.175-11.225z"
+         id="path3541" />
+      <path
+         d="m83.356 49.514q1.425 0.5 2.025 1.525 0.625 1 0.625 3.175v6.475q0 0.6 0.15 0.925t0.55 0.625v0.25h-5.375l-0.25-1.4q-1 0.925-2.175 1.35-1.15 0.425-2.75 0.425-2.125 0-3.4-1.05-1.275-1.075-1.275-2.9 0-1.875 1.325-2.95 1.35-1.075 4.775-1.4 1.675-0.15 2.45-0.425 0.775-0.3 0.775-0.925 0-0.525-0.475-0.8-0.45-0.275-1.225-0.275-1.7 0-1.825 1.275h-5q0-2.25 1.775-3.325t5.375-1.075q2.5 0 3.925 0.5zm-4.85 10.4q1.1 0 1.7-0.675 0.6-0.7 0.6-2.05v-0.5q-0.375 0.2-1.025 0.375-0.625 0.15-1.25 0.275-0.85 0.175-1.275 0.525-0.4 0.325-0.4 0.95 0 0.5 0.45 0.8t1.2 0.3z"
+         id="path3543" />
+      <path
+         d="m87.805 62.489v-18h5.2v18h-5.2z"
+         id="path3545" />
+      <path
+         d="m105.81 49.514q1.425 0.5 2.025 1.525 0.625 1 0.625 3.175v6.475q0 0.6 0.15 0.925t0.55 0.625v0.25h-5.375l-0.25-1.4q-1 0.925-2.175 1.35-1.15 0.425-2.75 0.425-2.125 0-3.4-1.05-1.275-1.075-1.275-2.9 0-1.875 1.325-2.95 1.35-1.075 4.775-1.4 1.675-0.15 2.45-0.425 0.775-0.3 0.775-0.925 0-0.525-0.475-0.8-0.45-0.275-1.225-0.275-1.7 0-1.825 1.275h-5q0-2.25 1.775-3.325t5.375-1.075q2.5 0 3.925 0.5zm-4.85 10.4q1.1 0 1.7-0.675 0.6-0.7 0.6-2.05v-0.5q-0.375 0.2-1.025 0.375-0.625 0.15-1.25 0.275-0.85 0.175-1.275 0.525-0.4 0.325-0.4 0.95 0 0.5 0.45 0.8t1.2 0.3z"
+         id="path3547" />
+      <path
+         d="m118.4 54.139q-1.7 0-2.45 0.925-0.75 0.9-0.75 2.8v4.625h-5.2v-13.1h4.725v2.65h0.05q0.575-1.575 1.525-2.3 0.975-0.725 2.475-0.725 0.3 0 0.7 0.075v5.2q-0.7-0.15-1.075-0.15z"
+         id="path3549" />
+      <path
+         d="m120.04 47.714v-3.7h5.2v3.7h-5.2zm0 14.775v-13.1h5.2v13.1h-5.2z"
+         id="path3551" />
+      <path
+         d="m138.04 49.514q1.425 0.5 2.025 1.525 0.625 1 0.625 3.175v6.475q0 0.6 0.15 0.925t0.55 0.625v0.25h-5.375l-0.25-1.4q-1 0.925-2.175 1.35-1.15 0.425-2.75 0.425-2.125 0-3.4-1.05-1.275-1.075-1.275-2.9 0-1.875 1.325-2.95 1.35-1.075 4.775-1.4 1.675-0.15 2.45-0.425 0.775-0.3 0.775-0.925 0-0.525-0.475-0.8-0.45-0.275-1.225-0.275-1.7 0-1.825 1.275h-5q0-2.25 1.775-3.325t5.375-1.075q2.5 0 3.925 0.5zm-4.85 10.4q1.1 0 1.7-0.675 0.6-0.7 0.6-2.05v-0.5q-0.375 0.2-1.025 0.375-0.625 0.15-1.25 0.275-0.85 0.175-1.275 0.525-0.4 0.325-0.4 0.95 0 0.5 0.45 0.8t1.2 0.3z"
+         id="path3553" />
+      <path
+         d="m151.24 48.414q-1.65 0-2.55 1.375-0.875 1.375-0.875 3.875 0 2.45 0.95 3.675 0.975 1.225 2.8 1.225 1 0 1.925-0.625 0.95-0.625 1.125-1.45h-2.6v-3.9h8.075v9.95h-3.8l-0.225-1.775q-1.9 2.2-5.425 2.2-2.55 0-4.525-1.1-1.975-1.125-3.1-3.225-1.1-2.1-1.1-4.925 0-2.9 1.175-5.1t3.3-3.4 4.95-1.2q3.45 0 5.725 1.775 2.3 1.775 2.8 4.9h-5.6q-0.325-1.125-1.1-1.7t-1.925-0.575z"
+         id="path3555" />
+      <path
+         d="m168.29 48.689v2.575h7.425v4.2h-7.425v2.825h9.125v4.2h-15.025v-18h14.675v4.2h-8.775z"
+         id="path3557" />
+      <path
+         d="m190.7 49.964v-5.475h5.65v18h-5.525l-6.425-9.8q0.225 3.6 0.225 4.35v5.45h-5.65v-18h5.525l6.425 9.825q-0.225-3.775-0.225-4.35z"
+         id="path3559" />
+    </g>
+    <g
+       id="g3561">
+      <g
+         transform="translate(188.89 65.969)"
+         id="g3563">
+        <path
+           class="left-bar"
+           d="m0 0h35.918v1.5023h-35.918z"
+           id="path3565" />
+      </g>
+    </g>
+    <g
+       transform="translate(298.84 65.969)"
+       id="g3567">
+      <path
+         class="right-bar"
+         d="m0 0h36.328v1.5023h-36.328z"
+         id="path3569" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:80.00000119%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#36454f;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="227.20393"
+       y="70.791367"
+       id="text3603"
+       sodipodi:linespacing="80.000001%"><tspan
+         sodipodi:role="line"
+         id="tspan3605"
+         x="227.20393"
+         y="70.791367"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.50001335px;line-height:80.00000119%;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#36454f;fill-opacity:1">REPORTER</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="413.14203"
+       y="50.185234"
+       id="text3607"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3609"
+         x="413.14203"
+         y="50.185234"></tspan></text>
+  </g>
+</svg>
