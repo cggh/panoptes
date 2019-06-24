@@ -1,7 +1,6 @@
-import '@babel/polyfill';
 import 'string.prototype.startswith';
-import createHistory from 'history/createBrowserHistory';
-const history = createHistory();
+import { createBrowserHistory } from 'history';
+const history = createBrowserHistory();
 import ComponentRegistry from 'util/ComponentRegistry';
 
 //Needed for JSX
