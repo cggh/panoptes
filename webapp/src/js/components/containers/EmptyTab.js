@@ -8,13 +8,16 @@ import FluxMixin from 'mixins/FluxMixin';
 
 import ViewList from 'panoptes/ViewList';
 import TableList from 'panoptes/TableList';
+import ConfigMixin from 'mixins/ConfigMixin';
+import DocPage from "panoptes/DocPage";
 
 let EmptyTab = createReactClass({
   displayName: 'EmptyTab',
 
   mixins: [
     PureRenderMixin,
-    FluxMixin
+    FluxMixin,
+    ConfigMixin,
   ],
 
   propTypes: {
@@ -38,13 +41,8 @@ let EmptyTab = createReactClass({
   },
 
   render() {
-    return (
-      <div className="horizontal stack start-align wrap">
-        <ViewList style={{width: '500px'}} onClick={this.handleClick} />
-        <TableList style={{width: '500px'}} onClick={this.handleClick} />
-      </div>
-    );
-  },
+      return <DocPage path='index.html'/>;
+  }
 });
 
 export default EmptyTab;
