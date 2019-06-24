@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "babel-plugin-dynamic-import-node-babel-7",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-syntax-import-meta",
@@ -38,11 +39,10 @@
             "IE >= 11",
             "last 4 Edge versions"
           ]
-        },
-        "useBuiltIns": "entry",
+        }
       }
     ],
-    "@babel/react",
+    "@babel/react"
   ],
   "env": {
     "test": {

@@ -83,7 +83,6 @@ module.exports = function(env) {
     // devtool: isProd ? 'source-map' : 'eval',
     context: __dirname,
     entry: {
-      babel: isProd ? ['@babel/polyfill'] : ["webpack-dev-server/client?http://localhost:8000", '@babel/polyfill'],
       panoptes: isProd ? [path.resolve(__dirname, 'src/js/index.js')] : ["webpack-dev-server/client?http://localhost:8000", path.resolve(__dirname, 'src/js/index.js')]
     },
     output: {
@@ -118,7 +117,7 @@ module.exports = function(env) {
           use: [
             {loader: 'style-loader'},
             {loader: 'css-loader'},
-            {loader: 'postcss-loader', options: {plugins: [autoprefixer({browsers: ['last 2 versions']})]}},
+            {loader: 'postcss-loader', options: {plugins: [autoprefixer()]}},
           ]
         },
         {
@@ -126,14 +125,29 @@ module.exports = function(env) {
           use: [
             {loader: 'style-loader'},
             {loader: 'css-loader'},
-            {loader: 'postcss-loader', options: {plugins: [autoprefixer({browsers: ['last 2 versions']})]}},
+            {loader: 'postcss-loader', options: {plugins: [autoprefixer()]}},
             {loader: 'sass-loader'},
           ]
         },
-        {test: /\.(png|jpg|ico|xml)$/, loader: 'url-loader?limit=64000'},
+        {test: /\.(png|jpg|ico|xml)$/, use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 64000
+              },
+            },
+          ],
+        },
         {
-          test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-          loader: 'url-loader?prefix=font/&limit=5000&mimetype=application/font-woff'
+          test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, use: [
+            {
+              loader: 'url-loader',
+              options: {
+                mimetype: 'application/font-woff',
+                limit: 64000
+              },
+            },
+          ],
         },
         {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader?prefix=font/'},
         // {test: /\.json$/, loader: 'file-loader'},

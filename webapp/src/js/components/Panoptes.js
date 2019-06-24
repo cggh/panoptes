@@ -278,6 +278,6 @@ let Header = createReactClass({
   },
 });
 
-Panoptes = withTheme()(Panoptes);
+Panoptes = withTheme(Panoptes);
 Panoptes.displayName = "Panoptes";
 export default Panoptes;
