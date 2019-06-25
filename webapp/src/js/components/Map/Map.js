@@ -4,6 +4,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import displayName from 'util/getDisplayName';
 import 'leaflet-loading/src/Control.Loading.js';
+import 'leaflet-easyprint';
+import MapControlComponent from "components/Map/MapControlComponent";
 
 //Panoptes
 import filterChildren from 'util/filterChildren';
@@ -59,7 +61,8 @@ let Map = createReactClass({
     onChange: PropTypes.func,
     title: PropTypes.string,
     zoom: PropTypes.number,
-    disableInteraction: PropTypes.bool
+    disableInteraction: PropTypes.bool,
+    printButton: PropTypes.bool,
   },
 
   childContextTypes: {
@@ -79,7 +82,9 @@ let Map = createReactClass({
     // because render() relies on undefined to indicate that they have not already been set in the session (then decide a default).
     return {
       center: undefined,
-      zoom: undefined
+      zoom: undefined,
+      disableInteraction: false,
+      printButton: false
     };
   },
 
@@ -118,6 +123,11 @@ let Map = createReactClass({
         map._container.addEventListener("touchmove", this.onTouch);
         map._container.addEventListener("touchend", this.onTouch);
     }
+
+    this.printer = L.easyPrint({
+      filename: 'map-download.png',
+      exportOnly: true,
+    }).addTo(this.map.leafletElement);
   },
 
   // Event handlers
@@ -184,7 +194,7 @@ let Map = createReactClass({
   },
 
   render() {
-    let {center, children, zoom, disableInteraction} = this.props;
+    let {center, children, zoom, disableInteraction, printButton} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     let {bounds, loadStatus} = this.state;
 
@@ -227,6 +237,8 @@ let Map = createReactClass({
     // TODO: Tidy up this logic. Maybe extract into functions?
     // Is similar logic needed elsewhere?
 
+    let printButtonControl = <MapControlComponent position="bottomright"> SAVE </MapControlComponent>
+
     if (children && children.length) {
 
       // If children is iterable and not empty (i.e. Map has real children).
@@ -259,6 +271,7 @@ let Map = createReactClass({
           >
             <TileLayer key="0" />
             {children}
+            {printButton ? printButtonControl : null}
           </LeafletMap>
         );
 
@@ -272,7 +285,9 @@ let Map = createReactClass({
             {...commonMapProps}
             center={center}
             zoom={zoom}
-          >{children}</LeafletMap>
+          >{children}
+            {printButton ? printButtonControl : null}
+          </LeafletMap>
         );
 
       }
@@ -301,7 +316,10 @@ let Map = createReactClass({
               {...commonMapProps}
               center={center}
               zoom={zoom}
-            >{augmentedChild}</LeafletMap>
+            >
+              {augmentedChild}
+              {printButton ? printButtonControl : null}
+            </LeafletMap>
           );
 
         } else {
@@ -313,7 +331,10 @@ let Map = createReactClass({
               {...commonMapProps}
               center={center}
               zoom={zoom}
-            >{children}</LeafletMap>
+            >
+              {children}
+              {printButton ? printButtonControl : null}
+            </LeafletMap>
           );
 
         }
@@ -331,6 +352,7 @@ let Map = createReactClass({
             zoom={zoom}
           >
             <TileLayer />
+            {printButton ? printButtonControl : null}
           </LeafletMap>
         );
 
