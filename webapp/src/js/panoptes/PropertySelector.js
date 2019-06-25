@@ -35,12 +35,14 @@ const PropertySelector = createReactClass({
     filter: PropTypes.func,
     onSelect: PropTypes.func,
     label: PropTypes.string,
-    allowNull: PropTypes.bool
+    allowNull: PropTypes.bool,
+    fullWidth: PropTypes.bool
   },
 
   getDefaultProps() {
     return {
-      filter: () => true
+      filter: () => true,
+      fullWidth: true
     };
   },
 
@@ -87,7 +89,7 @@ const PropertySelector = createReactClass({
     }
 
     return (
-      <FormControl style={{minWidth: '100px'}} fullWidth={true}>
+      <FormControl style={{minWidth: '100px'}} fullWidth={this.props.fullWidth}>
         <InputLabel htmlFor={this.state.uid}>{label}</InputLabel>
         <Select
           autoWidth={true}
