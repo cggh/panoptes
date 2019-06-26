@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from  'react';
+import React from 'react';
 import createReactClass from 'create-react-class';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
@@ -26,15 +26,14 @@ import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 // Material UI
 import IconButton from '@material-ui/core/IconButton';
-// import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
-// import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import createPalette from '@material-ui/core/styles/createPalette';
 import createTypography from '@material-ui/core/styles/createTypography';
 import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import {withTheme} from '@material-ui/core/styles';
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
-
+import {MuiPickersUtilsProvider} from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 //https://github.com/facebook/flow/issues/380
 import {blue, pink} from '@material-ui/core/colors';
 import {A200 as pinkA200} from '@material-ui/core/colors/pink';
@@ -46,6 +45,9 @@ import DetectResize from 'utils/DetectResize';
 import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
+
+import moment from 'moment';
+moment.locale('en-gb');
 
 const palette = createPalette({
   primary: blue,
@@ -125,64 +127,67 @@ let Panoptes = createReactClass({
     // NB: initialConfig is actually defined (in index.html)
     return (
       <DetectResize onResize={this.handleResize}>
-        <MuiThemeProvider theme={muiTheme}>
-          <div>
-            <div className="loading-container">
-              <div className="spinner" />
-            </div>
-            <div className="page">
-              <Header dataset={config.dataset} url={panoptes.get('url')} name={config.settings.nameBanner} logo={initialConfig.logo}/>
-              <div className="body">
-                <TabbedArea activeTab={tabs.get('selectedTab')}
-                  unclosableTabs={tabs.get('unclosableTabs')}
-                  unreplaceableTabs={tabs.get('unreplaceableTabs')}
-                  onSwitch={actions.tabSwitch}
-                  onClose={actions.tabClose}
-                  onAddTab={actions.tabOpen}
-                  onDragAway={actions.tabPopOut}
-                >
-                  {tabs.get('components').map((compId) =>
-                    <TabPane
-                      compId={compId}
-                      key={compId}>
-                      <SessionComponent compId={compId} />
-                    </TabPane>
-                  ).toArray()}
-                </TabbedArea>
+        <MuiPickersUtilsProvider utils={MomentUtils} moment={moment} locale="en-gb">
+          <MuiThemeProvider theme={muiTheme}>
+            <div>
+              <div className="loading-container">
+                <div className="spinner"/>
               </div>
+              <div className="page">
+                <Header dataset={config.dataset} url={panoptes.get('url')} name={config.settings.nameBanner}
+                        logo={initialConfig.logo}/>
+                <div className="body">
+                  <TabbedArea activeTab={tabs.get('selectedTab')}
+                              unclosableTabs={tabs.get('unclosableTabs')}
+                              unreplaceableTabs={tabs.get('unreplaceableTabs')}
+                              onSwitch={actions.tabSwitch}
+                              onClose={actions.tabClose}
+                              onAddTab={actions.tabOpen}
+                              onDragAway={actions.tabPopOut}
+                  >
+                    {tabs.get('components').map((compId) =>
+                      <TabPane
+                        compId={compId}
+                        key={compId}>
+                        <SessionComponent compId={compId}/>
+                      </TabPane>
+                    ).toArray()}
+                  </TabbedArea>
+                </div>
+              </div>
+              <Popups>
+                {popups.get('components').map((compId) => {
+                  let state = popups.getIn(['state', compId]);
+                  let {x, y} = state.get('position', Map()).toJS();
+                  let {width, height} = state.get('size', Map()).toJS();
+                  return (
+                    <Popup
+                      initialX={x}
+                      initialY={y}
+                      initialWidth={width}
+                      initialHeight={height}
+                      compId={compId}
+                      key={compId}
+                      onMoveStop={actions.popupMove.bind(this, compId)}
+                      onResizeStop={actions.popupResize.bind(this, compId)}
+                      onClose={actions.popupClose.bind(this, compId)}
+                      onMaximise={actions.popupToTab.bind(this, compId)}
+                      onClick={actions.popupFocus.bind(this, compId)}>
+                      <SessionComponent compId={compId}/>
+                    </Popup>
+                  );
+                }).toArray()}
+              </Popups>
+              <Modal visible={!!modal}
+                     onClose={actions.modalClose}>
+                {modal ?
+                  React.cloneElement(modal, {setProps: actions.modalSetProps})
+                  : null}
+              </Modal>
+              <NotificationSystem ref={(ref) => this.notificationSystem = ref}/>
             </div>
-            <Popups>
-              {popups.get('components').map((compId) => {
-                let state = popups.getIn(['state', compId]);
-                let {x, y} = state.get('position', Map()).toJS();
-                let {width, height} = state.get('size', Map()).toJS();
-                return (
-                  <Popup
-                    initialX={x}
-                    initialY={y}
-                    initialWidth={width}
-                    initialHeight={height}
-                    compId={compId}
-                    key={compId}
-                    onMoveStop={actions.popupMove.bind(this, compId)}
-                    onResizeStop={actions.popupResize.bind(this, compId)}
-                    onClose={actions.popupClose.bind(this, compId)}
-                    onMaximise={actions.popupToTab.bind(this, compId)}
-                    onClick={actions.popupFocus.bind(this, compId)}>
-                    <SessionComponent compId={compId} />
-                  </Popup>
-                );
-              }).toArray()}
-            </Popups>
-            <Modal visible={modal ? true : false}
-              onClose={actions.modalClose}>
-              {modal ?
-                React.cloneElement(modal, {setProps: actions.modalSetProps})
-                : null}
-            </Modal>
-            <NotificationSystem ref={(ref) => this.notificationSystem = ref}/>
-          </div>
-        </MuiThemeProvider>
+          </MuiThemeProvider>
+        </MuiPickersUtilsProvider>
       </DetectResize>
     );
   },
@@ -207,7 +212,8 @@ let Header = createReactClass({
   handlePageLinkClick() {
     let introContent = 'Here\'s the link for this page, which you can copy and paste elsewhere: ';
     let selectedContent = window.location.href;
-    this.getFlux().actions.session.modalOpen(<Copy title="Page Link" introContent={introContent} selectedContent={selectedContent}/>);
+    this.getFlux().actions.session.modalOpen(<Copy title="Page Link" introContent={introContent}
+                                                   selectedContent={selectedContent}/>);
   },
 
   handleSaveInitialSession() {
@@ -232,9 +238,10 @@ let Header = createReactClass({
     const userId = this.config.user.id;
     return (
       <div className="header">
-        <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a></div>
+        <div className="title"><a href={`/panoptes/${dataset}`}><HTMLWithComponents>{name}</HTMLWithComponents></a>
+        </div>
         <div className="username">
-          { this.config.cas.service ? (userId == 'anonymous' ?
+          {this.config.cas.service ? (userId == 'anonymous' ?
             <a href={`${this.config.cas.service}?service=${url}`}>Login</a>
             : <span>
               {userId}
@@ -261,7 +268,7 @@ let Header = createReactClass({
         >
           <IconButton
             className="fa fa-search"
-            onClick={() => actions.session.modalOpen(<Finder />)}
+            onClick={() => actions.session.modalOpen(<Finder/>)}
           />
         </Tooltip>
         <Tooltip

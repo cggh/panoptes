@@ -28,6 +28,7 @@ module.exports = function(env) {
       // Include leading and trailing forward slashes when not empty.
       'process.env.DATASET_URL_PATH_PREFIX': JSON.stringify(datasetUrlPathPrefix),
     }),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), //Avoid importing all locales from moment
   ];
 
   if (isProd) {
@@ -150,12 +151,6 @@ module.exports = function(env) {
           ],
         },
         {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader?prefix=font/'},
-        // {test: /\.json$/, loader: 'file-loader'},
-        //Filter out this module as it is large and we don't need it (used by "date" handlebars helper)
-        {
-          test: path.resolve(__dirname, 'node_modules/moment'),
-          use: 'null-loader'
-        },
         {
           test: path.resolve(__dirname, 'node_modules/chalk'),
           use: 'null-loader'
