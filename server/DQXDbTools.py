@@ -496,24 +496,28 @@ class WhereClause:
             if operatorstr == 'CONTAINS':
                 operatorstr = 'LIKE'
                 decoval = '%{0}%'.format(decoval)
-            if operatorstr == 'NOTCONTAINS':
+            elif operatorstr == 'NOTCONTAINS':
                 operatorstr = 'NOT LIKE'
                 decoval = '%{0}%'.format(decoval)
-            if operatorstr == 'STARTSWITH':
+            elif operatorstr == 'STARTSWITH':
                 operatorstr = 'LIKE'
                 decoval = '{0}%'.format(decoval)
-            if operatorstr == 'ENDSWITH':
+            elif operatorstr == 'ENDSWITH':
                 operatorstr = 'LIKE'
                 decoval = '%{0}'.format(decoval)
-            if operatorstr == 'CONTAINS_CASE_INSENSITIVE':
+            elif operatorstr == 'CONTAINS_CASE_INSENSITIVE':
                 operatorstr = 'LIKE'
                 decoval = '%{0}%'.format(decoval)
                 self.querystring += DBCOLESC(statm['ColName']) + ' ' + ToSafeIdentifier(operatorstr) + ' '
+                print('{0} {1} {2}'.format(
+                    'UPPER(' + DBCOLESC(statm['ColName']) + ')',
+                    ToSafeIdentifier(operatorstr),
+                    'UPPER(' + self.ParameterPlaceHolder) + ')')
                 self.querystring_params += '{0} {1} {2}'.format(
                     'UPPER(' + DBCOLESC(statm['ColName']) + ')',
                     ToSafeIdentifier(operatorstr),
                     'UPPER(' + self.ParameterPlaceHolder) + ')'
-            if operatorstr == 'NOT_CONTAINS_CASE_INSENSITIVE':
+            elif operatorstr == 'NOT_CONTAINS_CASE_INSENSITIVE':
                 operatorstr = 'NOT LIKE'
                 decoval = '%{0}%'.format(decoval)
                 self.querystring += DBCOLESC(statm['ColName']) + ' ' + ToSafeIdentifier(operatorstr) + ' '
