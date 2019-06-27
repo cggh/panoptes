@@ -10,6 +10,9 @@ import _filter from 'lodash.filter';
 import _map from 'lodash.map';
 import _forEach from 'lodash.foreach';
 import _assign from 'lodash.assign';
+import _union from 'lodash.union';
+import _difference from 'lodash.difference';
+import _intersection from 'lodash.intersection';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -24,6 +27,10 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
 import SearchIcon from '@material-ui/icons/Search';
 import MuiButton from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -41,6 +48,7 @@ import FilterButton from 'panoptes/FilterButton';
 import PivotTableWithActions from 'containers/PivotTableWithActions';
 import TablePlotActions from 'components/TablePlotActions';
 import QueryPicker from 'containers/QueryPicker';
+import SelectWithNativeFallback from "../panoptes/SelectWithNativeFallback";
 
 let DataTableWithActions = createReactClass({
   displayName: 'DataTableWithActions',
@@ -313,7 +321,7 @@ let DataTableWithActions = createReactClass({
 
   render() {
 
-    let {table, columns, columnWidths, order, sidebar, setProps, searchText, maxRowsPerPage} = this.props;
+    let {table, columns, columnWidths, order, sidebar, setProps, searchText, maxRowsPerPage, ...otherProps} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
     if (!columns) {
       columns = _filter(this.tableConfig().visibleProperties, (prop) => prop.showByDefault);
@@ -329,28 +337,7 @@ let DataTableWithActions = createReactClass({
 
     }
     let searchGUI = (
-      <Button
-        label="Find text"
-        disabled={columns.length === 0}
-        color="primary"
-        onClick={this.handleSearchOpen}
-        iconName="search"
-      />
-    );
-    if (searchOpen) {
-      searchGUI = (
         <div style={{margin: '0 18px'}}>
-          <Button
-            raised="true"
-            label="Find text"
-            disabled={columns.length === 0}
-            color="primary"
-            iconName="search"
-            iconInverse={true}
-          />
-          <div style={{margin: '8px 0'}}>
-            Searchable columns: {quickFindFieldsList}
-          </div>
           <TextField
             fullWidth={true}
             label="Text to find"
@@ -360,9 +347,11 @@ let DataTableWithActions = createReactClass({
             variant="outlined"
             style={{margin: '8px 0'}}
           />
+          <div style={{margin: '-7px 0px 8px 3px', fontSize:'0.8rem'}}>
+            Searching: {quickFindFieldsList}
+          </div>
         </div>
       );
-    }
 
     let dataTableQuery = this.createDataTableQuery();
 
@@ -378,18 +367,65 @@ let DataTableWithActions = createReactClass({
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
         <Divider/>
+        <FormControl>
+          <FormLabel>Filters</FormLabel>
+        </FormControl>
+        <div className='aspis-study-filter'>
+            <SelectWithNativeFallback
+              helperText="Study"
+              value={otherProps.studyFilter}
+              fullWidth={true}
+              options={_map(this.tableConfig().propertiesById.study_id.distinctValues, (study) => ({value: study, label: study}))}
+              onChange={(value) => setProps({studyFilter: value, query:
+                  `{"whcClass":"comparefixed","isCompound":false,"ColName":"study_id","CompValue":"${value}","isRoot":true,"Tpe":"="}`})}
+            />
+        </div>
         <div className="sidebar-body">
-          <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
+          <FilterButton table={table} query={this.getDefinedQuery()} onPick={(query) => {
+            setProps({studyFilter: null});
+            this.handleQueryPick(query)
+          }}/>
+          {searchGUI}
+        </div>
+        <Divider />
+        <FormControl>
+          <FormLabel>Column groups</FormLabel>
+          {this.tableConfig().propertyGroups.map(({id, name, visibleProperties}) => {
+            let groupProps = _map(visibleProperties, (prop) => prop.id);
+            if (groupProps.length == 0) return null;
+            let fullyMatched = _intersection(columns, groupProps).length === visibleProperties.length;
+            let someMatched = _intersection(columns, groupProps).length > 0;
+            return <FormControlLabel
+              control={
+                <Checkbox
+                  key={id}
+                  checked={someMatched}
+                  indeterminate={someMatched && !fullyMatched}
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      this.handleColumnChange(_union(columns, groupProps))
+                    } else {
+                      this.handleColumnChange(_difference(columns, groupProps))
+                    }
+                  }}
+                  value="checked"
+                  color="primary"
+                  className="aspis-map-control"
+                />
+              }
+              label={name}
+            />
+          })}
           <Button
             label={columnPickerLabel}
             color="primary"
             onClick={this.handleOpenColumnPicker}
             iconName="columns"
           />
-          {searchGUI}
-        </div>
-        <Divider/>
-        <div className="sidebar-body">
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Actions</FormLabel>
           <Button
             label="Download data"
             disabled={columns.length === 0}
@@ -398,18 +434,20 @@ let DataTableWithActions = createReactClass({
             iconName="download"
           />
           <Button
+            style={{color:"white"}}
             label="Pivot Table"
             color="primary"
             onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
             iconName="table"
           />
           <Button
+            style={{color:"white"}}
             label="Plot Table"
             color="primary"
             onClick={() => this.flux.actions.session.tabOpen(<TablePlotActions table={table} query={dataTableQuery}/>, true)}
             iconName="chart-bar"
           />
-        </div>
+        </FormControl>
       </div>
     );
 
