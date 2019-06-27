@@ -376,6 +376,7 @@ let DataTableView = createReactClass({
                 } else if (calculatedColumnWidths !== undefined && calculatedColumnWidths[columnData.tableId] !== undefined) {
                   columnWidth = calculatedColumnWidths[columnData.tableId][columnData.id] || PREDEFINED_COLUMN_WIDTH;
                 }
+                if (rows.length > 0 && !rows[0][columnData.tableId === table ? id : `${columnData.tableId}.${id}`]) return null;
                 return (
                   <Column
                     width={columnWidth}
