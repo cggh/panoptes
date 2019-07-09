@@ -8,11 +8,11 @@ TIMEOUT = 30
 # Server side file locations
 #########################################################################################################
 # Directory where disk-held data will be stored by panoptes - created if not existing
-BASEDIR = '/var/lib/Panoptes/basedir'
+BASEDIR = '/panoptes/basedir'
 
 #Dir which is scanned for data to import  - created if not existing
 #If this is empty, examples datasets will be copied to it
-SOURCEDATADIR = '/var/lib/Panoptes/sourcedir'
+SOURCEDATADIR = '/panoptes/sourcedir'
 
 ###########################################################################################################
 # CAS authentication
