@@ -974,10 +974,6 @@
     eventemitter3 "3.0.0"
     object-path "0.11.4"
 
-"@elstats/percentile@^3.3.0":
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@elstats/percentile/-/percentile-3.3.0.tgz#eb54fdf3bce36bc252ec6f2a0727b606cc42ff44"
-
 "@emotion/hash@^0.7.1":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.7.1.tgz#9833722341379fb7d67f06a4b00ab3c37913da53"
@@ -7443,8 +7439,9 @@ locate-path@^3.0.0:
     path-exists "^3.0.0"
 
 lodash-es@^4.0.0, lodash-es@^4.2.1:
-  version "4.17.11"
-  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.11.tgz#145ab4a7ac5c5e52a3531fb4f310255a152b4be0"
+  version "4.17.14"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.14.tgz#12a95a963cc5955683cee3b74e85458954f37ecc"
+  integrity sha512-7zchRrGa8UZXjD/4ivUWP1867jDkhzTG2c/uj739utSd7O/pFFdxspCemIFKEEjErbcqRzn8nKnGsi7mvTgRPA==
 
 lodash._getnative@^3.0.0:
   version "3.9.1"
