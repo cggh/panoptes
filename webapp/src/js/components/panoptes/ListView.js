@@ -181,7 +181,6 @@ let ListView = createReactClass({
                     {itemTemplate}
                   </Highlight>
                 }
-                secondary="Import and configure datasets"
               />
             </ListItem>
           );
