@@ -82,7 +82,8 @@ let DataTableWithActions = createReactClass({
       sidebar: true,
       initialSearchFocus: false,
       searchText: '',
-      maxRowsPerPage: 250
+      maxRowsPerPage: 250,
+      studyFilter: null
     };
   },
 
@@ -256,7 +257,7 @@ let DataTableWithActions = createReactClass({
 
   createDataTableQuery() {
 
-    const {searchText} = this.props;
+    const {searchText, studyFilter} = this.props;
 
     // If there is searchText, then add the searchQuery to the base query, to form the dataTableQuery.
     let dataTableQuery = this.getDefinedQuery();
@@ -295,9 +296,20 @@ let DataTableWithActions = createReactClass({
         newAND.addComponent(searchQueryUnencoded);
         dataTableQuery = SQL.WhereClause.encode(newAND);
       }
-
     }
 
+    if (studyFilter) {
+      let query = SQL.WhereClause.decode(dataTableQuery);
+      let studyQuery = SQL.WhereClause.CompareFixed('study_id', '=', studyFilter);
+      if (query.isTrivial) {
+        dataTableQuery = SQL.WhereClause.encode(studyQuery);
+      } else {
+        let newAND = SQL.WhereClause.Compound('AND');
+        newAND.addComponent(_clone(query));
+        newAND.addComponent(studyQuery);
+        dataTableQuery = SQL.WhereClause.encode(newAND);
+      }
+    }
     return dataTableQuery;
   },
 
@@ -376,13 +388,11 @@ let DataTableWithActions = createReactClass({
               value={otherProps.studyFilter}
               fullWidth={true}
               options={_map(this.tableConfig().propertiesById.study_id.distinctValues, (study) => ({value: study, label: study}))}
-              onChange={(value) => setProps({studyFilter: value, query:
-                  `{"whcClass":"comparefixed","isCompound":false,"ColName":"study_id","CompValue":"${value}","isRoot":true,"Tpe":"="}`})}
+              onChange={(value) => setProps({studyFilter: value})}
             />
         </div>
         <div className="sidebar-body">
           <FilterButton table={table} query={this.getDefinedQuery()} onPick={(query) => {
-            setProps({studyFilter: null});
             this.handleQueryPick(query)
           }}/>
           {searchGUI}
