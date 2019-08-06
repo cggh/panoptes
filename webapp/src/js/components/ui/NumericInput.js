@@ -37,7 +37,8 @@ let NumericInput = createReactClass({
 
   getInitialState() {
     return {
-      value: this.props.value.toString(),
+      value: this.props.value,
+      text: this.props.value.toString(),
       error: undefined
     };
   },
@@ -59,34 +60,34 @@ let NumericInput = createReactClass({
 
   handleChange(event) {
     let {max, min} = this.props;
-    let value = event.target.value;
-    let valueNumber = parseFloat(value);
+    let text = event.target.value;
+    let value = parseFloat(text);
     let error = undefined;
-    if (_isFinite(valueNumber)) {
-      if (min && valueNumber < min) {
-        valueNumber = min;
-        value = min.toString();
-        error = `Minimum is ${min}`
+    if (_isFinite(value)) {
+      if (min && value < min) {
+        value = min;
+        error = `Minimum is ${min}`;
       }
-      if (max && valueNumber > max) {
-        valueNumber = max;
-        value = max.toString();
-        error = `Maximum is ${max}`
+      if (max && value > max) {
+        value = max;
+        error = `Maximum is ${max}`;
       }
-      (this.props.debounce ? this.debouncedNotify : this.notify)(valueNumber);
+      this.setState({value});
+      (this.props.debounce ? this.debouncedNotify : this.notify)(value);
     } else {
       error = 'Not a number';
     }
-    this.setState({value, error});
+    this.setState({text, error});
+
   },
 
   handleBlur() {
-    this.setState({value: this.props.value.toString()});
+    this.setState({text: this.state.value.toString()});
   },
 
   render() {
     let {label, width, disabled} = this.props;
-    let {error, value} = this.state;
+    let {error, text} = this.state;
     return (
       <FormControl error={!!error} aria-describedby="name-error-text">
         <InputLabel htmlFor="name-error">{label}</InputLabel>
@@ -94,7 +95,7 @@ let NumericInput = createReactClass({
                 type="number"
                 style={{width: `${width * 30}px`}}
                 inputRef={(node) => this.textField = node}
-                value={value}
+                value={text}
                 onBlur={this.handleBlur}
                 onChange={this.handleChange} />
         {error ? <FormHelperText id="name-error-text">{error}</FormHelperText> : null}
