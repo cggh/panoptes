@@ -29,8 +29,10 @@ export default class MapControlComponent extends MapControl {
         this.props.children,
         this.div
       );
-    else
+    else {
+      this.forceUpdate(); //We need a second render as onAdd is only triggered by the first.
       return null;
+    }
   }
 }
 

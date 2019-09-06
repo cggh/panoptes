@@ -109,12 +109,12 @@ let ListWithActions = createReactClass({
       <div className="sidebar" style={{height: '100%'}}>
         <div className="item-picker vertical stack">
           <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
-          <Button
-            label="Download data"
-            color="primary"
-            onClick={() => this.handleDownload()}
-            iconName="download"
-          />
+          {/*<Button*/}
+          {/*  label="Download data"*/}
+          {/*  color="primary"*/}
+          {/*  onClick={() => this.handleDownload()}*/}
+          {/*  iconName="download"*/}
+          {/*/>*/}
           <div className="search">
             <TextField ref={(ref) => this.search = ref}
               fullWidth={true}
