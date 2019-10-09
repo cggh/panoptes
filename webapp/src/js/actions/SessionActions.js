@@ -58,13 +58,14 @@ let SessionActions = {
   tabClose(compId) {
     this.dispatch(SESSION.TAB_CLOSE, {compId});
   },
-  tabOpen(component, switchTo = true) {
+  tabOpen(component, switchTo = true, reuse = false) {
     if (!component) {
       component = <EmptyTab />;
     }
     this.dispatch(SESSION.TAB_OPEN, {
       component: serialiseComponent(component),
-      switchTo
+      switchTo,
+      reuse
     });
   },
   tabPopOut(compId, pos) {

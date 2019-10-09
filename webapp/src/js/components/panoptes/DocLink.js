@@ -33,7 +33,7 @@ let DocLink = createReactClass({
       if (replaceParent) {
         replaceParent(<DocPage path={href} />);
       } else {
-        this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, true);
+        this.getFlux().actions.session.tabOpen(<DocPage path={href} {...other}/>, true, true);
       }
     }
   },
