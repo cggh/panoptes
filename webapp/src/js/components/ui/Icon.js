@@ -122,7 +122,7 @@ let Icon = createReactClass({
 
     if (_startsWith(name, 'bitmap:') || _startsWith(name, 'image:') || _startsWith(name, 'docimage:')) {
       const fileName = name.split(':')[1];
-      return <img className={classNames} style={style} {...otherProps} src={baseURL !== undefined ? baseURL + fileName : dynamicRequire(fileName)} />;
+      return <img className={classNames} style={style} {...otherProps} src={baseURL !== undefined ? baseURL + fileName : dynamicRequire(fileName).default} />;
     } else if (_startsWith(name, 'mui:')) {
       const iconFontLigatureName = name.split(':')[1];
       return <MuiIcon className={classes.icon} classes={classes} style={style} color={color}>{iconFontLigatureName}</MuiIcon>;
