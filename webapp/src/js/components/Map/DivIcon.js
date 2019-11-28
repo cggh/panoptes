@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React, {Children} from 'react';
 import {render, unmountComponentAtNode} from 'react-dom';
 import {DivIcon as LeafletDivIcon, marker} from 'leaflet';
-import {MapLayer, Popup, PropTypes as mapPropTypes} from 'react-leaflet';
+import {MapLayer, Popup} from 'react-leaflet';
 
 export default class DivIcon extends MapLayer {
   static displayName = 'DivIcon';
@@ -24,8 +24,8 @@ export default class DivIcon extends MapLayer {
 
   static contextTypes = {
     flux: PropTypes.object,
-    map: mapPropTypes.map,
-    layerContainer: mapPropTypes.layerContainer,
+    map: PropTypes.object,
+    layerContainer: PropTypes.object,
     pane: PropTypes.string
   };
 
