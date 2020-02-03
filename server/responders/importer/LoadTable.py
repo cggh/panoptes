@@ -104,7 +104,7 @@ class LoadTable(threading.Thread):
             cols = ','.join(col for (i,col) in additional_cols)
             positions = ','.join(str(i+1) for (i,col) in additional_cols)
             raise Exception("Data file for %s contains column(s) %s at position(s) %s not seen in settings. You can "
-                            "cut out this column with 'cut -f %s data --complement'" % (tableid, cols, positions, positions))
+                            "cut out this column with 'cut -f %s data --complement'" % (self._tableId, cols, positions, positions))
         #Table order has to be file order
         for col in header_names:
             st = DBCOLESC(self._loadSettings.getPropertyValue(col,'id'))
