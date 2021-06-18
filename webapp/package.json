@@ -208,7 +208,7 @@
     "scrollbar-size": "^2.1.0",
     "shallow-equals": "1.0.0",
     "string.prototype.startswith": "^0.2.0",
-    "striptags": "^3.1.1",
+    "striptags": "^3.2.0",
     "title-case": "^2.1.0",
     "tween.js": "^16.6.0",
     "uid": "0.0.2",
